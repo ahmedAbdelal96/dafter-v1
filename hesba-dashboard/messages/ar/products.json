@@ -1,0 +1,99 @@
+{
+  "pageTitle": "المنتجات | دفتر",
+  "pageDescription": "إدارة كتالوج المنتجات والتسعير وحالة الإتاحة.",
+  "title": "المنتجات",
+  "subtitle": "أنشئ كتالوج المنتجات وحدثه لتسريع إنشاء الفواتير.",
+  "summary": {
+    "total": "إجمالي المنتجات: {count}"
+  },
+  "filters": {
+    "searchPlaceholder": "ابحث بالاسم أو الكود أو الوصف",
+    "categoryPlaceholder": "فلترة حسب التصنيف",
+    "allStatuses": "كل الحالات",
+    "perPage": "{count} لكل صفحة"
+  },
+  "table": {
+    "ariaLabel": "جدول المنتجات",
+    "name": "الاسم",
+    "sku": "الكود",
+    "category": "التصنيف",
+    "unit": "الوحدة",
+    "unitPrice": "سعر الوحدة",
+    "status": "الحالة",
+    "description": "الوصف"
+  },
+  "status": {
+    "active": "نشط",
+    "inactive": "غير نشط"
+  },
+  "form": {
+    "name": "اسم المنتج",
+    "description": "الوصف",
+    "sku": "كود المنتج",
+    "category": "التصنيف",
+    "unit": "الوحدة",
+    "unitPrice": "سعر الوحدة",
+    "isActive": "المنتج نشط"
+  },
+  "actions": {
+    "addProduct": "إضافة منتج",
+    "exportExcel": "تصدير Excel",
+    "exporting": "جارٍ التصدير...",
+    "create": "إنشاء",
+    "save": "حفظ التعديلات",
+    "saving": "جارٍ الحفظ...",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "view": "عرض التفاصيل",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "loading": "جارٍ التحميل..."
+  },
+  "modal": {
+    "createTitle": "إضافة منتج جديد",
+    "createDescription": "أدخل بيانات المنتج لإضافته إلى الكتالوج.",
+    "editTitle": "تعديل المنتج",
+    "editDescription": "حدّث بيانات المنتج والتسعير والحالة."
+  },
+  "details": {
+    "pageTitle": "تفاصيل المنتج | دفتر",
+    "pageDescription": "عرض بيانات المنتج والتسعير ومعلومات الإنشاء.",
+    "title": "تفاصيل المنتج",
+    "subtitle": "راجع بيانات المنتج وحالته من صفحة واحدة.",
+    "backToList": "الرجوع إلى المنتجات",
+    "meta": {
+      "createdBy": "أُنشئ بواسطة",
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "آخر تحديث"
+    }
+  },
+  "empty": {
+    "title": "لا توجد منتجات بعد",
+    "description": "ابدأ بإضافة أول منتج لاستخدامه في الفواتير."
+  },
+  "messages": {
+    "createSuccess": "تم إنشاء المنتج بنجاح.",
+    "createError": "تعذر إنشاء المنتج.",
+    "updateSuccess": "تم تحديث المنتج بنجاح.",
+    "updateError": "تعذر تحديث المنتج.",
+    "deleteSuccess": "تم حذف المنتج بنجاح.",
+    "deleteError": "تعذر حذف المنتج.",
+    "exportSuccess": "تم تصدير المنتجات بنجاح.",
+    "exportError": "تعذر تصدير المنتجات.",
+    "exportEmpty": "لا توجد بيانات منتجات للتصدير."
+  },
+  "export": {
+    "sheetName": "المنتجات",
+    "filePrefix": "المنتجات"
+  },
+  "exportModal": {
+    "title": "تصدير المنتجات",
+    "description": "حدّد الحد الأقصى للصفوف قبل تنزيل ملف Excel.",
+    "maxRecords": "الحد الأقصى للصفوف",
+    "maxRecordsHint": "اتركه فارغًا لتصدير كل النتائج المطابقة.",
+    "reset": "إعادة ضبط"
+  },
+  "delete": {
+    "confirm": "هل أنت متأكد من حذف المنتج \"{name}\"؟"
+  }
+}

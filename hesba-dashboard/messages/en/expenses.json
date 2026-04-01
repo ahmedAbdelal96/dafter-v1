@@ -1,0 +1,118 @@
+{
+  "pageTitle": "Expenses | dafter",
+  "pageDescription": "Manage business expenses with filters, summaries, and exports.",
+  "title": "Expenses",
+  "subtitle": "Record and review operating expenses quickly and accurately.",
+  "filters": {
+    "searchPlaceholder": "Search by description, reference, or notes",
+    "allCategories": "All categories",
+    "searchCategory": "Search category",
+    "noCategories": "No categories found",
+    "allSuppliers": "All suppliers",
+    "searchSupplier": "Search supplier",
+    "noSuppliers": "No suppliers found",
+    "perPage": "{count} per page"
+  },
+  "summary": {
+    "totalExpenses": "Total expenses: {count}",
+    "totalAmount": "Total amount",
+    "count": "Records count",
+    "itemsCount": "{count} records",
+    "noCategoryBreakdown": "Category breakdown",
+    "noData": "No data"
+  },
+  "table": {
+    "ariaLabel": "Expenses table",
+    "expenseDate": "Expense date",
+    "category": "Category",
+    "amount": "Amount",
+    "supplier": "Supplier",
+    "paymentMethod": "Payment method",
+    "referenceNumber": "Reference number",
+    "description": "Description",
+    "notes": "Notes"
+  },
+  "form": {
+    "category": "Category",
+    "amount": "Amount",
+    "expenseDate": "Expense date",
+    "supplier": "Supplier (optional)",
+    "paymentMethod": "Payment method",
+    "referenceNumber": "Reference number",
+    "description": "Description",
+    "notes": "Notes"
+  },
+  "actions": {
+    "addExpense": "Add expense",
+    "exportExcel": "Export Excel",
+    "exporting": "Exporting...",
+    "create": "Create",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "view": "View details",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading..."
+  },
+  "export": {
+    "sheetName": "Expenses",
+    "filePrefix": "expenses"
+  },
+  "exportModal": {
+    "title": "Export expenses",
+    "description": "Choose an optional date range and max rows before downloading Excel.",
+    "fromDate": "From date",
+    "toDate": "To date",
+    "maxRecords": "Maximum rows",
+    "maxRecordsHint": "Leave empty to export all matched rows.",
+    "reset": "Reset"
+  },
+  "modal": {
+    "createTitle": "Add New Expense",
+    "createDescription": "Enter expense details and save it to the accounting ledger.",
+    "editTitle": "Edit Expense",
+    "editDescription": "Update expense details."
+  },
+  "details": {
+    "pageTitle": "Expense Details | dafter",
+    "pageDescription": "View complete expense record details.",
+    "title": "Expense Details",
+    "subtitle": "Review full expense information in one place.",
+    "backToList": "Back to expenses",
+    "meta": {
+      "createdBy": "Created by",
+      "createdAt": "Created at",
+      "updatedAt": "Last updated"
+    }
+  },
+  "empty": {
+    "title": "No expenses yet",
+    "description": "Start by adding your first expense record."
+  },
+  "messages": {
+    "createSuccess": "Expense created successfully.",
+    "createError": "Failed to create expense.",
+    "updateSuccess": "Expense updated successfully.",
+    "updateError": "Failed to update expense.",
+    "deleteSuccess": "Expense deleted successfully.",
+    "deleteError": "Failed to delete expense.",
+    "exportSuccess": "Expenses exported successfully.",
+    "exportError": "Failed to export expenses.",
+    "exportEmpty": "No expense data available for export."
+  },
+  "delete": {
+    "confirm": "Are you sure you want to delete expense #{id}?"
+  },
+  "categories": {
+    "RENT": "Rent",
+    "SALARIES": "Salaries",
+    "UTILITIES": "Utilities",
+    "SUPPLIES": "Supplies",
+    "TRANSPORTATION": "Transportation",
+    "MAINTENANCE": "Maintenance",
+    "MARKETING": "Marketing",
+    "TAXES": "Taxes",
+    "OTHER": "Other"
+  }
+}

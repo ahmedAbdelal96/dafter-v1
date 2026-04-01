@@ -1,0 +1,123 @@
+{
+  "title": "Installments",
+  "singular": "Installment Contract",
+
+  "list": {
+    "empty": "No installment contracts yet",
+    "emptyDesc": "Record your first installment contract"
+  },
+  "searchPlaceholder": "Search by party name...",
+
+  "filter": {
+    "ALL": "All",
+    "ACTIVE": "Active",
+    "COMPLETED": "Completed",
+    "OVERDUE": "Overdue",
+    "CANCELLED": "Cancelled",
+    "DEFAULTED": "Defaulted"
+  },
+
+  "contractStatus": {
+    "ACTIVE": "Active",
+    "COMPLETED": "Completed",
+    "OVERDUE": "Overdue",
+    "CANCELLED": "Cancelled",
+    "DEFAULTED": "Defaulted"
+  },
+
+  "scheduleStatus": {
+    "PENDING": "Pending",
+    "PARTIAL": "Partially Paid",
+    "PAID": "Paid",
+    "OVERDUE": "Overdue",
+    "WAIVED": "Waived"
+  },
+
+  "scheduleType": {
+    "FIXED": "Equal Fixed Installments",
+    "CUSTOM": "Custom Installments"
+  },
+
+  "partyType": {
+    "CUSTOMER": "Customer",
+    "SUPPLIER": "Supplier",
+    "EMPLOYEE": "Employee"
+  },
+
+  "detail": {
+    "totalAmount": "Total Value",
+    "paidAmount": "Paid",
+    "remainingAmount": "Remaining",
+    "downPayment": "Down Payment",
+    "installmentAmount": "Installment Amount",
+    "numberOfInstallments": "No. of Installments",
+    "scheduleType": "Schedule Type",
+    "startDate": "Start Date",
+    "dueDate": "Due Date",
+    "description": "Description",
+    "party": "Party",
+    "progress": "Payment Progress",
+    "schedule": "Payment Schedule",
+    "payments": "Payment History",
+    "cancelContract": "Cancel Contract",
+    "cancelConfirm": "Are you sure you want to cancel this contract? This action cannot be undone.",
+    "createInvoice": "Create Invoice",
+    "payInstallment": "Pay Installment"
+  },
+
+  "form": {
+    "create": "New Installment Contract",
+    "partyType": "Party Type",
+    "party": "Party",
+    "partyPlaceholder": "Search and select...",
+    "totalAmount": "Total Value",
+    "amountPlaceholder": "0.00",
+    "downPayment": "Down Payment (optional)",
+    "downPaymentPlaceholder": "0.00",
+    "numberOfInstallments": "Number of Installments",
+    "numberOfInstallmentsPlaceholder": "e.g. 12",
+    "startDate": "Start Date",
+    "startDatePlaceholder": "YYYY-MM-DD",
+    "scheduleType": "Schedule Type",
+    "description": "Description",
+    "descriptionPlaceholder": "Optional description",
+    "customSchedule": "Custom Schedule",
+    "addScheduleItem": "Add Installment",
+    "scheduleItemAmount": "Amount",
+    "scheduleItemDueDate": "Due Date",
+    "submit": "Create Contract"
+  },
+
+  "payment": {
+    "title": "Record Payment",
+    "amount": "Payment Amount",
+    "amountPlaceholder": "0.00",
+    "date": "Payment Date",
+    "datePlaceholder": "YYYY-MM-DD",
+    "method": "Payment Method",
+    "methodPlaceholder": "Cash / Transfer...",
+    "notes": "Notes",
+    "notesPlaceholder": "Optional notes",
+    "empty": "No payments recorded",
+    "submit": "Confirm Payment"
+  },
+
+  "validation": {
+    "partyRequired": "Party is required",
+    "amountPositive": "Amount must be greater than zero",
+    "installmentsMin": "Number of installments must be at least 2",
+    "startDateRequired": "Start date is required",
+    "startDateFormat": "Invalid date format (YYYY-MM-DD)",
+    "downPaymentExceedsTotal": "Down payment exceeds total value",
+    "paymentAmountRequired": "Payment amount is required",
+    "paymentExceedsRemaining": "Amount exceeds remaining balance",
+    "paymentDateRequired": "Payment date is required",
+    "customScheduleRequired": "Add at least one installment"
+  },
+
+  "error": {
+    "createFailed": "Failed to create contract",
+    "paymentFailed": "Failed to record payment",
+    "cancelFailed": "Failed to cancel contract"
+  }
+}

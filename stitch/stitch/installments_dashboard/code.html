@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', 'Noto Sans Arabic', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(31, 122, 90, 0.3);
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+<!-- Header -->
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 sticky top-0 z-10 border-b border-primary/10">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">menu</span>
+</div>
+<h1 class="text-slate-900 dark:text-white text-lg font-bold leading-tight flex-1 px-4">لوحة الأقساط</h1>
+<div class="flex items-center gap-3">
+<button class="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnu2HyUpBeQOl2S7a0kkOjg-1HbjnJtN3sKhbiMi5i9P3zQ7hcLa4fHwoA_L_56KVFIRqa0UMN3c9wD_VYMug44YF_uswPO2TXbpfXxwPsM-OrLYhxK7AdsDuoPscFnHPonEUH681NGvFUg14QCxG8UtXJpMjYZErjbJNxyAG7pO0cC-FCXv0mbm6rPdvQMX8IBUZ9g4NAnocwZumHmsJ9GzFAoPDV4ZC-nd5cB2B6wF6KicqBUQQSb8wq2Q-M8YS-s1JSAyAxjEc"/>
+</div>
+</div>
+</header>
+<!-- KPI Section -->
+<section class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-white dark:bg-primary/10 border border-slate-200 dark:border-primary/20 shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-600 dark:text-slate-400 text-sm font-medium">إجمالي المؤجل</p>
+<span class="material-symbols-outlined text-primary text-xl">account_balance_wallet</span>
+</div>
+<p class="text-slate-900 dark:text-white text-2xl font-bold leading-tight mt-1">450,000 ر.س</p>
+<div class="flex items-center gap-1 text-emerald-500 text-xs font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full w-fit">
+<span class="material-symbols-outlined text-xs">trending_up</span>
+<span>5.2%</span>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-white dark:bg-primary/10 border border-slate-200 dark:border-primary/20 shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-600 dark:text-slate-400 text-sm font-medium">المحصل هذا الشهر</p>
+<span class="material-symbols-outlined text-primary text-xl">payments</span>
+</div>
+<p class="text-slate-900 dark:text-white text-2xl font-bold leading-tight mt-1">12,500 ر.س</p>
+<div class="flex items-center gap-1 text-emerald-500 text-xs font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full w-fit">
+<span class="material-symbols-outlined text-xs">trending_up</span>
+<span>12.8%</span>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-white dark:bg-primary/10 border border-slate-200 dark:border-primary/20 shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-600 dark:text-slate-400 text-sm font-medium">الأقساط المتأخرة</p>
+<span class="material-symbols-outlined text-rose-500 text-xl">warning</span>
+</div>
+<p class="text-slate-900 dark:text-white text-2xl font-bold leading-tight mt-1">8,400 ر.س</p>
+<div class="flex items-center gap-1 text-rose-500 text-xs font-medium bg-rose-500/10 px-2 py-0.5 rounded-full w-fit">
+<span class="material-symbols-outlined text-xs">trending_down</span>
+<span>2.1%</span>
+</div>
+</div>
+</section>
+<!-- Filters -->
+<div class="flex gap-3 px-4 py-2 overflow-x-auto custom-scrollbar no-scrollbar">
+<button class="flex h-9 shrink-0 items-center justify-center rounded-lg bg-primary px-5 text-white text-sm font-medium">الكل</button>
+<button class="flex h-9 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-primary/10 border border-slate-200 dark:border-primary/20 px-5 text-slate-700 dark:text-slate-300 text-sm font-medium">القادمة</button>
+<button class="flex h-9 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-primary/10 border border-slate-200 dark:border-primary/20 px-5 text-slate-700 dark:text-slate-300 text-sm font-medium">المتأخرة</button>
+<button class="flex h-9 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-primary/10 border border-slate-200 dark:border-primary/20 px-5 text-slate-700 dark:text-slate-300 text-sm font-medium">المكتملة</button>
+</div>
+<!-- Overdue Section -->
+<div class="px-4 pt-6">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-rose-500">priority_high</span>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold tracking-tight">تنبيهات المتأخرات</h2>
+</div>
+<a class="text-primary text-sm font-medium" href="#">عرض الكل</a>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-4 rounded-xl p-4 bg-rose-50 dark:bg-rose-500/5 border border-rose-200 dark:border-rose-500/20">
+<div class="size-12 rounded-lg bg-rose-100 dark:bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400">
+<span class="material-symbols-outlined text-2xl">person_alert</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-900 dark:text-white font-semibold text-sm">أحمد محمد العتيبي</p>
+<p class="text-rose-600 dark:text-rose-400 text-xs font-medium">متأخر 15 يوم</p>
+</div>
+<div class="text-left">
+<p class="text-slate-900 dark:text-white font-bold text-sm">2,500 ر.س</p>
+<span class="text-[10px] bg-rose-500 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">RISK</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Upcoming Collections -->
+<div class="px-4 py-6 mb-20">
+<h2 class="text-slate-900 dark:text-white text-lg font-bold tracking-tight mb-4">تحصيلات قادمة</h2>
+<div class="flex flex-col gap-3">
+<!-- Item 1 -->
+<div class="flex items-center gap-4 rounded-xl p-4 bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 shadow-sm">
+<div class="size-12 rounded-lg bg-slate-100 dark:bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-900 dark:text-white font-semibold text-sm">خالد عبدالله الساير</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">تاريخ الاستحقاق: 12 أكتوبر</p>
+</div>
+<div class="text-left">
+<p class="text-slate-900 dark:text-white font-bold text-sm">1,200 ر.س</p>
+<span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-bold">قيد الانتظار</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center gap-4 rounded-xl p-4 bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 shadow-sm">
+<div class="size-12 rounded-lg bg-slate-100 dark:bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-900 dark:text-white font-semibold text-sm">مؤسسة الحلول الرقمية</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">تاريخ الاستحقاق: 15 أكتوبر</p>
+</div>
+<div class="text-left">
+<p class="text-slate-900 dark:text-white font-bold text-sm">5,800 ر.س</p>
+<span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-bold">قيد الانتظار</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex items-center gap-4 rounded-xl p-4 bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 shadow-sm">
+<div class="size-12 rounded-lg bg-slate-100 dark:bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-900 dark:text-white font-semibold text-sm">سارة فهد التميمي</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">تاريخ الاستحقاق: 18 أكتوبر</p>
+</div>
+<div class="text-left">
+<p class="text-slate-900 dark:text-white font-bold text-sm">850 ر.س</p>
+<span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-bold">قيد الانتظار</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 z-20 border-t border-primary/10 bg-white/80 dark:bg-background-dark/80 backdrop-blur-lg px-4 pb-4 pt-2">
+<div class="flex items-center justify-between gap-1">
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-[10px] font-medium leading-normal">الرئيسية</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">group</span>
+<p class="text-[10px] font-medium leading-normal">العملاء</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">description</span>
+<p class="text-[10px] font-medium leading-normal">الفواتير</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">credit_card</span>
+<p class="text-[10px] font-bold leading-normal">الأقساط</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<p class="text-[10px] font-medium leading-normal">المزيد</p>
+</a>
+</div>
+</nav>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 left-6 z-30 flex size-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</div>
+</body></html>

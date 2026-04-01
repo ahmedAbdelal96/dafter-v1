@@ -1,0 +1,170 @@
+{
+  "pageTitle": "Installments | Daftar",
+  "pageDescription": "Manage installment contracts, payment schedules, and collections.",
+  "title": "Installments",
+  "subtitle": "Create contracts, track installments, and record payments with full visibility.",
+  "actions": {
+    "addContract": "Add Contract",
+    "export": "Export Excel",
+    "exporting": "Exporting...",
+    "view": "View",
+    "cancelContract": "Cancel Contract",
+    "recordPayment": "Record Payment",
+    "remove": "Remove",
+    "cancel": "Cancel",
+    "create": "Create",
+    "saving": "Saving..."
+  },
+  "export": {
+    "sheetName": "Installments",
+    "filePrefix": "installments"
+  },
+  "exportModal": {
+    "title": "Export installments",
+    "description": "Choose an optional date range and max rows before downloading Excel.",
+    "fromDate": "From date",
+    "toDate": "To date",
+    "maxRecords": "Maximum rows",
+    "maxRecordsHint": "Leave empty to export all matched rows.",
+    "reset": "Reset"
+  },
+  "filters": {
+    "search": "Search by contract number or description",
+    "partyType": "Party type",
+    "party": "Party",
+    "partyTypeAll": "All parties",
+    "partyTypeCustomer": "Customer",
+    "partyTypeSupplier": "Supplier",
+    "partyTypeEmployee": "Employee",
+    "status": "Contract status",
+    "statusAll": "All statuses",
+    "scheduleStatus": "Installment status",
+    "scheduleStatusAll": "All installment statuses",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "perPage": "{count} per page",
+    "total": "{count} contracts",
+    "searchParty": "Search party",
+    "noParties": "No parties found"
+  },
+  "table": {
+    "contractNumber": "Contract",
+    "partyType": "Party type",
+    "totalAmount": "Total amount",
+    "paidAmount": "Paid amount",
+    "installmentsCount": "Installments",
+    "startDate": "Start date",
+    "status": "Status",
+    "ariaLabel": "Installments contracts table"
+  },
+  "status": {
+    "ACTIVE": "Active",
+    "COMPLETED": "Completed",
+    "CANCELLED": "Cancelled"
+  },
+  "scheduleStatus": {
+    "PENDING": "Pending",
+    "PARTIAL": "Partially Paid",
+    "PAID": "Paid",
+    "OVERDUE": "Overdue",
+    "WAIVED": "Waived"
+  },
+  "scheduleType": {
+    "FIXED": "Fixed",
+    "CUSTOM": "Custom"
+  },
+  "partyType": {
+    "CUSTOMER": "Customer",
+    "SUPPLIER": "Supplier",
+    "EMPLOYEE": "Employee"
+  },
+  "form": {
+    "partyType": "Party type",
+    "party": "Party",
+    "scheduleType": "Schedule type",
+    "totalAmount": "Total amount",
+    "downPayment": "Down payment",
+    "numberOfInstallments": "Installments count",
+    "startDate": "First installment date",
+    "description": "Description"
+  },
+  "createModal": {
+    "title": "Create Installment Contract",
+    "description": "Create a new installment contract and define schedule settings.",
+    "scheduleTypeFixed": "Fixed schedule",
+    "scheduleTypeCustom": "Custom schedule",
+    "customScheduleTitle": "Custom schedule items",
+    "addScheduleItem": "Add item",
+    "scheduleDueDate": "Due date",
+    "scheduleAmount": "Amount",
+    "scheduleNotes": "Notes"
+  },
+  "empty": {
+    "title": "No installment contracts",
+    "description": "Create your first installment contract to start tracking payments."
+  },
+  "scheduleSection": {
+    "title": "Upcoming Installments",
+    "subtitle": "Track due installments during the selected date range."
+  },
+  "scheduleTable": {
+    "contractNumber": "Contract",
+    "partyType": "Party type",
+    "installmentNumber": "Installment",
+    "dueDate": "Due date",
+    "amount": "Amount",
+    "remaining": "Remaining",
+    "status": "Status",
+    "ariaLabel": "Upcoming installments table"
+  },
+  "details": {
+    "pageTitle": "Installment Contract Details | Daftar",
+    "pageDescription": "View contract details, schedules, and payment history.",
+    "title": "Installment Contract",
+    "subtitle": "Full contract details with installment schedule and actions.",
+    "backToList": "Back to Installments",
+    "partyName": "Party name",
+    "downPayment": "Down payment",
+    "remaining": "Remaining amount",
+    "scheduleType": "Schedule type",
+    "createdAt": "Created at",
+    "description": "Description",
+    "empty": {
+      "title": "Contract not found",
+      "description": "The requested installment contract does not exist or you have no access."
+    },
+    "schedule": {
+      "title": "Installment Schedule",
+      "subtitle": "Track each installment amount and payment status.",
+      "installmentNumber": "Installment",
+      "dueDate": "Due date",
+      "amount": "Amount",
+      "paidAmount": "Paid",
+      "remaining": "Remaining",
+      "status": "Status",
+      "paidAt": "Paid at",
+      "ariaLabel": "Contract schedule table"
+    }
+  },
+  "paymentModal": {
+    "title": "Record Installment Payment",
+    "description": "Contract {contractId} - Installment #{installmentNumber}",
+    "remaining": "Remaining amount",
+    "amount": "Payment amount",
+    "paymentDate": "Payment date",
+    "paymentMethod": "Payment method",
+    "notes": "Notes"
+  },
+  "messages": {
+    "createSuccess": "Installment contract created successfully.",
+    "createError": "Failed to create installment contract.",
+    "cancelConfirm": "Are you sure you want to cancel contract {contractNumber}?",
+    "cancelSuccess": "Contract cancelled successfully.",
+    "cancelError": "Failed to cancel contract.",
+    "paymentSuccess": "Payment recorded successfully.",
+    "paymentError": "Failed to record payment.",
+    "exportSuccess": "Data exported successfully.",
+    "exportError": "Failed to export data.",
+    "exportEmpty": "No data available for export."
+  }
+}

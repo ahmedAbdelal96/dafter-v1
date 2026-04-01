@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased font-display">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Header Section -->
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 sticky top-0 z-10 border-b border-primary/20">
+<div class="text-primary dark:text-slate-100 flex size-12 shrink-0 items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined text-2xl">arrow_forward</span>
+</div>
+<h1 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight flex-1 text-center">تقارير المبيعات التفصيلية - حسبة</h1>
+<div class="flex w-12 items-center justify-end">
+<button class="flex items-center justify-center h-12 w-12 bg-transparent text-primary dark:text-slate-100">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</header>
+<main class="flex-1 pb-24">
+<!-- Date Range Picker Scrollable Area -->
+<div class="flex gap-3 p-4 overflow-x-auto no-scrollbar">
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary text-white px-4">
+<span class="material-symbols-outlined text-lg">calendar_today</span>
+<span class="text-sm font-medium">اليوم</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary/10 dark:bg-primary/20 text-slate-700 dark:text-slate-200 px-4 border border-primary/20">
+<span class="material-symbols-outlined text-lg">date_range</span>
+<span class="text-sm font-medium">هذا الأسبوع</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary/10 dark:bg-primary/20 text-slate-700 dark:text-slate-200 px-4 border border-primary/20">
+<span class="material-symbols-outlined text-lg">event_note</span>
+<span class="text-sm font-medium">هذا الشهر</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary/10 dark:bg-primary/20 text-slate-700 dark:text-slate-200 px-4 border border-primary/20">
+<span class="material-symbols-outlined text-lg">calendar_month</span>
+<span class="text-sm font-medium">هذا العام</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary/10 dark:bg-primary/20 text-slate-700 dark:text-slate-200 px-4 border border-primary/20">
+<span class="material-symbols-outlined text-lg">tune</span>
+<span class="text-sm font-medium">تاريخ مخصص</span>
+</button>
+</div>
+<!-- KPI Cards Section -->
+<div class="px-4 py-2 flex flex-col gap-4">
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-primary/10 border border-slate-200 dark:border-primary/30 shadow-sm">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">صافي المبيعات (Net Sales)</p>
+<p class="text-slate-900 dark:text-slate-100 text-3xl font-bold mt-1 tracking-tight">45,230.50 ر.س</p>
+</div>
+<div class="flex items-center gap-1 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded-lg">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span class="text-xs font-bold">+12.5%</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<span class="text-slate-400 dark:text-slate-500 text-xs">مقارنة بالفترة السابقة</span>
+</div>
+</div>
+</div>
+<!-- Gross vs Net Toggle -->
+<div class="px-4 py-4">
+<div class="flex h-12 w-full items-center justify-center rounded-xl bg-slate-200 dark:bg-primary/20 p-1">
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 bg-white dark:bg-primary shadow-sm text-slate-900 dark:text-white text-sm font-semibold">
+<span class="truncate">صافي المبيعات</span>
+<input checked="" class="sr-only" name="sales_toggle" type="radio" value="net"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 text-slate-600 dark:text-slate-400 text-sm font-medium">
+<span class="truncate">إجمالي المبيعات</span>
+<input class="sr-only" name="sales_toggle" type="radio" value="gross"/>
+</label>
+</div>
+</div>
+<!-- Interactive Chart Placeholder -->
+<div class="px-4 py-2">
+<div class="bg-white dark:bg-primary/10 border border-slate-200 dark:border-primary/30 rounded-xl p-4">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-slate-900 dark:text-slate-100 font-bold">اتجاهات المبيعات اليومية</h3>
+<span class="material-symbols-outlined text-slate-400">more_horiz</span>
+</div>
+<!-- Mock Bar Chart -->
+<div class="flex items-end justify-between h-48 gap-2">
+<div class="flex-1 bg-primary/20 dark:bg-primary/30 h-[40%] rounded-t-lg relative group">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded hidden group-hover:block">12k</div>
+</div>
+<div class="flex-1 bg-primary/20 dark:bg-primary/30 h-[65%] rounded-t-lg relative group"></div>
+<div class="flex-1 bg-primary/20 dark:bg-primary/30 h-[50%] rounded-t-lg relative group"></div>
+<div class="flex-1 bg-primary h-[85%] rounded-t-lg relative group">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded">28k</div>
+</div>
+<div class="flex-1 bg-primary/20 dark:bg-primary/30 h-[45%] rounded-t-lg relative group"></div>
+<div class="flex-1 bg-primary/20 dark:bg-primary/30 h-[60%] rounded-t-lg relative group"></div>
+<div class="flex-1 bg-primary/20 dark:bg-primary/30 h-[75%] rounded-t-lg relative group"></div>
+</div>
+<div class="flex justify-between mt-2 text-[10px] text-slate-500 dark:text-slate-400">
+<span>السبت</span>
+<span>الأحد</span>
+<span>الاثنين</span>
+<span>الثلاثاء</span>
+<span>الأربعاء</span>
+<span>الخميس</span>
+<span>الجمعة</span>
+</div>
+</div>
+</div>
+<!-- Top Products Section -->
+<div class="px-4 py-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-slate-900 dark:text-slate-100 font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">inventory_2</span>
+                        أفضل المنتجات مبيعاً
+                    </h3>
+<button class="text-primary text-sm font-medium">عرض الكل</button>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-primary/5 border border-slate-100 dark:border-primary/20">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-slate-200 dark:bg-primary/20 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Modern wrist watch product image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4qLBitbBovRq8nn8w6jX_gpEQT8UvHYa9k3AZzM1ZYTRjd98avOjh2GjaSqIv0v5N8DoP6uy6hCxWQgUoYNu4GVSIx7FTr4zVgpTwj41cq1cqXrsQ4f3yxkMSr1s-8LsGtl7z81-uz0KJ5DxLBIm2xqWNuYuSJFvDqFZ2ZywCSUZ22aZulWZn2AyQwsmZOsG40tM-qscI6BlTtaYYIccRSAOBrYlYTqquDfvW-f0mGtja_LnYiu5mle1aUSG_umvsydAMIFKBz4M"/>
+</div>
+<div>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-semibold">ساعة ذكية برو</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">تم بيع 145 وحدة</p>
+</div>
+</div>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-bold">14,200 ر.س</p>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-primary/5 border border-slate-100 dark:border-primary/20">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-slate-200 dark:bg-primary/20 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Professional wireless headphones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNh2EzGOV4vJo0CX-3GecD0-64r0I0a5_maHAwEksNiaWEUkk82Rs5jv2PVZGMDRf7Wi0vL0zhmm2A299a7EhthX1yHbBggtf4V5v9azPEFTeZwbA4iaUDUz1oophWrktlksf2JfJwAhQ_ddV_6wTG9jhg5YnX1el38FEHIy8LdaKlmc9saGiIRuHnXQkhjv8Ilz9Yc5_z_t8dLty7YoUze7I2ceCrnat3BqxEyQYUAjGVokSI-ACZ6tSVv9nKRY87G2lWsLv9kzs"/>
+</div>
+<div>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-semibold">سماعات لاسلكية</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">تم بيع 89 وحدة</p>
+</div>
+</div>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-bold">8,450 ر.س</p>
+</div>
+</div>
+</div>
+<!-- Top Customers Section -->
+<div class="px-4 py-2">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-slate-900 dark:text-slate-100 font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">groups</span>
+                        أفضل العملاء (حسب الإيراد)
+                    </h3>
+<button class="text-primary text-sm font-medium">عرض الكل</button>
+</div>
+<div class="bg-white dark:bg-primary/10 rounded-xl divide-y divide-slate-100 dark:divide-primary/20 border border-slate-200 dark:border-primary/30 overflow-hidden">
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">ما</div>
+<div>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-semibold">محمد أحمد</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">الرياض، السعودية</p>
+</div>
+</div>
+<p class="text-emerald-600 dark:text-emerald-400 text-sm font-bold">5,320 ر.س</p>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">سح</div>
+<div>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-semibold">سارة حسن</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">جدة، السعودية</p>
+</div>
+</div>
+<p class="text-emerald-600 dark:text-emerald-400 text-sm font-bold">4,150 ر.س</p>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">عق</div>
+<div>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-semibold">عبدالله القحطاني</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">الدمام، السعودية</p>
+</div>
+</div>
+<p class="text-emerald-600 dark:text-emerald-400 text-sm font-bold">3,890 ر.س</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full bg-white dark:bg-background-dark border-t border-slate-200 dark:border-primary/20 flex items-center justify-around py-3 px-4 z-20">
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="text-[10px] font-medium">التقارير</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">sell</span>
+<span class="text-[10px] font-medium">المبيعات</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">الإعدادات</span>
+</a>
+</nav>
+</div>
+</body></html>

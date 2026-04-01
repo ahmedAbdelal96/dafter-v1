@@ -1,0 +1,100 @@
+{
+  "pageTitle": "دفتر الأستاذ | دفتر",
+  "pageDescription": "متابعة أرصدة وحركات العملاء والموردين والموظفين.",
+  "title": "دفتر الأستاذ",
+  "subtitle": "راجع كشف الحساب وأضف حركات محاسبية يدويًا بسهولة.",
+  "noPermission": "ليس لديك صلاحية لعرض كشف الحساب.",
+  "summary": {
+    "current": "الرصيد الحالي",
+    "opening": "رصيد أول المدة",
+    "closing": "رصيد آخر المدة"
+  },
+  "filters": {
+    "partyType": "نوع الطرف",
+    "party": "الطرف",
+    "partyPlaceholder": "اختر الطرف",
+    "partySearchPlaceholder": "ابحث بالاسم أو الهاتف",
+    "partyEmpty": "لا توجد نتائج مطابقة",
+    "partyLoading": "جارٍ تحميل البيانات...",
+    "partyTypes": {
+      "CUSTOMER": "عميل",
+      "SUPPLIER": "مورد",
+      "EMPLOYEE": "موظف"
+    },
+    "fromDate": "من تاريخ",
+    "toDate": "إلى تاريخ",
+    "perPage": "عدد الصفوف",
+    "reset": "إعادة ضبط الفلاتر"
+  },
+  "entryTypes": {
+    "INVOICE": "فاتورة",
+    "PAYMENT": "دفعة",
+    "RETURN": "مرتجع",
+    "ADJUSTMENT": "تسوية",
+    "ADVANCE": "سلفة",
+    "SALARY_PAYMENT": "صرف راتب",
+    "DEDUCTION": "خصم",
+    "SETTLEMENT": "تسوية نهائية"
+  },
+  "table": {
+    "ariaLabel": "جدول كشف الحساب",
+    "date": "تاريخ الحركة",
+    "type": "نوع الحركة",
+    "note": "البيان",
+    "amount": "المبلغ",
+    "runningBalance": "الرصيد الجاري",
+    "createdAt": "تاريخ الإضافة"
+  },
+  "actions": {
+    "addEntry": "إضافة حركة",
+    "createEntry": "إنشاء الحركة",
+    "deleteEntry": "حذف الحركة",
+    "cancel": "إلغاء",
+    "saving": "جارٍ الحفظ...",
+    "export": "تصدير Excel",
+    "exporting": "جارٍ تصدير البيانات..."
+  },
+  "form": {
+    "entryType": "نوع الحركة",
+    "amount": "المبلغ",
+    "increaseBalance": "زيادة الرصيد (إلغاء التحديد = تقليل الرصيد)",
+    "entryDate": "تاريخ الحركة",
+    "dueDate": "تاريخ الاستحقاق (اختياري)",
+    "note": "ملاحظة (اختياري)"
+  },
+  "modal": {
+    "title": "إضافة حركة دفتر",
+    "description": "سجل حركة محاسبية يدوية للطرف المحدد."
+  },
+  "emptySelection": {
+    "title": "اختر طرفًا أولًا",
+    "description": "حدد نوع الطرف ثم اختر الاسم لعرض كشف الحساب."
+  },
+  "empty": {
+    "title": "لا توجد حركات",
+    "description": "لا توجد قيود محاسبية مطابقة للفلاتر الحالية."
+  },
+  "messages": {
+    "createSuccess": "تمت إضافة الحركة بنجاح.",
+    "createError": "تعذر إضافة الحركة.",
+    "deleteSuccess": "تم حذف الحركة بنجاح.",
+    "deleteError": "تعذر حذف الحركة.",
+    "deleteConfirm": "هل أنت متأكد من حذف هذه الحركة؟",
+    "exportSuccess": "تم تصدير كشف الحساب بنجاح.",
+    "exportError": "تعذر تصدير كشف الحساب.",
+    "exportEmpty": "لا توجد قيود دفتر للتصدير."
+  },
+  "export": {
+    "sheetName": "كشف حساب الدفتر",
+    "filePrefix": "ledger-statement"
+  },
+  "exportModal": {
+    "title": "تصدير كشف الحساب",
+    "description": "اختر نطاقًا زمنيًا اختياريًا وحدًا أقصى للصفوف قبل تنزيل ملف Excel.",
+    "fromDate": "من تاريخ",
+    "toDate": "إلى تاريخ",
+    "maxRecords": "الحد الأقصى للصفوف",
+    "maxRecordsHint": "اتركه فارغًا لتصدير جميع الصفوف المطابقة.",
+    "reset": "إعادة ضبط"
+  }
+}

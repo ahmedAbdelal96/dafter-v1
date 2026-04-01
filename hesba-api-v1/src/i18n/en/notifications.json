@@ -1,0 +1,19 @@
+{
+  "deviceToken": {
+    "registered": "Device registered for push notifications",
+    "unregistered": "Device unregistered from push notifications"
+  },
+  "list": {
+    "success": "Notifications retrieved successfully"
+  },
+  "unreadCount": {
+    "success": "Unread count retrieved successfully"
+  },
+  "read": {
+    "success": "Notification marked as read",
+    "notFound": "Notification not found"
+  },
+  "readAll": {
+    "success": "All notifications marked as read"
+  }
+}

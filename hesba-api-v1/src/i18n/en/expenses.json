@@ -1,0 +1,19 @@
+{
+  "created": "Expense recorded successfully",
+  "updated": "Expense updated successfully",
+  "deleted": "Expense deleted successfully",
+  "notFound": "Expense not found",
+  "supplierNotFound": "The specified supplier was not found",
+
+  "category": {
+    "RENT": "Rent",
+    "SALARIES": "Salaries",
+    "UTILITIES": "Utilities",
+    "SUPPLIES": "Supplies",
+    "TRANSPORTATION": "Transportation",
+    "MAINTENANCE": "Maintenance",
+    "MARKETING": "Marketing",
+    "TAXES": "Taxes & Fees",
+    "OTHER": "Other"
+  }
+}

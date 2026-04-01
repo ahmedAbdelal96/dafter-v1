@@ -1,0 +1,43 @@
+{
+  "success": "تم جلب صلاحيات الشركة بنجاح",
+  "catalogSuccess": "تم جلب كتالوج الميزات بنجاح",
+  "noActiveSubscription": "لا يوجد اشتراك نشط لهذه الشركة",
+
+  "errors": {
+    "featureNotAvailable": "هذه الميزة غير متاحة في خطتك الحالية. يرجى الترقية للوصول إليها.",
+    "planLimitReached": "وصلت إلى الحد الأقصى المسموح به في خطتك. يرجى الترقية لإضافة المزيد.",
+    "subscriptionInactive": "اشتراكك غير نشط. يرجى تجديد الاشتراك للمتابعة."
+  },
+
+  "features": {
+    "module.dashboard.read": "عرض لوحة التحكم",
+    "module.customers.read": "عرض العملاء",
+    "module.customers.manage": "إدارة العملاء",
+    "module.suppliers.read": "عرض الموردين",
+    "module.suppliers.manage": "إدارة الموردين",
+    "module.employees.read": "عرض الموظفين",
+    "module.employees.manage": "إدارة الموظفين",
+    "module.ledger.read": "عرض دفتر الحسابات",
+    "module.ledger.manage": "إدارة دفتر الحسابات",
+    "module.expenses.read": "عرض المصروفات",
+    "module.expenses.manage": "إدارة المصروفات",
+    "module.products.read": "عرض المنتجات",
+    "module.products.manage": "إدارة المنتجات",
+    "module.invoices.read": "عرض الفواتير",
+    "module.invoices.manage": "إدارة الفواتير",
+    "module.deferred_sales.read": "عرض المبيعات الآجلة",
+    "module.deferred_sales.manage": "إدارة المبيعات الآجلة",
+    "module.installments.read": "عرض عقود التقسيط",
+    "module.installments.manage": "إدارة عقود التقسيط",
+    "module.reports.read": "عرض التقارير",
+    "module.reports.export": "تصدير التقارير"
+  },
+
+  "quotas": {
+    "users": "المستخدمون",
+    "customers": "العملاء",
+    "suppliers": "الموردون",
+    "employees": "الموظفون",
+    "ledgerEntries": "قيود الحسابات"
+  }
+}

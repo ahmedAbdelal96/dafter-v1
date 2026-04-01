@@ -1,0 +1,33 @@
+{
+  "eyebrow": "Revenue & subscriptions",
+  "heading": "Platform analytics",
+  "subheading": "Subscription health, plan distribution, revenue trends, and renewal forecasts across all tenants.",
+  "noData": "No data available for the selected period.",
+  "plan": "Plan",
+  "companies": "Companies",
+  "revenue": "Revenue",
+  "daysLeft": "{count} days left",
+  "metrics": {
+    "revenue": "Revenue collected",
+    "paidCompanies": "Paid companies",
+    "renewSoon": "Renewing soon",
+    "expired": "Expired",
+    "trial": "In trial",
+    "suspended": "Suspended",
+    "newInPeriod": "New in period"
+  },
+  "statusDistribution": {
+    "title": "Subscription status distribution"
+  },
+  "planDistribution": {
+    "title": "Plan distribution"
+  },
+  "expiring": {
+    "title": "Upcoming renewals",
+    "sub": "Subscriptions expiring soonest — sorted by days remaining."
+  },
+  "planWatchlist": {
+    "title": "Plan watchlist",
+    "sub": "Plan concentration and normalized revenue across active tenants."
+  }
+}

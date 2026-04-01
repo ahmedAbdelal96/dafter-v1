@@ -1,0 +1,21 @@
+{
+  "overview": {
+    "success": "Dashboard overview retrieved successfully"
+  },
+  "charts": {
+    "success": "Dashboard charts retrieved successfully"
+  },
+  "highlights": {
+    "success": "Dashboard highlights retrieved successfully"
+  },
+  "alerts": {
+    "success": "Dashboard alerts retrieved successfully"
+  },
+  "receivables": {
+    "success": "Receivables overview retrieved successfully"
+  },
+  "common": {
+    "invalidDateRange": "Start date must be before end date",
+    "missingDateRange": "Both dateFrom and dateTo must be provided together"
+  }
+}

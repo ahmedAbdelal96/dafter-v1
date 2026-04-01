@@ -1,0 +1,133 @@
+{
+  "pageTitle": "البيع الآجل | دفتر",
+  "pageDescription": "متابعة عمليات البيع الآجل والدفعات وحالات التحصيل.",
+  "title": "البيع الآجل",
+  "subtitle": "إدارة الأرصدة الآجلة وتسويتها بسرعة.",
+  "filters": {
+    "search": "ابحث برقم المرجع أو الوصف",
+    "partyType": "نوع الطرف",
+    "partyTypeAll": "كل أنواع الأطراف",
+    "partyTypeCustomer": "عميل",
+    "partyTypeSupplier": "مورد",
+    "partyTypeEmployee": "موظف",
+    "party": "الطرف",
+    "searchParty": "ابحث عن طرف",
+    "noParties": "لا يوجد أطراف",
+    "status": "الحالة",
+    "statusAll": "كل الحالات",
+    "perPage": "{count} سطر",
+    "total": "إجمالي البيع الآجل: {count}"
+  },
+  "partyType": {
+    "CUSTOMER": "عميل",
+    "SUPPLIER": "مورد",
+    "EMPLOYEE": "موظف"
+  },
+  "status": {
+    "PENDING": "في الانتظار",
+    "PARTIAL": "مسدد جزئيا",
+    "PAID": "مسدد",
+    "OVERDUE": "متأخر"
+  },
+  "actions": {
+    "add": "إضافة بيع آجل",
+    "create": "إنشاء",
+    "recordPayment": "تسجيل دفعة",
+    "cancelSale": "إلغاء البيع",
+    "createInvoice": "إنشاء فاتورة",
+    "view": "عرض",
+    "cancel": "إلغاء",
+    "saving": "جارٍ الحفظ...",
+    "loading": "جارٍ التحميل...",
+    "export": "تصدير Excel",
+    "exporting": "جارٍ تصدير البيانات..."
+  },
+  "table": {
+    "referenceNumber": "المرجع",
+    "partyType": "نوع الطرف",
+    "totalAmount": "إجمالي المبلغ",
+    "paidAmount": "المدفوع",
+    "remaining": "المتبقي",
+    "dueDate": "تاريخ الاستحقاق",
+    "status": "الحالة",
+    "ariaLabel": "جدول البيع الآجل",
+    "partyName": "الطرف"
+  },
+  "createModal": {
+    "title": "إنشاء بيع آجل",
+    "description": "سجل عملية بيع آجل لعميل أو مورد أو موظف."
+  },
+  "paymentModal": {
+    "title": "تسجيل دفعة",
+    "description": "أضف دفعة على هذا البيع الآجل."
+  },
+  "form": {
+    "partyType": "نوع الطرف",
+    "party": "الطرف",
+    "totalAmount": "إجمالي المبلغ",
+    "entryDate": "تاريخ القيد",
+    "dueDate": "تاريخ الاستحقاق",
+    "expectedPaymentMethod": "طريقة الدفع المتوقعة",
+    "description": "الوصف"
+  },
+  "paymentForm": {
+    "amount": "مبلغ الدفعة",
+    "paymentDate": "تاريخ الدفع",
+    "paymentMethod": "طريقة الدفع",
+    "notes": "ملاحظات"
+  },
+  "messages": {
+    "createSuccess": "تم إنشاء البيع الآجل بنجاح.",
+    "createError": "فشل إنشاء البيع الآجل.",
+    "paymentSuccess": "تم تسجيل الدفعة بنجاح.",
+    "paymentError": "فشل تسجيل الدفعة.",
+    "cancelSuccess": "تم إلغاء البيع الآجل بنجاح.",
+    "cancelError": "فشل إلغاء البيع الآجل.",
+    "cancelConfirm": "هل أنت متأكد من إلغاء البيع الآجل {referenceNumber}؟",
+    "createInvoiceSuccess": "تم إنشاء الفاتورة بنجاح.",
+    "createInvoiceError": "فشل إنشاء الفاتورة من البيع الآجل.",
+    "exportSuccess": "تم تصدير عمليات البيع الآجل بنجاح.",
+    "exportError": "تعذر تصدير عمليات البيع الآجل.",
+    "exportEmpty": "لا توجد عمليات بيع آجل للتصدير."
+  },
+  "empty": {
+    "title": "لا توجد عمليات بيع آجل",
+    "description": "لا توجد نتائج مطابقة للفلاتر الحالية."
+  },
+  "details": {
+    "pageTitle": "تفاصيل البيع الآجل | دفتر",
+    "pageDescription": "استعراض تفاصيل البيع الآجل وسجل الدفعات.",
+    "subtitle": "عرض تفصيلي للبيع الآجل وسجل التسويات.",
+    "back": "العودة إلى البيع الآجل",
+    "partyType": "نوع الطرف",
+    "partyName": "اسم الطرف",
+    "createdAt": "تاريخ الإنشاء",
+    "description": "الوصف",
+    "empty": {
+      "title": "تعذر العثور على البيع الآجل",
+      "description": "لا يمكن تحميل سجل البيع الآجل المطلوب."
+    },
+    "payments": {
+      "title": "الدفعات",
+      "subtitle": "كل الدفعات المسجلة على هذا البيع الآجل.",
+      "paymentDate": "تاريخ الدفع",
+      "amount": "المبلغ",
+      "paymentMethod": "الطريقة",
+      "notes": "ملاحظات",
+      "ariaLabel": "جدول دفعات البيع الآجل"
+    }
+  },
+  "export": {
+    "sheetName": "البيع الآجل",
+    "filePrefix": "deferred-sales"
+  },
+  "exportModal": {
+    "title": "تصدير البيع الآجل",
+    "description": "اختر نطاقًا زمنيًا اختياريًا وحدًا أقصى للصفوف قبل تنزيل ملف Excel.",
+    "fromDate": "من تاريخ",
+    "toDate": "إلى تاريخ",
+    "maxRecords": "الحد الأقصى للصفوف",
+    "maxRecordsHint": "اتركه فارغًا لتصدير جميع الصفوف المطابقة.",
+    "reset": "إعادة ضبط"
+  }
+}

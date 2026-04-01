@@ -1,0 +1,66 @@
+{
+  "title": "Ledger",
+  "partyPicker": {
+    "title": "Select Account",
+    "searchPlaceholder": "Search by name...",
+    "tabs": {
+      "customers": "Customers",
+      "suppliers": "Suppliers",
+      "employees": "Employees"
+    },
+    "empty": "No parties registered",
+    "emptyDesc": "Add customers, suppliers, or employees first"
+  },
+  "statement": {
+    "title": "Account Statement",
+    "currentBalance": "Current Balance",
+    "openingBalance": "Opening Balance",
+    "closingBalance": "Closing Balance",
+    "totalEntries": "Total Entries",
+    "empty": "No entries",
+    "emptyDesc": "No transactions recorded for this party yet"
+  },
+  "entry": {
+    "create": "New Entry",
+    "type": "Entry Type",
+    "amount": "Amount",
+    "amountPlaceholder": "0.00",
+    "description": "Description",
+    "descriptionPlaceholder": "Transaction description (optional)",
+    "date": "Entry Date",
+    "dueDate": "Due Date",
+    "addDueDate": "Add due date",
+    "runningBalance": "Balance After Entry",
+    "createdAt": "Recorded At",
+    "save": "Save Entry"
+  },
+  "entryType": {
+    "INVOICE": "Invoice (Debit)",
+    "PAYMENT": "Payment (Credit)",
+    "RETURN": "Return",
+    "ADJUSTMENT": "Adjustment",
+    "ADVANCE": "Advance",
+    "SALARY_PAYMENT": "Salary Payment",
+    "DEDUCTION": "Deduction"
+  },
+  "balance": {
+    "positive": "Receivable (they owe us)",
+    "negative": "Payable (we owe them)",
+    "zero": "Settled"
+  },
+  "delete": {
+    "title": "Delete Entry",
+    "message": "Are you sure you want to delete this entry? The balance will be updated automatically. This cannot be undone.",
+    "confirm": "Delete Entry"
+  },
+  "errors": {
+    "loadFailed": "Failed to load account statement",
+    "retry": "Try again",
+    "createFailed": "Failed to record entry. Check the data and try again."
+  },
+  "validation": {
+    "amountRequired": "Amount is required",
+    "amountPositive": "Amount must be greater than zero",
+    "typeRequired": "Entry type is required"
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "title": "إدارة المستخدمين",
+  "singular": "مستخدم",
+
+  "list": {
+    "empty": "لا يوجد مستخدمون آخرون",
+    "emptyDesc": "أضف موظفين للنظام ليتمكنوا من الوصول",
+    "emptySearch": "لا توجد نتائج",
+    "emptySearchDesc": "حاول البحث بكلمة مختلفة"
+  },
+
+  "filter": {
+    "all": "الكل",
+    "active": "نشط",
+    "disabled": "معطّل"
+  },
+
+  "search": {
+    "placeholder": "بحث باسم أو بريد إلكتروني"
+  },
+
+  "role": {
+    "OWNER": "مالك",
+    "STAFF": "موظف",
+    "SUPER_ADMIN": "مدير النظام"
+  },
+
+  "status": {
+    "ACTIVE": "نشط",
+    "DISABLED": "معطّل",
+    "INACTIVE": "غير نشط"
+  },
+
+  "detail": {
+    "title": "تفاصيل المستخدم"
+  },
+
+  "form": {
+    "create": "إضافة موظف",
+    "edit": "تعديل البيانات",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "fullName": "الاسم الكامل",
+    "namePlaceholder": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "example@email.com",
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "8 أحرف على الأقل، حرف كبير ورقم",
+    "phone": "رقم الهاتف",
+    "phonePlaceholder": "05XXXXXXXX"
+  },
+
+  "permissions": {
+    "title": "الصلاحيات",
+    "ownerFullAccess": "المالك لديه صلاحية كاملة على جميع الوظائف",
+    "viewParties": "عرض العملاء والموردين",
+    "manageParties": "إدارة العملاء والموردين",
+    "viewLedger": "عرض الدفتر",
+    "manageLedger": "إدارة قيود الدفتر",
+    "viewReports": "عرض التقارير",
+    "manageUsers": "إدارة المستخدمين"
+  },
+
+  "actions": {
+    "disable": "تعطيل الحساب",
+    "enable": "تفعيل الحساب",
+    "resetCredentials": "إعادة ضبط كلمة المرور",
+    "resetSuccess": "تم إرسال رمز إعادة ضبط كلمة المرور بنجاح.",
+    "resetError": "فشل إرسال رمز إعادة ضبط كلمة المرور."
+  },
+
+  "reset": {
+    "title": "إعادة ضبط كلمة المرور",
+    "message": "سيتم إرسال رمز إعادة ضبط مؤقت للموظف عبر البريد الإلكتروني أو واتساب. سيحتاج لتعيين كلمة مرور جديدة للدخول مجدداً.",
+    "confirm": "إرسال رمز الإعادة",
+    "cancel": "إلغاء"
+  },
+
+  "disable": {
+    "title": "تعطيل المستخدم",
+    "message": "هل أنت متأكد من تعطيل هذا المستخدم؟ سيفقد صلاحية الدخول إلى النظام.",
+    "confirm": "تعطيل",
+    "cancel": "إلغاء"
+  },
+
+  "validation": {
+    "nameRequired": "الاسم الكامل مطلوب",
+    "emailRequired": "البريد الإلكتروني مطلوب",
+    "emailInvalid": "تنسيق البريد الإلكتروني غير صحيح",
+    "passwordRequired": "كلمة المرور مطلوبة",
+    "passwordShort": "كلمة المرور يجب أن تكون 8 أحرف على الأقل",
+    "passwordWeak": "يجب أن تحتوي على حرف كبير ورقم على الأقل"
+  },
+
+  "errors": {
+    "createFailed": "فشل إنشاء المستخدم",
+    "updateFailed": "فشل تحديث البيانات",
+    "emailExists": "هذا البريد الإلكتروني مستخدم بالفعل",
+    "quotaExceeded": "وصلت للحد الأقصى لعدد المستخدمين في خطتك",
+    "disableFailed": "فشل تعطيل الحساب",
+    "enableFailed": "فشل تفعيل الحساب",
+    "enableLimitReached": "لا يمكن تفعيل الحساب — وصلت للحد الأقصى لعدد المستخدمين النشطين",
+    "permUpdateFailed": "فشل تحديث الصلاحيات"
+  }
+}

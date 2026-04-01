@@ -1,0 +1,105 @@
+{
+  "title": "العملاء",
+  "singular": "عميل",
+  "list": {
+    "title": "قائمة العملاء",
+    "empty": "لا يوجد عملاء",
+    "emptyDesc": "أضف أول عميل لك للبدء في تسجيل المعاملات",
+    "searchPlaceholder": "بحث باسم العميل أو رقم الهاتف"
+  },
+  "detail": {
+    "title": "بيانات العميل",
+    "balance": "الرصيد الحالي",
+    "openingBalance": "الرصيد الافتتاحي",
+    "creditLimit": "حد الائتمان",
+    "phone": "رقم الهاتف",
+    "address": "العنوان",
+    "createdAt": "تاريخ الإضافة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "viewStatement": "الحساب",
+    "newEntry": "قيد جديد",
+    "newInvoice": "فاتورة جديدة",
+    "recordPayment": "دفعة",
+    "openInvoices": "فواتير مفتوحة",
+    "totalPurchases": "إجمالي المشتريات",
+    "overdue": "المتأخرات",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "overdueRisk": "متأخر في السداد",
+    "paymentType": {
+      "CASH": "نقداً",
+      "TRANSFER": "تحويل",
+      "DEFERRED": "آجل",
+      "CHECK": "شيك"
+    },
+    "tabs": {
+      "invoices": "الفواتير",
+      "payments": "الدفعات",
+      "statement": "كشف حساب",
+      "deferred": "الآجل",
+      "pricing": "الأسعار",
+      "noInvoices": "لا توجد فواتير",
+      "noPayments": "لا توجد دفعات",
+      "noStatement": "لا توجد حركات",
+      "noDeferred": "لا توجد مبيعات آجلة",
+      "noPricing": "لا توجد أسعار خاصة لهذا العميل",
+      "viewAll": "عرض الكل",
+      "openingBalance": "رصيد افتتاحي",
+      "remaining": "المتبقي"
+    }
+  },
+  "invoiceStatus": {
+    "DRAFT": "مسودة",
+    "PENDING_APPROVAL": "معلقة",
+    "APPROVED": "معتمدة",
+    "REJECTED": "مرفوضة",
+    "CANCELLED": "ملغية"
+  },
+  "deferredStatus": {
+    "PENDING": "معلق",
+    "PARTIAL": "مدفوع جزئياً",
+    "PAID": "مدفوع",
+    "OVERDUE": "متأخر"
+  },
+  "form": {
+    "create": "إضافة عميل",
+    "edit": "تعديل بيانات العميل",
+    "name": "الاسم",
+    "namePlaceholder": "اسم العميل",
+    "phone": "رقم الهاتف",
+    "phonePlaceholder": "01xxxxxxxxx",
+    "address": "العنوان",
+    "addressPlaceholder": "العنوان (اختياري)",
+    "openingBalance": "الرصيد الافتتاحي",
+    "openingBalancePlaceholder": "0.00",
+    "openingBalanceHint": "المبلغ الذي يدين به العميل مسبقاً (يمكن تركه صفراً)",
+    "creditLimit": "حد الائتمان",
+    "creditLimitPlaceholder": "0.00 (اتركه فارغاً للحد اللانهائي)",
+    "isActive": "حالة العميل",
+    "activeYes": "نشط",
+    "activeNo": "غير نشط",
+    "save": "حفظ"
+  },
+  "delete": {
+    "title": "حذف العميل",
+    "message": "هل أنت متأكد من حذف هذا العميل؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirm": "حذف",
+    "hasLedger": "لا يمكن حذف العميل لأن له معاملات مسجلة في الدفتر"
+  },
+  "validation": {
+    "nameRequired": "الاسم مطلوب",
+    "phoneInvalid": "رقم الهاتف غير صحيح",
+    "invalidAmount": "المبلغ غير صحيح"
+  },
+  "errors": {
+    "loadFailed": "تعذر تحميل العملاء",
+    "createFailed": "تعذر إضافة العميل",
+    "updateFailed": "تعذر تحديث بيانات العميل",
+    "deleteFailed": "تعذر حذف العميل",
+    "nameTaken": "يوجد عميل بهذا الاسم مسبقاً",
+    "versionConflict": "تم تعديل بيانات العميل من مكان آخر، يرجى إغلاق النافذة وإعادة المحاولة",
+    "quotaExceeded": "تم الوصول إلى الحد الأقصى لعدد العملاء في خطتك",
+    "retry": "إعادة المحاولة"
+  }
+}

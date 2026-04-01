@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-checkbox:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-display">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+<div class="flex items-center p-4 justify-between max-w-md mx-auto w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100 cursor-pointer">arrow_forward</span>
+<h1 class="text-lg font-bold tracking-tight">تعديل صلاحيات الدور</h1>
+</div>
+<div class="flex items-center">
+<button class="p-2 rounded-lg hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-primary">info</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1 max-w-md mx-auto w-full pb-32">
+<!-- Role Header Section -->
+<section class="p-6 flex flex-col items-center gap-4">
+<div class="relative">
+<div class="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary/30 overflow-hidden">
+<img class="w-full h-full object-cover opacity-80" data-alt="Professional accounting icon or abstract representation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABfO11GfzcuNI3_lQtFkY8HAm-SaNfXcsjuB4Vl9ZHEbr3S6HDfMwHvs2D2blVAUzceqArwIU0cq5VuPh9OyVLY71XlqEUlWloqO-3iw64ElK1J8-lE8urJd4sGql8w0f0xPPNqSqUBFZMt2V_jDa3nGcbuZbVT7PrjptXKMAvT5ENSr8SheAVyirup9_if0vgh5iLAyG6x_DPho5aY8bBKghVuSBgrCM2QRg5Jiwqf0zOnDRdlHm0FiMgmiIP2A6B9MlCR3_mh10"/>
+</div>
+<div class="absolute bottom-0 right-0 bg-primary p-1.5 rounded-full border-2 border-background-dark">
+<span class="material-symbols-outlined text-white text-sm">edit</span>
+</div>
+</div>
+<div class="text-center">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100">محاسب (Accountant)</h2>
+<p class="text-slate-500 dark:text-slate-400 text-sm mt-1">إدارة مستويات الوصول لقسم المحاسبة والمالية</p>
+</div>
+</section>
+<!-- Permissions Categories -->
+<div class="space-y-6 px-4">
+<!-- Category: Invoices -->
+<div class="bg-white/5 dark:bg-primary/5 rounded-xl border border-primary/10 overflow-hidden">
+<div class="p-4 bg-primary/10 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">receipt_long</span>
+<h3 class="font-bold text-slate-900 dark:text-slate-100">الفواتير</h3>
+</div>
+<span class="text-xs text-primary font-medium bg-primary/10 px-2 py-1 rounded">4/4 مفعل</span>
+</div>
+<div class="p-2 divide-y divide-primary/5">
+<label class="flex items-center justify-between p-3 cursor-pointer">
+<span class="text-sm font-medium">عرض الفواتير</span>
+<input checked="" class="custom-checkbox h-5 w-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 cursor-pointer">
+<span class="text-sm font-medium">إنشاء فاتورة جديدة</span>
+<input checked="" class="custom-checkbox h-5 w-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 cursor-pointer">
+<span class="text-sm font-medium">تعديل الفواتير</span>
+<input checked="" class="custom-checkbox h-5 w-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 cursor-pointer">
+<span class="text-sm font-medium">حذف الفواتير</span>
+<input checked="" class="custom-checkbox h-5 w-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Category: Customers -->
+<div class="bg-white/5 dark:bg-primary/5 rounded-xl border border-primary/10 overflow-hidden">
+<div class="p-4 bg-primary/10 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">group</span>
+<h3 class="font-bold text-slate-900 dark:text-slate-100">العملاء</h3>
+</div>
+<span class="text-xs text-slate-400 font-medium bg-slate-400/10 px-2 py-1 rounded">2/4 مفعل</span>
+</div>
+<div class="p-2 divide-y divide-primary/5">
+<label class="flex items-center justify-between p-3 cursor-pointer">
+<span class="text-sm font-medium">عرض بيانات العملاء</span>
+<input checked="" class="custom-checkbox h-5 w-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 cursor-pointer">
+<span class="text-sm font-medium">إضافة عميل جديد</span>
+<input checked="" class="custom-checkbox h-5 w-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 cursor-pointer">
+<span class="text-sm font-medium text-slate-400">تعديل بيانات العملاء</span>
+<input class="custom-checkbox h-5 w-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 cursor-pointer">
+<span class="text-sm font-medium text-slate-400">حذف عملاء</span>
+<input class="custom-checkbox h-5 w-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Category: Reports -->
+<div class="bg-white/5 dark:bg-primary/5 rounded-xl border border-primary/10 overflow-hidden">
+<div class="p-4 bg-primary/10 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<h3 class="font-bold text-slate-900 dark:text-slate-100">التقارير</h3>
+</div>
+</div>
+<div class="p-2 divide-y divide-primary/5">
+<label class="flex items-center justify-between p-3 cursor-pointer">
+<span class="text-sm font-medium">عرض التقارير المالية</span>
+<input checked="" class="custom-checkbox h-5 w-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 cursor-pointer">
+<span class="text-sm font-medium">تصدير التقارير (PDF/Excel)</span>
+<input checked="" class="custom-checkbox h-5 w-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Category: Settings -->
+<div class="bg-white/5 dark:bg-primary/5 rounded-xl border border-primary/10 overflow-hidden mb-8">
+<div class="p-4 bg-primary/10 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">settings</span>
+<h3 class="font-bold text-slate-900 dark:text-slate-100">الإعدادات</h3>
+</div>
+</div>
+<div class="p-2 divide-y divide-primary/5">
+<label class="flex items-center justify-between p-3 cursor-pointer">
+<span class="text-sm font-medium text-slate-400">تغيير إعدادات الضرائب</span>
+<input class="custom-checkbox h-5 w-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 cursor-pointer">
+<span class="text-sm font-medium text-slate-400">إدارة المستخدمين</span>
+<input class="custom-checkbox h-5 w-5 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+</div>
+</div>
+</div>
+</main>
+<!-- Sticky Footer -->
+<footer class="fixed bottom-0 left-0 right-0 p-4 bg-background-light dark:bg-background-dark border-t border-primary/10 z-50">
+<div class="max-w-md mx-auto flex gap-3">
+<button class="flex-1 bg-primary text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">save</span>
+<span>حفظ التغييرات</span>
+</button>
+<button class="px-6 py-3.5 rounded-xl border border-primary/30 text-primary font-bold hover:bg-primary/5 active:scale-95 transition-transform">
+                إلغاء
+            </button>
+</div>
+</footer>
+</body></html>

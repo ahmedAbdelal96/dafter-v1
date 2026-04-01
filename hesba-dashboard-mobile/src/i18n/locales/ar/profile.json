@@ -1,0 +1,58 @@
+{
+  "title": "الملف الشخصي",
+  "companyInfo": "معلومات الشركة",
+  "personalInfo": "المعلومات الشخصية",
+  "account": "الحساب",
+  "fields": {
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "role": "الدور",
+    "companyName": "اسم الشركة",
+    "city": "المدينة",
+    "plan": "الخطة"
+  },
+  "roles": {
+    "OWNER": "مالك",
+    "SUPER_ADMIN": "مدير عام",
+    "RECEPTION": "استقبال",
+    "STAFF": "موظف"
+  },
+  "plans": {
+    "BASIC": "أساسية",
+    "PRO": "احترافية",
+    "PREMIUM": "مميزة"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "language": "اللغة",
+    "theme": "المظهر",
+    "notifications": "الإشعارات",
+    "darkMode": "الوضع الداكن",
+    "lightMode": "الوضع الفاتح"
+  },
+  "actions": {
+    "editProfile": "تعديل الملف الشخصي",
+    "changePassword": "تغيير كلمة المرور",
+    "logout": "تسجيل الخروج",
+    "logoutConfirm": "هل أنت متأكد من تسجيل الخروج؟"
+  },
+  "subscription": {
+    "title": "الاشتراك",
+    "manage": "إدارة الاشتراك",
+    "plan": "الخطة الحالية",
+    "status": "الحالة",
+    "expiresAt": "ينتهي في",
+    "TRIAL": "تجريبي",
+    "ACTIVE": "نشط",
+    "PAST_DUE": "متأخر",
+    "CANCELLED": "ملغي",
+    "SUSPENDED": "موقف"
+  },
+  "language": {
+    "ar": "العربية",
+    "en": "English",
+    "restartRequired": "يلزم إعادة التشغيل لتطبيق اتجاه التخطيط الجديد"
+  },
+  "editCompany": "تعديل بيانات الشركة"
+}

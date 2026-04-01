@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden pb-24">
+<!-- Header -->
+<div class="sticky top-0 z-10 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 justify-between border-b border-primary/10">
+<div class="text-primary flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 cursor-pointer">
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">تفاصيل المنتج</h2>
+<div class="size-10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">more_vert</span>
+</div>
+</div>
+<!-- Hero Section -->
+<div class="@container">
+<div class="p-4">
+<div class="w-full bg-center bg-no-repeat bg-cover flex flex-col justify-end overflow-hidden rounded-xl min-h-[280px] border border-primary/20 shadow-lg relative" data-alt="Modern professional electronic office equipment on a dark desk" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBuBg63ZKBGSMAENSBI-jeW5jLu_av_uXYGWjTWWIlIn_FmO2Zfa-tMry0wctdmGhY6OopAOw1vWFiRu0ooxXMX-mMbvdnP9VRFifNI1mBU7Ov9O0eEcFa8uO84BAejBF3xSNNly0l09Ocb5t8HEZDx9JBF17yB73BzqqCOrXk1I_urGyRT9F04bnvYNzOLAaHva0WI1PswaP64w630SgbohLsUDOybraWubt3BY_deIHz42FQ_E3LA5ZroRh7itAOsOXJDY6Ux1l0");'>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent"></div>
+<div class="relative p-4 flex justify-between items-end">
+<span class="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">نشط</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Key Stats -->
+<div class="grid grid-cols-3 gap-3 px-4 py-2">
+<div class="flex flex-col gap-1 rounded-xl p-4 border border-primary/20 bg-primary/5">
+<p class="text-primary/70 text-xs font-medium leading-normal">السعر</p>
+<p class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight">150 ر.س</p>
+</div>
+<div class="flex flex-col gap-1 rounded-xl p-4 border border-primary/20 bg-primary/5">
+<p class="text-primary/70 text-xs font-medium leading-normal">المخزون</p>
+<p class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight">45 وحدة</p>
+</div>
+<div class="flex flex-col gap-1 rounded-xl p-4 border border-primary/20 bg-primary/5">
+<p class="text-primary/70 text-xs font-medium leading-normal">SKU</p>
+<p class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight">HSB-992</p>
+</div>
+</div>
+<!-- Tabs Navigation -->
+<div class="flex border-b border-primary/10 mt-4 px-4 overflow-x-auto no-scrollbar">
+<button class="px-4 py-3 text-sm font-bold border-b-2 border-primary text-primary whitespace-nowrap">المعلومات</button>
+<button class="px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">المعاملات الأخيرة</button>
+<button class="px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">التقارير</button>
+</div>
+<!-- Info Sections -->
+<div class="flex flex-col gap-6 p-4">
+<!-- Basic Info -->
+<section>
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-sm">info</span>
+<h3 class="text-slate-900 dark:text-slate-100 text-md font-bold leading-tight tracking-[-0.015em]">معلومات أساسية</h3>
+</div>
+<div class="bg-primary/5 rounded-xl p-4 space-y-4 border border-primary/5">
+<div class="flex justify-between items-center">
+<p class="text-slate-500 dark:text-slate-400 text-sm">اسم المنتج</p>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium">طابعة ليزر جيت برو</p>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-slate-500 dark:text-slate-400 text-sm">الفئة</p>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium">إلكترونيات / مكتبية</p>
+</div>
+<div class="flex flex-col gap-1">
+<p class="text-slate-500 dark:text-slate-400 text-sm">الوصف</p>
+<p class="text-slate-900 dark:text-slate-100 text-sm leading-relaxed">طابعة عالية الجودة مصممة للمكاتب المتوسطة والكبيرة، تدعم الاتصال اللاسلكي.</p>
+</div>
+</div>
+</section>
+<!-- Pricing & Cost -->
+<section>
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-sm">payments</span>
+<h3 class="text-slate-900 dark:text-slate-100 text-md font-bold leading-tight tracking-[-0.015em]">التسعير والتكلفة</h3>
+</div>
+<div class="bg-primary/5 rounded-xl p-4 space-y-4 border border-primary/5">
+<div class="flex justify-between items-center">
+<p class="text-slate-500 dark:text-slate-400 text-sm">سعر البيع</p>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-bold">150.00 ر.س</p>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-slate-500 dark:text-slate-400 text-sm">تكلفة الشراء</p>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium">110.00 ر.س</p>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-slate-500 dark:text-slate-400 text-sm">معدل الضريبة</p>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium">15% (ضريبة القيمة المضافة)</p>
+</div>
+<div class="pt-2 border-t border-primary/10 flex justify-between items-center">
+<p class="text-primary text-sm font-medium">هامش الربح</p>
+<p class="text-primary text-sm font-bold">40.00 ر.س (26%)</p>
+</div>
+</div>
+</section>
+<!-- Inventory -->
+<section>
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-sm">inventory_2</span>
+<h3 class="text-slate-900 dark:text-slate-100 text-md font-bold leading-tight tracking-[-0.015em]">المخزون والمستودع</h3>
+</div>
+<div class="bg-primary/5 rounded-xl p-4 space-y-4 border border-primary/5">
+<div class="flex justify-between items-center">
+<p class="text-slate-500 dark:text-slate-400 text-sm">الكمية الحالية</p>
+<div class="flex items-center gap-2">
+<span class="text-slate-900 dark:text-slate-100 text-sm font-bold">45 وحدة</span>
+<span class="size-2 rounded-full bg-green-500"></span>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-slate-500 dark:text-slate-400 text-sm">نقطة إعادة الطلب</p>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium">10 وحدات</p>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-slate-500 dark:text-slate-400 text-sm">الموقع</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-primary text-xs">location_on</span>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium">المستودع الرئيسي - رف A4</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Transactions Mini-list (Preview) -->
+<section>
+<div class="flex justify-between items-center mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">history</span>
+<h3 class="text-slate-900 dark:text-slate-100 text-md font-bold leading-tight tracking-[-0.015em]">المعاملات الأخيرة</h3>
+</div>
+<button class="text-primary text-xs font-bold">عرض الكل</button>
+</div>
+<div class="space-y-2">
+<div class="flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/5">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-500 text-sm">add_shopping_cart</span>
+</div>
+<div>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium">فاتورة مبيعات #4421</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">منذ ساعتين</p>
+</div>
+</div>
+<p class="text-red-500 text-sm font-bold">-2 وحدة</p>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/5">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-500 text-sm">local_shipping</span>
+</div>
+<div>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-medium">أمر توريد #1092</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">أمس</p>
+</div>
+</div>
+<p class="text-green-500 text-sm font-bold">+20 وحدة</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Sticky Bottom Actions -->
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-primary/10 flex gap-3">
+<button class="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border border-primary text-primary font-bold hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-md">edit</span>
+                تعديل المنتج
+            </button>
+<button class="flex-[1.5] flex items-center justify-center gap-2 py-4 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all">
+<span class="material-symbols-outlined text-md">swap_vert</span>
+                تعديل المخزون
+            </button>
+</div>
+</div>
+</body></html>

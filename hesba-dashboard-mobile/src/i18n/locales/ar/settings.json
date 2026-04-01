@@ -1,0 +1,51 @@
+{
+  "title": "الإعدادات",
+  "sections": {
+    "account": "الحساب",
+    "preferences": "التفضيلات",
+    "company": "بيانات الشركة",
+    "subscription": "الاشتراك",
+    "security": "الأمان",
+    "support": "الدعم الفني"
+  },
+  "account": {
+    "profile": "الملف الشخصي",
+    "changePassword": "تغيير كلمة المرور",
+    "logout": "تسجيل الخروج",
+    "logoutConfirm": "هل أنت متأكد من تسجيل الخروج؟"
+  },
+  "preferences": {
+    "language": "اللغة",
+    "theme": "المظهر",
+    "themeLight": "فاتح",
+    "themeDark": "داكن",
+    "languageAr": "العربية",
+    "languageEn": "English",
+    "restartRequired": "يتطلب إعادة التشغيل لتطبيق التغيير"
+  },
+  "company": {
+    "name": "اسم الشركة",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "address": "العنوان",
+    "currency": "العملة"
+  },
+  "subscription": {
+    "currentPlan": "الخطة الحالية",
+    "status": "الحالة",
+    "expiresAt": "تنتهي في",
+    "upgrade": "ترقية الخطة"
+  },
+  "security": {
+    "changePassword": "تغيير كلمة المرور",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "passwordMismatch": "كلمتا المرور غير متطابقتين",
+    "passwordTooShort": "كلمة المرور يجب أن تكون 8 أحرف على الأقل"
+  },
+  "support": {
+    "contact": "تواصل معنا",
+    "version": "الإصدار"
+  }
+}

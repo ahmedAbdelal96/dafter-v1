@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-10 flex items-center justify-between border-b border-primary/10 bg-background-light/80 dark:bg-background-dark/80 px-4 py-4 backdrop-blur-md">
+<div class="flex items-center gap-3">
+<button class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight">الموردين</h1>
+</div>
+<button class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add</span>
+</button>
+</header>
+<main class="flex-1 pb-24">
+<!-- Search Bar -->
+<div class="px-4 py-4">
+<div class="relative flex w-full items-center">
+<span class="material-symbols-outlined absolute right-3 text-slate-400 dark:text-primary/60">search</span>
+<input class="w-full rounded-xl border-none bg-primary/5 py-3 pr-11 pl-4 text-sm focus:ring-2 focus:ring-primary/50 dark:bg-primary/10 dark:text-slate-100 dark:placeholder:text-slate-500" placeholder="بحث عن مورد أو شركة..." type="text"/>
+</div>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-2 overflow-x-auto px-4 pb-4 no-scrollbar">
+<button class="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-white">
+<span class="material-symbols-outlined text-sm">done</span>
+                    الكل
+                </button>
+<button class="flex shrink-0 items-center gap-1.5 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary dark:bg-primary/20">
+                    نشط
+                </button>
+<button class="flex shrink-0 items-center gap-1.5 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary dark:bg-primary/20">
+                    الدائنون
+                </button>
+<button class="flex shrink-0 items-center gap-1.5 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary dark:bg-primary/20">
+                    متأخر
+                </button>
+</div>
+<!-- Supplier List -->
+<div class="space-y-3 px-4">
+<!-- Card 1 -->
+<div class="group relative overflow-hidden rounded-xl border border-primary/10 bg-white p-4 shadow-sm dark:bg-primary/5">
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-primary/40">آخر معاملة: 25 أكتوبر 2023</span>
+<h3 class="text-base font-bold text-slate-900 dark:text-slate-100">شركة جلوبال للإلكترونيات</h3>
+<div class="mt-2 flex items-baseline gap-1 text-primary">
+<span class="text-lg font-bold">45,000</span>
+<span class="text-xs font-medium">ر.س</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-3">
+<span class="rounded bg-primary/10 px-2 py-1 text-[10px] font-bold text-primary dark:bg-primary/20">نشط</span>
+<div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 bg-cover bg-center" data-alt="Corporate technology company logo placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA1uPJbPAb8n-a8_Ua9tuM9AXg7u4loVlHLIVk4dYTBxDZtOJTNswC_3-8NtnLGH3rKmPw1CahJ2kqzGdSGmt6XXTJkpu0T_ZTfaEzL_odorWankKAbWf1aawe8sqdpTiTJ3hiz45S4OQ1NPyneNSv_TZ5GRJkcArnMQgAqdRpVgJBOZPT9oq8U39t77H_6n6F5Kj41EDlXsm7Wk-FEDMmk95C1Qzh006AT_yvxpSOx31cqH2rkjzXSrdVjDusew9EHQzzwVCFL_ww')"></div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group relative overflow-hidden rounded-xl border border-primary/10 bg-white p-4 shadow-sm dark:bg-primary/5">
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-primary/40">آخر معاملة: 12 نوفمبر 2023</span>
+<h3 class="text-base font-bold text-slate-900 dark:text-slate-100">مؤسسة الحلول المبتكرة</h3>
+<div class="mt-2 flex items-baseline gap-1 text-red-500">
+<span class="text-lg font-bold">12,850</span>
+<span class="text-xs font-medium">ر.س</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-3">
+<span class="rounded bg-red-500/10 px-2 py-1 text-[10px] font-bold text-red-500 dark:bg-red-500/20">متأخر</span>
+<div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 bg-cover bg-center" data-alt="Modern logistics service logo placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDN1MVlYBQViW6NGpKEpmOH2vTp8LZy1P6t_7DMpZuUhycJ-Ieq9Nv48y3jRxEqAF7HMKrab4Omj-05MryHr8PiokR2IgYD_FVBEPetigwZg7JvdoU3TwJSzc8u2gOm55RqFhF10S0UEcWCIouJergwWfwJVzAllTT9kRvvX1tN6nvaHJy13UC_V2LfReqNaiGt7rbNmO8-5ty3Hn9Slro5W5ed3Rk0zfILKqQQByT5X3huBHFpHpPsl2qQrju7ugS9Kpy7lveJiNY')"></div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group relative overflow-hidden rounded-xl border border-primary/10 bg-white p-4 shadow-sm dark:bg-primary/5">
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-primary/40">آخر معاملة: 05 ديسمبر 2023</span>
+<h3 class="text-base font-bold text-slate-900 dark:text-slate-100">توزيعات الوفاق التجارية</h3>
+<div class="mt-2 flex items-baseline gap-1 text-slate-500 dark:text-slate-400">
+<span class="text-lg font-bold">0.00</span>
+<span class="text-xs font-medium">ر.س</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-3">
+<span class="rounded bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-500 dark:bg-primary/10 dark:text-primary/60">مكتمل</span>
+<div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 bg-cover bg-center" data-alt="Trade and distribution company logo" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDSGiIk8b_1vUkrM-T_b712LieoKX312gf8J3m8AGPpukkEE7p7XCePLqnNl7zEAF961oHK5lGtLTTyw8SarrB67fL1w0ROTRJQhz83e5mzJ7sYyG0By-3t4l4emPbFQFxPHUFjNN4DC_6HjYlihamr1WlFsGJ9W3GDFfsPurhPM7oRw9KBs1SOEgTJlJrQaggyJxIUT3bDTf9oTOLwCkNK8e3TEDhJKZ6vYmwrQFu0BCCbWzNeFpYLzk41qngdJHxxOT-NtXx1Xas')"></div>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group relative overflow-hidden rounded-xl border border-primary/10 bg-white p-4 shadow-sm dark:bg-primary/5">
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-primary/40">آخر معاملة: 28 نوفمبر 2023</span>
+<h3 class="text-base font-bold text-slate-900 dark:text-slate-100">مصنع البلاستيك الوطني</h3>
+<div class="mt-2 flex items-baseline gap-1 text-primary">
+<span class="text-lg font-bold">8,420</span>
+<span class="text-xs font-medium">ر.س</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-3">
+<span class="rounded bg-primary/10 px-2 py-1 text-[10px] font-bold text-primary dark:bg-primary/20">نشط</span>
+<div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 bg-cover bg-center" data-alt="Industrial factory building outline icon" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA2CG0fYr9coDP0Rj3k9EBL80J-bVm2Uu2biAEXRR8pQgNO0E8lmOX4h6FRreTaU1iFnZwiMV-HgWkE0__MVm6EmtHnJV_9meY3zR4DVGCdgLZABxZ63tWDC_RQw7lnZkcXHShfx-AI_sE9l8gt2qrx3eiJ7uTtw_6CRJbfbmznii8pbd4-YQG9ZgoI7UkJRgYH2WM6_BoY7tZkBwzj3uvwT3-3sy6cPb-TkHl1hBILPsSwgnHyZRb4Zffd2sFxxkoVNV27GC0IiJQ')"></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Nav Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-20 border-t border-primary/10 bg-background-light dark:bg-background-dark pb-6 pt-2">
+<div class="flex items-center justify-around px-2">
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">pie_chart</span>
+<span class="text-[10px] font-medium">التقارير</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined material-symbols-fill">group</span>
+<span class="text-[10px] font-bold">الموردين</span>
+<div class="h-1 w-1 rounded-full bg-primary"></div>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-[10px] font-medium">المزيد</span>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

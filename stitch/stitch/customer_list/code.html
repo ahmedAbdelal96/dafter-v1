@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-icon {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10 px-4 py-4">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="p-2 rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">menu</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight">قائمة العملاء</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
+<div class="w-full h-full bg-cover bg-center" data-alt="User profile avatar of a businessman" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCrGcxJPb2d1xLVk5b-EbkOcDgj3bK32o5NkS32xa6bppRtC880sqWoh15xzFs_J6dZm44jc65bY_OTG4aHVtgdzmJAqTenVO9ge0S_ua_rhFpCqqyTiqHeb6gXMP96TH9qhWyQiSe0gDM2ZpFQFIlyatZqRINilOntMqeNFTtnR16nVKH_WJ0anlHUfyDZgh2o771s9o0ZrTl2nF2STsg7PsFA_IfeRu8pKPjPAbiuXIkXj5OJZ1RkK2Gi5CrZl0ia8tQsJVB-ics')"></div>
+</div>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="relative group">
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full pr-10 pl-4 py-3 bg-slate-100 dark:bg-primary/5 border border-slate-200 dark:border-primary/20 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400" placeholder="البحث عن عميل بالاسم أو الرقم..." type="text"/>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-2 mt-4 overflow-x-auto pb-1 no-scrollbar">
+<button class="px-5 py-1.5 rounded-full bg-primary text-white text-sm font-medium whitespace-nowrap">الكل</button>
+<button class="px-5 py-1.5 rounded-full bg-slate-200 dark:bg-primary/10 text-slate-600 dark:text-slate-300 text-sm font-medium whitespace-nowrap hover:bg-primary/20 transition-colors">متأخرات</button>
+<button class="px-5 py-1.5 rounded-full bg-slate-200 dark:bg-primary/10 text-slate-600 dark:text-slate-300 text-sm font-medium whitespace-nowrap hover:bg-primary/20 transition-colors">نشط</button>
+<button class="px-5 py-1.5 rounded-full bg-slate-200 dark:bg-primary/10 text-slate-600 dark:text-slate-300 text-sm font-medium whitespace-nowrap hover:bg-primary/20 transition-colors">جديد</button>
+<button class="px-5 py-1.5 rounded-full bg-slate-200 dark:bg-primary/10 text-slate-600 dark:text-slate-300 text-sm font-medium whitespace-nowrap hover:bg-primary/20 transition-colors">مكتمل</button>
+</div>
+</header>
+<!-- Main Content: Customer List -->
+<main class="flex-1 px-4 py-4 space-y-3 overflow-y-auto">
+<!-- Customer Card: Overdue -->
+<div class="bg-white dark:bg-primary/5 border border-slate-100 dark:border-primary/10 rounded-xl p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 flex items-center justify-center text-red-600 font-bold text-lg">أ</div>
+<div>
+<h3 class="font-semibold text-slate-900 dark:text-slate-100">أحمد محمد عبد الله</h3>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="w-2 h-2 rounded-full bg-red-500"></span>
+<span class="text-xs text-red-500 font-medium">متأخر - منذ ١٥ يوم</span>
+</div>
+</div>
+</div>
+<div class="text-left">
+<p class="text-xs text-slate-400 mb-1">الرصيد الحالي</p>
+<p class="text-lg font-bold text-slate-900 dark:text-slate-100">٢,٥٠٠ <span class="text-xs font-normal">ر.س</span></p>
+</div>
+</div>
+<!-- Customer Card: Active -->
+<div class="bg-white dark:bg-primary/5 border border-slate-100 dark:border-primary/10 rounded-xl p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-lg">س</div>
+<div>
+<h3 class="font-semibold text-slate-900 dark:text-slate-100">سارة فهد السبيعي</h3>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-xs text-emerald-500 font-medium">عميل نشط</span>
+</div>
+</div>
+</div>
+<div class="text-left">
+<p class="text-xs text-slate-400 mb-1">الرصيد الحالي</p>
+<p class="text-lg font-bold text-slate-900 dark:text-slate-100">١٢,٤٠٠ <span class="text-xs font-normal">ر.س</span></p>
+</div>
+</div>
+<!-- Customer Card: Overdue -->
+<div class="bg-white dark:bg-primary/5 border border-slate-100 dark:border-primary/10 rounded-xl p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 flex items-center justify-center text-red-600 font-bold text-lg">م</div>
+<div>
+<h3 class="font-semibold text-slate-900 dark:text-slate-100">مؤسسة التوريد الحديثة</h3>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="w-2 h-2 rounded-full bg-red-500"></span>
+<span class="text-xs text-red-500 font-medium">متأخر - منذ ٣ أيام</span>
+</div>
+</div>
+</div>
+<div class="text-left">
+<p class="text-xs text-slate-400 mb-1">الرصيد الحالي</p>
+<p class="text-lg font-bold text-slate-900 dark:text-slate-100">٤٥,٠٠٠ <span class="text-xs font-normal">ر.س</span></p>
+</div>
+</div>
+<!-- Customer Card: Normal -->
+<div class="bg-white dark:bg-primary/5 border border-slate-100 dark:border-primary/10 rounded-xl p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-lg">خ</div>
+<div>
+<h3 class="font-semibold text-slate-900 dark:text-slate-100">خالد بن وليد</h3>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="w-2 h-2 rounded-full bg-slate-300"></span>
+<span class="text-xs text-slate-500 font-medium">لا توجد مستحقات</span>
+</div>
+</div>
+</div>
+<div class="text-left">
+<p class="text-xs text-slate-400 mb-1">الرصيد الحالي</p>
+<p class="text-lg font-bold text-slate-900 dark:text-slate-100">٠ <span class="text-xs font-normal">ر.س</span></p>
+</div>
+</div>
+<!-- Customer Card: Active -->
+<div class="bg-white dark:bg-primary/5 border border-slate-100 dark:border-primary/10 rounded-xl p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-lg">ي</div>
+<div>
+<h3 class="font-semibold text-slate-900 dark:text-slate-100">ياسين المحمدي</h3>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-xs text-emerald-500 font-medium">عميل نشط</span>
+</div>
+</div>
+</div>
+<div class="text-left">
+<p class="text-xs text-slate-400 mb-1">الرصيد الحالي</p>
+<p class="text-lg font-bold text-slate-900 dark:text-slate-100">٧,٨٥٠ <span class="text-xs font-normal">ر.س</span></p>
+</div>
+</div>
+<!-- Customer Card: New -->
+<div class="bg-white dark:bg-primary/5 border border-slate-100 dark:border-primary/10 rounded-xl p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30 flex items-center justify-center text-blue-600 font-bold text-lg">ر</div>
+<div>
+<h3 class="font-semibold text-slate-900 dark:text-slate-100">ريهام القحطاني</h3>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="w-2 h-2 rounded-full bg-blue-500"></span>
+<span class="text-xs text-blue-500 font-medium">عميل جديد</span>
+</div>
+</div>
+</div>
+<div class="text-left">
+<p class="text-xs text-slate-400 mb-1">الرصيد الحالي</p>
+<p class="text-lg font-bold text-slate-900 dark:text-slate-100">١,٢٠٠ <span class="text-xs font-normal">ر.س</span></p>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 left-6 w-14 h-14 bg-primary text-white rounded-full shadow-lg shadow-primary/40 flex items-center justify-center z-20 hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-3xl">person_add</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<nav class="sticky bottom-0 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-primary/20 px-4 py-2 flex justify-between items-center z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors flex-1" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary flex-1" href="#">
+<span class="material-symbols-outlined active-icon">group</span>
+<span class="text-[10px] font-bold">العملاء</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors flex-1" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-medium">التقارير</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors flex-1" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">الإعدادات</span>
+</a>
+</nav>
+</body></html>

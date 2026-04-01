@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<!-- Header Section -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+<div class="flex items-center p-4 justify-between max-w-2xl mx-auto w-full">
+<div class="flex items-center gap-3">
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_forward</span>
+</button>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center">مركز المساعدة</h2>
+<div class="flex items-center justify-end gap-2">
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">share</span>
+</button>
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">bookmark</span>
+</button>
+</div>
+</div>
+<!-- Progress Bar Component -->
+<div class="w-full h-1 bg-primary/10">
+<div class="h-full bg-primary" style="width: 35%;"></div>
+</div>
+</header>
+<main class="max-w-2xl mx-auto pb-32">
+<!-- Hero Image -->
+<div class="@container">
+<div class="px-0 py-0 sm:px-4 sm:py-6">
+<div class="w-full bg-center bg-no-repeat bg-cover flex flex-col justify-end overflow-hidden bg-primary/20 aspect-video sm:rounded-xl" data-alt="Modern office desk with digital tablet showing financial data" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDveieT6Ky-mte6OnAN6_cf4Hx9enrhCJLItfcHZa49r8YPKhK0N3gK3SmRPQLyZ8YqWXM_EPP6b6gm8cYBjEIj4LaZq6Lc-dJuNjDc_aUYJgJcVkBX1FTyO6CRVloZBg7jLGJUa1P0gG6MZISbuC3THIR5dy1lprENo47ULpYwxKXEFta4XqiBhmxQ5v7pNnuHyWq_P7eQ3oXDMbGg8FH52v-ITVYx3XoatgFN1G_Kqe_owHi0I32TFFGnPKa5ye2gU4Xuo_if3kw");'>
+</div>
+</div>
+</div>
+<!-- Article Content -->
+<article class="px-4 py-6">
+<div class="flex flex-col gap-2 mb-6">
+<div class="flex items-center gap-2 text-primary text-sm font-semibold uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm">menu_book</span>
+<span>دليل المبتدئين</span>
+</div>
+<h1 class="text-slate-900 dark:text-slate-100 text-3xl font-extrabold leading-tight">كيفية إنشاء فاتورتك الأولى في حسبة</h1>
+<div class="flex items-center gap-4 mt-4 text-slate-500 dark:text-slate-400 text-sm">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span>قراءة لمدة 5 دقائق</span>
+</div>
+<div class="flex items-center gap-1 text-primary">
+<span>تمت قراءة 35%</span>
+</div>
+</div>
+</div>
+<div class="prose prose-slate dark:prose-invert max-w-none space-y-6 text-slate-700 dark:text-slate-300 leading-relaxed">
+<p class="text-lg">تُعد الفواتير الاحترافية أساس نجاح أي عمل تجاري. في هذا الدليل، سنشرح لك خطوة بخطوة كيفية إصدار فاتورتك الأولى باستخدام نظام "حسبة" المتطور.</p>
+<h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-8 mb-4 border-r-4 border-primary pr-3">1. إعداد بيانات العميل</h3>
+<p>قبل البدء في إنشاء الفاتورة، تأكد من إضافة بيانات العميل بشكل صحيح لضمان وصول الفاتورة له وتوافقها مع المتطلبات الضريبية:</p>
+<ul class="list-disc list-inside space-y-2 pr-4">
+<li>انتقل إلى قائمة <span class="text-primary font-medium">العملاء</span> من القائمة الجانبية.</li>
+<li>اضغط على "إضافة عميل جديد".</li>
+<li>أدخل الاسم التجاري والرقم الضريبي للعميل (إن وجد).</li>
+<li>تأكد من صحة البريد الإلكتروني لإرسال الفاتورة تلقائياً.</li>
+</ul>
+<h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-8 mb-4 border-r-4 border-primary pr-3">2. إضافة البنود والخدمات</h3>
+<div class="bg-primary/5 p-4 rounded-xl border border-primary/10 my-6">
+<p class="font-semibold text-primary mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined">lightbulb</span>
+                        نصيحة الخبراء
+                    </p>
+<p class="text-sm">يمكنك حفظ المنتجات المتكررة في "قائمة المنتجات" لتوفير الوقت عند إنشاء فواتير مستقبلية.</p>
+</div>
+<p>بعد اختيار العميل، قم بإضافة الخدمات أو المنتجات التي ترغب في فوترتها:</p>
+<ul class="list-disc list-inside space-y-2 pr-4">
+<li>حدد الكمية والسعر لكل بند.</li>
+<li>سيقوم النظام تلقائياً بحساب ضريبة القيمة المضافة (VAT) بناءً على إعداداتك.</li>
+<li>يمكنك إضافة ملاحظات خاصة لكل بند على حدة.</li>
+</ul>
+</div>
+<!-- Feedback Component -->
+<div class="mt-12 p-6 bg-primary/10 rounded-xl border border-primary/20 text-center">
+<h4 class="text-slate-900 dark:text-slate-100 font-bold mb-4">هل كان هذا المقال مفيداً؟</h4>
+<div class="flex justify-center gap-4">
+<button class="flex items-center gap-2 px-6 py-2 bg-background-light dark:bg-background-dark border border-primary/30 rounded-full hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined">thumb_up</span>
+<span>نعم</span>
+</button>
+<button class="flex items-center gap-2 px-6 py-2 bg-background-light dark:bg-background-dark border border-primary/30 rounded-full hover:bg-red-500 hover:text-white transition-all">
+<span class="material-symbols-outlined">thumb_down</span>
+<span>لا</span>
+</button>
+</div>
+</div>
+</article>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 bg-background-light dark:bg-background-dark border-t border-primary/10 pb-safe">
+<div class="flex gap-2 px-4 pb-3 pt-2 max-w-2xl mx-auto">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-[10px] font-medium leading-normal tracking-wide">الرئيسية</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<p class="text-[10px] font-medium leading-normal tracking-wide">الفواتير</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<p class="text-[10px] font-medium leading-normal tracking-wide">التقارير</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">help</span>
+<p class="text-[10px] font-medium leading-normal tracking-wide">المساعدة</p>
+</a>
+</div>
+</nav>
+</body></html>

@@ -1,0 +1,61 @@
+{
+    "pageTitle":  "Payments",
+    "pageDescription":  "Manage standalone and distributed payments",
+    "title":  "Payments",
+    "subtitle":  "Record standalone payments and distribute amounts across open invoices",
+    "form":  {
+                 "customerSearch":  "Customer search",
+                 "customerSearchPlaceholder":  "Search by customer name",
+                 "customer":  "Customer",
+                 "selectCustomer":  "Select a customer",
+                 "note":  "Note (optional)"
+             },
+    "partyType":  {
+                      "CUSTOMER":  "Customer",
+                      "SUPPLIER":  "Supplier",
+                      "EMPLOYEE":  "Employee"
+                  },
+    "standalone":  {
+                       "title":  "Standalone payment",
+                       "partyType":  "Party type",
+                       "amount":  "Amount",
+                       "submit":  "Record payment",
+                       "helper":  "Use this path when the payment should be recorded directly without invoice distribution."
+                   },
+    "distribute":  {
+                       "title":  "Distribute payment",
+                       "amount":  "Amount",
+                       "submit":  "Distribute now",
+                       "helper":  "The amount is applied automatically across the customer\u0027s open approved invoices, starting with the oldest eligible balance.",
+                       "customerOnly":  "Distribution is only available for customers because it applies directly to open sales invoices.",
+                       "summaryTitle":  "Distribution summary before submit",
+                       "allocated":  "Will be applied: {amount}",
+                       "leftover":  "Unallocated amount: {amount}",
+                       "affectedInvoices":  "Invoices affected: {count}"
+                   },
+    "openInvoices":  {
+                         "title":  "Open invoices",
+                         "subtitle":  "Only approved invoices that are not fully paid are listed",
+                         "emptyTitle":  "No open invoices",
+                         "emptyDescription":  "This customer has no approved unpaid invoices available for distribution right now.",
+                         "changeCustomer":  "Choose another customer"
+                     },
+    "messages":  {
+                     "standaloneSuccess":  "Standalone payment recorded successfully",
+                     "standaloneFailed":  "Failed to record standalone payment",
+                     "distributeSuccess":  "Payment distribution completed successfully",
+                     "distributeFailed":  "Failed to distribute payment",
+                     "distributeSuccessDetailed":  "Payment distributed successfully. {amount} was applied across {count} invoice(s).",
+                     "retry":  "Retry loading"
+                 },
+    "errors":  {
+                   "invalidStandalonePayload":  "Select a customer and enter a valid amount before submitting standalone payment.",
+                   "invalidDistributePayload":  "Select a customer and enter a valid amount before distribution."
+               },
+    "intent":  {
+                   "distributionTitle":  "Collect from a customer",
+                   "distributionDescription":  "Start with the usual collection flow and let the system apply the amount across open invoices.",
+                   "standaloneTitle":  "Record a direct payment",
+                   "standaloneDescription":  "Use this when you need to register a payment for a supplier, employee, or a one-off balance."
+               }
+}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10 px-4 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center size-10 rounded-xl bg-primary/10 text-primary">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<h1 class="text-lg font-bold">استيراد المنتجات</h1>
+</div>
+<button class="flex items-center justify-center size-10 rounded-xl text-slate-400">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</header>
+<main class="flex-1 p-4 space-y-6">
+<!-- Welcome/Brand Section -->
+<div class="flex items-center gap-3 px-1">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<div>
+<p class="text-xs text-primary font-bold uppercase tracking-wider">Hasba | حسبة</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">تحديث المخزون بكميات كبيرة</p>
+</div>
+</div>
+<!-- Instructions Card -->
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/20 rounded-xl p-5 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 size-24 bg-primary/5 rounded-full blur-2xl"></div>
+<h2 class="text-base font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">info</span>
+                تعليمات الاستيراد
+            </h2>
+<div class="space-y-4">
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="size-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">1</div>
+<div class="w-0.5 h-full bg-primary/20 my-1"></div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">قم بتحميل نموذج ملف المنتجات المعتمد من النظام.</p>
+</div>
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="size-6 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center font-bold">2</div>
+<div class="w-0.5 h-full bg-primary/20 my-1"></div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">أضف تفاصيل منتجاتك (الاسم، السعر، الكمية) في الملف.</p>
+</div>
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="size-6 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center font-bold">3</div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">قم برفع الملف المكتمل لبدء عملية المزامنة.</p>
+</div>
+</div>
+</div>
+<!-- Download Template Action -->
+<div class="flex flex-col gap-3">
+<button class="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-green-500/10 text-green-500 flex items-center justify-center">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="text-right">
+<p class="font-bold text-sm">تحميل النموذج</p>
+<p class="text-xs text-slate-500">Excel format (.xlsx)</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">download</span>
+</button>
+</div>
+<!-- Upload Area -->
+<div class="relative">
+<div class="flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-primary/30 dark:border-primary/20 bg-primary/5 px-6 py-12 text-center group transition-all hover:border-primary/50">
+<div class="size-16 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">cloud_upload</span>
+</div>
+<div>
+<p class="text-slate-900 dark:text-slate-100 font-bold mb-1">اضغط لرفع الملف أو اسحب الملف هنا</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">الصيغ المدعومة: Excel, CSV (الحد الأقصى 10MB)</p>
+</div>
+<input class="absolute inset-0 opacity-0 cursor-pointer" type="file"/>
+<button class="mt-2 px-6 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold shadow-sm">
+                    اختيار ملف
+                </button>
+</div>
+</div>
+<!-- Start Import Button (Disabled State) -->
+<div class="pt-4">
+<button class="w-full h-14 bg-slate-300 dark:bg-slate-800 text-slate-500 dark:text-slate-600 rounded-xl font-bold flex items-center justify-center gap-2 cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined">play_arrow</span>
+                بدء الاستيراد
+            </button>
+<p class="text-center text-[10px] text-slate-500 mt-3">بالنقر على بدء الاستيراد، فأنت توافق على شروط معالجة البيانات في حسبة.</p>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="sticky bottom-0 bg-white dark:bg-[#1d2f29] border-t border-slate-200 dark:border-primary/20 pb-6 pt-2 px-6">
+<div class="flex items-center justify-between max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-[10px] font-medium">التقارير</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="text-[10px] font-bold">المنتجات</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">الإعدادات</span>
+</a>
+</div>
+</nav>
+<!-- Optional Illustration / Visual (Using a placeholder for texture) -->
+<div class="fixed bottom-24 -left-12 size-48 bg-primary/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+</body></html>

@@ -1,0 +1,115 @@
+{
+  "title": "Invoices",
+  "singular": "Invoice",
+  "list": {
+    "title": "Invoices List",
+    "empty": "No invoices yet",
+    "emptyDesc": "Create your first invoice for a customer",
+    "searchPlaceholder": "Search by invoice number or customer..."
+  },
+  "detail": {
+    "title": "Invoice Details",
+    "invoiceNumber": "Invoice Number",
+    "customer": "Customer",
+    "issuedAt": "Issue Date",
+    "dueDate": "Due Date",
+    "totalAmount": "Total Amount",
+    "paid": "Paid",
+    "status": "Status",
+    "items": "Invoice Items",
+    "notes": "Notes"
+  },
+  "form": {
+    "create": "New Invoice",
+    "fromDeferredSale": "Invoice from Deferred Sale",
+    "customer": "Customer",
+    "customerPlaceholder": "Select customer",
+    "dueDate": "Due Date",
+    "notes": "Notes",
+    "notesPlaceholder": "Notes (optional)",
+    "items": "Invoice Items",
+    "addItem": "Add Item",
+    "item": {
+      "description": "Description",
+      "descriptionPlaceholder": "Product or service name",
+      "quantity": "Qty",
+      "unitPrice": "Unit Price",
+      "totalPrice": "Total"
+    },
+    "total": "Total",
+    "submit": "Create Invoice",
+    "saveDraft": "Save Draft",
+    "approve": "Approve",
+    "approveConfirmTitle": "Confirm Approval",
+    "approveConfirmMessage": "The invoice will be created and immediately approved, triggering a financial effect. Continue?",
+    "frequentProducts": "Frequent products for this customer",
+    "repeatLast": "Repeat last invoice",
+    "repeatTitle": "Select an invoice to repeat",
+    "noLastInvoices": "No previous invoices for this customer"
+  },
+  "snapshot": {
+    "loading": "Loading customer data...",
+    "balance": "Balance",
+    "openInvoices": "Open Invoices",
+    "lastInvoice": "Last Invoice",
+    "overdueWarning": "Warning: overdue amount {{amount}}"
+  },
+  "status": {
+    "DRAFT": "Draft",
+    "PENDING_APPROVAL": "Pending",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected",
+    "CANCELLED": "Cancelled"
+  },
+  "actions": {
+    "submit": "Submit for Approval",
+    "submitTitle": "Submit for Approval",
+    "submitMessage": "The invoice will be sent for review and approval.",
+    "approve": "Approve",
+    "approveDirect": "Direct Approve",
+    "approveTitle": "Confirm Approval",
+    "approveMessage": "Approving this invoice will trigger a financial effect in the ledger.",
+    "reject": "Reject",
+    "rejectTitle": "Confirm Rejection",
+    "rejectMessage": "This invoice will be rejected with no financial effect.",
+    "cancel": "Cancel Invoice",
+    "cancelTitle": "Confirm Cancellation",
+    "cancelMessage": "The invoice will be cancelled and any financial effect will be reversed.",
+    "recordPayment": "Record Payment",
+    "paymentAmount": "Payment Amount",
+    "confirmPayment": "Confirm Payment",
+    "paymentAmountRequired": "Enter payment amount",
+    "paymentExceedsRemaining": "Amount exceeds remaining balance",
+    "paymentFailed": "Failed to record payment"
+  },
+  "delete": {
+    "title": "Delete Invoice",
+    "message": "Are you sure you want to delete this invoice?"
+  },
+  "errors": {
+    "alreadyInvoiced": "An invoice has already been created for this deferred sale",
+    "loadFailed": "Failed to load invoices",
+    "retry": "Try again"
+  },
+  "filter": {
+    "status": "Status",
+    "allStatuses": "All Statuses",
+    "customer": "Customer",
+    "customerName": "Filter by customer name…",
+    "dateFrom": "From (YYYY-MM-DD)",
+    "dateTo": "To (YYYY-MM-DD)",
+    "clearAll": "Clear filters"
+  },
+  "paymentStatus": {
+    "UNPAID": "Unpaid",
+    "PARTIAL": "Partial",
+    "PAID": "Paid"
+  },
+  "validation": {
+    "customerRequired": "Customer is required",
+    "itemsRequired": "At least one item is required",
+    "descriptionRequired": "Description is required",
+    "quantityPositive": "Quantity must be greater than zero",
+    "pricePositive": "Price must be greater than zero"
+  }
+}

@@ -1,0 +1,561 @@
+{
+  "pageTitle": "Reports | Daftar",
+  "pageDescription": "Collections, debts, staff activity, and simple ledger reports.",
+  "title": "Reports",
+  "subtitle": "Track key trade indicators with fast filters and export-ready tables.",
+  "tabs": {
+    "overview": "Overview",
+    "profitLoss": "Profit & Loss",
+    "cashFlow": "Cash Flow",
+    "customersAging": "Customers Aging",
+    "suppliersAging": "Suppliers Aging",
+    "salesDetailed": "Sales Detailed",
+    "expensesAnalytics": "Expenses Analytics",
+    "productsPerformance": "Products Performance",
+    "operationalPerformance": "Operational Performance",
+    "criticalAlerts": "Critical Alerts",
+    "ledgerStatement": "Ledger Statement",
+    "collectionsFollowup": "Collections Follow-up",
+    "debtsSummary": "Debts Summary",
+    "staffActivity": "Staff Activity",
+    "simpleLedger": "Simple Ledger"
+  },
+  "partyType": {
+    "customer": "Customer",
+    "supplier": "Supplier",
+    "employee": "Employee"
+  },
+  "messages": {
+    "exportSuccess": "Report exported successfully.",
+    "exportError": "Failed to export report.",
+    "exportEmpty": "No data available for export.",
+    "selectPartyForExport": "Select a party first to export this ledger report.",
+    "estimatedRecords": "Estimated records: {count}"
+  },
+  "export": {
+    "filePrefixCollectionsFollowup": "collections_followup",
+    "filePrefixDebtsSummary": "debts_summary",
+    "filePrefixStaffActivity": "staff_activity",
+    "filePrefixSimpleLedger": "simple_ledger",
+    "filePrefixProfitLoss": "profit_loss",
+    "filePrefixCashFlow": "cash_flow",
+    "filePrefixCustomersAging": "customers_aging",
+    "filePrefixSuppliersAging": "suppliers_aging",
+    "filePrefixSalesDetailed": "sales_detailed",
+    "filePrefixExpensesAnalytics": "expenses_analytics",
+    "filePrefixProductsPerformance": "products_performance",
+    "filePrefixOperationalPerformance": "operational_performance",
+    "filePrefixCriticalAlerts": "critical_alerts",
+    "filePrefixLedgerStatement": "ledger_statement"
+  },
+  "exportModal": {
+    "title": "Export Data",
+    "description": "Optional: restrict export by date range or max records.",
+    "fromDate": "From date",
+    "toDate": "To date",
+    "maxRecords": "Max records",
+    "maxRecordsHint": "Leave empty to export all records.",
+    "reset": "Reset",
+    "cancel": "Cancel",
+    "confirm": "Export"
+  },
+  "overview": {
+    "title": "Executive Overview",
+    "subtitle": "Fast view of receivables, deferred sales, and installment exposure.",
+    "filters": {
+      "partyType": "Party type",
+      "partyTypeAll": "All parties",
+      "partyTypeCustomer": "Customers",
+      "partyTypeSupplier": "Suppliers",
+      "partyTypeEmployee": "Employees",
+      "dateFrom": "From date",
+      "dateTo": "To date"
+    },
+    "cards": {
+      "totalReceivables": "Total receivables",
+      "deferredRemaining": "Deferred remaining",
+      "installmentsRemaining": "Installments remaining"
+    },
+    "actions": {
+      "title": "Quick actions",
+      "openCollectionsFollowup": "Open Collections Follow-up",
+      "openDebtsSummary": "Open Debts Summary",
+      "openStaffActivity": "Open Staff Activity"
+    },
+    "panels": {
+      "deferredProgress": "Deferred Sales Progress",
+      "deferredProgressSubtitle": "Total sales: {total} | Overdue: {overdue}",
+      "installmentsProgress": "Installments Progress",
+      "installmentsProgressSubtitle": "Active contracts: {total} | Overdue schedules: {overdue}",
+      "paid": "Paid",
+      "remaining": "Remaining",
+      "overdueAmount": "Overdue amount"
+    },
+    "charts": {
+      "noData": "No data available",
+      "categories": {
+        "deferredSales": "Deferred Sales",
+        "installments": "Installments"
+      },
+      "series": {
+        "paid": "Paid",
+        "remaining": "Remaining",
+        "overdue": "Overdue"
+      },
+      "titles": {
+        "collectionBreakdown": "Collections Breakdown",
+        "overdueDistribution": "Overdue Distribution"
+      },
+      "subtitles": {
+        "collectionBreakdown": "Paid vs remaining vs overdue for deferred and installment flows.",
+        "overdueDistribution": "Share of overdue amount between deferred sales and installments."
+      }
+    }
+  },
+  "collectionsFollowup": {
+    "title": "Collections Follow-up",
+    "subtitle": "Planned collections vs collected amounts and overdue exposure.",
+    "actions": {
+      "export": "Export",
+      "exporting": "Exporting..."
+    },
+    "filters": {
+      "partyType": "Party type",
+      "partyTypeAll": "All",
+      "partyTypeCustomer": "Customers",
+      "partyTypeSupplier": "Suppliers",
+      "partyTypeEmployee": "Employees",
+      "party": "Party",
+      "partySearch": "Search party",
+      "partyEmpty": "No parties",
+      "partyLoading": "Loading parties...",
+      "dateFrom": "From date",
+      "dateTo": "To date",
+      "limit": "Rows"
+    },
+    "summary": {
+      "expectedAmount": "Expected amount",
+      "collectedAmount": "Collected amount",
+      "collectionRatePercent": "Collection rate",
+      "overdueOutstanding": "Overdue outstanding"
+    },
+    "table": {
+      "type": "Type",
+      "referenceNumber": "Reference",
+      "party": "Party",
+      "phone": "Phone",
+      "dueDate": "Due date",
+      "expectedAmount": "Expected amount",
+      "daysUntilDue": "Days until due",
+      "ariaLabel": "Collections follow-up report table"
+    },
+    "type": {
+      "DEFERRED": "Deferred sale",
+      "INSTALLMENT": "Installment"
+    }
+  },
+  "debtsSummary": {
+    "title": "Debts Summary",
+    "subtitle": "Net receivables/payables by customers and suppliers.",
+    "actions": {
+      "export": "Export",
+      "exporting": "Exporting..."
+    },
+    "filters": {
+      "search": "Search name or phone",
+      "entityType": "Entity type",
+      "entityTypeAll": "All entities",
+      "entityTypeCustomer": "Customers",
+      "entityTypeSupplier": "Suppliers",
+      "balanceType": "Balance type",
+      "balanceTypeAll": "All balances",
+      "balanceTypeReceivable": "Receivable",
+      "balanceTypePayable": "Payable",
+      "isActive": "Status",
+      "isActiveAll": "All",
+      "isActiveTrue": "Active only",
+      "isActiveFalse": "Inactive only",
+      "minAmount": "Minimum amount",
+      "limit": "Rows"
+    },
+    "summary": {
+      "customersReceivable": "Customers receivable",
+      "customersCredit": "Customers credit",
+      "suppliersReceivable": "Suppliers receivable",
+      "suppliersPayable": "Suppliers payable",
+      "netReceivable": "Net receivable"
+    },
+    "table": {
+      "entityType": "Entity",
+      "name": "Name",
+      "phone": "Phone",
+      "balanceType": "Balance type",
+      "amount": "Amount",
+      "status": "Status",
+      "ariaLabel": "Debts summary report table"
+    },
+    "entityType": {
+      "CUSTOMER": "Customer",
+      "SUPPLIER": "Supplier"
+    },
+    "balanceType": {
+      "RECEIVABLE": "Receivable",
+      "PAYABLE": "Payable"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
+  "staffActivity": {
+    "title": "Staff Activity",
+    "subtitle": "Measure operational contribution per user across transactions.",
+    "actions": {
+      "export": "Export",
+      "exporting": "Exporting..."
+    },
+    "filters": {
+      "search": "Search by staff name or email",
+      "user": "Staff member",
+      "userSearch": "Search staff",
+      "userEmpty": "No staff found",
+      "userLoading": "Loading staff...",
+      "dateFrom": "From date",
+      "dateTo": "To date",
+      "limit": "Rows"
+    },
+    "summary": {
+      "usersCount": "Users count",
+      "totalActivities": "Total activities",
+      "totalInvoices": "Total invoices",
+      "totalInvoiceAmount": "Invoices amount",
+      "totalCollections": "Collections amount",
+      "totalExpenses": "Expenses amount"
+    },
+    "table": {
+      "fullName": "Full name",
+      "email": "Email",
+      "role": "Role",
+      "activitiesCount": "Activities",
+      "invoicesCount": "Invoices",
+      "invoicesAmount": "Invoices amount",
+      "collectionsAmount": "Collections",
+      "expensesAmount": "Expenses",
+      "lastActivityAt": "Last activity",
+      "ariaLabel": "Staff activity report table"
+    }
+  },
+  "simpleLedger": {
+    "title": "Simple Ledger",
+    "subtitle": "Quick statement for a selected customer, supplier, or employee.",
+    "actions": {
+      "export": "Export",
+      "exporting": "Exporting..."
+    },
+    "messages": {
+      "selectParty": "Select a party to load the ledger statement."
+    },
+    "filters": {
+      "partyType": "Party type",
+      "partyTypeCustomer": "Customer",
+      "partyTypeSupplier": "Supplier",
+      "partyTypeEmployee": "Employee",
+      "party": "Party",
+      "partySearch": "Search party",
+      "partyEmpty": "No parties",
+      "partyLoading": "Loading parties...",
+      "dateFrom": "From date",
+      "dateTo": "To date",
+      "limit": "Rows"
+    },
+    "summary": {
+      "openingBalance": "Opening balance",
+      "totalDebit": "Total debit",
+      "totalCredit": "Total credit",
+      "closingBalance": "Closing balance",
+      "currentBalance": "Current balance"
+    },
+    "table": {
+      "date": "Date",
+      "dueDate": "Due date",
+      "entryType": "Entry type",
+      "note": "Note",
+      "debit": "Debit",
+      "credit": "Credit",
+      "runningBalance": "Running balance",
+      "ariaLabel": "Simple ledger report table"
+    }
+  },
+  "profitLoss": {
+    "title": "Profit & Loss",
+    "subtitle": "Revenue, expenses, and net margin for the selected period.",
+    "filters": {
+      "dateFrom": "From date",
+      "dateTo": "To date",
+      "comparePrevious": "Compare previous period"
+    },
+    "summary": {
+      "netSales": "Net sales",
+      "totalExpenses": "Total expenses",
+      "netProfit": "Net profit",
+      "margin": "Margin"
+    }
+  },
+  "cashFlow": {
+    "title": "Cash Flow",
+    "subtitle": "Daily inflow and outflow movement.",
+    "filters": {
+      "dateFrom": "From date",
+      "dateTo": "To date",
+      "limit": "Rows"
+    },
+    "summary": {
+      "openingBalance": "Opening balance",
+      "inflow": "Inflow",
+      "outflow": "Outflow",
+      "netChange": "Net change",
+      "closingBalance": "Closing balance"
+    },
+    "table": {
+      "date": "Date",
+      "inflow": "Inflow",
+      "outflow": "Outflow",
+      "net": "Net",
+      "closingBalance": "Closing balance",
+      "ariaLabel": "Cash flow report table"
+    }
+  },
+  "customersAging": {
+    "title": "Customers Aging",
+    "subtitle": "Receivables aging buckets for customers.",
+    "filters": {
+      "search": "Search by customer name or phone",
+      "asOfDate": "As of date",
+      "isActive": "Status",
+      "isActiveAll": "All",
+      "isActiveTrue": "Active only",
+      "isActiveFalse": "Inactive only",
+      "limit": "Rows"
+    },
+    "summary": {
+      "partiesCount": "Customers",
+      "totalOutstanding": "Total outstanding",
+      "bucket0_30": "0-30 days",
+      "bucket90": "90+ days"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "name": "Name",
+      "phone": "Phone",
+      "status": "Status",
+      "totalOutstanding": "Total outstanding",
+      "bucket0_30": "0-30",
+      "bucket31_60": "31-60",
+      "bucket61_90": "61-90",
+      "bucket90": "90+",
+      "oldestDueDate": "Oldest due",
+      "lastTransactionDate": "Last transaction",
+      "ariaLabel": "Customers aging report table"
+    }
+  },
+  "suppliersAging": {
+    "title": "Suppliers Aging",
+    "subtitle": "Payables aging buckets for suppliers.",
+    "filters": {
+      "search": "Search by supplier name or phone",
+      "asOfDate": "As of date",
+      "isActive": "Status",
+      "isActiveAll": "All",
+      "isActiveTrue": "Active only",
+      "isActiveFalse": "Inactive only",
+      "limit": "Rows"
+    },
+    "summary": {
+      "partiesCount": "Suppliers",
+      "totalOutstanding": "Total outstanding",
+      "bucket0_30": "0-30 days",
+      "bucket90": "90+ days"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "name": "Name",
+      "phone": "Phone",
+      "status": "Status",
+      "totalOutstanding": "Total outstanding",
+      "bucket0_30": "0-30",
+      "bucket31_60": "31-60",
+      "bucket61_90": "61-90",
+      "bucket90": "90+",
+      "oldestDueDate": "Oldest due",
+      "lastTransactionDate": "Last transaction",
+      "ariaLabel": "Suppliers aging report table"
+    }
+  },
+  "salesDetailed": {
+    "title": "Sales Detailed",
+    "subtitle": "Detailed invoice sales listing.",
+    "filters": {
+      "search": "Search by invoice number or party",
+      "saleType": "Sale type",
+      "saleTypeAll": "All sale types",
+      "saleTypeCash": "Cash",
+      "saleTypeDeferred": "Deferred",
+      "saleTypeInstallment": "Installment",
+      "partyType": "Party type",
+      "partyTypeAll": "All parties",
+      "partyTypeCustomer": "Customers",
+      "partyTypeSupplier": "Suppliers",
+      "partyTypeEmployee": "Employees",
+      "dateFrom": "From date",
+      "dateTo": "To date",
+      "limit": "Rows"
+    },
+    "summary": {
+      "invoicesCount": "Invoices",
+      "grossAmount": "Gross amount",
+      "taxAmount": "Tax amount",
+      "netAmount": "Net amount"
+    },
+    "table": {
+      "invoiceNumber": "Invoice #",
+      "issueDate": "Issue date",
+      "partyName": "Party",
+      "partyType": "Party type",
+      "saleType": "Sale type",
+      "totalAmount": "Total amount",
+      "taxAmount": "Tax amount",
+      "netAmount": "Net amount",
+      "createdBy": "Created by",
+      "ariaLabel": "Sales detailed report table"
+    }
+  },
+  "expensesAnalytics": {
+    "title": "Expenses Analytics",
+    "subtitle": "Expense distribution and trend summary.",
+    "summary": {
+      "totalAmount": "Total amount",
+      "expensesCount": "Expenses count",
+      "averageExpense": "Average expense",
+      "byCategoryCount": "Categories"
+    },
+    "export": {
+      "date": "Date",
+      "category": "Category",
+      "amount": "Amount",
+      "supplier": "Supplier",
+      "description": "Description"
+    }
+  },
+  "productsPerformance": {
+    "title": "Products Performance",
+    "subtitle": "Best and weakest product movement.",
+    "summary": {
+      "totalProducts": "Products",
+      "totalQuantity": "Sold quantity",
+      "totalSalesAmount": "Sales amount"
+    },
+    "table": {
+      "productName": "Product",
+      "sku": "SKU",
+      "category": "Category",
+      "quantitySold": "Qty sold",
+      "salesAmount": "Sales amount",
+      "averageUnitPrice": "Avg unit price",
+      "invoicesCount": "Invoices",
+      "ariaLabel": "Products performance table"
+    }
+  },
+  "operationalPerformance": {
+    "title": "Operational Performance",
+    "subtitle": "Quick health snapshot for operations.",
+    "summary": {
+      "revenue": "Revenue",
+      "avgInvoiceValue": "Avg invoice",
+      "expensesTotal": "Expenses",
+      "collectionRate": "Collection rate"
+    }
+  },
+  "criticalAlerts": {
+    "title": "Critical Alerts",
+    "subtitle": "Early risk indicators.",
+    "summary": {
+      "creditRiskCount": "Credit risk",
+      "largeOverduesCount": "Large overdues",
+      "upcomingInstallmentsCount": "Upcoming installments",
+      "expensesSpikeAlert": "Expense spike"
+    },
+    "values": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "export": {
+      "type": "Alert type",
+      "name": "Name",
+      "value": "Value",
+      "amount": "Amount",
+      "typeCreditRisk": "Credit risk",
+      "typeLargeOverdue": "Large overdue",
+      "typeUpcomingInstallment": "Upcoming installment"
+    }
+  },
+  "ledgerStatement": {
+    "title": "Ledger Statement",
+    "subtitle": "Statement by selected party.",
+    "filters": {
+      "party": "Select party",
+      "partySearch": "Search party"
+    },
+    "summary": {
+      "openingBalance": "Opening",
+      "totalDebit": "Debit",
+      "totalCredit": "Credit",
+      "closingBalance": "Closing",
+      "currentBalance": "Current"
+    },
+    "table": {
+      "date": "Date",
+      "entryType": "Entry type",
+      "debit": "Debit",
+      "credit": "Credit",
+      "runningBalance": "Running balance",
+      "note": "Note",
+      "ariaLabel": "Ledger statement report table"
+    }
+  },
+  "quickStart": {
+    "overviewTitle": "Start with the overview",
+    "overviewDescription": "Use the overview when you want the fastest read on receivables, deferred sales, and overdue exposure.",
+    "collectionsTitle": "Follow collections first",
+    "collectionsDescription": "Open collections follow-up when you need the next customer-payment actions quickly.",
+    "alertsTitle": "Check critical alerts",
+    "alertsDescription": "Review urgent credit, overdue, and installment alerts before moving into detailed analysis."
+  },
+  "groups": {
+    "recommended": "Recommended reports",
+    "moreReports": "More detailed reports",
+    "recommendedHint": "This report is part of the recommended daily view for faster decisions.",
+    "moreReportsHint": "This report stays available for deeper analysis and follow-up work."
+  },
+  "operationalCash": {
+    "badge": "Operational-only data",
+    "title": "Cash Reconciliation Visibility",
+    "subtitle": "Operational reconciliation values shown here are separate from official system-generated totals.",
+    "totalRecords": "Total records",
+    "closedDays": "Closed days",
+    "openDrafts": "Open drafts",
+    "totalVariance": "Total variance",
+    "columns": {
+      "businessDate": "Business date",
+      "expectedCash": "Expected cash",
+      "actualCash": "Actual cash",
+      "variance": "Variance",
+      "closedAt": "Closed at"
+    }
+  }
+}

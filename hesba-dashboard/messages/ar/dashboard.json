@@ -1,0 +1,135 @@
+{
+  "pageTitle": "لوحة التحكم | دفتر",
+  "pageDescription": "لوحة تشغيل شاملة لصاحب الشركة تعرض أهم أرقام الشركة وحركتها.",
+  "title": "لوحة التحكم",
+  "welcome": "مرحبًا",
+  "welcomeTitle": "مرحبًا بك في دفتر",
+  "welcomeDescription": "مساحة مركزية لمتابعة المبيعات والتحصيل والمصروفات والتنبيهات المهمة.",
+  "overview": "نظرة عامة",
+  "page": {
+    "title": "لوحة التحكم | دفتر",
+    "description": "لوحة تشغيل مالية وإدارية متكاملة للشركة",
+    "heading": "لوحة تحكم الشركة",
+    "subheading": "أهم أرقام {company} في شاشة واحدة، جاهزة للمتابعة واتخاذ القرار.",
+    "eyebrow": "تشغيل الشركة",
+    "periodLabel": "الفترة الحالية",
+    "quickAccessTitle": "الوصول السريع",
+    "quickAccessDescription": "اختصارات للوحدات الأكثر استخدامًا أثناء التشغيل اليومي.",
+    "companyFallback": "شركتك",
+    "loading": "جاري التحميل...",
+    "operationalCash": {
+      "badge": "بيانات تشغيلية فقط",
+      "title": "لقطة مطابقة الصندوق",
+      "subtitle": "عرض تشغيلي للمطابقة فقط. هذه القيم لا تُعوّض الفواتير أو المدفوعات أو إجماليات المحاسبة الرسمية.",
+      "openAction": "فتح المطابقة",
+      "totalRecords": "إجمالي السجلات",
+      "closedDays": "الأيام المغلقة",
+      "openDrafts": "المسودات المفتوحة",
+      "totalVariance": "إجمالي الفرق"
+    }
+  },
+  "filters": {
+    "dateFrom": "من تاريخ",
+    "dateTo": "إلى تاريخ",
+    "reset": "إعادة الضبط",
+    "presets": {
+      "today": "اليوم",
+      "week": "هذا الأسبوع",
+      "month": "هذا الشهر",
+      "year": "هذا العام",
+      "last30days": "آخر 30 يومًا"
+    }
+  },
+  "cards": {
+    "totalSales": "إجمالي المبيعات",
+    "collectionAmount": "إجمالي التحصيل",
+    "totalExpenses": "إجمالي المصروفات",
+    "activeCustomers": "العملاء النشطون",
+    "netProfit": "صافي الربح",
+    "cashNetFlow": "صافي التدفق النقدي",
+    "overdueCount": "الحالات المتأخرة",
+    "creditRisk": "خطر الائتمان",
+    "invoicesCount": "عدد الفواتير: {count}",
+    "payables": "الذمم الدائنة: {count}",
+    "productsEmployees": "المنتجات {products} • الموظفون {employees}",
+    "receivables": "الذمم المدينة: {amount}",
+    "deferredInstallments": "آجل {deferred} • تقسيط {installments}",
+    "overdueBreakdown": "آجل متأخر {deferred} • أقساط متأخرة {installments}",
+    "criticalNegativeBalances": "أرصدة حرجة: {count}"
+  },
+  "charts": {
+    "salesExpensesTitle": "اتجاه المبيعات والمصروفات",
+    "salesExpensesDescription": "مقارنة مباشرة بين الأداء البيعي والمصروفات خلال الفترة المحددة.",
+    "salesSeries": "المبيعات",
+    "expensesSeries": "المصروفات",
+    "collectionsTitle": "اتجاه التحصيل",
+    "collectionsDescription": "متابعة التحصيل اليومي أو الشهري خلال نفس الفترة.",
+    "collectionsSeries": "التحصيل",
+    "balancesTitle": "الذمم المدينة مقابل الدائنة",
+    "balancesDescription": "قياس سريع لما لك عند العملاء وما عليك للموردين.",
+    "receivablesLabel": "مدينة",
+    "payablesLabel": "دائنة",
+    "salesDistributionTitle": "توزيع أنواع البيع",
+    "salesDistributionDescription": "نسبة البيع النقدي والآجل والتقسيط داخل الفترة المحددة.",
+    "cashLabel": "نقدي",
+    "deferredLabel": "آجل",
+    "installmentLabel": "تقسيط"
+  },
+  "highlights": {
+    "topCustomersTitle": "أفضل العملاء",
+    "topCustomersDescription": "أعلى العملاء مساهمة في المبيعات خلال الفترة.",
+    "topProductsTitle": "أفضل المنتجات",
+    "topProductsDescription": "أكثر المنتجات تأثيرًا على الإيراد الحالي.",
+    "topEmployeesTitle": "أفضل الموظفين",
+    "topEmployeesDescription": "أكثر الموظفين مساهمة في الفواتير والتحصيل.",
+    "outstandingBalance": "الرصيد الحالي: {amount}",
+    "quantitySold": "الكمية المباعة: {quantity}",
+    "employeeMeta": "فواتير {invoices} • تحصيل {collections}"
+  },
+  "alerts": {
+    "title": "تنبيهات تحتاج متابعة",
+    "description": "حالات حرجة أو متأخرة تستحق تدخلًا سريعًا من صاحب الشركة أو المحاسب.",
+    "empty": "لا توجد تنبيهات حرجة في الوقت الحالي.",
+    "dueDate": "تاريخ الاستحقاق: {date}",
+    "entityType": "الطرف: {type}",
+    "severity": {
+      "low": "منخفض",
+      "medium": "متوسط",
+      "high": "مرتفع"
+    }
+  },
+  "quickModules": {
+    "customers": {
+      "title": "العملاء",
+      "description": "إدارة حسابات العملاء"
+    },
+    "suppliers": {
+      "title": "الموردون",
+      "description": "متابعة أرصدة الموردين"
+    },
+    "invoices": {
+      "title": "الفواتير",
+      "description": "إصدار وإدارة الفواتير"
+    },
+    "expenses": {
+      "title": "المصروفات",
+      "description": "متابعة مصروفات التشغيل"
+    },
+    "deferredSales": {
+      "title": "البيع الآجل",
+      "description": "متابعة عمليات البيع الآجل"
+    },
+    "installments": {
+      "title": "التقسيط",
+      "description": "إدارة عقود التقسيط"
+    },
+    "ledger": {
+      "title": "دفتر الأستاذ",
+      "description": "مراجعة القيود المحاسبية"
+    },
+    "reports": {
+      "title": "التقارير",
+      "description": "تقارير أداء الأعمال"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "title": "لوحة التحكم",
+
+  "greeting": {
+    "morning":   "صباح الخير",
+    "afternoon": "مساء الخير",
+    "evening":   "مساء النور"
+  },
+
+  "period": {
+    "today":       "اليوم",
+    "week":        "الأسبوع",
+    "month":       "الشهر",
+    "year":        "العام",
+    "last_30_days":"آخر 30 يوم"
+  },
+
+  "kpis": {
+    "netProfit":        "صافي الربح",
+    "totalSales":       "المبيعات",
+    "totalExpenses":    "المصروفات",
+    "collectionAmount": "التحصيلات",
+    "receivables":      "الذمم المدينة",
+    "payables":         "الذمم الدائنة",
+    "cashNetFlow":      "التدفق النقدي"
+  },
+
+  "sections": {
+    "operations":    "العمليات",
+    "alerts":        "تنبيهات تحتاج اهتمام",
+    "quickActions":  "إجراءات سريعة",
+    "todaySnapshot": "لقطة اليوم",
+    "topOverdue":    "أكثر العملاء تأخراً"
+  },
+
+  "todayKpis": {
+    "sales":       "مبيعات اليوم",
+    "collections": "التحصيل",
+    "pending":     "معلقة",
+    "overdue":     "متأخرون"
+  },
+
+  "ctas": {
+    "newInvoice":    "فاتورة جديدة",
+    "recordPayment": "تسجيل دفعة",
+    "viewOverdue":   "المتأخرات"
+  },
+
+  "operations": {
+    "invoices":      "الفواتير",
+    "deferredSales": "البيع الآجل",
+    "installments":  "الأقساط"
+  },
+
+  "alerts": {
+    "overdueDeferredSales":      "{{count}} بيع آجل متأخر عن السداد — اضغط للمراجعة",
+    "overdueInstallments":       "{{count}} قسط متأخر عن السداد — اضغط للمراجعة",
+    "criticalNegativeBalances":  "{{count}} رصيد سالب حرج — اضغط لمراجعة الدفتر"
+  },
+
+  "quickActions": {
+    "newInvoice":   "فاتورة جديدة",
+    "newExpense":   "مصروف جديد",
+    "newCustomer":  "عميل جديد",
+    "viewLedger":   "الدفتر"
+  }
+}

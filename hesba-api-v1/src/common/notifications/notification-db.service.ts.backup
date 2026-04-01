@@ -1,0 +1,243 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { PrismaService } from '../../database/prisma/prisma.service';
+import { NotificationType } from '@prisma/client';
+import { NotificationGateway } from './notification.gateway';
+
+/**
+ * Notification Database Service
+ *
+ * يدير الإخطارات في قاعدة البيانات
+ * - حفظ الإخطارات بشكل دائم
+ * - الاستعلام عن الإخطارات
+ * - تحديث حالة الإخطار
+ * - حذف الإخطارات
+ * - البث الفوري عبر WebSocket
+ */
+@Injectable()
+export class NotificationDbService {
+  private logger = new Logger(NotificationDbService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private gateway: NotificationGateway,
+  ) {}
+
+  /**
+   * إنشاء إخطار في قاعدة البيانات والـ WebSocket
+   */
+  async create(data: {
+    userId: string;
+    type: NotificationType;
+    title: string;
+    titleAr?: string;
+    message: string;
+    messageAr?: string;
+    data?: Record<string, any>;
+  }) {
+    try {
+      const notification = await this.prisma.notification.create({
+        data: {
+          userId: data.userId,
+          type: data.type,
+          message: data.message,
+          recipient: '', // Required field
+          channel: 'PUSH', // Default channel for in-app notifications
+          tenantId: '', // Will need to be passed in later
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+            },
+          },
+        },
+      });
+
+      // بث الإخطار الفوري عبر WebSocket
+      if (this.gateway) {
+        this.gateway.notifyUser(data.userId, notification);
+      }
+
+      this.logger.log(
+        `Notification created: ${notification.id} for user ${data.userId}`,
+      );
+      return notification;
+    } catch (error) {
+      this.logger.error(`Error creating notification: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * الحصول على إخطارات المستخدم
+   */
+  async getUserNotifications(userId: string, limit: number = 50) {
+    try {
+      return await this.prisma.notification.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+      });
+    } catch (error) {
+      this.logger.error(`Error fetching notifications: ${error.message}`);
+      return [];
+    }
+  }
+
+  /**
+   * الحصول على الإخطارات غير المقروءة
+   */
+  async getUnreadNotifications(userId: string) {
+    try {
+      return await this.prisma.notification.findMany({
+        where: {
+          userId,
+          isRead: false,
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (error) {
+      this.logger.error(
+        `Error fetching unread notifications: ${error.message}`,
+      );
+      return [];
+    }
+  }
+
+  /**
+   * عدد الإخطارات غير المقروءة
+   */
+  async getUnreadCount(userId: string): Promise<number> {
+    try {
+      return await this.prisma.notification.count({
+        where: {
+          userId,
+          isRead: false,
+        },
+      });
+    } catch (error) {
+      this.logger.error(`Error counting unread: ${error.message}`);
+      return 0;
+    }
+  }
+
+  /**
+   * تحديث إخطار كمقروء
+   */
+  async markAsRead(notificationId: string) {
+    try {
+      return await this.prisma.notification.update({
+        where: { id: notificationId },
+        data: {
+          isRead: true,
+          readAt: new Date(),
+        },
+      });
+    } catch (error) {
+      this.logger.error(`Error marking as read: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * تحديث جميع الإخطارات كمقروءة
+   */
+  async markAllAsRead(userId: string) {
+    try {
+      const result = await this.prisma.notification.updateMany({
+        where: {
+          userId,
+          isRead: false,
+        },
+        data: {
+          isRead: true,
+          readAt: new Date(),
+        },
+      });
+      return result.count;
+    } catch (error) {
+      this.logger.error(`Error marking all as read: ${error.message}`);
+      return 0;
+    }
+  }
+
+  /**
+   * حذف إخطار
+   */
+  async delete(notificationId: string) {
+    try {
+      return await this.prisma.notification.delete({
+        where: { id: notificationId },
+      });
+    } catch (error) {
+      this.logger.error(`Error deleting notification: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * حذف جميع إخطارات المستخدم
+   */
+  async deleteAll(userId: string) {
+    try {
+      const result = await this.prisma.notification.deleteMany({
+        where: { userId },
+      });
+      return result.count;
+    } catch (error) {
+      this.logger.error(`Error deleting all notifications: ${error.message}`);
+      return 0;
+    }
+  }
+
+  /**
+   * تنظيف الإخطارات المنتهية الصلاحية
+   * (يجب تشغيله دورياً)
+   */
+  async cleanupExpiredNotifications() {
+    try {
+      const result = await this.prisma.notification.deleteMany({
+        where: {
+          expiresAt: {
+            lt: new Date(),
+          },
+        },
+      });
+
+      this.logger.log(`Cleaned up ${result.count} expired notifications`);
+      return result.count;
+    } catch (error) {
+      this.logger.error(`Error cleaning up notifications: ${error.message}`);
+      return 0;
+    }
+  }
+
+  /**
+   * البث الفوري إلى مستخدم واحد
+   */
+  broadcastToUser(userId: string, notification: any) {
+    if (this.gateway) {
+      this.gateway.notifyUser(userId, notification);
+    }
+  }
+
+  /**
+   * البث الفوري إلى عدة مستخدمين
+   */
+  broadcastToUsers(userIds: string[], notification: any) {
+    if (this.gateway) {
+      this.gateway.notifyUsers(userIds, notification);
+    }
+  }
+
+  /**
+   * البث الفوري للجميع
+   */
+  broadcastToAll(notification: any) {
+    if (this.gateway) {
+      this.gateway.notifyAll(notification);
+    }
+  }
+}

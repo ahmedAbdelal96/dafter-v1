@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col">
+<!-- Header -->
+<header class="sticky top-0 z-10 flex items-center bg-background-light dark:bg-background-dark/95 backdrop-blur-md p-4 border-b border-slate-200 dark:border-primary/20">
+<div class="flex items-center justify-between w-full">
+<button class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_forward</span>
+</button>
+<h1 class="text-lg font-bold tracking-tight">الإعدادات</h1>
+<div class="w-10"></div> <!-- Spacer for balance -->
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto no-scrollbar pb-24">
+<!-- Profile Header -->
+<section class="p-6">
+<div class="flex items-center gap-4 bg-primary/5 dark:bg-primary/10 p-4 rounded-xl border border-primary/10">
+<div class="relative">
+<div class="w-16 h-16 rounded-full border-2 border-primary bg-cover bg-center" data-alt="User profile photo of a man in a suit" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDGjNOyCTuq82vi45j2Orq8ktaF1nYSN1CujCeKao98d1urdm5zh2jXWMMM3EFrwD-aHuqZwpaVnH9_6-5f2Jr_kVeFBmlPjNrIdMUIA0-Yzl8g0JpHMi86iMk7YI4wZC9xRD603j6M9ihGBCv1AmtD0MDNLpThxhWk-TxKIkLmHdD-03XfnrlNsMkAJby5q0504zqdl6WUAKXw3uvXD-JYJcatEgdCeip1qgAFzpIWGq3F2EjgS2c8Cohr9F6RaxuMfuThmdEhFJU")'></div>
+<div class="absolute bottom-0 left-0 bg-primary text-white rounded-full p-1 border-2 border-background-dark">
+<span class="material-symbols-outlined text-[14px]">edit</span>
+</div>
+</div>
+<div class="flex flex-col">
+<h2 class="text-xl font-bold">أحمد محمد</h2>
+<p class="text-sm text-primary font-medium opacity-90">مالك الحساب</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">ahmed.m@hasba.com</p>
+</div>
+</div>
+</section>
+<!-- Account Settings -->
+<section class="mt-2">
+<h3 class="px-6 text-sm font-semibold text-slate-500 dark:text-primary/70 uppercase tracking-wider">إعدادات الحساب</h3>
+<div class="mt-3 space-y-px">
+<button class="w-full flex items-center justify-between px-6 py-4 bg-white dark:bg-primary/5 hover:bg-slate-50 dark:hover:bg-primary/10 transition-colors">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-xl bg-primary/20 text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<span class="font-medium">المعلومات الشخصية</span>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_left</span>
+</button>
+<button class="w-full flex items-center justify-between px-6 py-4 bg-white dark:bg-primary/5 hover:bg-slate-50 dark:hover:bg-primary/10 transition-colors">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-xl bg-primary/20 text-primary">
+<span class="material-symbols-outlined">lock</span>
+</div>
+<span class="font-medium">الأمان ورمز PIN</span>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_left</span>
+</button>
+</div>
+</section>
+<!-- Company Settings -->
+<section class="mt-6">
+<h3 class="px-6 text-sm font-semibold text-slate-500 dark:text-primary/70 uppercase tracking-wider">إعدادات الشركة</h3>
+<div class="mt-3 space-y-px">
+<button class="w-full flex items-center justify-between px-6 py-4 bg-white dark:bg-primary/5 hover:bg-slate-50 dark:hover:bg-primary/10 transition-colors">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-xl bg-primary/20 text-primary">
+<span class="material-symbols-outlined">business</span>
+</div>
+<span class="font-medium">ملف العمل التجاري</span>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_left</span>
+</button>
+<button class="w-full flex items-center justify-between px-6 py-4 bg-white dark:bg-primary/5 hover:bg-slate-50 dark:hover:bg-primary/10 transition-colors">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-xl bg-primary/20 text-primary">
+<span class="material-symbols-outlined">group</span>
+</div>
+<span class="font-medium">إدارة الموظفين</span>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_left</span>
+</button>
+<button class="w-full flex items-center justify-between px-6 py-4 bg-white dark:bg-primary/5 hover:bg-slate-50 dark:hover:bg-primary/10 transition-colors">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-xl bg-primary/20 text-primary">
+<span class="material-symbols-outlined">account_tree</span>
+</div>
+<span class="font-medium">إعدادات الفروع</span>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_left</span>
+</button>
+</div>
+</section>
+<!-- Preferences -->
+<section class="mt-6">
+<h3 class="px-6 text-sm font-semibold text-slate-500 dark:text-primary/70 uppercase tracking-wider">التفضيلات</h3>
+<div class="mt-3 space-y-px">
+<div class="flex items-center justify-between px-6 py-4 bg-white dark:bg-primary/5">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-xl bg-primary/20 text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</div>
+<span class="font-medium">التنبيهات</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between px-6 py-4 bg-white dark:bg-primary/5">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-xl bg-primary/20 text-primary">
+<span class="material-symbols-outlined">language</span>
+</div>
+<span class="font-medium">اللغة</span>
+</div>
+<div class="flex bg-slate-100 dark:bg-background-dark p-1 rounded-lg">
+<button class="px-3 py-1 text-xs font-bold rounded bg-white dark:bg-primary text-slate-900 dark:text-white shadow-sm">العربية</button>
+<button class="px-3 py-1 text-xs font-medium text-slate-500 dark:text-slate-400">EN</button>
+</div>
+</div>
+<div class="flex items-center justify-between px-6 py-4 bg-white dark:bg-primary/5">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-xl bg-primary/20 text-primary">
+<span class="material-symbols-outlined">dark_mode</span>
+</div>
+<span class="font-medium">الوضع الليلي</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- About & Support -->
+<section class="mt-6">
+<h3 class="px-6 text-sm font-semibold text-slate-500 dark:text-primary/70 uppercase tracking-wider">حول والدعم</h3>
+<div class="mt-3 space-y-px">
+<button class="w-full flex items-center justify-between px-6 py-4 bg-white dark:bg-primary/5 hover:bg-slate-50 dark:hover:bg-primary/10 transition-colors">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-xl bg-primary/20 text-primary">
+<span class="material-symbols-outlined">help_center</span>
+</div>
+<span class="font-medium">مركز المساعدة</span>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_left</span>
+</button>
+<button class="w-full flex items-center justify-between px-6 py-4 bg-white dark:bg-primary/5 hover:bg-slate-50 dark:hover:bg-primary/10 transition-colors">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-xl bg-primary/20 text-primary">
+<span class="material-symbols-outlined">article</span>
+</div>
+<span class="font-medium">شروط الخدمة</span>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_left</span>
+</button>
+<button class="w-full flex items-center justify-between px-6 py-4 bg-white dark:bg-primary/5 hover:bg-slate-50 dark:hover:bg-primary/10 transition-colors">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-xl bg-primary/20 text-primary">
+<span class="material-symbols-outlined">policy</span>
+</div>
+<span class="font-medium">سياسة الخصوصية</span>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_left</span>
+</button>
+</div>
+</section>
+<!-- Logout -->
+<section class="mt-8 px-6">
+<button class="w-full flex items-center justify-center gap-2 py-4 rounded-xl border-2 border-red-500/20 text-red-500 font-bold hover:bg-red-500/10 transition-colors">
+<span class="material-symbols-outlined">logout</span>
+<span>تسجيل الخروج</span>
+</button>
+<p class="text-center text-xs text-slate-500 mt-6 pb-4">إصدار التطبيق 2.4.0 (Hasba Finance)</p>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 border-t border-slate-200 dark:border-primary/20 bg-white dark:bg-background-dark/95 backdrop-blur-md px-2 pb-6 pt-2 z-20">
+<div class="flex justify-around items-center max-w-lg mx-auto">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">pie_chart</span>
+<span class="text-[10px] font-medium">التقارير</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<div class="bg-primary text-white size-12 rounded-full flex items-center justify-center -mt-8 shadow-lg shadow-primary/40 border-4 border-white dark:border-background-dark">
+<span class="material-symbols-outlined">add</span>
+</div>
+<span class="text-[10px] font-medium mt-1">جديد</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-[10px] font-medium">المعاملات</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-[1]">settings</span>
+<span class="text-[10px] font-bold">الإعدادات</span>
+</a>
+</div>
+</nav>
+</body></html>

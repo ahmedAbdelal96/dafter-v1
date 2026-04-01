@@ -1,0 +1,20 @@
+{
+  "create": {
+    "success": "Product added successfully",
+    "skuExists": "Another product with this SKU already exists in your company"
+  },
+  "update": {
+    "success": "Product updated successfully",
+    "skuExists": "Another product with this SKU already exists in your company"
+  },
+  "delete": {
+    "success": "Product deleted successfully"
+  },
+  "get": {
+    "notFound": "Product not found"
+  },
+  "toggleActive": {
+    "activated": "Product activated successfully",
+    "deactivated": "Product deactivated successfully"
+  }
+}

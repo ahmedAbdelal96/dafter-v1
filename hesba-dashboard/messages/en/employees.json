@@ -1,0 +1,265 @@
+{
+  "pageTitle": "Employees | dafter",
+  "pageDescription": "Manage employees, balances, and account activity.",
+  "title": "Employees",
+  "subtitle": "Create, track, and update employee accounts quickly.",
+  "summary": {
+    "total": "Total employees: {count}"
+  },
+  "filters": {
+    "searchPlaceholder": "Search by employee name, phone, or job title",
+    "allStatuses": "All statuses",
+    "perPage": "{count} per page"
+  },
+  "table": {
+    "ariaLabel": "Employees table",
+    "name": "Name",
+    "phone": "Phone",
+    "jobTitle": "Job title",
+    "openingBalance": "Opening balance",
+    "balance": "Balance",
+    "status": "Status"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "form": {
+    "name": "Employee name",
+    "phone": "Phone number",
+    "jobTitle": "Job title",
+    "openingBalance": "Opening balance",
+    "isActive": "Employee is active"
+  },
+  "actions": {
+    "addEmployee": "Add employee",
+    "exportExcel": "Export Excel",
+    "exporting": "Exporting...",
+    "create": "Create",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "close": "Close",
+    "view": "View details",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading..."
+  },
+  "modal": {
+    "createTitle": "Add New Employee",
+    "createDescription": "Enter employee details to create a new account.",
+    "editTitle": "Edit Employee",
+    "editDescription": "Update employee details and account status.",
+    "detailsTitle": "Employee Details"
+  },
+  "details": {
+    "pageTitle": "Employee Account | dafter",
+    "pageDescription": "View employee profile, balance, and account details.",
+    "title": "Employee Account",
+    "subtitle": "Manage this employee profile and account activity from one page.",
+    "backToList": "Back to employees",
+    "infoSectionTitle": "Basic information",
+    "meta": {
+      "createdAt": "Created at",
+      "updatedAt": "Last updated"
+    }
+  },
+  "empty": {
+    "title": "No employees yet",
+    "description": "Start by adding your first employee to track balances and settlements."
+  },
+  "messages": {
+    "createSuccess": "Employee created successfully.",
+    "createError": "Failed to create employee.",
+    "updateSuccess": "Employee updated successfully.",
+    "updateError": "Failed to update employee.",
+    "deleteSuccess": "Employee deleted successfully.",
+    "deleteError": "Failed to delete employee.",
+    "exportSuccess": "Employees exported successfully.",
+    "exportError": "Failed to export employees.",
+    "exportEmpty": "No employees found for export."
+  },
+  "export": {
+    "sheetName": "Employees",
+    "filePrefix": "employees"
+  },
+  "exportModal": {
+    "title": "Export employees",
+    "description": "Choose max rows before downloading Excel.",
+    "maxRecords": "Maximum rows",
+    "maxRecordsHint": "Leave empty to export all matched rows.",
+    "reset": "Reset"
+  },
+  "delete": {
+    "confirm": "Are you sure you want to delete employee \"{name}\"?"
+  },
+  "ledger": {
+    "title": "Employee Ledger",
+    "subtitle": "Track all employee transactions, running balances, and account history.",
+    "noPermission": "You don't have permission to view the ledger.",
+    "summary": {
+      "current": "Current balance",
+      "opening": "Opening balance (period)",
+      "closing": "Closing balance (period)"
+    },
+    "filters": {
+      "from": "From date",
+      "to": "To date",
+      "perPage": "Rows per page",
+      "reset": "Reset filters"
+    },
+    "actions": {
+      "addEntry": "Add ledger entry",
+      "createEntry": "Create entry",
+      "openCentralLedger": "Open in ledger page"
+    },
+    "form": {
+      "entryType": "Entry type",
+      "amount": "Amount",
+      "increaseBalance": "Increase employee balance",
+      "entryDate": "Entry date",
+      "dueDate": "Due date",
+      "note": "Note"
+    },
+    "entryTypes": {
+      "INVOICE": "Invoice",
+      "PAYMENT": "Payment",
+      "RETURN": "Return",
+      "ADJUSTMENT": "Adjustment",
+      "ADVANCE": "Advance",
+      "SALARY_PAYMENT": "Salary payment",
+      "DEDUCTION": "Deduction",
+      "SETTLEMENT": "Settlement"
+    },
+    "modal": {
+      "title": "Add Ledger Entry",
+      "description": "Create an employee ledger transaction with accurate balance impact."
+    },
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "note": "Note",
+      "amount": "Amount",
+      "runningBalance": "Running balance",
+      "actions": "Actions"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "summary": "Page {page} of {totalPages} ({total} entries)"
+    },
+    "messages": {
+      "createSuccess": "Ledger entry created successfully.",
+      "createError": "Failed to create ledger entry.",
+      "deleteSuccess": "Ledger entry deleted successfully.",
+      "deleteError": "Failed to delete ledger entry.",
+      "deleteConfirm": "Are you sure you want to delete this ledger entry?"
+    },
+    "empty": {
+      "title": "No ledger entries",
+      "description": "No transactions were found for the selected period."
+    }
+  },
+  "payroll": {
+    "pageTitle": "Employee Payroll | dafter",
+    "pageDescription": "Manage salaries, advances, and deductions for employees.",
+    "title": "Employee Payroll",
+    "subtitle": "Track payroll transactions with fast employee-level control.",
+    "selectEmployeeTitle": "Select an employee",
+    "selectEmployeeDescription": "Choose an employee first to view payroll entries and create transactions.",
+    "filters": {
+      "employee": "Employee",
+      "period": "Period",
+      "selectEmployee": "Select employee",
+      "searchEmployee": "Search employee",
+      "noEmployees": "No employees found",
+      "from": "From date",
+      "to": "To date",
+      "search": "Search payroll",
+      "searchPlaceholder": "Search by note or transaction type",
+      "periods": {
+        "all": "All time",
+        "thisMonth": "This month",
+        "lastMonth": "Last month",
+        "thisYear": "This year",
+        "custom": "Custom range"
+      }
+    },
+    "actions": {
+      "addSalary": "Add salary payment",
+      "addAdvance": "Add advance",
+      "addDeduction": "Add deduction",
+      "createEntry": "Create payroll entry",
+      "exportExcel": "Export Excel",
+      "exporting": "Exporting..."
+    },
+    "export": {
+      "sheetName": "Payroll",
+      "filePrefix": "payroll"
+    },
+    "exportModal": {
+      "title": "Export payroll",
+      "description": "Choose an optional date range and max rows before downloading Excel.",
+      "fromDate": "From date",
+      "toDate": "To date",
+      "maxRecords": "Maximum rows",
+      "maxRecordsHint": "Leave empty to export all matched rows.",
+      "reset": "Reset"
+    },
+    "summary": {
+      "salaryPayments": "Salary payments",
+      "advances": "Advances",
+      "deductions": "Deductions",
+      "netPayout": "Net payout impact",
+      "monthlyNet": "Current month net",
+      "yearlyNet": "Current year net",
+      "transactionsCount": "Transactions count"
+    },
+    "entryTypes": {
+      "SALARY_PAYMENT": "Salary payment",
+      "ADVANCE": "Advance",
+      "DEDUCTION": "Deduction"
+    },
+    "table": {
+      "title": "Payroll entries - {employeeName}",
+      "subtitle": "Current balance: {balance}",
+      "date": "Date",
+      "type": "Type",
+      "note": "Note",
+      "amount": "Amount",
+      "runningBalance": "Running balance",
+      "actions": "Actions"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "summary": "Page {page} of {totalPages} ({total} entries)"
+    },
+    "modal": {
+      "title": "Create Payroll Entry",
+      "description": "Record salary-related movement for this employee."
+    },
+    "form": {
+      "entryType": "Transaction type",
+      "amount": "Amount",
+      "entryDate": "Transaction date",
+      "dueDate": "Due date",
+      "note": "Note",
+      "signHint": "Salary payment is saved as a positive amount. Advance and deduction are saved as negative amounts."
+    },
+    "messages": {
+      "createSuccess": "Payroll entry created successfully.",
+      "createError": "Failed to create payroll entry.",
+      "deleteSuccess": "Payroll entry deleted successfully.",
+      "deleteError": "Failed to delete payroll entry.",
+      "deleteConfirm": "Are you sure you want to delete this payroll entry?",
+      "exportSuccess": "Payroll Excel exported successfully.",
+      "exportError": "Failed to export payroll Excel.",
+      "exportEmpty": "No payroll data available for export."
+    },
+    "empty": {
+      "title": "No payroll entries",
+      "description": "No payroll transactions were found for the selected filters."
+    }
+  }
+}

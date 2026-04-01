@@ -1,0 +1,93 @@
+{
+  "title": "البيع الآجل",
+  "singular": "بيع آجل",
+  "list": {
+    "title": "البيوع الآجلة",
+    "empty": "لا توجد بيوع آجلة",
+    "emptyDesc": "سجّل أول بيع آجل الآن",
+    "searchPlaceholder": "بحث بالاسم أو رقم المرجع..."
+  },
+  "detail": {
+    "title": "تفاصيل البيع الآجل",
+    "party": "الطرف",
+    "referenceNumber": "رقم المرجع",
+    "totalAmount": "إجمالي المبلغ",
+    "paidAmount": "المدفوع",
+    "remainingAmount": "المتبقي",
+    "progress": "نسبة السداد",
+    "dueDate": "تاريخ الاستحقاق",
+    "entryDate": "تاريخ التسجيل",
+    "status": "الحالة",
+    "description": "الوصف",
+    "paymentMethod": "طريقة الدفع",
+    "payments": "سجل الدفعات",
+    "createInvoice": "تحويل لفاتورة",
+    "cancelSale": "إلغاء البيع الآجل",
+    "cancelConfirm": "هل أنت متأكد من إلغاء هذا البيع الآجل؟",
+    "cancelSuccess": "تم إلغاء البيع الآجل بنجاح"
+  },
+  "form": {
+    "create": "بيع آجل جديد",
+    "partyType": "نوع الطرف",
+    "partyTypePlaceholder": "اختر نوع الطرف",
+    "party": "الطرف",
+    "partyPlaceholder": "اسم الطرف / UUID",
+    "totalAmount": "إجمالي المبلغ",
+    "amountPlaceholder": "0.00",
+    "dueDate": "تاريخ الاستحقاق",
+    "dueDatePlaceholder": "YYYY-MM-DD",
+    "description": "وصف البيع (اختياري)",
+    "descriptionPlaceholder": "وصف البضاعة أو الخدمة",
+    "expectedPaymentMethod": "طريقة الدفع المتوقعة (اختياري)",
+    "paymentMethodPlaceholder": "نقد / تحويل بنكي / شيك",
+    "submit": "حفظ البيع الآجل"
+  },
+  "payment": {
+    "title": "تسجيل دفعة",
+    "amount": "مبلغ الدفعة",
+    "amountPlaceholder": "0.00",
+    "date": "تاريخ الدفعة",
+    "datePlaceholder": "YYYY-MM-DD",
+    "method": "طريقة الدفع (اختياري)",
+    "methodPlaceholder": "نقد / تحويل / شيك",
+    "notes": "ملاحظات (اختياري)",
+    "notesPlaceholder": "رقم الحوالة أو أي ملاحظات",
+    "submit": "تسجيل الدفعة",
+    "empty": "لم يتم تسجيل أي دفعات بعد"
+  },
+  "status": {
+    "PENDING": "في الانتظار",
+    "PARTIAL": "مدفوع جزئياً",
+    "PAID": "مسدد بالكامل",
+    "OVERDUE": "متأخر السداد"
+  },
+  "partyType": {
+    "CUSTOMER": "عميل",
+    "SUPPLIER": "مورد",
+    "EMPLOYEE": "موظف"
+  },
+  "filter": {
+    "all": "الكل",
+    "status": "الحالة",
+    "PENDING": "في الانتظار",
+    "PARTIAL": "جزئي",
+    "PAID": "مسدد",
+    "OVERDUE": "متأخر"
+  },
+  "validation": {
+    "partyRequired": "الطرف مطلوب",
+    "amountRequired": "المبلغ مطلوب",
+    "amountPositive": "يجب أن يكون المبلغ أكبر من صفر",
+    "dueDateRequired": "تاريخ الاستحقاق مطلوب",
+    "dueDateFormat": "صيغة التاريخ يجب أن تكون YYYY-MM-DD",
+    "paymentAmountRequired": "مبلغ الدفعة مطلوب",
+    "paymentDateRequired": "تاريخ الدفعة مطلوب",
+    "paymentExceedsRemaining": "مبلغ الدفعة يتجاوز المبلغ المتبقي"
+  },
+  "error": {
+    "loadFailed": "فشل تحميل البيوع الآجلة",
+    "createFailed": "فشل إنشاء البيع الآجل",
+    "paymentFailed": "فشل تسجيل الدفعة",
+    "cancelFailed": "فشل إلغاء البيع الآجل"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "pageTitle": "الإشعارات | دفتر",
+  "pageDescription": "متابعة كل إشعارات النظام وحالة قراءتها.",
+  "title": "الإشعارات",
+  "subtitle": "راجع الإشعارات داخل النظام وحافظ على صندوق إشعارات منظم.",
+  "noPermission": "ليس لديك صلاحية لعرض الإشعارات.",
+  "filters": {
+    "scope": "نطاق العرض",
+    "scopeAll": "كل الإشعارات",
+    "scopeUnread": "غير المقروء فقط",
+    "perPage": "{count} عنصر لكل صفحة"
+  },
+  "summary": {
+    "total": "إجمالي الإشعارات: {count}",
+    "unread": "غير المقروء: {count}"
+  },
+  "table": {
+    "title": "العنوان",
+    "body": "الرسالة",
+    "type": "النوع",
+    "status": "الحالة",
+    "createdAt": "تاريخ الإنشاء",
+    "ariaLabel": "جدول الإشعارات"
+  },
+  "status": {
+    "read": "مقروء",
+    "unread": "غير مقروء"
+  },
+  "actions": {
+    "export": "تصدير",
+    "exporting": "جارٍ التصدير...",
+    "markAllRead": "تحديد الكل كمقروء",
+    "markingAll": "جارٍ التحديث...",
+    "markRead": "تحديد كمقروء",
+    "view": "عرض التفاصيل",
+    "loading": "جارٍ التحميل...",
+    "close": "إغلاق",
+    "cancel": "إلغاء"
+  },
+  "empty": {
+    "title": "لا توجد إشعارات",
+    "description": "لا توجد إشعارات مطابقة لهذا الفلتر."
+  },
+  "messages": {
+    "markReadSuccess": "تم تحديد الإشعار كمقروء.",
+    "markReadError": "تعذر تحديد الإشعار كمقروء.",
+    "markAllReadSuccess": "تم تحديد {count} إشعار كمقروء.",
+    "markAllReadError": "تعذر تحديد كل الإشعارات كمقروءة.",
+    "nothingToMark": "كل الإشعارات مقروءة بالفعل.",
+    "exportSuccess": "تم تصدير الإشعارات بنجاح.",
+    "exportError": "تعذر تصدير الإشعارات.",
+    "exportEmpty": "لا توجد إشعارات متاحة للتصدير."
+  },
+  "export": {
+    "sheetName": "الإشعارات",
+    "filePrefix": "notifications"
+  },
+  "exportModal": {
+    "title": "تصدير الإشعارات",
+    "description": "اختر الحد الأقصى لعدد الصفوف المراد تصديرها.",
+    "maxRecords": "أقصى عدد صفوف",
+    "maxRecordsHint": "اترك الحقل فارغًا لتصدير كل الصفوف المطابقة.",
+    "reset": "إعادة الضبط"
+  },
+  "modal": {
+    "detailsTitle": "تفاصيل الإشعار",
+    "detailsDescription": "راجع بيانات الإشعار والمعلومات المرتبطة به."
+  },
+  "details": {
+    "payload": "البيانات"
+  }
+}

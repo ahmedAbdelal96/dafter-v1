@@ -1,0 +1,19 @@
+{
+  "created": "تم تسجيل المصروف بنجاح",
+  "updated": "تم تعديل المصروف بنجاح",
+  "deleted": "تم حذف المصروف بنجاح",
+  "notFound": "المصروف غير موجود",
+  "supplierNotFound": "المورّد المحدد غير موجود",
+
+  "category": {
+    "RENT": "إيجار",
+    "SALARIES": "رواتب",
+    "UTILITIES": "مرافق",
+    "SUPPLIES": "مستلزمات",
+    "TRANSPORTATION": "مواصلات",
+    "MAINTENANCE": "صيانة",
+    "MARKETING": "تسويق",
+    "TAXES": "ضرائب ورسوم",
+    "OTHER": "أخرى"
+  }
+}

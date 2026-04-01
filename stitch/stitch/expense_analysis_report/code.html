@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>تحليل المصروفات - حسبة</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="max-w-md mx-auto bg-background-light dark:bg-background-dark min-h-screen flex flex-col border-x border-primary/10">
+<!-- Header -->
+<header class="flex items-center justify-between p-4 sticky top-0 bg-background-dark/80 backdrop-blur-md z-10 border-b border-primary/10">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<h1 class="text-lg font-bold">تحليل المصروفات</h1>
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-primary">calendar_month</span>
+</button>
+</header>
+<!-- KPI Card -->
+<div class="p-4">
+<div class="bg-primary/10 border border-primary/20 rounded-xl p-6 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
+<div class="relative z-10">
+<p class="text-slate-400 text-sm mb-1">إجمالي المصروفات (هذا الشهر)</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold text-slate-100">٤٥,٢٣٠</span>
+<span class="text-sm font-medium text-slate-400">ر.س</span>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<div class="flex items-center text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full text-xs font-bold">
+<span class="material-symbols-outlined text-xs leading-none">trending_up</span>
+<span>١٢٪+</span>
+</div>
+<p class="text-slate-500 text-xs">مقارنة بالشهر السابق (٣٩,٨٥٠ ر.س)</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Breakdown Chart Section -->
+<div class="px-4 py-2">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-md font-bold">توزيع المصروفات حسب الفئة</h2>
+<button class="text-primary text-xs font-medium">التفاصيل</button>
+</div>
+<div class="bg-slate-900/40 border border-primary/5 rounded-xl p-6">
+<!-- Simple Custom CSS Donut Visual representation -->
+<div class="flex items-center gap-8">
+<div class="relative w-32 h-32 flex items-center justify-center shrink-0">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-slate-800" cx="64" cy="64" fill="transparent" r="56" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-primary" cx="64" cy="64" fill="transparent" r="56" stroke="currentColor" stroke-dasharray="351.8" stroke-dashoffset="105" stroke-width="12"></circle>
+<circle class="text-emerald-400" cx="64" cy="64" fill="transparent" r="56" stroke="currentColor" stroke-dasharray="351.8" stroke-dashoffset="280" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-xl font-bold">١٠٠٪</span>
+<span class="text-[10px] text-slate-500">الإجمالي</span>
+</div>
+</div>
+<div class="flex flex-col gap-3 flex-1">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-xs text-slate-300">الموردين</span>
+</div>
+<span class="text-xs font-bold">٤٠٪</span>
+</div>
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+<span class="text-xs text-slate-300">الموظفين</span>
+</div>
+<span class="text-xs font-bold">٢٥٪</span>
+</div>
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-slate-600"></div>
+<span class="text-xs text-slate-300">الإيجار</span>
+</div>
+<span class="text-xs font-bold">٢٠٪</span>
+</div>
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-slate-800"></div>
+<span class="text-xs text-slate-300">أخرى</span>
+</div>
+<span class="text-xs font-bold">١٥٪</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Top Transactions List -->
+<div class="p-4 flex-1">
+<h3 class="text-md font-bold mb-4">أعلى المعاملات المالية</h3>
+<div class="space-y-3">
+<!-- Transaction 1 -->
+<div class="flex items-center justify-between p-3 bg-slate-900/20 border border-primary/5 rounded-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">factory</span>
+</div>
+<div>
+<p class="text-sm font-semibold">مجموعة التوريدات الوطنية</p>
+<p class="text-[11px] text-slate-500">١٤ نوفمبر ٢٠٢٤ • موردين</p>
+</div>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold text-red-400 leading-none">١٢,٤٠٠-</p>
+<p class="text-[10px] text-slate-500 mt-1">ر.س</p>
+</div>
+</div>
+<!-- Transaction 2 -->
+<div class="flex items-center justify-between p-3 bg-slate-900/20 border border-primary/5 rounded-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<p class="text-sm font-semibold">رواتب موظفي الإدارة</p>
+<p class="text-[11px] text-slate-500">٠١ نوفمبر ٢٠٢٤ • رواتب</p>
+</div>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold text-red-400 leading-none">٨,٥٠٠-</p>
+<p class="text-[10px] text-slate-500 mt-1">ر.س</p>
+</div>
+</div>
+<!-- Transaction 3 -->
+<div class="flex items-center justify-between p-3 bg-slate-900/20 border border-primary/5 rounded-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">apartment</span>
+</div>
+<div>
+<p class="text-sm font-semibold">شركة العقارات المميزة</p>
+<p class="text-[11px] text-slate-500">٠٥ نوفمبر ٢٠٢٤ • إيجار</p>
+</div>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold text-red-400 leading-none">٥,٠٠٠-</p>
+<p class="text-[10px] text-slate-500 mt-1">ر.س</p>
+</div>
+</div>
+<!-- Transaction 4 -->
+<div class="flex items-center justify-between p-3 bg-slate-900/20 border border-primary/5 rounded-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">bolt</span>
+</div>
+<div>
+<p class="text-sm font-semibold">شركة الكهرباء</p>
+<p class="text-[11px] text-slate-500">١٢ نوفمبر ٢٠٢٤ • مرافق</p>
+</div>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold text-red-400 leading-none">١,٢٤٠-</p>
+<p class="text-[10px] text-slate-500 mt-1">ر.س</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-4 py-3 text-sm font-medium text-slate-400 hover:text-primary transition-colors border-t border-primary/5">
+                عرض كافة المعاملات
+            </button>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="sticky bottom-0 bg-background-dark/95 backdrop-blur-md border-t border-primary/20 flex justify-around items-center px-4 pb-6 pt-3">
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium leading-none">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">pie_chart</span>
+<span class="text-[10px] font-medium leading-none">التقارير</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-[10px] font-medium leading-none">المعاملات</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-[10px] font-medium leading-none">المزيد</span>
+</a>
+</nav>
+</div>
+</body></html>

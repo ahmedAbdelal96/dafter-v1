@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Sans Arabic", "Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans Arabic', 'Inter', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<header class="flex items-center p-4 border-b border-primary/10">
+<div class="flex-1">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<h1 class="text-lg font-bold">تصدير البيانات</h1>
+<div class="flex-1"></div>
+</header>
+<main class="flex-1 flex flex-col items-center justify-center p-6 gap-8 max-w-md mx-auto w-full">
+<div class="w-full flex flex-col items-center text-center">
+<div class="relative size-48 flex items-center justify-center">
+<svg class="size-full transform -rotate-90">
+<circle class="text-primary/10" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-dasharray="552.92" stroke-dashoffset="82.93" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-4xl font-bold text-primary">85%</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 mt-1">جاري المعالجة</span>
+</div>
+</div>
+<h2 class="text-2xl font-bold mt-8 mb-2">جاري معالجة الملف</h2>
+<p class="text-slate-500 dark:text-slate-400">تحضير البيانات... يرجى الانتظار قليلاً</p>
+</div>
+<div class="w-full bg-primary/5 dark:bg-primary/10 border border-primary/20 rounded-xl p-5 space-y-4">
+<h3 class="text-sm font-semibold text-primary/80 uppercase tracking-wider">تفاصيل الملف</h3>
+<div class="flex justify-between items-center py-1 border-b border-primary/5">
+<span class="text-slate-500 dark:text-slate-400 text-sm">اسم الملف</span>
+<span class="text-sm font-medium">Hasba_Export_Feb2024.xlsx</span>
+</div>
+<div class="flex justify-between items-center py-1 border-b border-primary/5">
+<span class="text-slate-500 dark:text-slate-400 text-sm">حجم الملف</span>
+<span class="text-sm font-medium">2.4 MB</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-slate-500 dark:text-slate-400 text-sm">الحالة</span>
+<span class="text-sm font-medium flex items-center gap-2">
+<span class="size-2 bg-primary rounded-full animate-pulse"></span>
+                    تحضير البيانات...
+                </span>
+</div>
+</div>
+</main>
+<div class="p-6 border-t border-primary/10 bg-background-light dark:bg-background-dark/50 backdrop-blur-sm">
+<div class="max-w-md mx-auto space-y-3">
+<button class="w-full bg-primary text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+<span class="material-symbols-outlined">download</span>
+                تحميل الملف الآن
+            </button>
+<button class="w-full bg-transparent border border-primary/30 text-primary py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined">share</span>
+                مشاركة
+            </button>
+</div>
+</div>
+<div class="hidden fixed inset-0 z-50 bg-background-dark/90 flex flex-col items-center justify-center p-6">
+<div class="bg-background-dark border border-primary/20 p-8 rounded-3xl max-w-sm w-full text-center flex flex-col items-center">
+<div class="size-20 bg-primary/20 text-primary rounded-full flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-5xl">check_circle</span>
+</div>
+<h2 class="text-2xl font-bold mb-2">الملف جاهز</h2>
+<p class="text-slate-400 mb-8">تم تصدير كافة البيانات بنجاح</p>
+<button class="w-full bg-primary text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 mb-3">
+<span class="material-symbols-outlined">download</span>
+                تحميل الملف الآن
+            </button>
+<button class="w-full bg-primary/10 text-primary py-4 rounded-xl font-bold flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">share</span>
+                مشاركة
+            </button>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,40 @@
+{
+  "page": {
+    "pageTitle": "Subscription | Daftar",
+    "pageDescription": "View your current plan, usage quotas, and active features.",
+    "title": "Subscription",
+    "subtitle": "Your current plan, quota usage, and available features.",
+    "planSection": "Plan details",
+    "planName": "Plan",
+    "status": "Status",
+    "endDate": "Renewal date",
+    "featuresSection": "Active features",
+    "quotasSection": "Usage quotas",
+    "noFeatures": "No features listed for this plan.",
+    "unlimited": "Unlimited",
+    "empty": {
+      "title": "No subscription data",
+      "description": "Unable to load subscription information."
+    },
+    "statusValues": {
+      "ACTIVE": "Active",
+      "TRIAL": "Trial",
+      "EXPIRED": "Expired",
+      "SUSPENDED": "Suspended",
+      "CANCELLED": "Cancelled"
+    }
+  },
+  "errors": {
+    "featureNotAvailable": "This feature is not included in your current subscription plan.",
+    "planLimitReached": "You reached the current plan limit for {entity}. Upgrade the workspace plan to continue.",
+    "subscriptionInactive": "Your subscription is inactive. Renew or reactivate the workspace subscription to continue.",
+    "generic": "This action is unavailable for your current role or subscription."
+  },
+  "entities": {
+    "users": "users",
+    "customers": "customers",
+    "suppliers": "suppliers",
+    "employees": "employees",
+    "ledgerEntries": "ledger entries"
+  }
+}

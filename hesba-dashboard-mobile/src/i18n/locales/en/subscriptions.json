@@ -1,0 +1,50 @@
+{
+  "title": "Subscription",
+  "currentPlan": "Current Plan",
+  "endDate": "Subscription End Date",
+  "daysLeft": "days left",
+  "errorLoad": "Failed to load subscription data",
+  "retry": "Try Again",
+
+  "status": {
+    "ACTIVE": "Active",
+    "TRIAL": "Trial",
+    "SUSPENDED": "Suspended",
+    "EXPIRED": "Expired",
+    "INACTIVE": "Inactive"
+  },
+
+  "section": {
+    "quotas": "Usage Limits",
+    "features": "Available Features"
+  },
+
+  "quota": {
+    "customers": "Customers",
+    "suppliers": "Suppliers",
+    "employees": "Employees",
+    "users": "Users",
+    "ledgerEntries": "Ledger Entries",
+    "unlimited": "Unlimited",
+    "atLimit": "Limit reached"
+  },
+
+  "feature": {
+    "dashboard": "Dashboard",
+    "customers": "Customers",
+    "suppliers": "Suppliers",
+    "employees": "Employees",
+    "ledger": "Ledger",
+    "expenses": "Expenses",
+    "products": "Products",
+    "invoices": "Invoices",
+    "deferred_sales": "Deferred Sales",
+    "installments": "Installments",
+    "reports": "Reports"
+  },
+
+  "cta": {
+    "title": "Want to upgrade your plan?",
+    "desc": "Contact us to upgrade your subscription and unlock more features."
+  }
+}

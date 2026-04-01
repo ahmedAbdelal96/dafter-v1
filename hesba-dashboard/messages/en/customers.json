@@ -1,0 +1,258 @@
+{
+  "pageTitle": "Customers | dafter",
+  "pageDescription": "Manage customers, balances, and credit limits.",
+  "title": "Customers",
+  "subtitle": "Create, track, and update customer accounts quickly.",
+  "summary": {
+    "total": "Total customers: {count}"
+  },
+  "filters": {
+    "searchPlaceholder": "Search by customer name or phone",
+    "allStatuses": "All statuses",
+    "perPage": "{count} per page"
+  },
+  "table": {
+    "ariaLabel": "Customers table",
+    "name": "Name",
+    "phone": "Phone",
+    "balance": "Balance",
+    "creditLimit": "Credit limit",
+    "status": "Status",
+    "address": "Address",
+    "noLimit": "No limit"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "form": {
+    "name": "Customer name",
+    "phone": "Phone number",
+    "address": "Address",
+    "openingBalance": "Opening balance",
+    "creditLimit": "Credit limit",
+    "isActive": "Customer is active"
+  },
+  "actions": {
+    "addCustomer": "Add customer",
+    "exportExcel": "Export Excel",
+    "exporting": "Exporting...",
+    "create": "Create",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "close": "Close",
+    "view": "View details",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading..."
+  },
+  "modal": {
+    "createTitle": "Add New Customer",
+    "createDescription": "Enter customer details to create a new account.",
+    "editTitle": "Edit Customer",
+    "editDescription": "Update customer details and account status.",
+    "detailsTitle": "Customer Details"
+  },
+  "details": {
+    "pageTitle": "Customer Account | dafter",
+    "pageDescription": "View customer profile, balance, and account details.",
+    "title": "Customer Account",
+    "subtitle": "Manage this customer profile and account activity from one page.",
+    "backToList": "Back to customers",
+    "infoSectionTitle": "Basic information",
+    "currentBalance": "Current balance",
+    "currentBalanceHint": "This reflects approved financial activity only. Draft invoices do not change it yet.",
+    "openApprovedInvoices": "Open approved invoices",
+    "openApprovedInvoicesHint": "Draft invoices stay outside this number until they are approved.",
+    "accountSectionTitle": "Account activity",
+    "accountSectionDescription": "This section is ready for invoices, payments, and ledger entries as the module grows.",
+    "meta": {
+      "createdAt": "Created at",
+      "updatedAt": "Last updated"
+    }
+  },
+  "empty": {
+    "title": "No customers yet",
+    "description": "Start by adding your first customer to track balances and invoices."
+  },
+  "messages": {
+    "createSuccess": "Customer created successfully.",
+    "createError": "Failed to create customer.",
+    "updateSuccess": "Customer updated successfully.",
+    "updateError": "Failed to update customer.",
+    "deleteSuccess": "Customer deleted successfully.",
+    "deleteError": "Failed to delete customer.",
+    "exportSuccess": "Customers exported successfully.",
+    "exportError": "Failed to export customers.",
+    "exportEmpty": "No customers found for export."
+  },
+  "export": {
+    "sheetName": "Customers",
+    "filePrefix": "customers"
+  },
+  "exportModal": {
+    "title": "Export customers",
+    "description": "Choose max rows before downloading Excel.",
+    "maxRecords": "Maximum rows",
+    "maxRecordsHint": "Leave empty to export all matched rows.",
+    "reset": "Reset"
+  },
+  "delete": {
+    "confirm": "Are you sure you want to delete customer \"{name}\"?"
+  },
+  "pricing": {
+    "title": "Custom Prices",
+    "subtitle": "Products with special prices set for this customer.",
+    "table": {
+      "product": "Product",
+      "sku": "SKU",
+      "price": "Price",
+      "updatedAt": "Last updated"
+    },
+    "empty": {
+      "title": "No custom prices",
+      "description": "No special prices have been set for this customer yet."
+    },
+    "messages": {
+      "updateSuccess": "Price updated successfully.",
+      "updateError": "Failed to update price."
+    }
+  },
+  "ledger": {
+    "title": "Customer Ledger",
+    "subtitle": "Track all customer transactions, running balances, and account history.",
+    "noPermission": "You don't have permission to view the ledger.",
+    "summary": {
+      "current": "Current balance",
+      "opening": "Opening balance (period)",
+      "closing": "Closing balance (period)"
+    },
+    "filters": {
+      "from": "From date",
+      "to": "To date",
+      "perPage": "Rows per page",
+      "reset": "Reset filters"
+    },
+    "actions": {
+      "addEntry": "Add ledger entry",
+      "createEntry": "Create entry",
+      "openCentralLedger": "Open in ledger page"
+    },
+    "form": {
+      "entryType": "Entry type",
+      "amount": "Amount",
+      "increaseBalance": "Increase customer balance",
+      "entryDate": "Entry date",
+      "dueDate": "Due date",
+      "note": "Note"
+    },
+    "entryTypes": {
+      "INVOICE": "Invoice",
+      "PAYMENT": "Payment",
+      "RETURN": "Return",
+      "ADJUSTMENT": "Adjustment",
+      "ADVANCE": "Advance",
+      "SALARY_PAYMENT": "Salary payment",
+      "DEDUCTION": "Deduction",
+      "SETTLEMENT": "Settlement"
+    },
+    "modal": {
+      "title": "Add Ledger Entry",
+      "description": "Create a customer ledger transaction with accurate balance impact."
+    },
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "note": "Note",
+      "amount": "Amount",
+      "runningBalance": "Running balance",
+      "actions": "Actions"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "summary": "Page {page} of {totalPages} ({total} entries)"
+    },
+    "messages": {
+      "createSuccess": "Ledger entry created successfully.",
+      "createError": "Failed to create ledger entry.",
+      "deleteSuccess": "Ledger entry deleted successfully.",
+      "deleteError": "Failed to delete ledger entry.",
+      "deleteConfirm": "Are you sure you want to delete this ledger entry?"
+    },
+    "empty": {
+      "title": "No ledger entries",
+      "description": "No transactions were found for the selected period."
+    }
+  },
+  "sales": {
+    "title": "Sales Invoices",
+    "subtitle": "Create and manage customer sales invoices.",
+    "statusNotice": "Invoices created here start as drafts. They do not affect the current balance until they are approved.",
+    "noPermission": "You don't have permission to view sales invoices.",
+    "filters": {
+      "search": "Search by invoice number"
+    },
+    "actions": {
+      "addInvoice": "Add sales invoice",
+      "createInvoice": "Create invoice",
+      "saveDraft": "Save draft",
+      "saveAndApprove": "Save and approve",
+      "addItem": "Add item",
+      "duplicate": "Duplicate"
+    },
+    "modal": {
+      "title": "Create Sales Invoice",
+      "description": "Create a customer sales invoice with one or more line items.",
+      "keyboardHint": "Tip: Press Ctrl/Cmd + Enter to add a new line item quickly.",
+      "approvalHint": "Save draft keeps the invoice pending. Save and approve finishes it immediately when you have approval permission."
+    },
+    "form": {
+      "issueDate": "Issue date",
+      "taxAmount": "Tax amount",
+      "partyAddress": "Customer address",
+      "items": "Invoice items",
+      "product": "Select product (optional)",
+      "searchProduct": "Search products",
+      "noProducts": "No products found",
+      "description": "Item description",
+      "quantity": "Quantity",
+      "unitPrice": "Unit price",
+      "notes": "Notes"
+    },
+    "table": {
+      "invoiceNumber": "Invoice number",
+      "issueDate": "Issue date",
+      "status": "Status",
+      "total": "Total",
+      "tax": "Tax",
+      "createdBy": "Created by",
+      "actions": "Actions"
+    },
+    "summary": {
+      "subtotal": "Subtotal",
+      "tax": "Tax",
+      "total": "Grand total"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "summary": "Page {page} of {totalPages} ({total} invoices)"
+    },
+    "messages": {
+      "createSuccess": "Sales invoice draft created successfully.",
+      "createError": "Failed to create sales invoice.",
+      "createAndApproveSuccess": "Sales invoice created and approved successfully.",
+      "createAndApproveError": "Failed to create and approve sales invoice.",
+      "deleteSuccess": "Sales invoice deleted successfully.",
+      "deleteError": "Failed to delete sales invoice.",
+      "deleteConfirm": "Are you sure you want to delete invoice {invoiceNumber}?",
+      "duplicateError": "Failed to load invoice data for duplication."
+    },
+    "empty": {
+      "title": "No sales invoices",
+      "description": "No sales invoices were found for this customer."
+    }
+  }
+}

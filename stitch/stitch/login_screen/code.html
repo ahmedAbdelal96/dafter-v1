@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hasba - تسجيل الدخول</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans Arabic", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', 'Noto Sans Arabic', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden">
+<div class="flex items-center p-4 pb-2 justify-between">
+<button class="text-slate-900 dark:text-white flex size-12 shrink-0 items-center justify-center hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<div class="flex items-center gap-2">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl">account_balance_wallet</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">حسبة</h2>
+</div>
+<div class="size-12"></div>
+</div>
+<main class="flex-1 flex flex-col items-center justify-center px-6 max-w-[480px] mx-auto w-full">
+<div class="w-full text-center mb-10">
+<h1 class="text-slate-900 dark:text-white tracking-tight text-[32px] font-bold leading-tight pb-3">مرحباً بك مجدداً</h1>
+<p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal">سجل دخولك للوصول إلى محفظتك المالية الذكية</p>
+</div>
+<form class="w-full space-y-5">
+<div class="flex flex-col w-full">
+<label class="text-slate-900 dark:text-slate-200 text-sm font-medium leading-normal pb-2 px-1">البريد الإلكتروني أو اسم المستخدم</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">mail</span>
+<input class="form-input flex w-full rounded-xl text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-200 dark:border-primary/30 bg-white dark:bg-primary/5 h-14 placeholder:text-slate-400 dark:placeholder:text-slate-500 pr-12 pl-4 text-base font-normal transition-all" placeholder="example@hasba.com" type="text" value=""/>
+</div>
+</div>
+<div class="flex flex-col w-full">
+<div class="flex justify-between items-center pb-2 px-1">
+<label class="text-slate-900 dark:text-slate-200 text-sm font-medium leading-normal">كلمة المرور</label>
+<a class="text-primary text-xs font-semibold hover:underline" href="#">نسيت كلمة المرور؟</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
+<input class="form-input flex w-full rounded-xl text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-200 dark:border-primary/30 bg-white dark:bg-primary/5 h-14 placeholder:text-slate-400 dark:placeholder:text-slate-500 pr-12 pl-12 text-base font-normal transition-all" placeholder="••••••••" type="password" value=""/>
+<button class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<div class="pt-4">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98]" type="submit">
+                        تسجيل الدخول
+                    </button>
+</div>
+<div class="flex items-center gap-4 py-4">
+<div class="h-[1px] flex-1 bg-slate-200 dark:bg-primary/20"></div>
+<span class="text-slate-400 text-sm">أو تابع بواسطة</span>
+<div class="h-[1px] flex-1 bg-slate-200 dark:bg-primary/20"></div>
+</div>
+<div class="flex justify-center gap-6">
+<button class="size-14 rounded-xl border border-slate-200 dark:border-primary/30 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-primary/10 transition-colors" type="button">
+<span class="material-symbols-outlined text-3xl text-primary">fingerprint</span>
+</button>
+<button class="size-14 rounded-xl border border-slate-200 dark:border-primary/30 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-primary/10 transition-colors" type="button">
+<span class="material-symbols-outlined text-3xl text-primary">face</span>
+</button>
+</div>
+</form>
+<div class="mt-auto py-10 text-center">
+<p class="text-slate-600 dark:text-slate-400 text-sm">ليس لديك حساب؟ 
+                    <a class="text-primary font-bold hover:underline" href="#">أنشئ حساباً جديداً</a>
+</p>
+</div>
+</main>
+<footer class="p-6 text-center">
+<div class="flex justify-center gap-4 text-xs text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">سياسة الخصوصية</a>
+<span>•</span>
+<a class="hover:text-primary transition-colors" href="#">شروط الاستخدام</a>
+<span>•</span>
+<a class="hover:text-primary transition-colors" href="#">المساعدة</a>
+</div>
+</footer>
+</div>
+</body></html>

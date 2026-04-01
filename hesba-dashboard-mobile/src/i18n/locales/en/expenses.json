@@ -1,0 +1,74 @@
+{
+  "title": "Expenses",
+  "singular": "Expense",
+  "list": {
+    "title": "Expenses List",
+    "empty": "No expenses yet",
+    "emptyDesc": "Start recording your business expenses",
+    "searchPlaceholder": "Search expenses..."
+  },
+  "summary": {
+    "title": "Expenses Summary",
+    "total": "Total Expenses",
+    "byCategory": "By Category"
+  },
+  "detail": {
+    "title": "Expense Details",
+    "createdAt": "Recorded At"
+  },
+  "form": {
+    "create": "Add Expense",
+    "edit": "Edit Expense",
+    "save": "Save Changes",
+    "amount": "Amount",
+    "amountPlaceholder": "0.00",
+    "category": "Category",
+    "description": "Description",
+    "descriptionPlaceholder": "Expense description (optional)",
+    "date": "Date",
+    "supplier": "Supplier (optional)",
+    "supplierPlaceholder": "Select a supplier...",
+    "referenceNumber": "Reference Number",
+    "referenceNumberPlaceholder": "Invoice or receipt number",
+    "paymentMethod": "Payment Method",
+    "paymentMethodPlaceholder": "Cash / Transfer / Cheque...",
+    "notes": "Notes",
+    "notesPlaceholder": "Additional notes (optional)",
+    "advancedFields": "Additional fields"
+  },
+  "category": {
+    "RENT": "Rent",
+    "SALARIES": "Salaries",
+    "UTILITIES": "Utilities",
+    "SUPPLIES": "Supplies",
+    "TRANSPORTATION": "Transportation",
+    "MAINTENANCE": "Maintenance",
+    "MARKETING": "Marketing",
+    "TAXES": "Taxes & Fees",
+    "OTHER": "Other"
+  },
+  "delete": {
+    "title": "Delete Expense",
+    "message": "Are you sure you want to delete this expense? This action cannot be undone.",
+    "confirm": "Delete"
+  },
+  "filter": {
+    "title": "Filter Expenses",
+    "category": "Category",
+    "allCategories": "All Categories",
+    "dateFrom": "From Date",
+    "dateTo": "To Date"
+  },
+  "errors": {
+    "loadFailed": "Failed to load expenses",
+    "retry": "Try again",
+    "createFailed": "Failed to add expense. Check the data and try again."
+  },
+  "validation": {
+    "amountRequired": "Amount is required",
+    "amountPositive": "Amount must be greater than zero",
+    "categoryRequired": "Category is required",
+    "descriptionRequired": "Description is required",
+    "dateRequired": "Date is required"
+  }
+}

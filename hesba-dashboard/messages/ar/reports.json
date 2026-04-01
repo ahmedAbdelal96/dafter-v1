@@ -1,0 +1,561 @@
+{
+  "pageTitle": "التقارير | دفتر",
+  "pageDescription": "تقارير التحصيل، والديون، ونشاط الموظفين، ودفتر الحسابات المبسط.",
+  "title": "التقارير",
+  "subtitle": "تابع أهم مؤشرات النشاط التجاري بسرعة عبر فلاتر واضحة وجداول قابلة للتصدير.",
+  "tabs": {
+    "overview": "نظرة عامة",
+    "profitLoss": "الأرباح والخسائر",
+    "cashFlow": "التدفق النقدي",
+    "customersAging": "أعمار ديون العملاء",
+    "suppliersAging": "أعمار ديون الموردين",
+    "salesDetailed": "تفاصيل المبيعات",
+    "expensesAnalytics": "تحليل المصروفات",
+    "productsPerformance": "أداء المنتجات",
+    "operationalPerformance": "الأداء التشغيلي",
+    "criticalAlerts": "تنبيهات حرجة",
+    "ledgerStatement": "كشف الحساب",
+    "collectionsFollowup": "متابعة التحصيل",
+    "debtsSummary": "ملخص الديون",
+    "staffActivity": "نشاط الموظفين",
+    "simpleLedger": "دفتر حسابات مبسط"
+  },
+  "partyType": {
+    "customer": "عميل",
+    "supplier": "مورد",
+    "employee": "موظف"
+  },
+  "messages": {
+    "exportSuccess": "تم تصدير التقرير بنجاح.",
+    "exportError": "تعذر تصدير التقرير.",
+    "exportEmpty": "لا توجد بيانات متاحة للتصدير.",
+    "selectPartyForExport": "اختر طرفًا أولًا لتصدير كشف الحساب هذا.",
+    "estimatedRecords": "عدد السجلات المتوقع: {count}"
+  },
+  "export": {
+    "filePrefixCollectionsFollowup": "متابعة_التحصيل",
+    "filePrefixDebtsSummary": "ملخص_الديون",
+    "filePrefixStaffActivity": "نشاط_الموظفين",
+    "filePrefixSimpleLedger": "دفتر_حسابات_مبسط",
+    "filePrefixProfitLoss": "الأرباح_والخسائر",
+    "filePrefixCashFlow": "التدفق_النقدي",
+    "filePrefixCustomersAging": "أعمار_ديون_العملاء",
+    "filePrefixSuppliersAging": "أعمار_ديون_الموردين",
+    "filePrefixSalesDetailed": "تفاصيل_المبيعات",
+    "filePrefixExpensesAnalytics": "تحليل_المصروفات",
+    "filePrefixProductsPerformance": "أداء_المنتجات",
+    "filePrefixOperationalPerformance": "الأداء_التشغيلي",
+    "filePrefixCriticalAlerts": "تنبيهات_حرجة",
+    "filePrefixLedgerStatement": "كشف_الحساب"
+  },
+  "exportModal": {
+    "title": "تصدير البيانات",
+    "description": "اختياري: حدّد نطاقًا زمنيًا أو أقصى عدد من السجلات.",
+    "fromDate": "من تاريخ",
+    "toDate": "إلى تاريخ",
+    "maxRecords": "الحد الأقصى للسجلات",
+    "maxRecordsHint": "اتركه فارغًا لتصدير كل السجلات.",
+    "reset": "إعادة ضبط",
+    "cancel": "إلغاء",
+    "confirm": "تصدير"
+  },
+  "overview": {
+    "title": "نظرة تنفيذية",
+    "subtitle": "عرض سريع للمستحقات، والبيع الآجل، وحجم الأقساط.",
+    "filters": {
+      "partyType": "نوع الطرف",
+      "partyTypeAll": "كل الأطراف",
+      "partyTypeCustomer": "العملاء",
+      "partyTypeSupplier": "الموردون",
+      "partyTypeEmployee": "الموظفون",
+      "dateFrom": "من تاريخ",
+      "dateTo": "إلى تاريخ"
+    },
+    "cards": {
+      "totalReceivables": "إجمالي المستحقات",
+      "deferredRemaining": "المتبقي من البيع الآجل",
+      "installmentsRemaining": "المتبقي من الأقساط"
+    },
+    "actions": {
+      "title": "إجراءات سريعة",
+      "openCollectionsFollowup": "فتح متابعة التحصيل",
+      "openDebtsSummary": "فتح ملخص الديون",
+      "openStaffActivity": "فتح نشاط الموظفين"
+    },
+    "panels": {
+      "deferredProgress": "تقدم البيع الآجل",
+      "deferredProgressSubtitle": "إجمالي العمليات: {total} | متأخر: {overdue}",
+      "installmentsProgress": "تقدم التقسيط",
+      "installmentsProgressSubtitle": "العقود النشطة: {total} | الجداول المتأخرة: {overdue}",
+      "paid": "محصّل",
+      "remaining": "متبقٍ",
+      "overdueAmount": "قيمة المتأخر"
+    },
+    "charts": {
+      "noData": "لا توجد بيانات متاحة",
+      "categories": {
+        "deferredSales": "البيع الآجل",
+        "installments": "التقسيط"
+      },
+      "series": {
+        "paid": "محصّل",
+        "remaining": "متبقٍ",
+        "overdue": "متأخر"
+      },
+      "titles": {
+        "collectionBreakdown": "تفصيل التحصيل",
+        "overdueDistribution": "توزيع المتأخرات"
+      },
+      "subtitles": {
+        "collectionBreakdown": "مقارنة بين المحصّل والمتبقي والمتأخر في البيع الآجل والتقسيط.",
+        "overdueDistribution": "نسبة المتأخرات بين البيع الآجل والتقسيط."
+      }
+    }
+  },
+  "collectionsFollowup": {
+    "title": "متابعة التحصيل",
+    "subtitle": "مقارنة المبالغ المتوقعة بالمبالغ المحصلة مع تتبع المتأخرات.",
+    "actions": {
+      "export": "تصدير",
+      "exporting": "جارٍ التصدير..."
+    },
+    "filters": {
+      "partyType": "نوع الطرف",
+      "partyTypeAll": "الكل",
+      "partyTypeCustomer": "العملاء",
+      "partyTypeSupplier": "الموردون",
+      "partyTypeEmployee": "الموظفون",
+      "party": "الطرف",
+      "partySearch": "ابحث عن طرف",
+      "partyEmpty": "لا توجد أطراف",
+      "partyLoading": "جارٍ تحميل الأطراف...",
+      "dateFrom": "من تاريخ",
+      "dateTo": "إلى تاريخ",
+      "limit": "عدد الصفوف"
+    },
+    "summary": {
+      "expectedAmount": "المبلغ المتوقع",
+      "collectedAmount": "المبلغ المحصل",
+      "collectionRatePercent": "نسبة التحصيل",
+      "overdueOutstanding": "المتأخرات القائمة"
+    },
+    "table": {
+      "type": "النوع",
+      "referenceNumber": "المرجع",
+      "party": "الطرف",
+      "phone": "الهاتف",
+      "dueDate": "تاريخ الاستحقاق",
+      "expectedAmount": "المبلغ المتوقع",
+      "daysUntilDue": "الأيام حتى الاستحقاق",
+      "ariaLabel": "جدول تقرير متابعة التحصيل"
+    },
+    "type": {
+      "DEFERRED": "بيع آجل",
+      "INSTALLMENT": "قسط"
+    }
+  },
+  "debtsSummary": {
+    "title": "ملخص الديون",
+    "subtitle": "صافي الذمم المدينة والدائنة للعملاء والموردين.",
+    "actions": {
+      "export": "تصدير",
+      "exporting": "جارٍ التصدير..."
+    },
+    "filters": {
+      "search": "ابحث بالاسم أو الهاتف",
+      "entityType": "نوع الجهة",
+      "entityTypeAll": "كل الجهات",
+      "entityTypeCustomer": "العملاء",
+      "entityTypeSupplier": "الموردون",
+      "balanceType": "نوع الرصيد",
+      "balanceTypeAll": "كل الأرصدة",
+      "balanceTypeReceivable": "مدين",
+      "balanceTypePayable": "دائن",
+      "isActive": "الحالة",
+      "isActiveAll": "الكل",
+      "isActiveTrue": "نشط فقط",
+      "isActiveFalse": "غير نشط فقط",
+      "minAmount": "الحد الأدنى للمبلغ",
+      "limit": "عدد الصفوف"
+    },
+    "summary": {
+      "customersReceivable": "ديون العملاء",
+      "customersCredit": "أرصدة دائنة للعملاء",
+      "suppliersReceivable": "مستحقات على الموردين",
+      "suppliersPayable": "ديون الموردين",
+      "netReceivable": "صافي الذمم المدينة"
+    },
+    "table": {
+      "entityType": "الجهة",
+      "name": "الاسم",
+      "phone": "الهاتف",
+      "balanceType": "نوع الرصيد",
+      "amount": "المبلغ",
+      "status": "الحالة",
+      "ariaLabel": "جدول تقرير ملخص الديون"
+    },
+    "entityType": {
+      "CUSTOMER": "عميل",
+      "SUPPLIER": "مورد"
+    },
+    "balanceType": {
+      "RECEIVABLE": "مدين",
+      "PAYABLE": "دائن"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    }
+  },
+  "staffActivity": {
+    "title": "نشاط الموظفين",
+    "subtitle": "قياس المساهمة التشغيلية لكل مستخدم عبر الحركات المختلفة.",
+    "actions": {
+      "export": "تصدير",
+      "exporting": "جارٍ التصدير..."
+    },
+    "filters": {
+      "search": "ابحث باسم الموظف أو بريده",
+      "user": "الموظف",
+      "userSearch": "ابحث عن موظف",
+      "userEmpty": "لا يوجد موظفون",
+      "userLoading": "جارٍ تحميل الموظفين...",
+      "dateFrom": "من تاريخ",
+      "dateTo": "إلى تاريخ",
+      "limit": "عدد الصفوف"
+    },
+    "summary": {
+      "usersCount": "عدد المستخدمين",
+      "totalActivities": "إجمالي الأنشطة",
+      "totalInvoices": "إجمالي الفواتير",
+      "totalInvoiceAmount": "قيمة الفواتير",
+      "totalCollections": "قيمة التحصيل",
+      "totalExpenses": "قيمة المصروفات"
+    },
+    "table": {
+      "fullName": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "role": "الدور",
+      "activitiesCount": "الأنشطة",
+      "invoicesCount": "الفواتير",
+      "invoicesAmount": "قيمة الفواتير",
+      "collectionsAmount": "التحصيل",
+      "expensesAmount": "المصروفات",
+      "lastActivityAt": "آخر نشاط",
+      "ariaLabel": "جدول تقرير نشاط الموظفين"
+    }
+  },
+  "simpleLedger": {
+    "title": "دفتر حسابات مبسط",
+    "subtitle": "كشف سريع لطرف محدد من عميل أو مورد أو موظف.",
+    "actions": {
+      "export": "تصدير",
+      "exporting": "جارٍ التصدير..."
+    },
+    "messages": {
+      "selectParty": "اختر طرفًا لعرض كشف الحساب."
+    },
+    "filters": {
+      "partyType": "نوع الطرف",
+      "partyTypeCustomer": "عميل",
+      "partyTypeSupplier": "مورد",
+      "partyTypeEmployee": "موظف",
+      "party": "الطرف",
+      "partySearch": "ابحث عن طرف",
+      "partyEmpty": "لا توجد أطراف",
+      "partyLoading": "جارٍ تحميل الأطراف...",
+      "dateFrom": "من تاريخ",
+      "dateTo": "إلى تاريخ",
+      "limit": "عدد الصفوف"
+    },
+    "summary": {
+      "openingBalance": "الرصيد الافتتاحي",
+      "totalDebit": "إجمالي المدين",
+      "totalCredit": "إجمالي الدائن",
+      "closingBalance": "الرصيد الختامي",
+      "currentBalance": "الرصيد الحالي"
+    },
+    "table": {
+      "date": "التاريخ",
+      "dueDate": "تاريخ الاستحقاق",
+      "entryType": "نوع الحركة",
+      "note": "البيان",
+      "debit": "مدين",
+      "credit": "دائن",
+      "runningBalance": "الرصيد التراكمي",
+      "ariaLabel": "جدول دفتر الحسابات المبسط"
+    }
+  },
+  "profitLoss": {
+    "title": "الأرباح والخسائر",
+    "subtitle": "الإيرادات والمصروفات وصافي الربح للفترة المحددة.",
+    "filters": {
+      "dateFrom": "من تاريخ",
+      "dateTo": "إلى تاريخ",
+      "comparePrevious": "مقارنة بالفترة السابقة"
+    },
+    "summary": {
+      "netSales": "صافي المبيعات",
+      "totalExpenses": "إجمالي المصروفات",
+      "netProfit": "صافي الربح",
+      "margin": "الهامش"
+    }
+  },
+  "cashFlow": {
+    "title": "التدفق النقدي",
+    "subtitle": "حركة الدخول والخروج النقدي يوميًا.",
+    "filters": {
+      "dateFrom": "من تاريخ",
+      "dateTo": "إلى تاريخ",
+      "limit": "عدد الصفوف"
+    },
+    "summary": {
+      "openingBalance": "الرصيد الافتتاحي",
+      "inflow": "الداخل",
+      "outflow": "الخارج",
+      "netChange": "صافي التغير",
+      "closingBalance": "الرصيد الختامي"
+    },
+    "table": {
+      "date": "التاريخ",
+      "inflow": "داخل",
+      "outflow": "خارج",
+      "net": "الصافي",
+      "closingBalance": "الرصيد الختامي",
+      "ariaLabel": "جدول تقرير التدفق النقدي"
+    }
+  },
+  "customersAging": {
+    "title": "أعمار ديون العملاء",
+    "subtitle": "تحليل ديون العملاء حسب فترات التأخر.",
+    "filters": {
+      "search": "ابحث باسم العميل أو الهاتف",
+      "asOfDate": "حتى تاريخ",
+      "isActive": "الحالة",
+      "isActiveAll": "الكل",
+      "isActiveTrue": "نشط فقط",
+      "isActiveFalse": "غير نشط فقط",
+      "limit": "عدد الصفوف"
+    },
+    "summary": {
+      "partiesCount": "عدد العملاء",
+      "totalOutstanding": "إجمالي الرصيد القائم",
+      "bucket0_30": "0-30 يومًا",
+      "bucket90": "90+ يومًا"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "table": {
+      "name": "الاسم",
+      "phone": "الهاتف",
+      "status": "الحالة",
+      "totalOutstanding": "إجمالي الرصيد القائم",
+      "bucket0_30": "0-30",
+      "bucket31_60": "31-60",
+      "bucket61_90": "61-90",
+      "bucket90": "90+",
+      "oldestDueDate": "أقدم استحقاق",
+      "lastTransactionDate": "آخر حركة",
+      "ariaLabel": "جدول أعمار ديون العملاء"
+    }
+  },
+  "suppliersAging": {
+    "title": "أعمار ديون الموردين",
+    "subtitle": "تحليل ديون الموردين حسب فترات التأخر.",
+    "filters": {
+      "search": "ابحث باسم المورد أو الهاتف",
+      "asOfDate": "حتى تاريخ",
+      "isActive": "الحالة",
+      "isActiveAll": "الكل",
+      "isActiveTrue": "نشط فقط",
+      "isActiveFalse": "غير نشط فقط",
+      "limit": "عدد الصفوف"
+    },
+    "summary": {
+      "partiesCount": "عدد الموردين",
+      "totalOutstanding": "إجمالي الرصيد القائم",
+      "bucket0_30": "0-30 يومًا",
+      "bucket90": "90+ يومًا"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "table": {
+      "name": "الاسم",
+      "phone": "الهاتف",
+      "status": "الحالة",
+      "totalOutstanding": "إجمالي الرصيد القائم",
+      "bucket0_30": "0-30",
+      "bucket31_60": "31-60",
+      "bucket61_90": "61-90",
+      "bucket90": "90+",
+      "oldestDueDate": "أقدم استحقاق",
+      "lastTransactionDate": "آخر حركة",
+      "ariaLabel": "جدول أعمار ديون الموردين"
+    }
+  },
+  "salesDetailed": {
+    "title": "تفاصيل المبيعات",
+    "subtitle": "قائمة تفصيلية بفواتير المبيعات.",
+    "filters": {
+      "search": "ابحث برقم الفاتورة أو الطرف",
+      "saleType": "نوع البيع",
+      "saleTypeAll": "كل أنواع البيع",
+      "saleTypeCash": "نقدي",
+      "saleTypeDeferred": "آجل",
+      "saleTypeInstallment": "تقسيط",
+      "partyType": "نوع الطرف",
+      "partyTypeAll": "كل الأطراف",
+      "partyTypeCustomer": "العملاء",
+      "partyTypeSupplier": "الموردون",
+      "partyTypeEmployee": "الموظفون",
+      "dateFrom": "من تاريخ",
+      "dateTo": "إلى تاريخ",
+      "limit": "عدد الصفوف"
+    },
+    "summary": {
+      "invoicesCount": "عدد الفواتير",
+      "grossAmount": "إجمالي المبلغ",
+      "taxAmount": "الضريبة",
+      "netAmount": "الصافي"
+    },
+    "table": {
+      "invoiceNumber": "رقم الفاتورة",
+      "issueDate": "تاريخ الإصدار",
+      "partyName": "الطرف",
+      "partyType": "نوع الطرف",
+      "saleType": "نوع البيع",
+      "totalAmount": "إجمالي المبلغ",
+      "taxAmount": "الضريبة",
+      "netAmount": "الصافي",
+      "createdBy": "أُنشئت بواسطة",
+      "ariaLabel": "جدول تفاصيل المبيعات"
+    }
+  },
+  "expensesAnalytics": {
+    "title": "تحليل المصروفات",
+    "subtitle": "ملخص توزيع المصروفات واتجاهها.",
+    "summary": {
+      "totalAmount": "إجمالي المبلغ",
+      "expensesCount": "عدد المصروفات",
+      "averageExpense": "متوسط المصروف",
+      "byCategoryCount": "عدد التصنيفات"
+    },
+    "export": {
+      "date": "التاريخ",
+      "category": "التصنيف",
+      "amount": "المبلغ",
+      "supplier": "المورد",
+      "description": "الوصف"
+    }
+  },
+  "productsPerformance": {
+    "title": "أداء المنتجات",
+    "subtitle": "أفضل وأضعف حركة للمنتجات.",
+    "summary": {
+      "totalProducts": "عدد المنتجات",
+      "totalQuantity": "الكمية المباعة",
+      "totalSalesAmount": "قيمة المبيعات"
+    },
+    "table": {
+      "productName": "المنتج",
+      "sku": "SKU",
+      "category": "التصنيف",
+      "quantitySold": "الكمية المباعة",
+      "salesAmount": "قيمة المبيعات",
+      "averageUnitPrice": "متوسط سعر الوحدة",
+      "invoicesCount": "عدد الفواتير",
+      "ariaLabel": "جدول أداء المنتجات"
+    }
+  },
+  "operationalPerformance": {
+    "title": "الأداء التشغيلي",
+    "subtitle": "لقطة سريعة لصحة العمليات.",
+    "summary": {
+      "revenue": "الإيراد",
+      "avgInvoiceValue": "متوسط الفاتورة",
+      "expensesTotal": "المصروفات",
+      "collectionRate": "نسبة التحصيل"
+    }
+  },
+  "criticalAlerts": {
+    "title": "تنبيهات حرجة",
+    "subtitle": "مؤشرات مبكرة للمخاطر.",
+    "summary": {
+      "creditRiskCount": "مخاطر الائتمان",
+      "largeOverduesCount": "متأخرات كبيرة",
+      "upcomingInstallmentsCount": "أقساط قادمة",
+      "expensesSpikeAlert": "قفزة مصروفات"
+    },
+    "values": {
+      "yes": "نعم",
+      "no": "لا"
+    },
+    "export": {
+      "type": "نوع التنبيه",
+      "name": "الاسم",
+      "value": "القيمة",
+      "amount": "المبلغ",
+      "typeCreditRisk": "مخاطر ائتمان",
+      "typeLargeOverdue": "متأخر كبير",
+      "typeUpcomingInstallment": "قسط قادم"
+    }
+  },
+  "ledgerStatement": {
+    "title": "كشف الحساب",
+    "subtitle": "كشف حساب للطرف المحدد.",
+    "filters": {
+      "party": "اختر الطرف",
+      "partySearch": "ابحث عن طرف"
+    },
+    "summary": {
+      "openingBalance": "افتتاحي",
+      "totalDebit": "مدين",
+      "totalCredit": "دائن",
+      "closingBalance": "ختامي",
+      "currentBalance": "حالي"
+    },
+    "table": {
+      "date": "التاريخ",
+      "entryType": "نوع الحركة",
+      "debit": "مدين",
+      "credit": "دائن",
+      "runningBalance": "الرصيد التراكمي",
+      "note": "البيان",
+      "ariaLabel": "جدول كشف الحساب"
+    }
+  },
+  "quickStart": {
+    "overviewTitle": "ابدأ بالنظرة العامة",
+    "overviewDescription": "استخدم النظرة العامة عندما تحتاج أسرع قراءة للمستحقات والبيع الآجل وحجم التأخرات.",
+    "collectionsTitle": "ابدأ بمتابعة التحصيل",
+    "collectionsDescription": "افتح متابعة التحصيل عندما تحتاج معرفة الخطوات التالية لتحصيل دفعات العملاء بسرعة.",
+    "alertsTitle": "راجع التنبيهات الحرجة",
+    "alertsDescription": "راجع تنبيهات الائتمان والتأخرات والأقساط أولاً قبل الانتقال إلى التحليل التفصيلي."
+  },
+  "groups": {
+    "recommended": "التقارير الموصى بها",
+    "moreReports": "تقارير تفصيلية أكثر",
+    "recommendedHint": "هذا التقرير ضمن العرض اليومي الموصى به لاتخاذ القرار بسرعة.",
+    "moreReportsHint": "هذا التقرير ما زال متاحًا للتحليل الأعمق وأعمال المتابعة التفصيلية."
+  },
+  "operationalCash": {
+    "badge": "بيانات تشغيلية فقط",
+    "title": "رؤية مطابقة الصندوق",
+    "subtitle": "قيم المطابقة التشغيلية المعروضة هنا منفصلة عن الإجماليات الرسمية المُولَّدة من النظام.",
+    "totalRecords": "إجمالي السجلات",
+    "closedDays": "الأيام المغلقة",
+    "openDrafts": "المسودات المفتوحة",
+    "totalVariance": "إجمالي الفرق",
+    "columns": {
+      "businessDate": "تاريخ يوم العمل",
+      "expectedCash": "النقدية المتوقعة",
+      "actualCash": "النقدية الفعلية",
+      "variance": "الفرق",
+      "closedAt": "تاريخ الإغلاق"
+    }
+  }
+}

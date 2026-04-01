@@ -1,0 +1,265 @@
+{
+  "pageTitle": "الموظفون | دفتر",
+  "pageDescription": "إدارة الموظفين وأرصدة الحسابات وحركة المعاملات.",
+  "title": "الموظفون",
+  "subtitle": "أنشئ حسابات الموظفين وتابعها وعدّلها بسهولة.",
+  "summary": {
+    "total": "إجمالي الموظفين: {count}"
+  },
+  "filters": {
+    "searchPlaceholder": "ابحث باسم الموظف أو رقم الهاتف أو المسمى الوظيفي",
+    "allStatuses": "كل الحالات",
+    "perPage": "{count} لكل صفحة"
+  },
+  "table": {
+    "ariaLabel": "جدول الموظفين",
+    "name": "الاسم",
+    "phone": "الهاتف",
+    "jobTitle": "المسمى الوظيفي",
+    "openingBalance": "الرصيد الافتتاحي",
+    "balance": "الرصيد",
+    "status": "الحالة"
+  },
+  "status": {
+    "active": "نشط",
+    "inactive": "غير نشط"
+  },
+  "form": {
+    "name": "اسم الموظف",
+    "phone": "رقم الهاتف",
+    "jobTitle": "المسمى الوظيفي",
+    "openingBalance": "الرصيد الافتتاحي",
+    "isActive": "الموظف نشط"
+  },
+  "actions": {
+    "addEmployee": "إضافة موظف",
+    "exportExcel": "تصدير Excel",
+    "exporting": "جارٍ التصدير...",
+    "create": "إنشاء",
+    "save": "حفظ التعديلات",
+    "saving": "جارٍ الحفظ...",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "view": "عرض التفاصيل",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "loading": "جارٍ التحميل..."
+  },
+  "modal": {
+    "createTitle": "إضافة موظف جديد",
+    "createDescription": "أدخل بيانات الموظف لإنشاء حساب جديد.",
+    "editTitle": "تعديل بيانات الموظف",
+    "editDescription": "حدّث بيانات الموظف وحالة الحساب.",
+    "detailsTitle": "تفاصيل الموظف"
+  },
+  "details": {
+    "pageTitle": "حساب الموظف | دفتر",
+    "pageDescription": "عرض ملف الموظف والرصيد وتفاصيل الحساب.",
+    "title": "حساب الموظف",
+    "subtitle": "إدارة بيانات الموظف وحركة حسابه من صفحة مستقلة.",
+    "backToList": "الرجوع إلى الموظفين",
+    "infoSectionTitle": "البيانات الأساسية",
+    "meta": {
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "آخر تحديث"
+    }
+  },
+  "empty": {
+    "title": "لا يوجد موظفون بعد",
+    "description": "ابدأ بإضافة أول موظف لتتبع الأرصدة والتسويات."
+  },
+  "messages": {
+    "createSuccess": "تم إنشاء الموظف بنجاح.",
+    "createError": "تعذر إنشاء الموظف.",
+    "updateSuccess": "تم تحديث الموظف بنجاح.",
+    "updateError": "تعذر تحديث الموظف.",
+    "deleteSuccess": "تم حذف الموظف بنجاح.",
+    "deleteError": "تعذر حذف الموظف.",
+    "exportSuccess": "تم تصدير الموظفين بنجاح.",
+    "exportError": "تعذر تصدير الموظفين.",
+    "exportEmpty": "لا توجد بيانات موظفين للتصدير."
+  },
+  "export": {
+    "sheetName": "الموظفون",
+    "filePrefix": "الموظفون"
+  },
+  "exportModal": {
+    "title": "تصدير الموظفين",
+    "description": "حدّد الحد الأقصى للصفوف قبل تنزيل ملف Excel.",
+    "maxRecords": "الحد الأقصى للصفوف",
+    "maxRecordsHint": "اتركه فارغًا لتصدير كل النتائج المطابقة.",
+    "reset": "إعادة ضبط"
+  },
+  "delete": {
+    "confirm": "هل أنت متأكد من حذف الموظف \"{name}\"؟"
+  },
+  "ledger": {
+    "title": "دفتر الموظف",
+    "subtitle": "تابع كل حركات الموظف والرصيد الجاري وسجل الحساب.",
+    "noPermission": "ليس لديك صلاحية عرض دفتر الحساب.",
+    "summary": {
+      "current": "الرصيد الحالي",
+      "opening": "رصيد بداية الفترة",
+      "closing": "رصيد نهاية الفترة"
+    },
+    "filters": {
+      "from": "من تاريخ",
+      "to": "إلى تاريخ",
+      "perPage": "عدد السطور",
+      "reset": "إعادة ضبط الفلاتر"
+    },
+    "actions": {
+      "addEntry": "إضافة حركة",
+      "createEntry": "تسجيل الحركة",
+      "openCentralLedger": "فتح في صفحة دفتر الأستاذ"
+    },
+    "form": {
+      "entryType": "نوع الحركة",
+      "amount": "المبلغ",
+      "increaseBalance": "زيادة رصيد الموظف",
+      "entryDate": "تاريخ الحركة",
+      "dueDate": "تاريخ الاستحقاق",
+      "note": "ملاحظة"
+    },
+    "entryTypes": {
+      "INVOICE": "فاتورة",
+      "PAYMENT": "دفعة",
+      "RETURN": "مرتجع",
+      "ADJUSTMENT": "تسوية",
+      "ADVANCE": "سلفة",
+      "SALARY_PAYMENT": "دفع راتب",
+      "DEDUCTION": "خصم",
+      "SETTLEMENT": "مخالصة"
+    },
+    "modal": {
+      "title": "إضافة حركة حساب",
+      "description": "سجل حركة جديدة في حساب الموظف مع تأثير صحيح على الرصيد."
+    },
+    "table": {
+      "date": "التاريخ",
+      "type": "النوع",
+      "note": "الملاحظة",
+      "amount": "المبلغ",
+      "runningBalance": "الرصيد التراكمي",
+      "actions": "إجراءات"
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "summary": "صفحة {page} من {totalPages} ({total} حركة)"
+    },
+    "messages": {
+      "createSuccess": "تم تسجيل الحركة بنجاح.",
+      "createError": "تعذر تسجيل الحركة.",
+      "deleteSuccess": "تم حذف الحركة بنجاح.",
+      "deleteError": "تعذر حذف الحركة.",
+      "deleteConfirm": "هل أنت متأكد من حذف هذه الحركة؟"
+    },
+    "empty": {
+      "title": "لا توجد حركات حساب",
+      "description": "لا توجد نتائج للفترة المحددة."
+    }
+  },
+  "payroll": {
+    "pageTitle": "رواتب الموظفين | دفتر",
+    "pageDescription": "إدارة الرواتب والسلف والخصومات للموظفين.",
+    "title": "رواتب الموظفين",
+    "subtitle": "تابع حركات الرواتب بسرعة وعلى مستوى كل موظف.",
+    "selectEmployeeTitle": "اختر موظفًا",
+    "selectEmployeeDescription": "ابدأ باختيار الموظف لعرض حركات الرواتب وإضافة قيود جديدة.",
+    "filters": {
+      "employee": "الموظف",
+      "period": "الفترة",
+      "selectEmployee": "اختر موظفًا",
+      "searchEmployee": "ابحث عن موظف",
+      "noEmployees": "لا يوجد موظفون",
+      "from": "من تاريخ",
+      "to": "إلى تاريخ",
+      "search": "بحث في الرواتب",
+      "searchPlaceholder": "ابحث بالملاحظة أو نوع الحركة",
+      "periods": {
+        "all": "كل الفترات",
+        "thisMonth": "هذا الشهر",
+        "lastMonth": "الشهر الماضي",
+        "thisYear": "هذه السنة",
+        "custom": "فترة مخصصة"
+      }
+    },
+    "actions": {
+      "addSalary": "إضافة صرف راتب",
+      "addAdvance": "إضافة سلفة",
+      "addDeduction": "إضافة خصم",
+      "createEntry": "تسجيل حركة رواتب",
+      "exportExcel": "تصدير Excel",
+      "exporting": "جارٍ التصدير..."
+    },
+    "export": {
+      "sheetName": "الرواتب",
+      "filePrefix": "الرواتب"
+    },
+    "exportModal": {
+      "title": "تصدير الرواتب",
+      "description": "حدّد فترة تاريخية اختيارية وحدًا أقصى للنتائج قبل تنزيل ملف Excel.",
+      "fromDate": "من تاريخ",
+      "toDate": "إلى تاريخ",
+      "maxRecords": "الحد الأقصى للصفوف",
+      "maxRecordsHint": "اتركه فارغًا لتصدير كل النتائج المطابقة.",
+      "reset": "إعادة ضبط"
+    },
+    "summary": {
+      "salaryPayments": "إجمالي الرواتب المصروفة",
+      "advances": "إجمالي السلف",
+      "deductions": "إجمالي الخصومات",
+      "netPayout": "صافي أثر الصرف",
+      "monthlyNet": "صافي الشهر الحالي",
+      "yearlyNet": "صافي السنة الحالية",
+      "transactionsCount": "عدد الحركات"
+    },
+    "entryTypes": {
+      "SALARY_PAYMENT": "صرف راتب",
+      "ADVANCE": "سلفة",
+      "DEDUCTION": "خصم"
+    },
+    "table": {
+      "title": "حركات الرواتب - {employeeName}",
+      "subtitle": "الرصيد الحالي: {balance}",
+      "date": "التاريخ",
+      "type": "النوع",
+      "note": "الملاحظة",
+      "amount": "المبلغ",
+      "runningBalance": "الرصيد التراكمي",
+      "actions": "إجراءات"
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "summary": "صفحة {page} من {totalPages} ({total} حركة)"
+    },
+    "modal": {
+      "title": "تسجيل حركة رواتب",
+      "description": "سجل حركة مرتبطة بالرواتب لهذا الموظف."
+    },
+    "form": {
+      "entryType": "نوع الحركة",
+      "amount": "المبلغ",
+      "entryDate": "تاريخ الحركة",
+      "dueDate": "تاريخ الاستحقاق",
+      "note": "ملاحظة",
+      "signHint": "صرف الراتب يُسجل كمبلغ موجب، بينما السلفة والخصم يُسجلان كمبالغ سالبة."
+    },
+    "messages": {
+      "createSuccess": "تم تسجيل حركة الرواتب بنجاح.",
+      "createError": "تعذر تسجيل حركة الرواتب.",
+      "deleteSuccess": "تم حذف حركة الرواتب بنجاح.",
+      "deleteError": "تعذر حذف حركة الرواتب.",
+      "deleteConfirm": "هل أنت متأكد من حذف حركة الرواتب هذه؟",
+      "exportSuccess": "تم تصدير ملف Excel للرواتب بنجاح.",
+      "exportError": "تعذر تصدير ملف Excel للرواتب.",
+      "exportEmpty": "لا توجد بيانات رواتب للتصدير."
+    },
+    "empty": {
+      "title": "لا توجد حركات رواتب",
+      "description": "لا توجد نتائج لحركات الرواتب بالفلاتر المحددة."
+    }
+  }
+}

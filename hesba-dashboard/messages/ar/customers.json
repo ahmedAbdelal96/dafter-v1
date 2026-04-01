@@ -1,0 +1,258 @@
+{
+  "pageTitle": "العملاء | دفتر",
+  "pageDescription": "إدارة العملاء والأرصدة وحدود الائتمان.",
+  "title": "العملاء",
+  "subtitle": "أنشئ حسابات العملاء وتابعها وعدلها بسهولة.",
+  "summary": {
+    "total": "إجمالي العملاء: {count}"
+  },
+  "filters": {
+    "searchPlaceholder": "ابحث باسم العميل أو رقم الهاتف",
+    "allStatuses": "كل الحالات",
+    "perPage": "{count} لكل صفحة"
+  },
+  "table": {
+    "ariaLabel": "جدول العملاء",
+    "name": "الاسم",
+    "phone": "الهاتف",
+    "balance": "الرصيد",
+    "creditLimit": "حد الائتمان",
+    "status": "الحالة",
+    "address": "العنوان",
+    "noLimit": "بدون حد"
+  },
+  "status": {
+    "active": "نشط",
+    "inactive": "غير نشط"
+  },
+  "form": {
+    "name": "اسم العميل",
+    "phone": "رقم الهاتف",
+    "address": "العنوان",
+    "openingBalance": "الرصيد الافتتاحي",
+    "creditLimit": "حد الائتمان",
+    "isActive": "العميل نشط"
+  },
+  "actions": {
+    "addCustomer": "إضافة عميل",
+    "exportExcel": "تصدير Excel",
+    "exporting": "جارٍ التصدير...",
+    "create": "إنشاء",
+    "save": "حفظ التعديلات",
+    "saving": "جارٍ الحفظ...",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "view": "عرض التفاصيل",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "loading": "جارٍ التحميل..."
+  },
+  "modal": {
+    "createTitle": "إضافة عميل جديد",
+    "createDescription": "أدخل بيانات العميل لإنشاء حساب جديد.",
+    "editTitle": "تعديل بيانات العميل",
+    "editDescription": "حدّث بيانات العميل وحالة الحساب.",
+    "detailsTitle": "تفاصيل العميل"
+  },
+  "empty": {
+    "title": "لا يوجد عملاء بعد",
+    "description": "ابدأ بإضافة أول عميل لتتبع الأرصدة والفواتير."
+  },
+  "messages": {
+    "createSuccess": "تم إنشاء العميل بنجاح.",
+    "createError": "تعذر إنشاء العميل.",
+    "updateSuccess": "تم تحديث العميل بنجاح.",
+    "updateError": "تعذر تحديث العميل.",
+    "deleteSuccess": "تم حذف العميل بنجاح.",
+    "deleteError": "تعذر حذف العميل.",
+    "exportSuccess": "تم تصدير العملاء بنجاح.",
+    "exportError": "تعذر تصدير العملاء.",
+    "exportEmpty": "لا توجد بيانات عملاء للتصدير."
+  },
+  "export": {
+    "sheetName": "العملاء",
+    "filePrefix": "العملاء"
+  },
+  "exportModal": {
+    "title": "تصدير العملاء",
+    "description": "حدّد الحد الأقصى للصفوف قبل تنزيل ملف Excel.",
+    "maxRecords": "الحد الأقصى للصفوف",
+    "maxRecordsHint": "اتركه فارغًا لتصدير كل النتائج المطابقة.",
+    "reset": "إعادة ضبط"
+  },
+  "delete": {
+    "confirm": "هل أنت متأكد من حذف العميل \"{name}\"؟"
+  },
+  "pricing": {
+    "title": "الأسعار الخاصة",
+    "subtitle": "المنتجات التي تمتلك أسعاراً مخصصة لهذا العميل.",
+    "table": {
+      "product": "المنتج",
+      "sku": "الرمز",
+      "price": "السعر",
+      "updatedAt": "آخر تعديل"
+    },
+    "empty": {
+      "title": "لا توجد أسعار خاصة",
+      "description": "لم يتم تحديد أسعار مخصصة لهذا العميل بعد."
+    },
+    "messages": {
+      "updateSuccess": "تم تحديث السعر بنجاح.",
+      "updateError": "تعذر تحديث السعر."
+    }
+  },
+  "details": {
+    "pageTitle": "حساب العميل | دفتر",
+    "pageDescription": "عرض ملف العميل والرصيد وتفاصيل الحساب.",
+    "title": "حساب العميل",
+    "subtitle": "إدارة بيانات العميل وحركة حسابه من صفحة مستقلة.",
+    "backToList": "الرجوع إلى العملاء",
+    "infoSectionTitle": "البيانات الأساسية",
+    "accountSectionTitle": "حركة الحساب",
+    "accountSectionDescription": "هذا القسم جاهز لإضافة الفواتير والمدفوعات وقيود الدفتر مع توسعة الموديول.",
+    "meta": {
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "آخر تحديث"
+    },
+    "currentBalance": "Current balance",
+    "currentBalanceHint": "Approved financial activity only. Draft invoices do not change this balance yet.",
+    "openApprovedInvoices": "Open approved invoices",
+    "openApprovedInvoicesHint": "Draft invoices stay outside this count until approval."
+  },
+  "ledger": {
+    "title": "دفتر العميل",
+    "subtitle": "تابع كل حركات العميل والرصيد الجاري وسجل الحساب.",
+    "noPermission": "ليس لديك صلاحية عرض دفتر الحساب.",
+    "summary": {
+      "current": "الرصيد الحالي",
+      "opening": "رصيد بداية الفترة",
+      "closing": "رصيد نهاية الفترة"
+    },
+    "filters": {
+      "from": "من تاريخ",
+      "to": "إلى تاريخ",
+      "perPage": "عدد السطور",
+      "reset": "إعادة ضبط الفلاتر"
+    },
+    "actions": {
+      "addEntry": "إضافة حركة",
+      "createEntry": "تسجيل الحركة",
+      "openCentralLedger": "فتح في صفحة دفتر الأستاذ"
+    },
+    "form": {
+      "entryType": "نوع الحركة",
+      "amount": "المبلغ",
+      "increaseBalance": "زيادة رصيد العميل",
+      "entryDate": "تاريخ الحركة",
+      "dueDate": "تاريخ الاستحقاق",
+      "note": "ملاحظة"
+    },
+    "entryTypes": {
+      "INVOICE": "فاتورة",
+      "PAYMENT": "دفعة",
+      "RETURN": "مرتجع",
+      "ADJUSTMENT": "تسوية",
+      "ADVANCE": "سلفة",
+      "SALARY_PAYMENT": "دفع راتب",
+      "DEDUCTION": "خصم",
+      "SETTLEMENT": "مخالصة"
+    },
+    "modal": {
+      "title": "إضافة حركة حساب",
+      "description": "سجل حركة جديدة في حساب العميل مع تأثير صحيح على الرصيد."
+    },
+    "table": {
+      "date": "التاريخ",
+      "type": "النوع",
+      "note": "الملاحظة",
+      "amount": "المبلغ",
+      "runningBalance": "الرصيد التراكمي",
+      "actions": "إجراءات"
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "summary": "صفحة {page} من {totalPages} ({total} حركة)"
+    },
+    "messages": {
+      "createSuccess": "تم تسجيل الحركة بنجاح.",
+      "createError": "تعذر تسجيل الحركة.",
+      "deleteSuccess": "تم حذف الحركة بنجاح.",
+      "deleteError": "تعذر حذف الحركة.",
+      "deleteConfirm": "هل أنت متأكد من حذف هذه الحركة؟"
+    },
+    "empty": {
+      "title": "لا توجد حركات حساب",
+      "description": "لا توجد نتائج للفترة المحددة."
+    }
+  },
+  "sales": {
+    "title": "فواتير المبيعات",
+    "subtitle": "إنشاء وإدارة فواتير مبيعات العملاء.",
+    "noPermission": "ليس لديك صلاحية عرض فواتير المبيعات.",
+    "filters": {
+      "search": "ابحث برقم الفاتورة"
+    },
+    "actions": {
+      "addInvoice": "إضافة فاتورة مبيعات",
+      "createInvoice": "إنشاء الفاتورة",
+      "addItem": "إضافة بند",
+      "duplicate": "تكرار",
+      "saveDraft": "Save draft",
+      "saveAndApprove": "Save and approve"
+    },
+    "modal": {
+      "title": "إنشاء فاتورة مبيعات",
+      "description": "أنشئ فاتورة مبيعات للعميل ببند واحد أو أكثر.",
+      "keyboardHint": "نصيحة: اضغط Ctrl/Cmd + Enter لإضافة بند جديد بسرعة.",
+      "approvalHint": "Save draft keeps the invoice pending. Save and approve finishes it immediately when approval permission is available."
+    },
+    "form": {
+      "issueDate": "تاريخ الإصدار",
+      "taxAmount": "قيمة الضريبة",
+      "partyAddress": "عنوان العميل",
+      "items": "بنود الفاتورة",
+      "description": "وصف البند",
+      "quantity": "الكمية",
+      "unitPrice": "سعر الوحدة",
+      "notes": "ملاحظات",
+      "product": "اختر المنتج (اختياري)",
+      "searchProduct": "ابحث عن منتج",
+      "noProducts": "لا توجد منتجات"
+    },
+    "table": {
+      "invoiceNumber": "رقم الفاتورة",
+      "issueDate": "تاريخ الإصدار",
+      "total": "الإجمالي",
+      "tax": "الضريبة",
+      "createdBy": "أُنشئت بواسطة",
+      "actions": "إجراءات",
+      "status": "Status"
+    },
+    "summary": {
+      "subtotal": "الإجمالي قبل الضريبة",
+      "tax": "الضريبة",
+      "total": "الإجمالي النهائي"
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "summary": "صفحة {page} من {totalPages} ({total} فاتورة)"
+    },
+    "messages": {
+      "createSuccess": "Sales invoice draft created successfully.",
+      "createError": "تعذر إنشاء فاتورة المبيعات.",
+      "deleteSuccess": "تم حذف فاتورة المبيعات بنجاح.",
+      "deleteError": "تعذر حذف فاتورة المبيعات.",
+      "deleteConfirm": "هل أنت متأكد من حذف الفاتورة {invoiceNumber}؟",
+      "duplicateError": "تعذر تحميل بيانات الفاتورة للتكرار.",
+      "createAndApproveSuccess": "Sales invoice created and approved successfully.",
+      "createAndApproveError": "Failed to create and approve sales invoice."
+    },
+    "empty": {
+      "title": "لا توجد فواتير مبيعات",
+      "description": "لا توجد فواتير مبيعات لهذا العميل."
+    },
+    "statusNotice": "Invoices created here start as drafts and do not affect the current balance until approval."
+  }
+}

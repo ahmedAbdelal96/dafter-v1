@@ -1,0 +1,99 @@
+{
+  "title": "Employees",
+  "singular": "Employee",
+  "list": {
+    "title": "Employees List",
+    "empty": "No employees yet",
+    "emptyDesc": "Add your first employee to track salaries and advances",
+    "searchPlaceholder": "Search by name, phone, or job title"
+  },
+  "detail": {
+    "title": "Employee Details",
+    "active": "Active",
+    "inactive": "Inactive",
+    "phone": "Phone",
+    "jobTitle": "Job Title",
+    "openingBalance": "Opening Balance",
+    "balance": "Current Balance",
+    "createdAt": "Date Added",
+    "viewStatement": "View Statement",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "form": {
+    "create": "Add Employee",
+    "edit": "Edit Employee",
+    "name": "Name",
+    "namePlaceholder": "Employee name",
+    "phone": "Phone",
+    "phonePlaceholder": "01xxxxxxxxx",
+    "jobTitle": "Job Title",
+    "jobTitlePlaceholder": "Job title (optional)",
+    "openingBalance": "Opening Balance",
+    "openingBalancePlaceholder": "0.00",
+    "openingBalanceHint": "Balance when adding the employee (cannot be changed later)",
+    "isActive": "Status",
+    "activeYes": "Active",
+    "activeNo": "Inactive",
+    "save": "Save"
+  },
+  "delete": {
+    "title": "Delete Employee",
+    "message": "Are you sure you want to delete this employee? This action cannot be undone.",
+    "confirm": "Delete",
+    "cancel": "Cancel",
+    "hasLedger": "Cannot delete employee because they have recorded ledger entries"
+  },
+  "errors": {
+    "loadFailed": "Failed to load employees",
+    "retry": "Try again",
+    "createFailed": "Failed to add employee",
+    "updateFailed": "Failed to update employee",
+    "nameTaken": "An employee with this name already exists",
+    "quotaExceeded": "You have reached the maximum number of employees for your current plan",
+    "versionConflict": "Employee data was modified from another device. Please close and try again."
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "invalidAmount": "Balance must be a valid number"
+  },
+  "payroll": {
+    "title": "Payroll",
+    "subtitle": "Salary payments, advances and deductions",
+    "selectHint": "Select an employee to view their payroll history",
+    "entryTypes": {
+      "SALARY_PAYMENT": "Salary Payment",
+      "ADVANCE": "Advance",
+      "DEDUCTION": "Deduction"
+    },
+    "summary": {
+      "salaryPayments": "Salaries",
+      "advances": "Advances",
+      "deductions": "Deductions",
+      "net": "Net Payout"
+    },
+    "empty": {
+      "title": "No payroll entries",
+      "desc": "No salary payments or advances recorded for this employee yet."
+    },
+    "form": {
+      "title": "New Payroll Entry",
+      "type": "Entry Type",
+      "amount": "Amount",
+      "amountPlaceholder": "0.00",
+      "date": "Date (YYYY-MM-DD)",
+      "datePlaceholder": "2026-03-20",
+      "note": "Note (optional)",
+      "notePlaceholder": "Add a note...",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "messages": {
+      "createSuccess": "Entry recorded successfully.",
+      "createError": "Failed to record entry.",
+      "deleteSuccess": "Entry deleted.",
+      "deleteError": "Failed to delete entry.",
+      "deleteConfirm": "Delete this payroll entry?"
+    }
+  }
+}

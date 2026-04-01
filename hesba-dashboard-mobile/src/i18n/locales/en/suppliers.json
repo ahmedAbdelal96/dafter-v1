@@ -1,0 +1,56 @@
+{
+  "title": "Suppliers",
+  "list": {
+    "searchPlaceholder": "Search suppliers...",
+    "empty": "No suppliers yet",
+    "emptyDesc": "Add your first supplier to start managing purchases"
+  },
+  "detail": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "balance": "Current Balance",
+    "phone": "Phone",
+    "address": "Address",
+    "openingBalance": "Opening Balance",
+    "createdAt": "Date Added",
+    "viewStatement": "View Statement",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "form": {
+    "create": "Add Supplier",
+    "edit": "Edit Supplier",
+    "name": "Supplier Name",
+    "namePlaceholder": "Enter supplier name",
+    "phone": "Phone",
+    "phonePlaceholder": "05xxxxxxxx",
+    "address": "Address",
+    "addressPlaceholder": "City, district...",
+    "openingBalance": "Opening Balance",
+    "openingBalancePlaceholder": "0.00",
+    "openingBalanceHint": "Set at creation only — cannot be changed later",
+    "isActive": "Status",
+    "activeYes": "Active",
+    "activeNo": "Inactive",
+    "save": "Save"
+  },
+  "delete": {
+    "title": "Delete Supplier",
+    "message": "Are you sure you want to delete this supplier? This action cannot be undone.",
+    "confirm": "Delete"
+  },
+  "validation": {
+    "nameRequired": "Supplier name is required",
+    "invalidAmount": "Invalid amount"
+  },
+  "errors": {
+    "loadFailed": "Failed to load suppliers. Check your connection and try again.",
+    "retry": "Retry",
+    "nameTaken": "Supplier name is already taken",
+    "versionConflict": "Data was modified elsewhere. Reload and try again.",
+    "quotaExceeded": "You have reached the supplier limit on your current plan",
+    "createFailed": "Failed to add supplier",
+    "updateFailed": "Failed to update supplier",
+    "deleteHasLedger": "Cannot delete this supplier because they have associated ledger entries"
+  }
+}

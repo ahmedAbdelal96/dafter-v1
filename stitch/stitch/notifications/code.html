@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden max-w-md mx-auto border-x border-primary/10">
+<!-- Header -->
+<header class="sticky top-0 z-10 flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between border-b border-primary/10">
+<div class="flex items-center gap-3">
+<button class="text-slate-900 dark:text-slate-100 flex size-10 items-center justify-center rounded-xl bg-primary/10">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<h1 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight tracking-tight">التنبيهات</h1>
+</div>
+<button class="text-primary text-sm font-semibold hover:underline decoration-primary/30">تحديد الكل كمقروء</button>
+</header>
+<!-- Filter Chips -->
+<div class="flex gap-3 p-4 overflow-x-auto no-scrollbar scroll-smooth">
+<button class="flex h-10 shrink-0 items-center justify-center rounded-xl bg-primary px-6">
+<span class="text-white text-sm font-semibold">الكل</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 px-5">
+<span class="text-slate-900 dark:text-slate-100 text-sm font-medium">الفواتير</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 px-5">
+<span class="text-slate-900 dark:text-slate-100 text-sm font-medium">المدفوعات</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 px-5">
+<span class="text-slate-900 dark:text-slate-100 text-sm font-medium">النظام</span>
+</button>
+</div>
+<!-- Notification List -->
+<div class="flex-1 overflow-y-auto px-4 space-y-3 pb-24">
+<!-- Unread Notification: High Priority -->
+<div class="relative flex items-start gap-4 bg-primary/10 dark:bg-primary/5 p-4 rounded-xl border border-primary/20">
+<div class="flex items-center justify-center rounded-lg bg-orange-500/20 text-orange-500 shrink-0 size-12 border border-orange-500/30">
+<span class="material-symbols-outlined text-2xl">priority_high</span>
+</div>
+<div class="flex flex-col flex-1 gap-1">
+<div class="flex justify-between items-start">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-none">فاتورة متأخرة جداً</p>
+<span class="text-slate-500 dark:text-slate-400 text-xs font-medium">منذ دقيقتين</span>
+</div>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">تجاوزت الفاتورة #INV-9821 موعد الاستحقاق بـ 5 أيام. يرجى اتخاذ إجراء.</p>
+</div>
+<div class="absolute left-3 top-1/2 -translate-y-1/2">
+<div class="size-2.5 rounded-full bg-primary shadow-[0_0_8px_rgba(31,122,90,0.6)]"></div>
+</div>
+</div>
+<!-- Unread Notification: Payment -->
+<div class="relative flex items-start gap-4 bg-primary/10 dark:bg-primary/5 p-4 rounded-xl border border-primary/20">
+<div class="flex items-center justify-center rounded-lg bg-primary/20 text-primary shrink-0 size-12 border border-primary/30">
+<span class="material-symbols-outlined text-2xl">payments</span>
+</div>
+<div class="flex flex-col flex-1 gap-1">
+<div class="flex justify-between items-start">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-none">تم استلام دفعة جديدة</p>
+<span class="text-slate-500 dark:text-slate-400 text-xs font-medium">منذ ساعة</span>
+</div>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">تم استلام مبلغ 12,500 ر.س من "شركة التقنية المتقدمة".</p>
+</div>
+<div class="absolute left-3 top-1/2 -translate-y-1/2">
+<div class="size-2.5 rounded-full bg-primary shadow-[0_0_8px_rgba(31,122,90,0.6)]"></div>
+</div>
+</div>
+<!-- Read Notification: System -->
+<div class="flex items-start gap-4 bg-transparent p-4 rounded-xl border border-slate-200 dark:border-primary/10 opacity-80">
+<div class="flex items-center justify-center rounded-lg bg-slate-200 dark:bg-primary/10 text-slate-600 dark:text-primary shrink-0 size-12">
+<span class="material-symbols-outlined text-2xl">settings_suggest</span>
+</div>
+<div class="flex flex-col flex-1 gap-1">
+<div class="flex justify-between items-start">
+<p class="text-slate-900 dark:text-slate-100 text-base font-semibold leading-none">تحديث النظام</p>
+<span class="text-slate-500 dark:text-slate-400 text-xs font-normal">أمس، 10:30 ص</span>
+</div>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">تم تحديث ميزات التقارير الضريبية لتتوافق مع معايير زكاة 2024.</p>
+</div>
+</div>
+<!-- Read Notification: User -->
+<div class="flex items-start gap-4 bg-transparent p-4 rounded-xl border border-slate-200 dark:border-primary/10 opacity-80">
+<div class="flex items-center justify-center rounded-lg bg-slate-200 dark:bg-primary/10 text-slate-600 dark:text-primary shrink-0 size-12">
+<span class="material-symbols-outlined text-2xl">person_add</span>
+</div>
+<div class="flex flex-col flex-1 gap-1">
+<div class="flex justify-between items-start">
+<p class="text-slate-900 dark:text-slate-100 text-base font-semibold leading-none">موظف جديد</p>
+<span class="text-slate-500 dark:text-slate-400 text-xs font-normal">02 مايو 2024</span>
+</div>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">تمت إضافة "أحمد علي" كمدقق مالي في حسابك.</p>
+</div>
+</div>
+<!-- Read Notification: Invoice -->
+<div class="flex items-start gap-4 bg-transparent p-4 rounded-xl border border-slate-200 dark:border-primary/10 opacity-80">
+<div class="flex items-center justify-center rounded-lg bg-slate-200 dark:bg-primary/10 text-slate-600 dark:text-primary shrink-0 size-12">
+<span class="material-symbols-outlined text-2xl">receipt_long</span>
+</div>
+<div class="flex flex-col flex-1 gap-1">
+<div class="flex justify-between items-start">
+<p class="text-slate-900 dark:text-slate-100 text-base font-semibold leading-none">موافقة على فاتورة</p>
+<span class="text-slate-500 dark:text-slate-400 text-xs font-normal">28 أبريل 2024</span>
+</div>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">تمت الموافقة على فاتورة المصروفات #EXP-004 بنجاح.</p>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-20 max-w-md mx-auto border-t border-slate-200 dark:border-primary/20 bg-white/80 dark:bg-background-dark/80 backdrop-blur-lg px-4 pb-6 pt-3">
+<div class="flex items-center justify-between gap-2">
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-500 dark:text-primary/60" href="#">
+<span class="material-symbols-outlined text-2xl">grid_view</span>
+<span class="text-xs font-medium">الرئيسية</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-500 dark:text-primary/60" href="#">
+<span class="material-symbols-outlined text-2xl">pie_chart</span>
+<span class="text-xs font-medium">التقارير</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined material-symbols-fill text-2xl">notifications</span>
+<span class="text-xs font-bold">التنبيهات</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-500 dark:text-primary/60" href="#">
+<span class="material-symbols-outlined text-2xl">settings</span>
+<span class="text-xs font-medium">الإعدادات</span>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

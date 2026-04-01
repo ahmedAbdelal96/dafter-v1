@@ -1,0 +1,43 @@
+{
+  "success": "Company entitlements retrieved successfully",
+  "catalogSuccess": "Feature catalog retrieved successfully",
+  "noActiveSubscription": "No active subscription found for this company",
+
+  "errors": {
+    "featureNotAvailable": "This feature is not available on your current plan. Please upgrade to access it.",
+    "planLimitReached": "You have reached the maximum limit on your current plan. Please upgrade to add more.",
+    "subscriptionInactive": "Your subscription is inactive. Please renew your subscription to continue."
+  },
+
+  "features": {
+    "module.dashboard.read": "View Dashboard",
+    "module.customers.read": "View Customers",
+    "module.customers.manage": "Manage Customers",
+    "module.suppliers.read": "View Suppliers",
+    "module.suppliers.manage": "Manage Suppliers",
+    "module.employees.read": "View Employees",
+    "module.employees.manage": "Manage Employees",
+    "module.ledger.read": "View Ledger",
+    "module.ledger.manage": "Manage Ledger",
+    "module.expenses.read": "View Expenses",
+    "module.expenses.manage": "Manage Expenses",
+    "module.products.read": "View Products",
+    "module.products.manage": "Manage Products",
+    "module.invoices.read": "View Invoices",
+    "module.invoices.manage": "Manage Invoices",
+    "module.deferred_sales.read": "View Deferred Sales",
+    "module.deferred_sales.manage": "Manage Deferred Sales",
+    "module.installments.read": "View Installment Contracts",
+    "module.installments.manage": "Manage Installment Contracts",
+    "module.reports.read": "View Reports",
+    "module.reports.export": "Export Reports"
+  },
+
+  "quotas": {
+    "users": "Users",
+    "customers": "Customers",
+    "suppliers": "Suppliers",
+    "employees": "Employees",
+    "ledgerEntries": "Ledger Entries"
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "title": "الفواتير",
+  "singular": "فاتورة",
+  "list": {
+    "title": "قائمة الفواتير",
+    "empty": "لا توجد فواتير",
+    "emptyDesc": "أنشئ أول فاتورة لعملائك",
+    "searchPlaceholder": "بحث برقم الفاتورة أو اسم العميل..."
+  },
+  "detail": {
+    "title": "تفاصيل الفاتورة",
+    "invoiceNumber": "رقم الفاتورة",
+    "customer": "العميل",
+    "issuedAt": "تاريخ الإصدار",
+    "dueDate": "تاريخ الاستحقاق",
+    "totalAmount": "إجمالي الفاتورة",
+    "paid": "المدفوع",
+    "status": "الحالة",
+    "items": "بنود الفاتورة",
+    "notes": "ملاحظات"
+  },
+  "form": {
+    "create": "فاتورة جديدة",
+    "fromDeferredSale": "فاتورة من بيع آجل",
+    "customer": "العميل",
+    "customerPlaceholder": "اختر العميل",
+    "dueDate": "تاريخ الاستحقاق",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "ملاحظات (اختياري)",
+    "items": "بنود الفاتورة",
+    "addItem": "إضافة بند",
+    "item": {
+      "description": "الوصف",
+      "descriptionPlaceholder": "اسم المنتج أو الخدمة",
+      "quantity": "الكمية",
+      "unitPrice": "سعر الوحدة",
+      "totalPrice": "الإجمالي"
+    },
+    "total": "الإجمالي",
+    "submit": "إنشاء الفاتورة",
+    "saveDraft": "حفظ مسودة",
+    "approve": "اعتماد",
+    "approveConfirmTitle": "تأكيد الاعتماد",
+    "approveConfirmMessage": "سيتم إنشاء الفاتورة واعتمادها فوراً وسيترتب عليها أثر مالي في الحسابات. هل تريد المتابعة؟",
+    "frequentProducts": "المنتجات المتكررة لهذا العميل",
+    "repeatLast": "تكرار آخر فاتورة",
+    "repeatTitle": "اختر فاتورة للتكرار",
+    "noLastInvoices": "لا توجد فواتير سابقة لهذا العميل"
+  },
+  "snapshot": {
+    "loading": "جاري تحميل بيانات العميل...",
+    "balance": "الرصيد",
+    "openInvoices": "فواتير مفتوحة",
+    "lastInvoice": "آخر فاتورة",
+    "overdueWarning": "تحذير: يوجد متأخرات بقيمة {{amount}}"
+  },
+  "status": {
+    "DRAFT": "مسودة",
+    "PENDING_APPROVAL": "معلقة",
+    "APPROVED": "معتمدة",
+    "REJECTED": "مرفوضة",
+    "CANCELLED": "ملغية"
+  },
+  "actions": {
+    "submit": "رفع للاعتماد",
+    "submitTitle": "رفع للاعتماد",
+    "submitMessage": "سيتم إرسال الفاتورة للمراجعة والاعتماد.",
+    "approve": "موافقة",
+    "approveDirect": "اعتماد مباشر",
+    "approveTitle": "تأكيد الاعتماد",
+    "approveMessage": "سيترتب على اعتماد الفاتورة أثر مالي في الحسابات.",
+    "reject": "رفض",
+    "rejectTitle": "تأكيد الرفض",
+    "rejectMessage": "سيتم رفض هذه الفاتورة دون أي أثر مالي.",
+    "cancel": "إلغاء الفاتورة",
+    "cancelTitle": "تأكيد الإلغاء",
+    "cancelMessage": "سيتم إلغاء الفاتورة وعكس أي أثر مالي إن وُجد.",
+    "recordPayment": "تسجيل دفعة",
+    "paymentAmount": "مبلغ الدفعة",
+    "confirmPayment": "تأكيد الدفعة",
+    "paymentAmountRequired": "أدخل مبلغ الدفعة",
+    "paymentExceedsRemaining": "المبلغ أكبر من المتبقي",
+    "paymentFailed": "فشل تسجيل الدفعة"
+  },
+  "delete": {
+    "title": "حذف الفاتورة",
+    "message": "هل أنت متأكد من حذف هذه الفاتورة؟"
+  },
+  "errors": {
+    "alreadyInvoiced": "تم إنشاء فاتورة لهذا البيع الآجل مسبقاً",
+    "loadFailed": "فشل تحميل الفواتير",
+    "retry": "إعادة المحاولة"
+  },
+  "filter": {
+    "status": "الحالة",
+    "allStatuses": "جميع الحالات",
+    "customer": "العميل",
+    "customerName": "بحث باسم العميل…",
+    "dateFrom": "من (YYYY-MM-DD)",
+    "dateTo": "إلى (YYYY-MM-DD)",
+    "clearAll": "مسح الفلاتر"
+  },
+  "paymentStatus": {
+    "UNPAID": "غير مدفوعة",
+    "PARTIAL": "مدفوعة جزئياً",
+    "PAID": "مدفوعة"
+  },
+  "validation": {
+    "customerRequired": "العميل مطلوب",
+    "itemsRequired": "يجب إضافة بند واحد على الأقل",
+    "descriptionRequired": "الوصف مطلوب",
+    "quantityPositive": "الكمية يجب أن تكون أكبر من صفر",
+    "pricePositive": "السعر يجب أن يكون أكبر من صفر"
+  }
+}

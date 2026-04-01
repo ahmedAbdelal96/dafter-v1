@@ -1,0 +1,67 @@
+{
+  "summary": {
+    "success": "Financial summary retrieved successfully"
+  },
+  "overdue": {
+    "success": "Overdue report retrieved successfully"
+  },
+  "party": {
+    "success": "Party report retrieved"
+  },
+  "collectionSchedule": {
+    "success": "Collection schedule retrieved successfully",
+    "invalidDateRange": "Start date must be before end date"
+  },
+  "profitLoss": {
+    "success": "Profit and loss report retrieved successfully",
+    "invalidDateRange": "Start date must be before end date"
+  },
+  "cashFlow": {
+    "success": "Cash flow report retrieved successfully",
+    "invalidDateRange": "Start date must be before end date"
+  },
+  "customersAging": {
+    "success": "Customers aging report retrieved successfully"
+  },
+  "suppliersAging": {
+    "success": "Suppliers aging report retrieved successfully"
+  },
+  "salesDetailed": {
+    "success": "Detailed sales report retrieved successfully",
+    "invalidDateRange": "Start date must be before end date"
+  },
+  "expensesAnalytics": {
+    "success": "Expenses analytics report retrieved successfully",
+    "invalidDateRange": "Start date must be before end date"
+  },
+  "productsPerformance": {
+    "success": "Products performance report retrieved successfully",
+    "invalidDateRange": "Start date must be before end date"
+  },
+  "operationalPerformance": {
+    "success": "Operational performance report retrieved successfully",
+    "invalidDateRange": "Start date must be before end date"
+  },
+  "criticalAlerts": {
+    "success": "Critical alerts report retrieved successfully"
+  },
+  "ledgerStatement": {
+    "success": "Ledger statement report retrieved successfully",
+    "invalidDateRange": "Start date must be before end date"
+  },
+  "collectionsFollowup": {
+    "success": "Collections follow-up report retrieved successfully",
+    "invalidDateRange": "Start date must be before end date"
+  },
+  "debtsSummary": {
+    "success": "Debts summary report retrieved successfully"
+  },
+  "staffActivity": {
+    "success": "Staff activity report retrieved successfully",
+    "invalidDateRange": "Start date must be before end date"
+  },
+  "simpleLedger": {
+    "success": "Simple ledger report retrieved successfully",
+    "invalidDateRange": "Start date must be before end date"
+  }
+}

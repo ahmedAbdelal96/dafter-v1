@@ -1,0 +1,96 @@
+{
+  "page": {
+    "eyebrow": "إدارة المنصة",
+    "heading": "لوحة تحكم السوبر أدمن",
+    "subheading": "تابع نمو الشركات، وحالة الاشتراكات، والتغطية التشغيلية العامة للمنصة من شاشة واحدة واضحة.",
+    "periodLabel": "الفترة الحالية",
+    "loading": "جارٍ تحميل البيانات...",
+    "error": "تعذر تحميل بيانات لوحة المنصة. تأكد من تشغيل الـ API أو أعد المحاولة لاحقًا."
+  },
+  "filters": {
+    "dateFrom": "من تاريخ",
+    "dateTo": "إلى تاريخ",
+    "reset": "إعادة ضبط",
+    "presets": {
+      "today": "اليوم",
+      "week": "هذا الأسبوع",
+      "month": "هذا الشهر",
+      "year": "هذا العام",
+      "last30days": "آخر 30 يومًا"
+    }
+  },
+  "cards": {
+    "totalCompanies": "إجمالي الشركات",
+    "activeCompanies": "{count} شركة نشطة",
+    "paidCompanies": "الشركات المدفوعة",
+    "trialCompanies": "{count} في الفترة التجريبية",
+    "totalUsers": "إجمالي المستخدمين",
+    "plansSummary": "{active} خطة نشطة من أصل {total}",
+    "renewSoon": "تجديدات قريبة",
+    "suspendedCompanies": "{count} شركة موقوفة",
+    "revenueCollected": "الإيراد المحصل",
+    "annualRunRate": "المعدل السنوي: {amount}",
+    "companiesCreated": "شركات جديدة",
+    "subscriptionsCreated": "{count} اشتراكًا جديدًا",
+    "expiredCompanies": "الشركات المنتهية",
+    "statusWatch": "{active} نشطة و{suspended} موقوفة",
+    "activePlans": "الخطط النشطة",
+    "platformCoverage": "يغطي {count} شركة الآن"
+  },
+  "charts": {
+    "growthTitle": "نمو المنصة",
+    "growthDescription": "اتجاه نمو الشركات والاشتراكات خلال الفترة المحددة مع نفس منطق الفلترة العام.",
+    "companiesSeries": "الشركات",
+    "subscriptionsSeries": "الاشتراكات",
+    "revenueTitle": "اتجاه الإيراد",
+    "revenueDescription": "الإيرادات المتوقعة والمحصلّة عبر الزمن.",
+    "revenueSeries": "الإيراد",
+    "plansTitle": "توزيع الخطط",
+    "plansDescription": "توزيع الشركات الحالية حسب الخطط المفعلة.",
+    "statusTitle": "حالة الاشتراكات",
+    "statusDescription": "لقطة سريعة لأهم حالات الاشتراك على مستوى المنصة.",
+    "statusLabels": {
+      "ACTIVE": "نشط",
+      "TRIAL": "تجريبي",
+      "SUSPENDED": "موقوف",
+      "EXPIRED": "منتهي",
+      "DISABLED": "معطل"
+    }
+  },
+  "health": {
+    "recentCompaniesTitle": "أحدث الشركات",
+    "recentCompaniesDescription": "آخر الشركات التي دخلت المنصة حديثًا مع حالة الاشتراك الحالية.",
+    "expiringTitle": "الاشتراكات القريبة من الانتهاء",
+    "expiringDescription": "الاشتراكات الحالية الأقرب للانتهاء.",
+    "plansWatchlistTitle": "مراقبة الخطط",
+    "plansWatchlistDescription": "أكثر الخطط استخدامًا وما إذا كانت تغطي الاحتياج الحالي أم لا.",
+    "ownerFallback": "لا يوجد مالك مسجل",
+    "usersLabel": "المستخدمون",
+    "customersLabel": "العملاء",
+    "ledgerLabel": "القيود",
+    "createdAt": "أُنشئت في {date}",
+    "daysLeft": "متبقي {count} يوم",
+    "companiesOnPlan": "{count} شركة على هذه الخطة",
+    "empty": "لا توجد بيانات لهذا القسم حاليًا.",
+    "status": {
+      "ACTIVE": "نشط",
+      "TRIAL": "تجريبي",
+      "SUSPENDED": "موقوف",
+      "EXPIRED": "منتهي",
+      "DISABLED": "معطل",
+      "NONE": "بدون اشتراك"
+    }
+  },
+  "quickLinks": {
+    "title": "وصول سريع",
+    "description": "انتقل مباشرة إلى أهم الصفحات التشغيلية داخل طبقة إدارة المنصة.",
+    "tenants": {
+      "title": "إدارة الشركات",
+      "description": "راجع حالة الشركات، والاشتراكات الحالية، وابدأ من هنا لأي إجراء على الشركة."
+    },
+    "subscriptions": {
+      "title": "الاشتراكات",
+      "description": "تابع توزيع الخطط والاشتراكات الحالية واتخذ إجراءات التجديد أو الإيقاف."
+    }
+  }
+}

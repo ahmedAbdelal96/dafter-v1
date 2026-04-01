@@ -1,0 +1,70 @@
+{
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "customers": "العملاء",
+    "suppliers": "الموردون",
+    "employees": "الموظفون",
+    "products": "المنتجات",
+    "invoices": "الفواتير",
+    "expenses": "المصروفات",
+    "ledger": "دفتر الحسابات",
+    "reports": "التقارير",
+    "settings": "الإعدادات",
+    "notifications": "الإشعارات",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج"
+  },
+  "actions": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "search": "بحث",
+    "filter": "تصفية",
+    "export": "تصدير",
+    "import": "استيراد",
+    "refresh": "تحديث",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "confirm": "تأكيد",
+    "close": "إغلاق",
+    "view": "عرض",
+    "print": "طباعة"
+  },
+  "status": {
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "pending": "قيد الانتظار",
+    "confirmed": "مؤكد",
+    "completed": "مكتمل",
+    "cancelled": "ملغي",
+    "paid": "مدفوع",
+    "unpaid": "غير مدفوع"
+  },
+  "messages": {
+    "success": "تمت العملية بنجاح",
+    "error": "حدث خطأ",
+    "loading": "جاري التحميل...",
+    "noData": "لا توجد بيانات",
+    "confirmDelete": "هل أنت متأكد أنك تريد الحذف؟",
+    "saved": "تم الحفظ بنجاح",
+    "deleted": "تم الحذف بنجاح",
+    "updated": "تم التحديث بنجاح"
+  },
+  "dataTable": {
+    "errorTitle": "حدث خطأ",
+    "tryAgain": "حاول مرة أخرى",
+    "noData": "لا توجد بيانات",
+    "actions": "الإجراءات",
+    "selectAll": "تحديد الكل",
+    "selectRow": "تحديد",
+    "showingRange": "عرض {start} إلى {end} من إجمالي {total}",
+    "previousPage": "الصفحة السابقة",
+    "nextPage": "الصفحة التالية",
+    "pageNumber": "صفحة {page}"
+  },
+  "currency": "ج.م",
+  "locale": "ar-EG"
+}

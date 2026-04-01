@@ -1,0 +1,74 @@
+{
+  "title": "المصروفات",
+  "singular": "مصروف",
+  "list": {
+    "title": "قائمة المصروفات",
+    "empty": "لا توجد مصروفات",
+    "emptyDesc": "ابدأ بتسجيل مصروفات عملك",
+    "searchPlaceholder": "بحث في المصروفات..."
+  },
+  "summary": {
+    "title": "ملخص المصروفات",
+    "total": "إجمالي المصروفات",
+    "byCategory": "حسب الفئة"
+  },
+  "detail": {
+    "title": "تفاصيل المصروف",
+    "createdAt": "تاريخ التسجيل"
+  },
+  "form": {
+    "create": "إضافة مصروف",
+    "edit": "تعديل المصروف",
+    "save": "حفظ التعديلات",
+    "amount": "المبلغ",
+    "amountPlaceholder": "0.00",
+    "category": "الفئة",
+    "description": "الوصف",
+    "descriptionPlaceholder": "وصف المصروف (اختياري)",
+    "date": "التاريخ",
+    "supplier": "المورد (اختياري)",
+    "supplierPlaceholder": "اختر مورداً...",
+    "referenceNumber": "رقم المرجع",
+    "referenceNumberPlaceholder": "رقم الفاتورة أو الإيصال",
+    "paymentMethod": "طريقة الدفع",
+    "paymentMethodPlaceholder": "نقداً / تحويل / شيك...",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "ملاحظات إضافية (اختياري)",
+    "advancedFields": "حقول إضافية"
+  },
+  "category": {
+    "RENT": "إيجار",
+    "SALARIES": "رواتب",
+    "UTILITIES": "مرافق (كهرباء/مياه/غاز)",
+    "SUPPLIES": "مستلزمات",
+    "TRANSPORTATION": "مواصلات",
+    "MAINTENANCE": "صيانة",
+    "MARKETING": "تسويق وإعلان",
+    "TAXES": "ضرائب ورسوم",
+    "OTHER": "أخرى"
+  },
+  "delete": {
+    "title": "حذف المصروف",
+    "message": "هل أنت متأكد من حذف هذا المصروف؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirm": "حذف"
+  },
+  "filter": {
+    "title": "تصفية المصروفات",
+    "category": "الفئة",
+    "allCategories": "جميع الفئات",
+    "dateFrom": "من تاريخ",
+    "dateTo": "إلى تاريخ"
+  },
+  "errors": {
+    "loadFailed": "فشل تحميل المصروفات",
+    "retry": "إعادة المحاولة",
+    "createFailed": "فشل إضافة المصروف. تحقق من البيانات وأعد المحاولة."
+  },
+  "validation": {
+    "amountRequired": "المبلغ مطلوب",
+    "amountPositive": "يجب أن يكون المبلغ أكبر من صفر",
+    "categoryRequired": "الفئة مطلوبة",
+    "descriptionRequired": "الوصف مطلوب",
+    "dateRequired": "التاريخ مطلوب"
+  }
+}

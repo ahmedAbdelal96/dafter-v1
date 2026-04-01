@@ -1,0 +1,30 @@
+{
+  "create": {
+    "success": "Deferred sale recorded successfully",
+    "partyNotFound": "Party not found",
+    "invalidDueDate": "Due date must be on or after the entry date"
+  },
+  "payment": {
+    "success": "Payment recorded successfully",
+    "notFound": "Deferred sale not found",
+    "alreadyPaid": "This deferred sale is already fully paid",
+    "amountExceedsRemaining": "Payment amount exceeds the remaining balance ({remaining})",
+    "cancelled": "Cannot make a payment on a cancelled deferred sale"
+  },
+  "cancel": {
+    "success": "Deferred sale cancelled successfully",
+    "notFound": "Deferred sale not found",
+    "alreadyPaid": "Cannot cancel a fully paid deferred sale",
+    "alreadyCancelled": "Deferred sale is already cancelled"
+  },
+  "get": {
+    "notFound": "Deferred sale not found"
+  },
+  "list": {},
+  "status": {
+    "PENDING": "Pending",
+    "PARTIAL": "Partially Paid",
+    "PAID": "Paid",
+    "OVERDUE": "Overdue"
+  }
+}

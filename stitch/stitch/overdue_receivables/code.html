@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-2xl overflow-hidden">
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 pt-6 justify-between sticky top-0 z-10 border-b border-primary/10">
+<div class="flex items-center gap-3">
+<div class="text-primary flex size-10 items-center justify-center rounded-lg bg-primary/10">
+<span class="material-symbols-outlined">menu</span>
+</div>
+<h1 class="text-slate-900 dark:text-slate-100 text-xl font-bold tracking-tight">المستحقات المتأخرة</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex size-10 items-center justify-center rounded-lg hover:bg-primary/10 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<div class="px-4 py-4">
+<label class="relative flex flex-col w-full group">
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-primary">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input w-full rounded-xl border-none bg-primary/5 dark:bg-primary/10 focus:ring-2 focus:ring-primary h-12 pr-11 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 text-sm" placeholder="البحث عن اسم العميل أو الرقم الضريبي..." type="text"/>
+</label>
+</div>
+<div class="flex gap-2 px-4 pb-4 overflow-x-auto no-scrollbar">
+<button class="flex h-9 shrink-0 items-center justify-center rounded-full bg-primary px-5 text-white text-sm font-semibold">
+                    الكل
+                </button>
+<button class="flex h-9 shrink-0 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20 px-5 text-primary text-sm font-medium border border-primary/20">
+                    +30 يوم
+                </button>
+<button class="flex h-9 shrink-0 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20 px-5 text-primary text-sm font-medium border border-primary/20">
+                    +60 يوم
+                </button>
+<button class="flex h-9 shrink-0 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20 px-5 text-primary text-sm font-medium border border-primary/20">
+                    +90 يوم
+                </button>
+</div>
+<div class="px-4 space-y-4">
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-primary/5 p-4 border border-slate-200 dark:border-primary/10 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<p class="text-red-500 text-xs font-bold leading-none flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                متأخر منذ 45 يوم
+                            </p>
+<h3 class="text-slate-900 dark:text-slate-100 text-base font-bold">شركة الأمل المتميزة للتجارة</h3>
+<p class="text-slate-500 dark:text-slate-400 text-xs">رقم الفاتورة: #INV-2023-089</p>
+</div>
+<div class="text-left">
+<p class="text-primary text-lg font-bold">15,420.00</p>
+<p class="text-slate-400 text-[10px] font-medium uppercase tracking-wider">ر.س</p>
+</div>
+</div>
+<div class="flex gap-2 pt-2">
+<button class="flex-1 flex items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-white text-sm font-bold">
+<span class="material-symbols-outlined text-lg">call</span>
+                            متابعة التحصيل
+                        </button>
+<button class="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-primary/5 p-4 border border-slate-200 dark:border-primary/10 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<p class="text-red-500 text-xs font-bold leading-none flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                متأخر منذ 72 يوم
+                            </p>
+<h3 class="text-slate-900 dark:text-slate-100 text-base font-bold">مؤسسة الحلول الذكية</h3>
+<p class="text-slate-500 dark:text-slate-400 text-xs">رقم الفاتورة: #INV-2023-102</p>
+</div>
+<div class="text-left">
+<p class="text-primary text-lg font-bold">8,900.50</p>
+<p class="text-slate-400 text-[10px] font-medium uppercase tracking-wider">ر.س</p>
+</div>
+</div>
+<div class="flex gap-2 pt-2">
+<button class="flex-1 flex items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-white text-sm font-bold">
+<span class="material-symbols-outlined text-lg">call</span>
+                            متابعة التحصيل
+                        </button>
+<button class="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-primary/5 p-4 border border-slate-200 dark:border-primary/10 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<p class="text-orange-500 text-xs font-bold leading-none flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                متأخر منذ 12 يوم
+                            </p>
+<h3 class="text-slate-900 dark:text-slate-100 text-base font-bold">مركز الصقور للتوزيع</h3>
+<p class="text-slate-500 dark:text-slate-400 text-xs">رقم الفاتورة: #INV-2023-145</p>
+</div>
+<div class="text-left">
+<p class="text-primary text-lg font-bold">3,250.00</p>
+<p class="text-slate-400 text-[10px] font-medium uppercase tracking-wider">ر.س</p>
+</div>
+</div>
+<div class="flex gap-2 pt-2">
+<button class="flex-1 flex items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-white text-sm font-bold">
+<span class="material-symbols-outlined text-lg">call</span>
+                            متابعة التحصيل
+                        </button>
+<button class="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-primary/5 p-4 border border-slate-200 dark:border-primary/10 shadow-sm opacity-80">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<p class="text-red-600 text-xs font-bold leading-none flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                متأخر منذ 115 يوم
+                            </p>
+<h3 class="text-slate-900 dark:text-slate-100 text-base font-bold">مجموعة الرائد للخدمات</h3>
+<p class="text-slate-500 dark:text-slate-400 text-xs">رقم الفاتورة: #INV-2023-012</p>
+</div>
+<div class="text-left">
+<p class="text-primary text-lg font-bold">24,000.00</p>
+<p class="text-slate-400 text-[10px] font-medium uppercase tracking-wider">ر.س</p>
+</div>
+</div>
+<div class="flex gap-2 pt-2">
+<button class="flex-1 flex items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-white text-sm font-bold">
+<span class="material-symbols-outlined text-lg">call</span>
+                            متابعة التحصيل
+                        </button>
+<button class="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto flex gap-2 border-t border-slate-200 dark:border-primary/20 bg-white/80 dark:bg-background-dark/95 backdrop-blur-md px-4 pb-6 pt-2">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined text-2xl">home</span>
+<p class="text-[10px] font-medium leading-normal tracking-tight">الرئيسية</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined text-2xl">pie_chart</span>
+<p class="text-[10px] font-medium leading-normal tracking-tight">التقارير</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<p class="text-[10px] font-bold leading-normal tracking-tight">المستحقات</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined text-2xl">group</span>
+<p class="text-[10px] font-medium leading-normal tracking-tight">العملاء</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined text-2xl">settings</span>
+<p class="text-[10px] font-medium leading-normal tracking-tight">الإعدادات</p>
+</a>
+</nav>
+</div>
+</body></html>

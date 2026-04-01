@@ -1,0 +1,135 @@
+{
+  "pageTitle": "Dashboard | dafter",
+  "pageDescription": "Operational company dashboard with the most important business numbers and trends.",
+  "title": "Dashboard",
+  "welcome": "Welcome",
+  "welcomeTitle": "Welcome to dafter",
+  "welcomeDescription": "A central workspace to monitor sales, collections, expenses, and critical alerts.",
+  "overview": "Overview",
+  "page": {
+    "title": "Dashboard | dafter",
+    "description": "Operational financial dashboard for the company",
+    "heading": "Company Dashboard",
+    "subheading": "The most important numbers for {company} in one screen, ready for monitoring and decisions.",
+    "eyebrow": "Company Operations",
+    "periodLabel": "Current Period",
+    "quickAccessTitle": "Quick Access",
+    "quickAccessDescription": "Shortcuts to the modules used most during daily operations.",
+    "companyFallback": "your company",
+    "loading": "Loading...",
+    "operationalCash": {
+      "badge": "Operational-only data",
+      "title": "Cash Reconciliation Snapshot",
+      "subtitle": "Operational reconciliation view only. These values do not replace invoices, payments, or official accounting totals.",
+      "openAction": "Open reconciliation",
+      "totalRecords": "Total records",
+      "closedDays": "Closed days",
+      "openDrafts": "Open drafts",
+      "totalVariance": "Total variance"
+    }
+  },
+  "filters": {
+    "dateFrom": "Date from",
+    "dateTo": "Date to",
+    "reset": "Reset",
+    "presets": {
+      "today": "Today",
+      "week": "This week",
+      "month": "This month",
+      "year": "This year",
+      "last30days": "Last 30 days"
+    }
+  },
+  "cards": {
+    "totalSales": "Total Sales",
+    "collectionAmount": "Collections",
+    "totalExpenses": "Total Expenses",
+    "activeCustomers": "Active Customers",
+    "netProfit": "Net Profit",
+    "cashNetFlow": "Net Cash Flow",
+    "overdueCount": "Overdue Cases",
+    "creditRisk": "Credit Risk",
+    "invoicesCount": "Invoices: {count}",
+    "payables": "Payables: {count}",
+    "productsEmployees": "Products {products} • Employees {employees}",
+    "receivables": "Receivables: {amount}",
+    "deferredInstallments": "Deferred {deferred} • Installments {installments}",
+    "overdueBreakdown": "Deferred overdue {deferred} • Installments overdue {installments}",
+    "criticalNegativeBalances": "Critical balances: {count}"
+  },
+  "charts": {
+    "salesExpensesTitle": "Sales vs Expenses",
+    "salesExpensesDescription": "Direct comparison between sales performance and expenses for the selected period.",
+    "salesSeries": "Sales",
+    "expensesSeries": "Expenses",
+    "collectionsTitle": "Collections Trend",
+    "collectionsDescription": "Track daily or monthly collections across the same period.",
+    "collectionsSeries": "Collections",
+    "balancesTitle": "Receivables vs Payables",
+    "balancesDescription": "A quick read of what customers owe you versus what you owe suppliers.",
+    "receivablesLabel": "Receivables",
+    "payablesLabel": "Payables",
+    "salesDistributionTitle": "Sales Distribution",
+    "salesDistributionDescription": "Split of cash, deferred, and installment sales for the selected period.",
+    "cashLabel": "Cash",
+    "deferredLabel": "Deferred",
+    "installmentLabel": "Installment"
+  },
+  "highlights": {
+    "topCustomersTitle": "Top Customers",
+    "topCustomersDescription": "Customers contributing most to sales during the period.",
+    "topProductsTitle": "Top Products",
+    "topProductsDescription": "Products with the strongest impact on current revenue.",
+    "topEmployeesTitle": "Top Employees",
+    "topEmployeesDescription": "Employees contributing most through invoices and collections.",
+    "outstandingBalance": "Outstanding balance: {amount}",
+    "quantitySold": "Quantity sold: {quantity}",
+    "employeeMeta": "Invoices {invoices} • Collections {collections}"
+  },
+  "alerts": {
+    "title": "Alerts Requiring Attention",
+    "description": "Critical or overdue situations that need quick action from the owner or accountant.",
+    "empty": "There are no critical alerts right now.",
+    "dueDate": "Due date: {date}",
+    "entityType": "Party: {type}",
+    "severity": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    }
+  },
+  "quickModules": {
+    "customers": {
+      "title": "Customers",
+      "description": "Manage customer accounts"
+    },
+    "suppliers": {
+      "title": "Suppliers",
+      "description": "Track supplier balances"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "description": "Issue and manage invoices"
+    },
+    "expenses": {
+      "title": "Expenses",
+      "description": "Track operating expenses"
+    },
+    "deferredSales": {
+      "title": "Deferred Sales",
+      "description": "Follow deferred sales"
+    },
+    "installments": {
+      "title": "Installments",
+      "description": "Manage installment contracts"
+    },
+    "ledger": {
+      "title": "Ledger",
+      "description": "Review accounting ledger"
+    },
+    "reports": {
+      "title": "Reports",
+      "description": "Business performance reports"
+    }
+  }
+}

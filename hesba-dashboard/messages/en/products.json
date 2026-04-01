@@ -1,0 +1,99 @@
+{
+  "pageTitle": "Products | dafter",
+  "pageDescription": "Manage product catalog, pricing, and availability.",
+  "title": "Products",
+  "subtitle": "Build and maintain your product catalog for fast invoicing.",
+  "summary": {
+    "total": "Total products: {count}"
+  },
+  "filters": {
+    "searchPlaceholder": "Search by name, SKU, or description",
+    "categoryPlaceholder": "Filter by category",
+    "allStatuses": "All statuses",
+    "perPage": "{count} per page"
+  },
+  "table": {
+    "ariaLabel": "Products table",
+    "name": "Name",
+    "sku": "SKU",
+    "category": "Category",
+    "unit": "Unit",
+    "unitPrice": "Unit price",
+    "status": "Status",
+    "description": "Description"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "form": {
+    "name": "Product name",
+    "description": "Description",
+    "sku": "SKU code",
+    "category": "Category",
+    "unit": "Unit",
+    "unitPrice": "Unit price",
+    "isActive": "Product is active"
+  },
+  "actions": {
+    "addProduct": "Add product",
+    "exportExcel": "Export Excel",
+    "exporting": "Exporting...",
+    "create": "Create",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "close": "Close",
+    "view": "View details",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading..."
+  },
+  "modal": {
+    "createTitle": "Add New Product",
+    "createDescription": "Enter product details to create a new catalog item.",
+    "editTitle": "Edit Product",
+    "editDescription": "Update product details, pricing, and status."
+  },
+  "details": {
+    "pageTitle": "Product Details | dafter",
+    "pageDescription": "View product profile, pricing, and metadata.",
+    "title": "Product Details",
+    "subtitle": "Review product data and availability from one page.",
+    "backToList": "Back to products",
+    "meta": {
+      "createdBy": "Created by",
+      "createdAt": "Created at",
+      "updatedAt": "Last updated"
+    }
+  },
+  "empty": {
+    "title": "No products yet",
+    "description": "Start by adding your first product to use it in invoices."
+  },
+  "messages": {
+    "createSuccess": "Product created successfully.",
+    "createError": "Failed to create product.",
+    "updateSuccess": "Product updated successfully.",
+    "updateError": "Failed to update product.",
+    "deleteSuccess": "Product deleted successfully.",
+    "deleteError": "Failed to delete product.",
+    "exportSuccess": "Products exported successfully.",
+    "exportError": "Failed to export products.",
+    "exportEmpty": "No products found for export."
+  },
+  "export": {
+    "sheetName": "Products",
+    "filePrefix": "products"
+  },
+  "exportModal": {
+    "title": "Export products",
+    "description": "Choose max rows before downloading Excel.",
+    "maxRecords": "Maximum rows",
+    "maxRecordsHint": "Leave empty to export all matched rows.",
+    "reset": "Reset"
+  },
+  "delete": {
+    "confirm": "Are you sure you want to delete product \"{name}\"?"
+  }
+}

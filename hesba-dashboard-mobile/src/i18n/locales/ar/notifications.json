@@ -1,0 +1,28 @@
+{
+  "title": "الإشعارات",
+  "markAllRead": "تحديد الكل كمقروء",
+  "markAllReadConfirm": "هل تريد تحديد جميع الإشعارات كمقروءة؟",
+  "confirm": "تأكيد",
+  "cancel": "إلغاء",
+  "filter": {
+    "all": "الكل",
+    "unread": "غير المقروءة"
+  },
+  "list": {
+    "empty": "لا توجد إشعارات",
+    "emptyDesc": "ستظهر هنا إشعارات الدفعات والاستحقاقات والعمليات",
+    "emptyUnread": "لا توجد إشعارات غير مقروءة",
+    "emptyUnreadDesc": "جميع إشعاراتك مقروءة"
+  },
+  "type": {
+    "ledger": "دفتر الحسابات",
+    "invoice": "فاتورة",
+    "payment": "دفعة",
+    "deferred": "بيع آجل",
+    "installment": "قسط",
+    "expense": "مصروف",
+    "subscription": "اشتراك",
+    "overdue": "متأخر",
+    "general": "إشعار عام"
+  }
+}

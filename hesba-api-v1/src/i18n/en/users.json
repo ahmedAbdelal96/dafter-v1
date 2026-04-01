@@ -1,0 +1,40 @@
+{
+  "create": {
+    "success": "User created successfully",
+    "failed": "Failed to create user",
+    "emailExists": "Email is already in use",
+    "limitReached": "User limit reached for your current plan"
+  },
+  "get": {
+    "success": "User retrieved successfully",
+    "notFound": "User not found"
+  },
+  "list": { "success": "Users retrieved successfully" },
+  "update": {
+    "success": "User updated successfully",
+    "notFound": "User not found"
+  },
+  "disable": {
+    "success": "User disabled successfully",
+    "lastOwner": "Cannot disable the last owner of the company"
+  },
+  "enable": {
+    "success": "User enabled successfully",
+    "limitReached": "User limit reached — cannot re-enable this account under the current plan"
+  },
+  "permissions": {
+    "updated": "Permissions updated successfully",
+    "ownerCannotBeModified": "Cannot modify owner permissions — owners have full access automatically"
+  },
+  "stats": {
+    "success": "User statistics retrieved successfully"
+  },
+  "credentialsReset": {
+    "success": "Credentials reset code sent successfully",
+    "emailMissing": "User does not have an email to receive reset code",
+    "phoneMissing": "User does not have a phone number to receive WhatsApp reset code",
+    "noDeliveryChannel": "No delivery channel is available for this user",
+    "deliveryFailed": "Failed to deliver credentials reset code",
+    "superAdminForbidden": "Resetting super admin credentials from tenant scope is not allowed"
+  }
+}

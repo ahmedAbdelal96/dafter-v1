@@ -1,0 +1,554 @@
+{
+  "filters": {
+    "searchPlaceholder": "Search company, phone, or address",
+    "subscriptionStatus": {
+      "all": "All subscription states",
+      "TRIAL": "Trial",
+      "ACTIVE": "Active",
+      "EXPIRED": "Expired",
+      "SUSPENDED": "Suspended",
+      "DISABLED": "Disabled"
+    },
+    "activeState": {
+      "all": "All workspaces",
+      "active": "Active workspaces",
+      "inactive": "Inactive workspaces"
+    },
+    "limitOption": "{count} rows",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "reset": "Reset filters",
+    "empty": "No options found",
+    "placeholders": {
+      "subscriptionStatus": "Subscription status",
+      "activeState": "Workspace state",
+      "archivedMode": "Archive scope",
+      "limit": "Rows per page",
+      "sortBy": "Sort by",
+      "sortOrder": "Order"
+    },
+    "archivedMode": {
+      "activeOnly": "Active list only",
+      "includeArchived": "Include archived",
+      "archivedOnly": "Archived only"
+    },
+    "sortBy": {
+      "createdAt": "Created date",
+      "updatedAt": "Updated date",
+      "name": "Name"
+    },
+    "sortOrder": {
+      "asc": "Ascending",
+      "desc": "Descending"
+    }
+  },
+  "details": {
+    "eyebrow": "Tenant details",
+    "backToList": "Back to organizations",
+    "loading": "Loading tenant details...",
+    "active": "Active workspace",
+    "inactive": "Inactive workspace",
+    "archived": "Archived workspace",
+    "noPhone": "No phone",
+    "noAddress": "No address",
+    "yes": "Yes",
+    "no": "No",
+    "metrics": {
+      "users": "Users",
+      "customers": "Customers",
+      "suppliers": "Suppliers",
+      "employees": "Employees",
+      "ledgerEntries": "Ledger entries"
+    },
+    "subscription": {
+      "title": "Current subscription",
+      "plan": "Plan",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "paymentStatus": "Payment status",
+      "autoRenew": "Auto renew",
+      "empty": "No subscription is currently assigned."
+    },
+    "history": {
+      "title": "Recent subscription history",
+      "empty": "No historical subscriptions yet."
+    },
+    "metadata": {
+      "title": "Workspace metadata",
+      "createdAt": "Created at",
+      "updatedAt": "Updated at"
+    },
+    "restore": {
+      "action": "Restore workspace",
+      "submitting": "Restoring...",
+      "confirmPrompt": "Restore this archived workspace and re-enable access?",
+      "success": "Workspace restored successfully.",
+      "error": "Failed to restore workspace."
+    }
+  },
+  "tenants": {
+    "meta": {
+      "title": "Organizations Management | Daftar Super Admin",
+      "description": "Manage platform organizations, profile updates, and workspace activation state."
+    },
+    "eyebrow": "Tenant operations",
+    "heading": "Organizations management",
+    "subheading": "Review platform workspaces, verify their current subscription state, and inspect operational footprint without leaving the super admin layer.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "tableAriaLabel": "Organizations table",
+    "tableCaption": "Organizations registered on the platform",
+    "status": {
+      "none": "No subscription"
+    },
+    "table": {
+      "company": "Organization",
+      "users": "Users",
+      "subscription": "Subscription",
+      "plan": "Plan",
+      "workspaceState": "Workspace state",
+      "createdAt": "Created at"
+    },
+    "actions": {
+      "view": "View",
+      "create": "Create organization",
+      "edit": "Edit",
+      "archive": "Archive",
+      "restore": "Restore",
+      "disable": "Disable",
+      "enable": "Enable",
+      "delete": "Delete",
+      "showArchived": "Show archived",
+      "hideArchived": "Hide archived"
+    },
+    "archived": "Archived",
+    "empty": {
+      "title": "No organizations found",
+      "description": "Try changing the current filters or search query.",
+      "retry": "Retry loading"
+    },
+    "createModal": {
+      "eyebrow": "Create organization",
+      "title": "Create tenant and owner",
+      "description": "Create a new company workspace with an owner account and an initial plan assignment.",
+      "sections": {
+        "company": "Company information",
+        "owner": "Owner account",
+        "subscription": "Initial subscription"
+      },
+      "fields": {
+        "companyName": "Company name",
+        "companyPhone": "Company phone",
+        "companyAddress": "Company address",
+        "currencyCode": "Currency code (ex: EGP)",
+        "ownerFullName": "Owner full name",
+        "ownerEmail": "Owner email",
+        "ownerPassword": "Owner password",
+        "ownerPhone": "Owner phone",
+        "plan": "Select plan",
+        "planSearch": "Search plans",
+        "subscriptionMode": "Subscription mode",
+        "subscriptionModeOptions": {
+          "trial": "Trial",
+          "paid": "Paid"
+        },
+        "trialDays": "Trial duration",
+        "trialDaysOption": "{days} days",
+        "termMonths": "Billing duration",
+        "termMonthsOption": "{months} month(s)",
+        "planCycle": "Plan billing cycle",
+        "planCycleOptions": {
+          "monthly": "Monthly",
+          "yearly": "Yearly"
+        },
+        "planCycleValue": "{cycle}",
+        "autoRenew": "Enable auto renew"
+      },
+      "passwordHint": "Password must include at least one uppercase letter and one number.",
+      "emptyPlans": "No active plans are available.",
+      "cancel": "Cancel",
+      "submit": "Create organization",
+      "submitting": "Creating...",
+      "errors": {
+        "requiredFields": "Please fill all required fields.",
+        "planRequired": "Please select a plan.",
+        "trialDaysRequired": "Please select trial duration.",
+        "termMonthsRequired": "Please select billing duration.",
+        "currencyCodeInvalid": "Currency code must be exactly 3 uppercase letters."
+      },
+      "messages": {
+        "success": "Organization created successfully.",
+        "error": "Failed to create organization."
+      }
+    },
+    "editModal": {
+      "eyebrow": "Edit organization",
+      "title": "Update organization profile",
+      "fields": {
+        "companyName": "Company name",
+        "companyPhone": "Company phone",
+        "companyAddress": "Company address",
+        "currencyCode": "Currency code (ex: EGP)"
+      },
+      "cancel": "Cancel",
+      "submit": "Save changes",
+      "submitting": "Saving...",
+      "errors": {
+        "companyNameRequired": "Company name is required.",
+        "currencyCodeInvalid": "Currency code must be exactly 3 uppercase letters."
+      },
+      "messages": {
+        "success": "Organization updated successfully.",
+        "error": "Failed to update organization."
+      }
+    },
+    "toggleModal": {
+      "eyebrow": "Organization status",
+      "titles": {
+        "disable": "Disable organization",
+        "enable": "Enable organization"
+      },
+      "descriptions": {
+        "disable": "Disable {companyName}? Users will lose access until re-enabled.",
+        "enable": "Enable {companyName} and restore workspace access."
+      },
+      "cancel": "Cancel",
+      "confirmDisable": "Disable",
+      "confirmEnable": "Enable",
+      "submitting": "Applying...",
+      "messages": {
+        "disableSuccess": "Organization disabled successfully.",
+        "enableSuccess": "Organization enabled successfully.",
+        "error": "Failed to update organization status."
+      }
+    },
+    "archiveModal": {
+      "eyebrow": "Archive organization",
+      "title": "Archive organization workspace",
+      "description": "Archive {companyName}. This hides it from active tenant lists and disables access.",
+      "reasonLabel": "Reason (optional)",
+      "reasonPlaceholder": "Add operational context for audit trail...",
+      "warning": "Archive is reversible, but it immediately blocks workspace access and removes the tenant from active operations lists.",
+      "confirmLabel": "I confirm archiving this organization workspace",
+      "cancel": "Cancel",
+      "confirm": "Archive",
+      "submitting": "Archiving...",
+      "messages": {
+        "success": "Organization archived successfully.",
+        "error": "Failed to archive organization."
+      }
+    },
+    "deleteModal": {
+      "eyebrow": "Danger zone",
+      "title": "Permanently delete organization",
+      "description": "Delete {companyName} permanently. This action cannot be undone.",
+      "confirmNameLabel": "Type organization name to confirm",
+      "confirmNamePlaceholder": "Type: {companyName}",
+      "confirmNameMismatch": "The typed name must exactly match the organization name.",
+      "reasonLabel": "Reason (required, minimum 5 characters)",
+      "reasonPlaceholder": "Add deletion rationale (compliance/support request, etc.)",
+      "reasonMin": "Please enter at least 5 characters for the deletion reason.",
+      "warning": "Permanent deletion removes organization data from the platform. This action cannot be undone.",
+      "confirmCheckbox": "I understand this action is permanent and cannot be reversed",
+      "cancel": "Cancel",
+      "confirm": "Delete permanently",
+      "submitting": "Deleting...",
+      "messages": {
+        "success": "Organization deleted permanently.",
+        "error": "Failed to delete organization."
+      }
+    },
+    "restoreModal": {
+      "eyebrow": "Restore organization",
+      "title": "Restore archived workspace",
+      "description": "Restore {companyName}. This re-enables workspace access and returns it to active operational lists.",
+      "reasonLabel": "Reason (optional)",
+      "reasonPlaceholder": "Add context for why this workspace is being restored...",
+      "warning": "Restoring will immediately re-activate this workspace for organization users.",
+      "confirmLabel": "I confirm restoring this organization workspace",
+      "cancel": "Cancel",
+      "confirm": "Restore",
+      "submitting": "Restoring...",
+      "messages": {
+        "success": "Organization restored successfully.",
+        "error": "Failed to restore organization."
+      }
+    }
+  },
+  "subscriptions": {
+    "eyebrow": "Subscription operations",
+    "heading": "Subscriptions and billing",
+    "subheading": "Track plan assignment, renewal risk, and subscription actions across all organizations from one operational view.",
+    "tableAriaLabel": "Subscriptions table",
+    "tableCaption": "Organizations and their current subscription state",
+    "cards": {
+      "active": {
+        "title": "Active subscriptions",
+        "description": "Organizations currently running on an active plan."
+      },
+      "expiring": {
+        "title": "Expiring in 14 days",
+        "description": "Subscriptions that need attention soon."
+      },
+      "suspended": {
+        "title": "Suspended subscriptions",
+        "description": "Organizations blocked at the subscription layer."
+      }
+    },
+    "plans": {
+      "title": "Plan catalog",
+      "description": "Reference the available plans before applying subscription actions.",
+      "emptyTitle": "No plans found",
+      "emptyDescription": "Create or activate plans in the backend before assigning them.",
+      "active": "Active",
+      "inactive": "Inactive",
+      "capacity": "Users: {users} - Customers: {customers}",
+      "unlimited": "Unlimited"
+    },
+    "table": {
+      "company": "Organization",
+      "plan": "Plan",
+      "status": "Status",
+      "endDate": "End date",
+      "createdAt": "Created at"
+    },
+    "status": {
+      "none": "No subscription",
+      "noExpiry": "No expiry date",
+      "daysLeft": "{count} days left"
+    },
+    "actions": {
+      "view": "View",
+      "timeline": "Timeline",
+      "activate": "Activate",
+      "changePlan": "Change plan",
+      "extend": "Extend",
+      "suspend": "Suspend"
+    },
+    "messages": {
+      "activateSuccess": "Subscription activated successfully.",
+      "extendSuccess": "Subscription extended successfully.",
+      "suspendSuccess": "Subscription suspended successfully.",
+      "actionError": "Unable to complete the subscription action."
+    },
+    "empty": {
+      "title": "No subscription records found",
+      "description": "Adjust the current filters to inspect another segment."
+    },
+    "modal": {
+      "eyebrow": "Subscription action",
+      "titles": {
+        "activate": "Activate subscription",
+        "changePlan": "Change subscription plan",
+        "extend": "Extend subscription",
+        "suspend": "Suspend subscription"
+      },
+      "plan": "Select plan",
+      "searchPlan": "Search plans",
+      "emptyPlans": "No active plans available for activation.",
+      "endDate": "End date",
+      "newEndDate": "New end date",
+      "reason": "Reason",
+      "note": "Internal note",
+      "autoRenew": "Enable auto-renew",
+      "cancel": "Cancel",
+      "submitting": "Saving...",
+      "submit": {
+        "activate": "Activate",
+        "changePlan": "Change plan",
+        "extend": "Extend",
+        "suspend": "Suspend"
+      },
+      "confirmLabel": "I confirm this action and its impact on the tenant",
+      "validation": {
+        "planRequired": "Please select a plan.",
+        "dateRequired": "Please select a date.",
+        "dateMustBeFuture": "Date must be today or in the future.",
+        "reasonMin": "Reason must be at least 3 characters.",
+        "confirmRequired": "You must confirm before submitting."
+      },
+      "context": {
+        "currentPlan": "Current plan",
+        "currentEndDate": "Current end date"
+      },
+      "sections": {
+        "currentState": "Current state",
+        "nextStep": "Next step",
+        "setup": "Action setup",
+        "notes": "Operational notes"
+      },
+      "guidance": {
+        "activate": "Choose the plan and renewal date that should take effect for this organization before confirming activation.",
+        "changePlan": "Review the current plan first, then choose the replacement plan that should apply immediately.",
+        "extend": "Pick the new end date that should be recorded for the current subscription term.",
+        "suspend": "Use suspension when access must stop now. Capture the operational reason before confirming."
+      },
+      "helpers": {
+        "planAndDate": "Set the target plan and the date the subscription should remain active through.",
+        "extendDate": "Select the new renewal date you want operators and finance teams to rely on.",
+        "noteOptional": "Add internal context if the activation needs an audit trail for support or billing follow-up.",
+        "reasonOptional": "Add the operational reason that explains why this subscription action is being applied."
+      }
+    },
+    "governance": {
+      "title": "Governance baseline",
+      "description": "Every high-risk action requires explicit confirmation and reason capture.",
+      "requiredReason": "Reason is required for plan changes and suspension.",
+      "requiredConfirm": "Action confirmation is required before submit."
+    },
+    "actionHistory": {
+      "title": "Recent operational actions (current session)",
+      "description": "Temporary trace of completed actions until backend audit endpoint is available.",
+      "empty": "No actions executed in this session yet.",
+      "fields": {
+        "action": "Action",
+        "company": "Company",
+        "at": "Timestamp",
+        "reason": "Reason"
+      },
+      "kinds": {
+        "activate": "Activate",
+        "changePlan": "Change plan",
+        "extend": "Extend",
+        "suspend": "Suspend"
+      }
+    },
+    "timeline": {
+      "eyebrow": "Subscription history",
+      "title": "Subscription timeline",
+      "fallbackCompany": "Company",
+      "emptyTitle": "No subscription timeline yet",
+      "emptyDescription": "No historical subscription records were found for this company.",
+      "createdAt": "Created on {date}",
+      "period": "Subscription period",
+      "paymentStatus": "Payment status",
+      "autoRenew": "Auto renew",
+      "updatedAt": "Last update",
+      "daysLeft": "{count} days left",
+      "noExpiry": "No expiry date",
+      "expiringSoon": "Expiring soon",
+      "yes": "Yes",
+      "no": "No",
+      "payment": {
+        "PENDING": "Pending",
+        "PAID": "Paid",
+        "FAILED": "Failed",
+        "REFUNDED": "Refunded"
+      }
+    }
+  },
+  "plansManagement": {
+    "meta": {
+      "title": "Plans Management | Daftar",
+      "description": "Create, update, and control platform plans from the super admin layer."
+    },
+    "eyebrow": "Plan operations",
+    "heading": "Plans management",
+    "subheading": "Control pricing, limits, and plan availability used across all tenant subscription workflows.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "unlimited": "Unlimited",
+    "billingCycle": {
+      "MONTHLY": "Monthly",
+      "YEARLY": "Yearly"
+    },
+    "capacitySummary": "Users: {users} - Customers: {customers}",
+    "cards": {
+      "total": {
+        "title": "Total plans",
+        "description": "All plans defined in the platform catalog."
+      },
+      "active": {
+        "title": "Active plans",
+        "description": "Plans currently available for assignment."
+      },
+      "monthly": {
+        "title": "Monthly plans",
+        "description": "Plans billed on monthly cycle."
+      },
+      "assigned": {
+        "title": "Assigned plans",
+        "description": "Plans currently used by at least one tenant."
+      }
+    },
+    "filters": {
+      "title": "Plan filters",
+      "description": "Search and narrow down plans before applying updates.",
+      "search": "Search by plan name or currency",
+      "reset": "Reset",
+      "status": {
+        "placeholder": "Plan status",
+        "all": "All statuses",
+        "active": "Active plans",
+        "inactive": "Inactive plans"
+      },
+      "cycle": {
+        "placeholder": "Billing cycle",
+        "all": "All cycles"
+      }
+    },
+    "tableAriaLabel": "Platform plans table",
+    "tableCaption": "Platform plans catalog",
+    "table": {
+      "name": "Plan",
+      "price": "Price",
+      "capacity": "Capacity",
+      "features": "Features",
+      "assignedTenants": "Assigned tenants",
+      "assignedEmpty": "No tenants",
+      "assignedSummary": "{count} tenants",
+      "assignedSubSummary": "Active: {active} - Archived: {archived}",
+      "status": "Status"
+    },
+    "actions": {
+      "create": "Create plan",
+      "edit": "Edit",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
+    },
+    "empty": {
+      "title": "No plans found",
+      "description": "Try changing filters or create your first plan."
+    },
+    "messages": {
+      "createSuccess": "Plan created successfully.",
+      "createError": "Failed to create plan.",
+      "updateSuccess": "Plan updated successfully.",
+      "updateError": "Failed to update plan.",
+      "enableSuccess": "Plan activated successfully.",
+      "disableSuccess": "Plan deactivated successfully.",
+      "toggleError": "Failed to change plan status.",
+      "invalidFeatures": "These feature keys are invalid: {features}",
+      "invalidFeaturesGeneric": "One or more feature keys are invalid."
+    },
+    "modal": {
+      "eyebrow": "Plan form",
+      "description": "Define pricing, limits, and availability of the plan.",
+      "titles": {
+        "create": "Create plan",
+        "edit": "Edit plan"
+      },
+      "fields": {
+        "name": "Plan name",
+        "price": "Price",
+        "currencyCode": "Currency code",
+        "billingCycle": "Billing cycle",
+        "maxUsers": "Max users",
+        "maxCustomers": "Max customers",
+        "maxSuppliers": "Max suppliers",
+        "maxEmployees": "Max employees",
+        "maxLedgerEntries": "Max ledger entries",
+        "features": "Features (comma separated)",
+        "featuresHint": "Example: reports, exports, multi-branch",
+        "isActive": "Plan is active"
+      },
+      "limitsHint": "Leave any limit field empty to keep it unrestricted by default.",
+      "cancel": "Cancel",
+      "submitting": "Saving...",
+      "submit": {
+        "create": "Create plan",
+        "edit": "Save changes"
+      }
+    }
+  }
+}

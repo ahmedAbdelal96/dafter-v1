@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<title>لوحة تحكم المشرف العام - Hasba</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden pb-20">
+<!-- Top Header -->
+<header class="flex items-center justify-between bg-background-light dark:bg-background-dark p-4 sticky top-0 z-10 border-b border-primary/10">
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary">admin_panel_settings</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-tight">لوحة تحكم المشرف</h1>
+<p class="text-xs text-slate-500 dark:text-primary/60">منصة حسبة (Hasba)</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+</div>
+</header>
+<!-- Stats Cards Row -->
+<div class="flex flex-wrap gap-4 p-4">
+<div class="flex min-w-[150px] flex-1 flex-col gap-2 rounded-xl p-5 bg-primary/5 border border-primary/10 shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">إجمالي الشركات</p>
+<span class="material-symbols-outlined text-primary text-xl">corporate_fare</span>
+</div>
+<p class="text-slate-900 dark:text-white tracking-tight text-2xl font-bold">1,284</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-emerald-500 text-sm">trending_up</span>
+<p class="text-emerald-500 text-xs font-medium">+12%</p>
+</div>
+</div>
+<div class="flex min-w-[150px] flex-1 flex-col gap-2 rounded-xl p-5 bg-primary/5 border border-primary/10 shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">الاشتراكات النشطة</p>
+<span class="material-symbols-outlined text-primary text-xl">subscriptions</span>
+</div>
+<p class="text-slate-900 dark:text-white tracking-tight text-2xl font-bold">942</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-emerald-500 text-sm">trending_up</span>
+<p class="text-emerald-500 text-xs font-medium">+5%</p>
+</div>
+</div>
+</div>
+<!-- MRR Chart Section -->
+<div class="px-4 py-2">
+<div class="flex flex-col gap-4 p-5 rounded-xl bg-primary/5 border border-primary/10">
+<div class="flex justify-between items-center">
+<div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">نمو الإيرادات الشهرية (MRR)</p>
+<p class="text-slate-900 dark:text-white text-2xl font-bold mt-1">$45,200</p>
+</div>
+<div class="bg-primary/10 px-2 py-1 rounded text-primary text-xs font-bold">
+                        +8.4%
+                    </div>
+</div>
+<div class="h-32 w-full mt-2">
+<svg class="w-full h-full" fill="none" preserveaspectratio="none" viewbox="0 0 400 100">
+<path class="text-primary" d="M0 80 Q 50 70, 100 85 T 200 60 T 300 40 T 400 20" fill="none" stroke="currentColor" stroke-width="3"></path>
+<path d="M0 80 Q 50 70, 100 85 T 200 60 T 300 40 T 400 20 V 100 H 0 Z" fill="url(#grad)" opacity="0.1"></path>
+<defs>
+<lineargradient id="grad" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:var(--primary);stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:var(--primary);stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+<div class="flex justify-between text-[10px] text-slate-500 font-medium">
+<span>يناير</span>
+<span>فبراير</span>
+<span>مارس</span>
+<span>أبريل</span>
+<span>مايو</span>
+<span>يونيو</span>
+</div>
+</div>
+</div>
+<!-- KPI: Trial Conversions -->
+<div class="p-4">
+<div class="bg-primary/5 border border-primary/10 rounded-xl p-5">
+<div class="flex justify-between items-center mb-3">
+<p class="text-slate-900 dark:text-white text-sm font-semibold">تحويل الفترة التجريبية</p>
+<span class="text-primary text-sm font-bold">65%</span>
+</div>
+<div class="w-full bg-slate-200 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 65%;"></div>
+</div>
+<div class="flex justify-between mt-2">
+<p class="text-slate-500 dark:text-slate-400 text-xs">المستهدف: 80%</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">باقي 15%</p>
+</div>
+</div>
+</div>
+<!-- Quick Actions Grid -->
+<div class="px-4 py-2">
+<h3 class="text-sm font-bold mb-3 text-slate-700 dark:text-slate-300">إجراءات سريعة</h3>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500">
+<span class="material-symbols-outlined">flag</span>
+<span class="text-xs font-bold">حسابات مبلغ عنها</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
+<span class="material-symbols-outlined">health_and_safety</span>
+<span class="text-xs font-bold">صحة النظام</span>
+</button>
+</div>
+</div>
+<!-- Recent Activity Feed -->
+<div class="px-4 py-6">
+<h3 class="text-sm font-bold mb-4 text-slate-700 dark:text-slate-300">النشاط الأخير للمنصة</h3>
+<div class="space-y-4">
+<div class="flex gap-4 items-start">
+<div class="size-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-blue-500 text-lg">person_add</span>
+</div>
+<div class="flex-1 border-b border-primary/5 pb-3">
+<p class="text-sm font-medium">شركة "تكنولوجيا المستقبل" سجلت حساباً جديداً</p>
+<p class="text-xs text-slate-500 mt-1">منذ ساعتين</p>
+</div>
+</div>
+<div class="flex gap-4 items-start">
+<div class="size-8 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-amber-500 text-lg">payments</span>
+</div>
+<div class="flex-1 border-b border-primary/5 pb-3">
+<p class="text-sm font-medium">تم تجديد اشتراك باقة "بريميوم" - متجر الوفاء</p>
+<p class="text-xs text-slate-500 mt-1">منذ 5 ساعات</p>
+</div>
+</div>
+<div class="flex gap-4 items-start">
+<div class="size-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-red-500 text-lg">warning</span>
+</div>
+<div class="flex-1 border-b border-primary/5 pb-3">
+<p class="text-sm font-medium">تنبيه: محاولة دخول مشبوهة من عنوان IP جديد</p>
+<p class="text-xs text-slate-500 mt-1">منذ 8 ساعات</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-background-light dark:bg-background-dark border-t border-primary/10 px-4 pb-2 pt-2">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">dashboard</span>
+<span class="text-[10px] font-bold">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="text-[10px] font-medium">الشركات</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-medium">المستخدمين</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">الإعدادات</span>
+</a>
+</nav>
+</div>
+</body></html>

@@ -1,0 +1,86 @@
+{
+  "meta": {
+    "title": "إعدادات المنصة",
+    "description": "التحكم في القيم الافتراضية العامة، وحوكمة الاشتراكات، وتدرّج تفعيل الميزات."
+  },
+  "title": "إعدادات المنصة",
+  "description": "إعدادات عامة تؤثر على كل الشركات الحالية والجديدة داخل المنصة.",
+  "actions": {
+    "saveSettings": "حفظ الإعدادات",
+    "saveFeature": "حفظ الميزة",
+    "createFeature": "إنشاء Feature Flag",
+    "resetLocal": "إلغاء التعديلات المحلية",
+    "saving": "جارٍ الحفظ...",
+    "creating": "جارٍ الإنشاء..."
+  },
+  "sections": {
+    "trial": {
+      "title": "إعدادات الفترة التجريبية",
+      "description": "التحكم في مدة التجربة وسلوك التفعيل عند التسجيل."
+    },
+    "subscription": {
+      "title": "سياسات الاشتراك",
+      "description": "سياسات عامة لتغيير الخطط وفترات السماح وآلية التطبيق."
+    },
+    "governance": {
+      "title": "ضوابط الحوكمة",
+      "description": "ضبط قواعد الأمان الخاصة بالحصص والوصول بعد انتهاء الاشتراك."
+    },
+    "flags": {
+      "title": "علامات الميزات",
+      "description": "إدارة تفعيل الميزات تدريجيًا وبشكل آمن على مستوى المنصة."
+    }
+  },
+  "fields": {
+    "trialDurationDays": "مدة التجربة (بالأيام)",
+    "autoActivateOnSignup": "تفعيل الاشتراك تلقائيًا عند التسجيل",
+    "requireCompanyPhone": "إلزام رقم هاتف الشركة أثناء التسجيل",
+    "gracePeriodDays": "فترة السماح (بالأيام)",
+    "allowPlanDowngrade": "السماح بالتحويل لخطة أقل",
+    "allowPlanUpgrade": "السماح بالترقية إلى خطة أعلى",
+    "enforceSingleActiveSubscription": "منع أكثر من اشتراك نشط لنفس الشركة",
+    "prorationMode": "طريقة تطبيق الفروقات",
+    "strictQuotaEnforcement": "تطبيق الحصص بشكل صارم",
+    "blockOnExpiredSubscription": "حظر الوصول بعد انتهاء الاشتراك",
+    "allowReadOnlyDuringGracePeriod": "السماح بالقراءة فقط أثناء فترة السماح",
+    "featureName": "اسم الميزة",
+    "featureDescription": "الوصف",
+    "rolloutPercentage": "نسبة التفعيل %",
+    "enabled": "مفعّل"
+  },
+  "placeholders": {
+    "featureName": "module.feature.key",
+    "featureDescription": "اكتب وصفًا واضحًا لاستخدام هذه الميزة"
+  },
+  "table": {
+    "name": "الميزة",
+    "description": "الوصف",
+    "rollout": "نسبة التفعيل %",
+    "enabled": "مفعّل",
+    "actions": "الإجراءات"
+  },
+  "proration": {
+    "none": "بدون فروقات",
+    "immediate": "فوري",
+    "nextCycle": "مع الدورة القادمة"
+  },
+  "states": {
+    "flagsLoading": "جارٍ تحميل Feature Flags...",
+    "flagsError": "فشل تحميل Feature Flags.",
+    "flagsEmpty": "لا توجد Feature Flags حتى الآن. أنشئ أول Flag لبدء التفعيل التدريجي."
+  },
+  "messages": {
+    "settingsSaved": "تم تحديث إعدادات المنصة بنجاح.",
+    "settingsSaveError": "فشل تحديث إعدادات المنصة.",
+    "localReset": "تم إلغاء التعديلات غير المحفوظة.",
+    "featureCreated": "تم إنشاء Feature Flag بنجاح.",
+    "featureCreateError": "فشل إنشاء Feature Flag.",
+    "featureUpdated": "تم تحديث Feature Flag \"{name}\" بنجاح.",
+    "featureUpdateError": "فشل تحديث Feature Flag."
+  },
+  "validation": {
+    "flagNameRequired": "اسم الميزة مطلوب.",
+    "flagDescriptionRequired": "وصف الميزة مطلوب.",
+    "flagNamePattern": "اسم الميزة يجب أن يحتوي على أحرف أو أرقام أو . أو _ أو - فقط."
+  }
+}

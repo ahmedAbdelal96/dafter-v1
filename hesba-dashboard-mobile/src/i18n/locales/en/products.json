@@ -1,0 +1,69 @@
+{
+  "title": "Products",
+  "singular": "Product",
+  "list": {
+    "title": "Product Catalog",
+    "empty": "No products yet",
+    "emptyDesc": "Add your products to include them in invoices",
+    "searchPlaceholder": "Search by name or SKU..."
+  },
+  "detail": {
+    "title": "Product Details",
+    "sku": "SKU",
+    "category": "Category",
+    "unit": "Unit",
+    "price": "Price",
+    "status": "Status",
+    "description": "Description",
+    "createdBy": "Added by",
+    "createdAt": "Created"
+  },
+  "form": {
+    "create": "Add Product",
+    "edit": "Edit Product",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "name": "Product Name",
+    "namePlaceholder": "Product name",
+    "sku": "SKU",
+    "skuPlaceholder": "Unique product code",
+    "skuHint": "Must be unique per product",
+    "category": "Category",
+    "categoryPlaceholder": "Category (optional)",
+    "unit": "Unit",
+    "unitPlaceholder": "piece",
+    "price": "Unit Price",
+    "pricePlaceholder": "0.00",
+    "description": "Description",
+    "descriptionPlaceholder": "Product description (optional)",
+    "isActive": "Active in catalog"
+  },
+  "delete": {
+    "title": "Delete Product",
+    "message": "Are you sure you want to delete this product? This action cannot be undone.",
+    "confirm": "Delete",
+    "cancel": "Cancel"
+  },
+  "filter": {
+    "title": "Filter Products",
+    "all": "All",
+    "category": "Category",
+    "allCategories": "All Categories",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "validation": {
+    "nameRequired": "Product name is required",
+    "skuRequired": "SKU is required",
+    "skuExists": "This SKU is already in use",
+    "priceRequired": "Price is required",
+    "pricePositive": "Price must be zero or greater"
+  },
+  "errors": {
+    "loadFailed": "Failed to load products",
+    "createFailed": "Failed to create product",
+    "updateFailed": "Failed to update product",
+    "deleteFailed": "Failed to delete product"
+  }
+}

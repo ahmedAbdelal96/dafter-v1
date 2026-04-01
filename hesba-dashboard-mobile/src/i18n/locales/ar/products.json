@@ -1,0 +1,69 @@
+{
+  "title": "المنتجات",
+  "singular": "منتج",
+  "list": {
+    "title": "كتالوج المنتجات",
+    "empty": "لا توجد منتجات",
+    "emptyDesc": "أضف منتجاتك لتتمكن من إضافتها في الفواتير",
+    "searchPlaceholder": "بحث باسم المنتج أو الكود..."
+  },
+  "detail": {
+    "title": "تفاصيل المنتج",
+    "sku": "كود المنتج (SKU)",
+    "category": "الفئة",
+    "unit": "الوحدة",
+    "price": "السعر",
+    "status": "الحالة",
+    "description": "الوصف",
+    "createdBy": "أضافه",
+    "createdAt": "تاريخ الإضافة"
+  },
+  "form": {
+    "create": "إضافة منتج",
+    "edit": "تعديل المنتج",
+    "save": "حفظ التعديلات",
+    "cancel": "إلغاء",
+    "name": "اسم المنتج",
+    "namePlaceholder": "اسم المنتج",
+    "sku": "كود المنتج (SKU)",
+    "skuPlaceholder": "كود فريد للمنتج",
+    "skuHint": "يجب أن يكون فريداً لكل منتج",
+    "category": "الفئة",
+    "categoryPlaceholder": "الفئة (اختياري)",
+    "unit": "الوحدة",
+    "unitPlaceholder": "قطعة",
+    "price": "السعر",
+    "pricePlaceholder": "0.00",
+    "description": "الوصف",
+    "descriptionPlaceholder": "وصف المنتج (اختياري)",
+    "isActive": "نشط في الكتالوج"
+  },
+  "delete": {
+    "title": "حذف المنتج",
+    "message": "هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirm": "حذف",
+    "cancel": "إلغاء"
+  },
+  "filter": {
+    "title": "تصفية المنتجات",
+    "all": "الكل",
+    "category": "الفئة",
+    "allCategories": "جميع الفئات",
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط"
+  },
+  "validation": {
+    "nameRequired": "اسم المنتج مطلوب",
+    "skuRequired": "كود المنتج مطلوب",
+    "skuExists": "هذا الكود مستخدم بالفعل",
+    "priceRequired": "السعر مطلوب",
+    "pricePositive": "يجب أن يكون السعر صفراً أو أكبر"
+  },
+  "errors": {
+    "loadFailed": "فشل تحميل المنتجات",
+    "createFailed": "فشل إضافة المنتج",
+    "updateFailed": "فشل تعديل المنتج",
+    "deleteFailed": "فشل حذف المنتج"
+  }
+}

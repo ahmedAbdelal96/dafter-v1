@@ -1,0 +1,56 @@
+{
+  "title": "الموردون",
+  "list": {
+    "searchPlaceholder": "البحث عن مورد...",
+    "empty": "لا يوجد موردون",
+    "emptyDesc": "أضف أول مورد لبدء إدارة مشترياتك"
+  },
+  "detail": {
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "balance": "الرصيد الحالي",
+    "phone": "رقم الهاتف",
+    "address": "العنوان",
+    "openingBalance": "الرصيد الافتتاحي",
+    "createdAt": "تاريخ الإضافة",
+    "viewStatement": "كشف الحساب",
+    "edit": "تعديل",
+    "delete": "حذف"
+  },
+  "form": {
+    "create": "إضافة مورد",
+    "edit": "تعديل المورد",
+    "name": "اسم المورد",
+    "namePlaceholder": "أدخل اسم المورد",
+    "phone": "رقم الهاتف",
+    "phonePlaceholder": "05xxxxxxxx",
+    "address": "العنوان",
+    "addressPlaceholder": "المدينة، الحي...",
+    "openingBalance": "الرصيد الافتتاحي",
+    "openingBalancePlaceholder": "0.00",
+    "openingBalanceHint": "يُحدَّد عند الإنشاء فقط ولا يمكن تغييره لاحقاً",
+    "isActive": "الحالة",
+    "activeYes": "نشط",
+    "activeNo": "غير نشط",
+    "save": "حفظ"
+  },
+  "delete": {
+    "title": "حذف المورد",
+    "message": "هل أنت متأكد من حذف هذا المورد؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirm": "حذف"
+  },
+  "validation": {
+    "nameRequired": "اسم المورد مطلوب",
+    "invalidAmount": "المبلغ غير صالح"
+  },
+  "errors": {
+    "loadFailed": "فشل تحميل الموردين. تحقق من الاتصال وأعد المحاولة.",
+    "retry": "إعادة المحاولة",
+    "nameTaken": "اسم المورد مستخدم بالفعل",
+    "versionConflict": "تم تعديل البيانات من مكان آخر. أعد تحميل الصفحة وحاول مجدداً.",
+    "quotaExceeded": "وصلت إلى الحد الأقصى للموردين في خطتك الحالية",
+    "createFailed": "فشل إضافة المورد",
+    "updateFailed": "فشل تحديث المورد",
+    "deleteHasLedger": "لا يمكن حذف هذا المورد لوجود قيود محاسبية مرتبطة به"
+  }
+}

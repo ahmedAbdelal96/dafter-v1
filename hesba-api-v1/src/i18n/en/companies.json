@@ -1,0 +1,46 @@
+{
+  "create": {
+    "success": "Company created successfully",
+    "failed": "Failed to create company",
+    "alreadyExists": "Company name already exists"
+  },
+  "get": {
+    "success": "Company data retrieved",
+    "notFound": "Company not found"
+  },
+  "me": {
+    "noCompany": "No company is associated with this account",
+    "versionConflict": "Company data was modified concurrently. Please refresh and try again."
+  },
+  "list": {
+    "success": "Companies list retrieved"
+  },
+  "update": {
+    "success": "Company updated successfully",
+    "notFound": "Company not found"
+  },
+  "cashMode": {
+    "getSuccess": "Cash reconciliation mode retrieved",
+    "updateSuccess": "Cash reconciliation mode updated successfully"
+  },
+  "disable": {
+    "success": "Company disabled successfully"
+  },
+  "subscription": {
+    "activated": "Subscription activated successfully",
+    "suspended": "Subscription suspended",
+    "extended": "Subscription extended successfully"
+  },
+  "plan": {
+    "create": {
+      "success": "Plan created successfully"
+    },
+    "list": {
+      "success": "Plans list retrieved"
+    },
+    "update": {
+      "success": "Plan updated successfully"
+    },
+    "notFound": "Plan not found"
+  }
+}

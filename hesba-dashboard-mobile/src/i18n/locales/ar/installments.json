@@ -1,0 +1,123 @@
+{
+  "title": "بيع بالتقسيط",
+  "singular": "عقد تقسيط",
+
+  "list": {
+    "empty": "لا توجد عقود تقسيط",
+    "emptyDesc": "سجّل أول عقد تقسيط لعملائك"
+  },
+  "searchPlaceholder": "بحث باسم الطرف...",
+
+  "filter": {
+    "ALL": "الكل",
+    "ACTIVE": "نشط",
+    "COMPLETED": "مكتمل",
+    "OVERDUE": "متأخر",
+    "CANCELLED": "ملغي",
+    "DEFAULTED": "متعثر"
+  },
+
+  "contractStatus": {
+    "ACTIVE": "نشط",
+    "COMPLETED": "مكتمل",
+    "OVERDUE": "متأخر",
+    "CANCELLED": "ملغي",
+    "DEFAULTED": "متعثر"
+  },
+
+  "scheduleStatus": {
+    "PENDING": "معلق",
+    "PARTIAL": "مدفوع جزئياً",
+    "PAID": "مدفوع",
+    "OVERDUE": "متأخر",
+    "WAIVED": "مُعفى"
+  },
+
+  "scheduleType": {
+    "FIXED": "أقساط ثابتة متساوية",
+    "CUSTOM": "أقساط مخصصة"
+  },
+
+  "partyType": {
+    "CUSTOMER": "عميل",
+    "SUPPLIER": "مورّد",
+    "EMPLOYEE": "موظف"
+  },
+
+  "detail": {
+    "totalAmount": "إجمالي القيمة",
+    "paidAmount": "المدفوع",
+    "remainingAmount": "المتبقي",
+    "downPayment": "الدفعة المقدمة",
+    "installmentAmount": "قيمة القسط",
+    "numberOfInstallments": "عدد الأقساط",
+    "scheduleType": "نوع الجدول",
+    "startDate": "تاريخ البدء",
+    "dueDate": "تاريخ الاستحقاق",
+    "description": "الوصف",
+    "party": "الطرف",
+    "progress": "نسبة السداد",
+    "schedule": "جدول الأقساط",
+    "payments": "سجل الدفعات",
+    "cancelContract": "إلغاء العقد",
+    "cancelConfirm": "هل أنت متأكد من إلغاء هذا العقد؟ لا يمكن التراجع عن هذا الإجراء.",
+    "createInvoice": "إنشاء فاتورة",
+    "payInstallment": "سداد القسط"
+  },
+
+  "form": {
+    "create": "عقد تقسيط جديد",
+    "partyType": "نوع الطرف",
+    "party": "الطرف",
+    "partyPlaceholder": "ابحث واختر...",
+    "totalAmount": "إجمالي القيمة",
+    "amountPlaceholder": "0.00",
+    "downPayment": "الدفعة المقدمة (اختياري)",
+    "downPaymentPlaceholder": "0.00",
+    "numberOfInstallments": "عدد الأقساط",
+    "numberOfInstallmentsPlaceholder": "مثال: 12",
+    "startDate": "تاريخ بدء التقسيط",
+    "startDatePlaceholder": "YYYY-MM-DD",
+    "scheduleType": "نوع الجدول",
+    "description": "الوصف",
+    "descriptionPlaceholder": "وصف اختياري",
+    "customSchedule": "الأقساط المخصصة",
+    "addScheduleItem": "إضافة قسط",
+    "scheduleItemAmount": "المبلغ",
+    "scheduleItemDueDate": "تاريخ الاستحقاق",
+    "submit": "إنشاء العقد"
+  },
+
+  "payment": {
+    "title": "تسجيل دفعة",
+    "amount": "المبلغ المدفوع",
+    "amountPlaceholder": "0.00",
+    "date": "تاريخ الدفعة",
+    "datePlaceholder": "YYYY-MM-DD",
+    "method": "طريقة الدفع",
+    "methodPlaceholder": "نقداً / تحويل...",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "ملاحظات اختيارية",
+    "empty": "لا توجد دفعات مسجلة",
+    "submit": "تأكيد الدفع"
+  },
+
+  "validation": {
+    "partyRequired": "الطرف مطلوب",
+    "amountPositive": "يجب أن يكون المبلغ أكبر من صفر",
+    "installmentsMin": "عدد الأقساط يجب أن يكون 2 على الأقل",
+    "startDateRequired": "تاريخ البدء مطلوب",
+    "startDateFormat": "صيغة التاريخ غير صحيحة (YYYY-MM-DD)",
+    "downPaymentExceedsTotal": "الدفعة المقدمة تتجاوز إجمالي القيمة",
+    "paymentAmountRequired": "مبلغ الدفعة مطلوب",
+    "paymentExceedsRemaining": "المبلغ يتجاوز المتبقي",
+    "paymentDateRequired": "تاريخ الدفعة مطلوب",
+    "customScheduleRequired": "أضف قسطاً واحداً على الأقل"
+  },
+
+  "error": {
+    "createFailed": "فشل إنشاء العقد",
+    "paymentFailed": "فشل تسجيل الدفعة",
+    "cancelFailed": "فشل إلغاء العقد"
+  }
+}

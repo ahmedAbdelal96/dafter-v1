@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>قائمة الأرباح والخسائر - حسبة</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                        "surface-dark": "#1d2f29",
+                        "border-dark": "#294239"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden">
+<!-- Header Section -->
+<header class="sticky top-0 z-50 bg-background-light dark:bg-background-dark border-b border-border-dark px-4 py-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-100">arrow_forward</span>
+<h1 class="text-lg font-bold">قائمة الأرباح والخسائر</h1>
+</div>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg bg-surface-dark text-slate-100">
+<span class="material-symbols-outlined">download</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-dark text-slate-100">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Period Tabs -->
+<nav class="flex border-b border-border-dark bg-background-dark">
+<button class="flex-1 py-4 text-sm font-bold text-slate-400 border-b-2 border-transparent">سنوي</button>
+<button class="flex-1 py-4 text-sm font-bold text-slate-400 border-b-2 border-transparent">ربع سنوي</button>
+<button class="flex-1 py-4 text-sm font-bold text-slate-100 border-b-2 border-primary">شهري</button>
+</nav>
+<!-- Key Metrics Grid -->
+<section class="p-4 grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-surface-dark border border-border-dark">
+<p class="text-slate-400 text-sm font-medium">صافي الربح</p>
+<p class="text-2xl font-bold">45,000 <span class="text-sm font-normal">ر.س</span></p>
+<div class="flex items-center gap-1 text-emerald-500 text-xs font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>+15.4%</span>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-surface-dark border border-border-dark">
+<p class="text-slate-400 text-sm font-medium">هامش الربح</p>
+<p class="text-2xl font-bold">22%</p>
+<div class="flex items-center gap-1 text-emerald-500 text-xs font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>+2.1%</span>
+</div>
+</div>
+</section>
+<!-- Detailed Financial Breakdown -->
+<main class="px-4 pb-24">
+<h2 class="text-lg font-bold mb-4 mt-2">التفاصيل المالية</h2>
+<div class="space-y-3">
+<!-- Revenue Section -->
+<div class="rounded-xl bg-surface-dark border border-border-dark overflow-hidden">
+<div class="flex items-center justify-between p-4 bg-primary/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">payments</span>
+<span class="font-bold">إجمالي الإيرادات</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-bold">120,500 ر.س</span>
+<span class="material-symbols-outlined text-slate-400">expand_more</span>
+</div>
+</div>
+</div>
+<!-- COGS Section -->
+<div class="rounded-xl bg-surface-dark border border-border-dark overflow-hidden">
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-amber-500">inventory_2</span>
+<span class="font-bold">تكلفة البضاعة المباعة</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-bold text-slate-300">45,200 ر.س</span>
+<span class="material-symbols-outlined text-slate-400">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Gross Profit Highlight -->
+<div class="flex items-center justify-between p-4 rounded-xl bg-primary/20 border border-primary/30">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+<span class="font-bold">إجمالي الربح</span>
+</div>
+<div class="text-left">
+<p class="font-bold text-primary">75,300 ر.س</p>
+<p class="text-[10px] text-primary/80">الهامش: 62.5%</p>
+</div>
+</div>
+<!-- Operating Expenses Section -->
+<div class="rounded-xl bg-surface-dark border border-border-dark overflow-hidden">
+<button class="w-full flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-red-400">receipt_long</span>
+<span class="font-bold">المصاريف التشغيلية</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-bold">30,300 ر.س</span>
+<span class="material-symbols-outlined text-slate-400">expand_less</span>
+</div>
+</button>
+<div class="px-4 pb-4 space-y-3">
+<div class="flex justify-between text-sm text-slate-400 py-1 border-b border-border-dark/50">
+<span>الرواتب والأجور</span>
+<span>15,000 ر.س</span>
+</div>
+<div class="flex justify-between text-sm text-slate-400 py-1 border-b border-border-dark/50">
+<span>إيجار المكاتب</span>
+<span>8,000 ر.س</span>
+</div>
+<div class="flex justify-between text-sm text-slate-400 py-1 border-b border-border-dark/50">
+<span>التسويق والإعلان</span>
+<span>5,300 ر.س</span>
+</div>
+<div class="flex justify-between text-sm text-slate-400 py-1">
+<span>مصاريف عامة</span>
+<span>2,000 ر.س</span>
+</div>
+</div>
+</div>
+<!-- Net Profit Final -->
+<div class="mt-6 p-6 rounded-xl bg-primary shadow-lg shadow-primary/20">
+<div class="flex justify-between items-end">
+<div>
+<p class="text-primary-100 text-sm opacity-90 mb-1">صافي الربح النهائي</p>
+<p class="text-3xl font-bold text-white">45,000 ر.س</p>
+</div>
+<div class="text-left">
+<div class="bg-white/20 px-3 py-1 rounded-full text-white text-sm font-bold">
+                            37.3% هامش
+                        </div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<footer class="fixed bottom-0 left-0 right-0 z-50">
+<div class="flex gap-2 border-t border-border-dark bg-surface-dark px-4 pb-6 pt-2">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-xs font-medium">الرئيسية</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">pie_chart</span>
+<p class="text-xs font-medium">التقارير</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<p class="text-xs font-medium">المعاملات</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">menu</span>
+<p class="text-xs font-medium">المزيد</p>
+</a>
+</div>
+</footer>
+</body></html>

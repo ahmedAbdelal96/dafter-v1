@@ -1,0 +1,36 @@
+{
+  "create": {
+    "success": "Customer created successfully",
+    "failed": "Failed to create customer",
+    "limitReached": "Maximum number of customers reached for your current plan",
+    "nameExists": "A customer with this name already exists in your company"
+  },
+  "get": {
+    "success": "Customer data retrieved",
+    "notFound": "Customer not found"
+  },
+  "list": {
+    "success": "Customers list retrieved"
+  },
+  "update": {
+    "success": "Customer updated successfully",
+    "notFound": "Customer not found",
+    "nameExists": "Another customer with this name already exists in your company",
+    "conflict": "This customer was modified by another user. Please refresh and try again"
+  },
+  "delete": {
+    "success": "Customer deleted successfully",
+    "hasEntries": "Cannot delete a customer with ledger entries. You can disable them instead",
+    "notFound": "Customer not found"
+  },
+  "snapshot": {
+    "success": "Customer snapshot fetched successfully",
+    "notFound": "Customer not found"
+  },
+  "creditLimit": {
+    "exceeded": "Warning: Credit limit exceeded for customer {name}"
+  },
+  "overdue": {
+    "success": "Overdue customers retrieved successfully"
+  }
+}

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Sans Arabic", "Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans Arabic', 'Inter', sans-serif;
+        }
+        .custom-checkbox:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="max-w-md mx-auto min-h-screen flex flex-col shadow-2xl bg-background-light dark:bg-background-dark border-x border-primary/10">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-10 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 border-b border-primary/10">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-primary/10 transition-colors text-slate-900 dark:text-slate-100">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<h1 class="text-xl font-bold leading-tight flex-1 mr-2 text-slate-900 dark:text-slate-100">تصدير البيانات</h1>
+<div class="size-10"></div> <!-- Spacer for symmetry -->
+</header>
+<main class="flex-1 overflow-y-auto pb-32">
+<!-- Header Image/Graphic -->
+<div class="relative h-32 w-full bg-gradient-to-br from-primary/20 to-transparent flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 opacity-10" data-alt="Abstract geometric data nodes pattern"></div>
+<span class="material-symbols-outlined text-primary text-6xl opacity-40">database</span>
+</div>
+<!-- Section 1: Data Type Selection -->
+<section class="p-4">
+<h3 class="text-lg font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">list_alt</span>
+                    ماذا تريد تصدير؟
+                </h3>
+<div class="space-y-1 bg-primary/5 dark:bg-primary/10 rounded-xl p-2 border border-primary/5">
+<label class="flex items-center justify-between p-3 hover:bg-primary/5 rounded-lg cursor-pointer transition-colors">
+<span class="text-base font-medium">الفواتير</span>
+<input checked="" class="custom-checkbox h-6 w-6 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-0 dark:focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 hover:bg-primary/5 rounded-lg cursor-pointer transition-colors">
+<span class="text-base font-medium">العملاء</span>
+<input class="custom-checkbox h-6 w-6 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-0 dark:focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 hover:bg-primary/5 rounded-lg cursor-pointer transition-colors">
+<span class="text-base font-medium">المدفوعات</span>
+<input class="custom-checkbox h-6 w-6 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-0 dark:focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 hover:bg-primary/5 rounded-lg cursor-pointer transition-colors">
+<span class="text-base font-medium">المنتجات</span>
+<input class="custom-checkbox h-6 w-6 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-0 dark:focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-3 hover:bg-primary/5 rounded-lg cursor-pointer transition-colors">
+<span class="text-base font-medium">الموردين</span>
+<input class="custom-checkbox h-6 w-6 rounded border-primary/30 bg-transparent text-primary focus:ring-primary focus:ring-offset-0 dark:focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+</div>
+</section>
+<!-- Section 2: Time Period -->
+<section class="p-4">
+<h3 class="text-lg font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">calendar_month</span>
+                    الفترة الزمنية
+                </h3>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col">
+<span class="text-xs font-medium mb-1 opacity-70">من تاريخ</span>
+<div class="relative">
+<input class="w-full bg-primary/5 dark:bg-primary/10 border-primary/20 rounded-lg px-3 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="DD/MM/YYYY" type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary/40 text-sm">event</span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-medium mb-1 opacity-70">إلى تاريخ</span>
+<div class="relative">
+<input class="w-full bg-primary/5 dark:bg-primary/10 border-primary/20 rounded-lg px-3 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="DD/MM/YYYY" type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary/40 text-sm">event</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: File Format -->
+<section class="p-4">
+<h3 class="text-lg font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">description</span>
+                    صيغة الملف
+                </h3>
+<div class="flex bg-primary/10 p-1 rounded-xl">
+<label class="flex-1 cursor-pointer">
+<input checked="" class="hidden peer" name="format" type="radio" value="excel"/>
+<div class="text-center py-2.5 rounded-lg peer-checked:bg-primary peer-checked:text-white transition-all text-sm font-semibold">
+                            Excel (.xlsx)
+                        </div>
+</label>
+<label class="flex-1 cursor-pointer">
+<input class="hidden peer" name="format" type="radio" value="pdf"/>
+<div class="text-center py-2.5 rounded-lg peer-checked:bg-primary peer-checked:text-white transition-all text-sm font-semibold">
+                            PDF
+                        </div>
+</label>
+<label class="flex-1 cursor-pointer">
+<input class="hidden peer" name="format" type="radio" value="csv"/>
+<div class="text-center py-2.5 rounded-lg peer-checked:bg-primary peer-checked:text-white transition-all text-sm font-semibold">
+                            CSV
+                        </div>
+</label>
+</div>
+</section>
+<!-- Recent Exports Section -->
+<section class="p-4 mt-4">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-base font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">history</span>
+                        عمليات التصدير الأخيرة
+                    </h3>
+<button class="text-xs text-primary font-bold">عرض الكل</button>
+</div>
+<div class="space-y-3">
+<!-- Export Item 1 -->
+<div class="flex items-center gap-3 p-3 bg-white dark:bg-primary/5 border border-primary/10 rounded-xl">
+<div class="size-10 bg-primary/20 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">table_view</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">تقرير الفواتير - ديسمبر</p>
+<p class="text-[10px] opacity-60">15 يناير 2024 • 2.4 MB</p>
+</div>
+<button class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+</div>
+<!-- Export Item 2 -->
+<div class="flex items-center gap-3 p-3 bg-white dark:bg-primary/5 border border-primary/10 rounded-xl">
+<div class="size-10 bg-primary/20 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">قائمة العملاء النشطين</p>
+<p class="text-[10px] opacity-60">10 يناير 2024 • 1.1 MB</p>
+</div>
+<button class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Action Button Container -->
+<footer class="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-lg border-t border-primary/10 z-20">
+<button class="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">ios_share</span>
+                بدء التصدير
+            </button>
+</footer>
+</div>
+</body></html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Sans Arabic", "Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans Arabic', 'Inter', sans-serif;
+        }
+        .custom-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%231f7a5a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: left 0.75rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="flex items-center bg-background-light dark:bg-background-dark border-b border-primary/10 p-4 justify-between sticky top-0 z-10 backdrop-blur-md">
+<div class="flex items-center gap-4">
+<button class="text-slate-900 dark:text-slate-100 flex size-10 items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<h1 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">حسبة - الدعم الفني</h1>
+</div>
+<div class="flex items-center">
+<div class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm">help</span>
+</div>
+</div>
+</header>
+<main class="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
+<div class="mb-8">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">تواصل معنا</h2>
+<p class="text-slate-600 dark:text-slate-400">يسعدنا مساعدتك. يرجى ملء النموذج أدناه وسيقوم فريقنا بالرد عليك في أقرب وقت ممكن.</p>
+</div>
+<!-- Ticket Creation Form -->
+<form class="space-y-6">
+<!-- Subject Selection -->
+<div class="flex flex-col gap-2">
+<label class="text-slate-700 dark:text-slate-300 text-sm font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">subject</span>
+                        الموضوع الأساسي
+                    </label>
+<select class="custom-select w-full rounded-xl border border-primary/20 bg-white dark:bg-primary/5 focus:border-primary focus:ring-1 focus:ring-primary h-14 px-4 text-base transition-all outline-none appearance-none">
+<option disabled="" selected="" value="">اختر موضوع التذكرة</option>
+<option value="billing">الاشتراكات والفوترة</option>
+<option value="technical">مشكلة تقنية في المنصة</option>
+<option value="account">إعدادات الحساب</option>
+<option value="feature">اقتراح ميزة جديدة</option>
+</select>
+</div>
+<!-- Issue Category -->
+<div class="flex flex-col gap-2">
+<label class="text-slate-700 dark:text-slate-300 text-sm font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">category</span>
+                        فئة المشكلة
+                    </label>
+<select class="custom-select w-full rounded-xl border border-primary/20 bg-white dark:bg-primary/5 focus:border-primary focus:ring-1 focus:ring-primary h-14 px-4 text-base transition-all outline-none appearance-none">
+<option disabled="" selected="" value="">اختر الفئة النوعية</option>
+<option value="login">مشكلة في تسجيل الدخول</option>
+<option value="data">تصدير البيانات والتقارير</option>
+<option value="api">ربط الخدمات (API)</option>
+<option value="other">أخرى</option>
+</select>
+</div>
+<!-- Description -->
+<div class="flex flex-col gap-2">
+<label class="text-slate-700 dark:text-slate-300 text-sm font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">description</span>
+                        تفاصيل المشكلة
+                    </label>
+<textarea class="w-full rounded-xl border border-primary/20 bg-white dark:bg-primary/5 focus:border-primary focus:ring-1 focus:ring-primary min-h-40 p-4 text-base transition-all outline-none resize-none" placeholder="اشرح مشكلتك بالتفصيل هنا... كلما زادت التفاصيل، تمكنا من مساعدتك بشكل أسرع."></textarea>
+</div>
+<!-- Attachment Upload -->
+<div class="flex flex-col gap-2">
+<label class="text-slate-700 dark:text-slate-300 text-sm font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">attach_file</span>
+                        المرفقات (اختياري)
+                    </label>
+<div class="group relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/20 rounded-xl bg-white dark:bg-primary/5 hover:bg-primary/10 transition-all cursor-pointer">
+<div class="flex flex-col items-center justify-center pt-5 pb-6">
+<span class="material-symbols-outlined text-primary text-3xl mb-2">cloud_upload</span>
+<p class="text-sm text-slate-500 dark:text-slate-400">اضغط لرفع صورة أو اسحب الملف هنا</p>
+<p class="text-xs text-slate-400 mt-1">PNG, JPG حتى 5 ميجابايت</p>
+</div>
+<input class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
+</div>
+</div>
+<!-- Buttons Area -->
+<div class="pt-6 flex flex-col sm:flex-row gap-4">
+<button class="flex-1 bg-primary hover:bg-primary/90 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20" type="submit">
+<span class="material-symbols-outlined">send</span>
+                        إرسال الرسالة
+                    </button>
+<button class="px-8 py-4 rounded-xl border border-slate-300 dark:border-primary/20 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-100 dark:hover:bg-primary/10 transition-all" type="button">
+                        إلغاء
+                    </button>
+</div>
+</form>
+<!-- Support Info Cards -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="p-4 rounded-xl bg-primary/5 border border-primary/10 flex items-start gap-4">
+<div class="size-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">schedule</span>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 text-sm">وقت الاستجابة</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">نقوم بالرد عادة خلال أقل من ساعتين عمل.</p>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-primary/5 border border-primary/10 flex items-start gap-4">
+<div class="size-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">verified_user</span>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 text-sm">خصوصية البيانات</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">تذكر عدم مشاركة كلمات المرور الخاصة بك في التذكرة.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Background Pattern -->
+<div class="h-12 w-full bg-gradient-to-t from-primary/10 to-transparent"></div>
+</div>
+</body></html>

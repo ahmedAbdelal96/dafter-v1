@@ -1,0 +1,43 @@
+{
+  "title": "Company Settings",
+  "save": "Save",
+  "retry": "Retry",
+
+  "section": {
+    "identity": "Company Info",
+    "currency": "Currency",
+    "info": "Details"
+  },
+
+  "fields": {
+    "name": "Company Name",
+    "phone": "Phone Number",
+    "address": "Address",
+    "currency": "Currency",
+    "currencyHint": "The currency used across invoices and reports.",
+    "companyId": "Company ID"
+  },
+
+  "placeholders": {
+    "name": "e.g. Dafter Store",
+    "phone": "e.g. +966 50 000 0000",
+    "address": "City, Street, Building…"
+  },
+
+  "validation": {
+    "nameRequired": "Company name is required."
+  },
+
+  "success": {
+    "title": "Saved",
+    "message": "Company profile updated successfully."
+  },
+
+  "error": {
+    "title": "Error",
+    "generic": "Failed to save changes. Please try again.",
+    "loadFailed": "Could not load company data.",
+    "conflictTitle": "Conflict Detected",
+    "conflictMessage": "Company data was updated elsewhere. The form has been refreshed — please review and save again."
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "meta": {
+    "title": "Platform Settings",
+    "description": "Control global defaults, subscription governance, and feature rollout."
+  },
+  "title": "Platform Settings",
+  "description": "Configure platform-wide defaults that affect all tenants and future subscriptions.",
+  "actions": {
+    "saveSettings": "Save Settings",
+    "saveFeature": "Save Feature",
+    "createFeature": "Create Feature Flag",
+    "resetLocal": "Reset Local Changes",
+    "saving": "Saving...",
+    "creating": "Creating..."
+  },
+  "sections": {
+    "trial": {
+      "title": "Trial Defaults",
+      "description": "Controls for trial onboarding and activation."
+    },
+    "subscription": {
+      "title": "Subscription Policies",
+      "description": "Global policy controls for plan changes and billing transitions."
+    },
+    "governance": {
+      "title": "Governance Guardrails",
+      "description": "Safety limits for quota and post-expiry behavior."
+    },
+    "flags": {
+      "title": "Feature Flags",
+      "description": "Enable gradual rollout and controlled activation of platform features."
+    }
+  },
+  "fields": {
+    "trialDurationDays": "Trial Duration (Days)",
+    "autoActivateOnSignup": "Auto-activate subscription on signup",
+    "requireCompanyPhone": "Require company phone during signup",
+    "gracePeriodDays": "Grace Period (Days)",
+    "allowPlanDowngrade": "Allow plan downgrade",
+    "allowPlanUpgrade": "Allow plan upgrade",
+    "enforceSingleActiveSubscription": "Enforce single active subscription",
+    "prorationMode": "Proration Mode",
+    "strictQuotaEnforcement": "Strict quota enforcement",
+    "blockOnExpiredSubscription": "Block access when subscription expires",
+    "allowReadOnlyDuringGracePeriod": "Allow read-only access during grace period",
+    "featureName": "Feature Name",
+    "featureDescription": "Description",
+    "rolloutPercentage": "Rollout %",
+    "enabled": "Enabled"
+  },
+  "placeholders": {
+    "featureName": "module.feature.key",
+    "featureDescription": "Describe when and why this feature should be enabled"
+  },
+  "table": {
+    "name": "Feature",
+    "description": "Description",
+    "rollout": "Rollout %",
+    "enabled": "Enabled",
+    "actions": "Actions"
+  },
+  "proration": {
+    "none": "No Proration",
+    "immediate": "Immediate",
+    "nextCycle": "Next Billing Cycle"
+  },
+  "states": {
+    "flagsLoading": "Loading feature flags...",
+    "flagsError": "Failed to load feature flags.",
+    "flagsEmpty": "No feature flags found. Create the first flag to start controlled rollout."
+  },
+  "messages": {
+    "settingsSaved": "Platform settings updated successfully.",
+    "settingsSaveError": "Failed to update platform settings.",
+    "localReset": "Unsaved local changes were reset.",
+    "featureCreated": "Feature flag created successfully.",
+    "featureCreateError": "Failed to create feature flag.",
+    "featureUpdated": "Feature flag \"{name}\" updated successfully.",
+    "featureUpdateError": "Failed to update feature flag."
+  },
+  "validation": {
+    "flagNameRequired": "Feature name is required.",
+    "flagDescriptionRequired": "Feature description is required.",
+    "flagNamePattern": "Feature name can contain letters, numbers, dot, underscore, and dash only."
+  }
+}

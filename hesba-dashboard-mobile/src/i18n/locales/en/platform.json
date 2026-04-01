@@ -1,0 +1,315 @@
+{
+  "tabs": {
+    "dashboard": "Dashboard",
+    "companies": "Companies",
+    "subscriptions": "Subscriptions",
+    "plans": "Plans",
+    "more": "More"
+  },
+  "subStatus": {
+    "ACTIVE": "Active",
+    "TRIAL": "Trial",
+    "SUSPENDED": "Suspended",
+    "EXPIRED": "Expired",
+    "CANCELLED": "Cancelled"
+  },
+  "billing": {
+    "MONTHLY": "Monthly",
+    "YEARLY": "Yearly",
+    "QUARTERLY": "Quarterly"
+  },
+  "stats": {
+    "total": "Total Companies",
+    "active": "Active",
+    "trial": "Trial",
+    "suspended": "Suspended"
+  },
+  "dashboard": {
+    "title": "Admin Panel",
+    "adminBadge": "Super Admin",
+    "quickLinks": "Quick Links",
+    "newCompany": "New Company",
+    "recentCompanies": "Recent Companies"
+  },
+  "companies": {
+    "title": "Companies",
+    "searchPlaceholder": "Search by name or phoneâ€¦",
+    "empty": "No companies found"
+  },
+  "subscriptions": {
+    "title": "Subscriptions",
+    "searchPlaceholder": "Search by company nameâ€¦",
+    "empty": "No subscriptions found",
+    "noSub": "No subscription",
+    "daysLeft": "{{count}} days left",
+    "expired": "Expired"
+  },
+  "filter": {
+    "all": "All"
+  },
+  "detail": {
+    "title": "Company Details",
+    "noSubscription": "No active subscription",
+    "currentPlan": "Current Plan",
+    "companyActive": "Active",
+    "companyDisabled": "Disabled",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "since": "Since {{date}}",
+    "subscription": "Subscription",
+    "actions": "Actions",
+    "noActiveSub": "No active subscription",
+    "companyActions": "Company actions",
+    "companyActionsDescription": "Update workspace details, user access, and day-to-day company access controls.",
+    "subscriptionActions": "Subscription actions",
+    "subscriptionActionsDescription": "Manage the current subscription term, plan, and access state for this company.",
+    "governanceActions": "Archive and permanent actions",
+    "governanceActionsDescription": "Use these only for governance, cleanup, or archived-workspace handling."
+  },
+  "metrics": {
+    "users": "Users",
+    "customers": "Customers",
+    "suppliers": "Suppliers",
+    "employees": "Employees"
+  },
+  "actions": {
+    "activate": "Activate Subscription",
+    "extend": "Extend Subscription",
+    "suspend": "Suspend Subscription",
+    "changePlan": "Change Plan",
+    "editCompany": "Edit Company",
+    "archiveCompany": "Archive Company",
+    "restoreCompany": "Restore Company",
+    "deleteCompany": "Delete Company",
+    "disable": "Disable Company",
+    "enable": "Enable Company",
+    "viewUsers": "Users",
+    "disableCompany": "Disable",
+    "enableCompany": "Enable"
+  },
+  "createCompany": {
+    "title": "Create New Company",
+    "sectionCompany": "Company Info",
+    "sectionOwner": "Owner Info",
+    "sectionSubscription": "Subscription",
+    "companyName": "Company Name",
+    "companyPhone": "Company Phone (optional)",
+    "currency": "Currency Code",
+    "ownerFullName": "Owner Full Name",
+    "ownerEmail": "Email",
+    "ownerPassword": "Password",
+    "ownerPhone": "Owner Phone (optional)",
+    "selectPlan": "Select Plan",
+    "trial": "Trial",
+    "paid": "Paid",
+    "trialDays": "Trial Days",
+    "termMonths": "Duration (months)",
+    "confirm": "Create Company",
+    "success": "Company created successfully",
+    "failed": "Failed to create company",
+    "validation": {
+      "companyNameRequired": "Company name is required",
+      "ownerNameRequired": "Owner name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email address",
+      "passwordRequired": "Password is required",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "passwordNeedsUppercase": "Must include an uppercase letter",
+      "passwordNeedsNumber": "Must include a number",
+      "planRequired": "Please select a plan",
+      "trialDaysRequired": "Enter the number of trial days"
+    }
+  },
+  "users": {
+    "title": "Company Users",
+    "statsTotal": "Total",
+    "statsActive": "Active",
+    "statsDisabled": "Disabled",
+    "searchPlaceholder": "Search by name or emailâ€¦",
+    "empty": "No users found",
+    "addStaff": "Add Staff",
+    "roleOwner": "Owner",
+    "roleStaff": "Staff",
+    "active": "Active",
+    "disabled": "Disabled",
+    "disableConfirmTitle": "Disable User",
+    "disableConfirmMsg": "Are you sure you want to disable this account?",
+    "enableConfirmTitle": "Enable User",
+    "enableConfirmMsg": "Are you sure you want to enable this account?"
+  },
+  "createStaff": {
+    "title": "Add Staff Member",
+    "fullName": "Full Name",
+    "email": "Email",
+    "password": "Password",
+    "phone": "Phone (optional)",
+    "confirm": "Add",
+    "success": "Staff member added successfully",
+    "failed": "Failed to add staff member",
+    "validation": {
+      "nameRequired": "Full name is required",
+      "emailInvalid": "Invalid email address",
+      "passwordWeak": "Weak password (min 8 chars, uppercase, number)"
+    }
+  },
+  "activate": {
+    "title": "Activate Subscription",
+    "selectPlan": "Select Plan",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "note": "Note (optional)",
+    "notePlaceholder": "e.g. Manual activation",
+    "confirm": "Activate",
+    "success": "Subscription activated successfully"
+  },
+  "extend": {
+    "title": "Extend Subscription",
+    "newEndDate": "New End Date",
+    "reason": "Reason (optional)",
+    "reasonPlaceholder": "e.g. Grace period",
+    "confirm": "Extend",
+    "success": "Subscription extended successfully"
+  },
+  "suspend": {
+    "title": "Suspend Subscription",
+    "warning": "Company members will lose system access immediately upon suspension.",
+    "reason": "Reason (optional)",
+    "reasonPlaceholder": "e.g. Payment overdue",
+    "confirm": "Suspend",
+    "success": "Subscription suspended"
+  },
+  "disableCompany": {
+    "title": "Disable Company",
+    "message": "Are you sure you want to disable this company? Its members will not be able to log in.",
+    "confirm": "Disable",
+    "cancel": "Cancel",
+    "success": "Company disabled"
+  },
+  "enableCompany": {
+    "title": "Enable Company",
+    "message": "Are you sure you want to enable this company? Its members will be able to log in again.",
+    "confirm": "Enable",
+    "cancel": "Cancel",
+    "success": "Company enabled"
+  },
+  "archiveCompany": {
+    "title": "Archive Company",
+    "message": "Archive {{name}}? The company will be hidden from active lists.",
+    "confirm": "Archive",
+    "cancel": "Cancel",
+    "success": "Company archived"
+  },
+  "restoreCompany": {
+    "title": "Restore Company",
+    "message": "Restore {{name}} and return it to active lists?",
+    "confirm": "Restore",
+    "cancel": "Cancel",
+    "success": "Company restored"
+  },
+  "editCompany": {
+    "title": "Edit Company",
+    "name": "Company Name",
+    "phone": "Phone",
+    "address": "Address",
+    "currencyCode": "Currency Code",
+    "confirm": "Save Changes"
+  },
+  "changePlan": {
+    "title": "Change Plan",
+    "currentPlan": "Current Plan",
+    "reason": "Reason (optional)",
+    "reasonPlaceholder": "e.g. customer requested upgrade",
+    "confirm": "Change Plan Now"
+  },
+  "deleteCompany": {
+    "title": "Delete Company Permanently",
+    "warning": "This action is irreversible. Delete should be used only for exceptional cleanup.",
+    "confirmNameLabel": "Type company name to confirm",
+    "nameRequired": "Please type the company name",
+    "reason": "Reason (optional)",
+    "reasonPlaceholder": "e.g. duplicate test tenant",
+    "confirm": "Delete Permanently"
+  },
+  "plans": {
+    "title": "Subscription Plans",
+    "active": "Active",
+    "inactive": "Inactive",
+    "hideInactive": "Hide Inactive",
+    "showInactive": "Show Inactive",
+    "empty": "No plans found",
+    "maxUsers": "Users",
+    "maxCustomers": "Customers",
+    "maxEmployees": "Employees",
+    "featuresCount": "{{count}} feature"
+  },
+  "more": {
+    "title": "More",
+    "superAdmin": "Super Admin",
+    "adminNote": "You manage the entire platform. Use this app to oversee companies and plans.",
+    "logout": "Log Out",
+    "auditLogs": "Audit Logs",
+    "platformSettings": "Platform Settings"
+  },
+  "auditLogs": {
+    "title": "Audit Logs",
+    "subtitle": "Track platform-level operations and governance events.",
+    "searchPlaceholder": "Search logs...",
+    "empty": "No audit logs found",
+    "total": "Total records: {{count}}",
+    "filters": {
+      "allActions": "All actions",
+      "allEntities": "All entities"
+    }
+  },
+  "platformSettings": {
+    "title": "Platform Settings",
+    "subtitle": "Global policies and feature controls.",
+    "readOnlyNote": "Read-only in this sprint. Editing settings will be enabled in a later phase.",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "noFlags": "No feature flags available",
+    "sections": {
+      "trialDefaults": "Trial defaults",
+      "subscriptionPolicies": "Subscription policies",
+      "governanceGuardrails": "Governance guardrails",
+      "featureFlags": "Feature flags"
+    },
+    "fields": {
+      "durationDays": "Default trial days",
+      "autoActivateOnSignup": "Auto activate on signup",
+      "requireCompanyPhone": "Require company phone",
+      "gracePeriodDays": "Grace period (days)",
+      "allowPlanDowngrade": "Allow downgrade",
+      "allowPlanUpgrade": "Allow upgrade",
+      "enforceSingleActiveSubscription": "Enforce single live subscription",
+      "prorationMode": "Proration mode",
+      "strictQuotaEnforcement": "Strict quota enforcement",
+      "blockOnExpiredSubscription": "Block on expired subscription",
+      "allowReadOnlyDuringGracePeriod": "Allow read-only during grace period"
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "selectPlan": "Please select a plan",
+    "selectDate": "Please select a date",
+    "planRequired": "Please select a plan",
+    "endDateRequired": "Please select an end date"
+  },
+  "errors": {
+    "activateFailed": "Failed to activate subscription",
+    "extendFailed": "Failed to extend subscription",
+    "suspendFailed": "Failed to suspend subscription",
+    "changePlanFailed": "Failed to change subscription plan",
+    "updateCompanyFailed": "Failed to update company",
+    "archiveFailed": "Failed to archive company",
+    "restoreFailed": "Failed to restore company",
+    "deleteFailed": "Failed to delete company",
+    "hardDeleteDisabled": "Hard delete is disabled by policy. Please archive instead.",
+    "idempotencyHashMismatch": "Request key already used with different data. Retry with a new operation.",
+    "idempotencyInProgress": "The same operation is already being processed. Please wait a moment.",
+    "liveSubscriptionConflict": "Another subscription update happened at the same time. Please refresh and retry.",
+    "disableFailed": "Failed to disable company",
+    "enableFailed": "Failed to enable company",
+    "generic": "Something went wrong"
+  }
+}

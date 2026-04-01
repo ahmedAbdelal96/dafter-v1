@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1f7a5a33;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10 px-4 h-16 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center size-10 rounded-xl hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_forward</span>
+</button>
+<h1 class="text-lg font-bold tracking-tight">كشف حساب عميل</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center justify-center size-10 rounded-xl hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">share</span>
+</button>
+<button class="flex items-center justify-center size-10 rounded-xl hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">picture_as_pdf</span>
+</button>
+</div>
+</header>
+<main class="flex-1 p-4 space-y-4 max-w-2xl mx-auto w-full">
+<!-- Customer Summary Card -->
+<div class="relative overflow-hidden bg-primary/5 dark:bg-primary/10 border border-primary/20 rounded-xl p-5 shadow-sm">
+<div class="absolute -top-12 -left-12 size-32 bg-primary/20 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-xs text-primary/70 font-semibold mb-1">اسم العميل</p>
+<h2 class="text-xl font-bold">شركة النور للتجارة</h2>
+</div>
+<div class="bg-primary px-3 py-1 rounded-full text-white text-[10px] font-bold uppercase tracking-wider">نشط</div>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<div class="bg-white/50 dark:bg-white/5 p-4 rounded-lg border border-primary/10">
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-1">الرصيد الحالي</p>
+<p class="text-2xl font-black text-primary">15,250.00 ر.س</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] text-slate-500 dark:text-slate-400">الرصيد الافتتاحي</p>
+<p class="font-semibold text-sm">5,000.00 ر.س</p>
+</div>
+<div class="text-left">
+<p class="text-[10px] text-slate-500 dark:text-slate-400">الرصيد الختامي</p>
+<p class="font-semibold text-sm">20,250.00 ر.س</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Date Range Filter -->
+<div class="flex items-center justify-between bg-slate-100 dark:bg-primary/5 p-3 rounded-xl border border-primary/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-sm">calendar_today</span>
+<span class="text-sm font-medium">1 أكتوبر 2023 - 31 أكتوبر 2023</span>
+</div>
+<button class="text-primary text-sm font-bold flex items-center gap-1">
+                تعديل
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+<!-- Transaction List Section -->
+<div class="space-y-3">
+<div class="flex items-center justify-between px-1">
+<h3 class="text-sm font-bold text-slate-500 dark:text-slate-400">المعاملات المالية</h3>
+<span class="text-[10px] font-medium bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded">6 معاملات</span>
+</div>
+<!-- Transaction Entries -->
+<div class="space-y-2">
+<!-- Row 1: Invoice -->
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 p-4 rounded-xl flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-lg bg-slate-100 dark:bg-slate-800">
+<span class="material-symbols-outlined text-slate-500">description</span>
+</div>
+<div>
+<p class="font-bold text-sm">فاتورة مبيعات #INV-001</p>
+<p class="text-[10px] text-slate-500">12 أكتوبر 2023</p>
+</div>
+</div>
+<div class="text-left">
+<p class="font-bold text-sm text-red-500 dark:text-red-400">- 10,000.00</p>
+<p class="text-[10px] text-slate-400">الرصيد: 15,000.00</p>
+</div>
+</div>
+<!-- Row 2: Payment -->
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 p-4 rounded-xl flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<p class="font-bold text-sm">سند قبض #PAY-102</p>
+<p class="text-[10px] text-slate-500">15 أكتوبر 2023</p>
+</div>
+</div>
+<div class="text-left">
+<p class="font-bold text-sm text-primary">+ 5,000.00</p>
+<p class="text-[10px] text-slate-400">الرصيد: 10,000.00</p>
+</div>
+</div>
+<!-- Row 3: Return -->
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 p-4 rounded-xl flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-lg bg-orange-100 dark:bg-orange-900/20 text-orange-500">
+<span class="material-symbols-outlined">keyboard_return</span>
+</div>
+<div>
+<p class="font-bold text-sm">مرتجع مبيعات #RTN-005</p>
+<p class="text-[10px] text-slate-500">20 أكتوبر 2023</p>
+</div>
+</div>
+<div class="text-left">
+<p class="font-bold text-sm text-primary">+ 1,250.00</p>
+<p class="text-[10px] text-slate-400">الرصيد: 11,250.00</p>
+</div>
+</div>
+<!-- Row 4: Invoice -->
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 p-4 rounded-xl flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-10 rounded-lg bg-slate-100 dark:bg-slate-800">
+<span class="material-symbols-outlined text-slate-500">description</span>
+</div>
+<div>
+<p class="font-bold text-sm">فاتورة مبيعات #INV-002</p>
+<p class="text-[10px] text-slate-500">25 أكتوبر 2023</p>
+</div>
+</div>
+<div class="text-left">
+<p class="font-bold text-sm text-red-500 dark:text-red-400">- 4,000.00</p>
+<p class="text-[10px] text-slate-400">الرصيد: 15,250.00</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<div class="sticky bottom-0 bg-background-light dark:bg-background-dark border-t border-primary/10 p-4 pb-8">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">download</span>
+            تحميل كشف الحساب (PDF)
+        </button>
+</div>
+<!-- Navigation Footer (Visual Reference) -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 h-16 flex items-center justify-around px-6 hidden">
+<div class="flex flex-col items-center text-primary">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold">الرئيسية</span>
+</div>
+<div class="flex flex-col items-center text-slate-400">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px]">العملاء</span>
+</div>
+<div class="flex flex-col items-center text-slate-400">
+<span class="material-symbols-outlined">assessment</span>
+<span class="text-[10px]">التقارير</span>
+</div>
+<div class="flex flex-col items-center text-slate-400">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px]">الإعدادات</span>
+</div>
+</nav>
+</body></html>

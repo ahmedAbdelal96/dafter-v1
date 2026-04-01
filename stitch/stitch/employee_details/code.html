@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans Arabic", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', 'Noto Sans Arabic', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header Navigation -->
+<header class="sticky top-0 z-10 bg-background-light dark:bg-background-dark border-b border-primary/20 p-4 flex items-center justify-between">
+<button class="p-2 hover:bg-primary/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_forward</span>
+</button>
+<h1 class="text-lg font-bold">تفاصيل الموظف</h1>
+<button class="p-2 hover:bg-primary/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">more_vert</span>
+</button>
+</header>
+<main class="flex-1 overflow-y-auto">
+<!-- Profile Section -->
+<section class="p-6 flex flex-col items-center text-center">
+<div class="relative mb-4">
+<div class="size-24 rounded-full bg-primary/20 border-2 border-primary overflow-hidden shadow-xl" data-alt="صورة شخصية للموظف بملابس رسمية" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAEQLEKsspBJmb9nBlOEbdAPbyUQ0rJaQr5MRrMVs0oD7f7yFhmebB-_ctbV27gjj8g3hTpyxtmTqBTWmL7TylisFQ8cpeSD-BoI_h2SgBb2_qLwrOCR7yeyoZVaXRimuPSzLJ2lJO4qV3QE-dC5oRpYqxQSP3_0KDIJjr8CpsK9LeiHtLllhYOOQd9gH8G75jwQAsYs1_0EYtgxJ_OLtW-wyUqvm2r8mUxTwvcseL2N7DcwCNOOv_XlBhifD9FNFTnzx5bmjxbRMU'); background-size: cover; background-position: center;">
+</div>
+<div class="absolute bottom-0 left-0 bg-primary size-6 rounded-full flex items-center justify-center border-2 border-background-dark">
+<span class="material-symbols-outlined text-[14px] text-white">verified</span>
+</div>
+</div>
+<h2 class="text-2xl font-bold mb-1">عبدالعزيز بن فهد</h2>
+<p class="text-primary font-medium text-sm mb-1 uppercase tracking-wider">محاسب قانوني أول</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">الرقم الوظيفي: #HAS-2024-089</p>
+</section>
+<!-- Metrics Cards -->
+<section class="px-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+<div class="bg-primary/10 border border-primary/20 p-4 rounded-xl">
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-1">إجمالي الراتب</p>
+<div class="flex items-baseline gap-2">
+<span class="text-xl font-bold text-slate-900 dark:text-slate-100">18,500</span>
+<span class="text-xs text-primary">ريال</span>
+</div>
+<div class="mt-2 flex items-center gap-1 text-[10px] text-primary">
+<span class="material-symbols-outlined text-[12px]">trending_up</span>
+<span>+2.4% عن الشهر الماضي</span>
+</div>
+</div>
+<div class="bg-primary/10 border border-primary/20 p-4 rounded-xl">
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-1">المبالغ المدفوعة</p>
+<div class="flex items-baseline gap-2">
+<span class="text-xl font-bold text-slate-900 dark:text-slate-100">12,000</span>
+<span class="text-xs text-primary">ريال</span>
+</div>
+<div class="mt-2 w-full bg-slate-200 dark:bg-slate-700 h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[65%]"></div>
+</div>
+</div>
+<div class="bg-primary/10 border border-primary/20 p-4 rounded-xl">
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-1">الرصيد المتبقي</p>
+<div class="flex items-baseline gap-2">
+<span class="text-xl font-bold text-red-500">6,500</span>
+<span class="text-xs text-red-500">ريال</span>
+</div>
+<p class="mt-2 text-[10px] text-slate-400">تاريخ الاستحقاق: 28 مايو</p>
+</div>
+</section>
+<!-- Tabs Section -->
+<section class="mt-6 border-b border-primary/20">
+<div class="flex px-4 overflow-x-auto no-scrollbar">
+<button class="px-4 py-3 text-sm font-bold text-primary border-b-2 border-primary whitespace-nowrap">سجل الرواتب</button>
+<button class="px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary whitespace-nowrap">الاستقطاعات</button>
+<button class="px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary whitespace-nowrap">المعلومات الشخصية</button>
+<button class="px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary whitespace-nowrap">المستندات</button>
+</div>
+</section>
+<!-- Transactions List -->
+<section class="p-4">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-bold text-base">العمليات الأخيرة</h3>
+<button class="text-primary text-xs font-bold">عرض الكل</button>
+</div>
+<div class="space-y-3">
+<!-- Transaction Item -->
+<div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-primary/5 rounded-xl border border-primary/10">
+<div class="size-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">صرف راتب شهر أبريل</p>
+<p class="text-[10px] text-slate-500">25 أبريل 2024 • حوالة بنكية</p>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold text-slate-900 dark:text-slate-100">12,000 ريال</p>
+<p class="text-[10px] text-primary">مكتمل</p>
+</div>
+</div>
+<!-- Transaction Item -->
+<div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-primary/5 rounded-xl border border-primary/10">
+<div class="size-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
+<span class="material-symbols-outlined">trending_down</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">خصم تأخير (4 ساعات)</p>
+<p class="text-[10px] text-slate-500">12 أبريل 2024 • تلقائي</p>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold text-red-500">450- ريال</p>
+<p class="text-[10px] text-slate-500">مخصوم</p>
+</div>
+</div>
+<!-- Transaction Item -->
+<div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-primary/5 rounded-xl border border-primary/10 opacity-75">
+<div class="size-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">add_card</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">مكافأة أداء سنوية</p>
+<p class="text-[10px] text-slate-500">01 أبريل 2024 • بونص</p>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold text-slate-900 dark:text-slate-100">2,500 ريال</p>
+<p class="text-[10px] text-primary">معتمد</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Padding for bottom nav and CTA -->
+<div class="h-32"></div>
+</main>
+<!-- Floating Action Bar -->
+<div class="fixed bottom-20 left-4 right-4 z-20">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-transform active:scale-95">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+            تسجيل دفعة جديدة
+        </button>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-background-light dark:bg-background-dark border-t border-primary/20 flex items-center justify-around px-2 py-3 z-30">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-medium">الموظفين</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-medium">التقارير</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">الإعدادات</span>
+</a>
+</nav>
+</body></html>

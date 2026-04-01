@@ -1,0 +1,67 @@
+{
+  "summary": {
+    "success": "تم جلب ملخص الحسابات بنجاح"
+  },
+  "overdue": {
+    "success": "تم جلب تقرير المتأخرين بنجاح"
+  },
+  "party": {
+    "success": "تم جلب تقرير الأطراف"
+  },
+  "collectionSchedule": {
+    "success": "تم جلب جدول التحصيل بنجاح",
+    "invalidDateRange": "تاريخ البداية يجب أن يكون قبل تاريخ النهاية"
+  },
+  "profitLoss": {
+    "success": "تم جلب تقرير الأرباح والخسائر بنجاح",
+    "invalidDateRange": "تاريخ البداية يجب أن يكون قبل تاريخ النهاية"
+  },
+  "cashFlow": {
+    "success": "تم جلب تقرير التدفق النقدي بنجاح",
+    "invalidDateRange": "تاريخ البداية يجب أن يكون قبل تاريخ النهاية"
+  },
+  "customersAging": {
+    "success": "تم جلب أعمار مديونيات العملاء بنجاح"
+  },
+  "suppliersAging": {
+    "success": "تم جلب أعمار مديونيات الموردين بنجاح"
+  },
+  "salesDetailed": {
+    "success": "تم جلب تقرير المبيعات التفصيلي بنجاح",
+    "invalidDateRange": "تاريخ البداية يجب أن يكون قبل تاريخ النهاية"
+  },
+  "expensesAnalytics": {
+    "success": "تم جلب تقرير تحليل المصروفات بنجاح",
+    "invalidDateRange": "تاريخ البداية يجب أن يكون قبل تاريخ النهاية"
+  },
+  "productsPerformance": {
+    "success": "تم جلب تقرير أداء المنتجات بنجاح",
+    "invalidDateRange": "تاريخ البداية يجب أن يكون قبل تاريخ النهاية"
+  },
+  "operationalPerformance": {
+    "success": "تم جلب تقرير الأداء التشغيلي بنجاح",
+    "invalidDateRange": "تاريخ البداية يجب أن يكون قبل تاريخ النهاية"
+  },
+  "criticalAlerts": {
+    "success": "تم جلب تقرير الإنذارات المبكرة بنجاح"
+  },
+  "ledgerStatement": {
+    "success": "تم جلب كشف حساب الأستاذ بنجاح",
+    "invalidDateRange": "تاريخ البداية يجب أن يكون قبل تاريخ النهاية"
+  },
+  "collectionsFollowup": {
+    "success": "تم جلب تقرير متابعة التحصيل بنجاح",
+    "invalidDateRange": "تاريخ البداية يجب أن يكون قبل تاريخ النهاية"
+  },
+  "debtsSummary": {
+    "success": "تم جلب ملخص المديونيات بنجاح"
+  },
+  "staffActivity": {
+    "success": "تم جلب تقرير نشاط المستخدمين بنجاح",
+    "invalidDateRange": "تاريخ البداية يجب أن يكون قبل تاريخ النهاية"
+  },
+  "simpleLedger": {
+    "success": "تم جلب كشف الحساب المبسط بنجاح",
+    "invalidDateRange": "تاريخ البداية يجب أن يكون قبل تاريخ النهاية"
+  }
+}

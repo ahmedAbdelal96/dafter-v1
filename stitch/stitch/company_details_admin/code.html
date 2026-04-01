@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Company Details (Admin)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-display">
+<!-- Header Section -->
+<header class="flex items-center justify-between p-4 border-b border-primary/20 sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-10">
+<button class="p-2 hover:bg-primary/10 rounded-full">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<h1 class="text-lg font-bold">تفاصيل الشركة (المسؤول)</h1>
+<button class="p-2 hover:bg-primary/10 rounded-full">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Company Profile -->
+<div class="p-6 flex flex-col items-center border-b border-primary/10">
+<div class="relative mb-4">
+<div class="w-24 h-24 rounded-xl bg-primary/20 flex items-center justify-center border-2 border-primary overflow-hidden shadow-lg shadow-primary/10">
+<img class="w-full h-full object-cover" data-alt="Modern corporate logo with green accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDapbzxPCfoXK3qGDw7_UeCnm02xLslZ_0xX_mDf8nDWsr8F0D6noU-qloYQyp1nQFB98ZKNsVoXu4t9ZLE67kVwVDxB8xn-ZCyGmm_4DbKWuWWzLVNq4yMoNL3Z6cLJhB6xKUqDPt_hRKxgdD9IAYxdYqtjZFLPVkhH2cSR8DKYSA37dXQV_Xp_-U_v0h-P1DKnkNMZFVC2fegcWxGKTHm-d7YUooiTSGI_riUDZjCXBUbOIL7qCA5GFFeWItHiuzHtfhJ_QbkTck"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-white p-1 rounded-full border-2 border-background-dark">
+<span class="material-symbols-outlined text-sm">verified</span>
+</div>
+</div>
+<h2 class="text-2xl font-bold mb-1">شركة أكمي المحدودة</h2>
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded">نشط - خطة المؤسسات</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-mono">ID: #89231-AR</p>
+</div>
+<!-- Quick Metrics -->
+<div class="grid grid-cols-3 gap-3 p-4">
+<div class="bg-primary/5 border border-primary/20 rounded-xl p-3 text-center">
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-1">الفواتير</p>
+<p class="text-lg font-bold">1,240</p>
+<p class="text-[10px] text-primary font-bold">+12%</p>
+</div>
+<div class="bg-primary/5 border border-primary/20 rounded-xl p-3 text-center">
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-1">التخزين</p>
+<p class="text-lg font-bold text-nowrap">45.2 GB</p>
+<p class="text-[10px] text-primary font-bold">+5%</p>
+</div>
+<div class="bg-primary/5 border border-primary/20 rounded-xl p-3 text-center">
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-1">الموظفين</p>
+<p class="text-lg font-bold">18</p>
+<p class="text-[10px] text-slate-400 font-bold">0%</p>
+</div>
+</div>
+<!-- Subscription Details -->
+<section class="px-4 py-2">
+<h3 class="text-sm font-bold text-primary mb-3 px-1 uppercase tracking-wider">تفاصيل الاشتراك</h3>
+<div class="bg-white dark:bg-slate-900/40 rounded-xl border border-primary/10 overflow-hidden">
+<div class="flex items-center justify-between p-4 border-b border-primary/5">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">calendar_today</span>
+<span class="text-sm">تاريخ البدء</span>
+</div>
+<span class="text-sm font-medium">12 يناير 2023</span>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">event_repeat</span>
+<span class="text-sm">تاريخ التجديد</span>
+</div>
+<span class="text-sm font-medium text-primary">12 يناير 2024</span>
+</div>
+</div>
+</section>
+<!-- Admin Actions -->
+<section class="px-4 py-6">
+<h3 class="text-sm font-bold text-primary mb-3 px-1 uppercase tracking-wider">إجراءات المدير</h3>
+<div class="flex flex-col gap-3">
+<button class="w-full flex items-center justify-between bg-primary text-white px-4 py-3 rounded-xl font-bold">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined">upgrade</span>
+<span>تغيير الخطة</span>
+</div>
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-full flex items-center justify-between bg-white dark:bg-slate-900/40 border border-primary/20 px-4 py-3 rounded-xl font-bold">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined">contact_support</span>
+<span>الاتصال بالمالك</span>
+</div>
+<span class="material-symbols-outlined">mail</span>
+</button>
+<button class="w-full flex items-center justify-between bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl font-bold">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined">block</span>
+<span>تعليق الحساب</span>
+</div>
+</button>
+</div>
+</section>
+<!-- Admin Notes History -->
+<section class="px-4 py-2">
+<div class="flex items-center justify-between mb-3 px-1">
+<h3 class="text-sm font-bold text-primary uppercase tracking-wider">سجل ملاحظات المسؤول</h3>
+<button class="text-xs text-primary font-bold">+ إضافة ملاحظة</button>
+</div>
+<div class="space-y-4">
+<div class="relative pr-4 border-r-2 border-primary/20 pb-4">
+<div class="absolute -right-[9px] top-0 w-4 h-4 rounded-full bg-primary border-4 border-background-dark"></div>
+<p class="text-xs text-slate-500 mb-1">أمس، 04:30 م - بواسطة أحمد علي</p>
+<p class="text-sm bg-white dark:bg-slate-900/40 p-3 rounded-lg border border-primary/5">تم تحديث سعة التخزين بناءً على طلب العميل لمواكبة حجم البيانات الجديد.</p>
+</div>
+<div class="relative pr-4 border-r-2 border-primary/20 pb-4">
+<div class="absolute -right-[9px] top-0 w-4 h-4 rounded-full bg-slate-400 border-4 border-background-dark"></div>
+<p class="text-xs text-slate-500 mb-1">15 أكتوبر 2023 - بواسطة سارة محمد</p>
+<p class="text-sm bg-white dark:bg-slate-900/40 p-3 rounded-lg border border-primary/5">استفسار حول الفواتير المتأخرة، تم الاتفاق على الدفع خلال أسبوع.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#1d2f29] border-t border-primary/20 px-6 py-2 pb-6 flex justify-between items-center z-20">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined font-fill">business</span>
+<span class="text-[10px] font-bold">الشركات</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-bold">المستخدمين</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-bold">التقارير</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold">الإعدادات</span>
+</a>
+</nav>
+</body></html>

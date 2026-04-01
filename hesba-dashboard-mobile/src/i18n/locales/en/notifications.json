@@ -1,0 +1,28 @@
+{
+  "title": "Notifications",
+  "markAllRead": "Mark all as read",
+  "markAllReadConfirm": "Mark all notifications as read?",
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "filter": {
+    "all": "All",
+    "unread": "Unread"
+  },
+  "list": {
+    "empty": "No notifications",
+    "emptyDesc": "Payments, due dates and activity notifications will appear here",
+    "emptyUnread": "No unread notifications",
+    "emptyUnreadDesc": "You're all caught up!"
+  },
+  "type": {
+    "ledger": "Ledger",
+    "invoice": "Invoice",
+    "payment": "Payment",
+    "deferred": "Deferred sale",
+    "installment": "Installment",
+    "expense": "Expense",
+    "subscription": "Subscription",
+    "overdue": "Overdue",
+    "general": "Notification"
+  }
+}

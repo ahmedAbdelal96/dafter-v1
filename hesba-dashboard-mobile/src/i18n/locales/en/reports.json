@@ -1,0 +1,150 @@
+{
+  "title": "Reports",
+  "tabs": {
+    "summary": "Summary",
+    "overdue": "Overdue",
+    "collection": "Collection Schedule",
+    "advanced": "Advanced"
+  },
+  "summary": {
+    "title": "Financial Summary",
+    "totalReceivables": "Total Receivables",
+    "deferredSales": "Deferred Sales",
+    "installments": "Installments",
+    "totalContracts": "Total Contracts",
+    "activeContracts": "Active Contracts",
+    "totalAmount": "Total Amount",
+    "remainingAmount": "Remaining Amount",
+    "overdueCount": "Overdue Contracts",
+    "overdueSchedules": "Overdue Installments",
+    "overdueAmount": "Overdue Amount"
+  },
+  "overdue": {
+    "title": "Overdue Accounts",
+    "empty": "No overdue accounts",
+    "emptyDesc": "All accounts are paid on time",
+    "amount": "Overdue Amount",
+    "remaining": "Remaining",
+    "daysOverdue": "{{count}} days overdue",
+    "dueDate": "Due",
+    "installment": "Installment #{{num}}",
+    "deferredSales": "Deferred Sales",
+    "installmentSchedules": "Installment Schedules"
+  },
+  "collection": {
+    "title": "Collection Schedule",
+    "empty": "No upcoming due dates",
+    "emptyDesc": "No payments due in the selected period",
+    "dueDate": "Due Date",
+    "amount": "Expected Amount",
+    "today": "Today",
+    "type": {
+      "DEFERRED": "Deferred Sale",
+      "INSTALLMENT": "Installment"
+    }
+  },
+  "errors": {
+    "loadFailed": "Failed to load report",
+    "retry": "Retry"
+  },
+  "filter": {
+    "dateFrom": "From Date",
+    "dateTo": "To Date",
+    "apply": "Retry",
+    "thisMonth": "This Month",
+    "last3Months": "Last 3 Months",
+    "thisYear": "This Year"
+  },
+  "export": {
+    "button": "Export",
+    "pdf": "Export PDF",
+    "excel": "Export Excel"
+  },
+  "advanced": {
+    "profitLoss": {
+      "title": "Profit & Loss",
+      "netSales": "Net Sales",
+      "expenses": "Expenses",
+      "netProfit": "Net Profit"
+    },
+    "cashFlow": {
+      "title": "Cash Flow",
+      "inflow": "Inflow",
+      "outflow": "Outflow",
+      "closingBalance": "Closing Balance"
+    },
+    "customersAging": {
+      "title": "Customers Aging",
+      "parties": "Customers Count",
+      "outstanding": "Total Outstanding"
+    },
+    "suppliersAging": {
+      "title": "Suppliers Aging",
+      "parties": "Suppliers Count",
+      "outstanding": "Total Outstanding"
+    },
+    "salesDetailed": {
+      "title": "Sales Detailed",
+      "invoices": "Invoices Count",
+      "netAmount": "Net Amount"
+    },
+    "collectionsFollowup": {
+      "title": "Collections Follow-up",
+      "expected": "Expected Amount",
+      "collected": "Collected Amount",
+      "collectionRate": "Collection Rate"
+    },
+    "expensesAnalytics": {
+      "title": "Expenses Analytics",
+      "count": "Expenses count",
+      "total": "Total amount",
+      "average": "Average expense"
+    },
+    "debtsSummary": {
+      "title": "Debts Summary",
+      "customersReceivable": "Customers receivable",
+      "suppliersPayable": "Suppliers payable",
+      "netReceivable": "Net receivable"
+    },
+    "productsPerformance": {
+      "title": "Products Performance",
+      "products": "Products",
+      "quantity": "Qty sold",
+      "salesAmount": "Sales amount"
+    },
+    "operationalPerformance": {
+      "title": "Operational Performance",
+      "revenue": "Revenue",
+      "expenses": "Expenses",
+      "collectionRate": "Collection rate"
+    },
+    "criticalAlerts": {
+      "title": "Critical Alerts",
+      "creditRisk": "Credit risk",
+      "largeOverdues": "Large overdues",
+      "upcomingInstallments": "Upcoming installments"
+    },
+    "staffActivity": {
+      "title": "Staff Activity",
+      "users": "Users",
+      "activities": "Activities",
+      "invoicesAmount": "Invoices amount"
+    },
+    "ledgerStatement": {
+      "title": "Ledger Statement",
+      "selectParty": "Select Party",
+      "hint": "Select a customer, supplier, or employee to view their ledger statement",
+      "openingBalance": "Opening Balance",
+      "totalDebit": "Total Debit",
+      "totalCredit": "Total Credit",
+      "closingBalance": "Closing Balance",
+      "currentBalance": "Current Balance",
+      "entriesCount": "Entries Count",
+      "partyType": {
+        "CUSTOMER": "Customer",
+        "SUPPLIER": "Supplier",
+        "EMPLOYEE": "Employee"
+      }
+    }
+  }
+}

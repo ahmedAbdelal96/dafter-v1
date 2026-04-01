@@ -1,0 +1,226 @@
+{
+  "pageTitle": "الموردون | دفتر",
+  "pageDescription": "إدارة الموردين وأرصدة الحسابات الدائنة.",
+  "title": "الموردون",
+  "subtitle": "أنشئ حسابات الموردين وتابعها وعدّلها بسهولة.",
+  "summary": {
+    "total": "إجمالي الموردين: {count}"
+  },
+  "filters": {
+    "searchPlaceholder": "ابحث باسم المورد أو رقم الهاتف",
+    "allStatuses": "كل الحالات",
+    "perPage": "{count} لكل صفحة"
+  },
+  "table": {
+    "ariaLabel": "جدول الموردين",
+    "name": "الاسم",
+    "phone": "الهاتف",
+    "balance": "الرصيد",
+    "status": "الحالة",
+    "address": "العنوان"
+  },
+  "status": {
+    "active": "نشط",
+    "inactive": "غير نشط"
+  },
+  "form": {
+    "name": "اسم المورد",
+    "phone": "رقم الهاتف",
+    "address": "العنوان",
+    "openingBalance": "الرصيد الافتتاحي",
+    "isActive": "المورد نشط"
+  },
+  "actions": {
+    "addSupplier": "إضافة مورد",
+    "exportExcel": "تصدير Excel",
+    "exporting": "جارٍ التصدير...",
+    "create": "إنشاء",
+    "save": "حفظ التعديلات",
+    "saving": "جارٍ الحفظ...",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "view": "عرض التفاصيل",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "loading": "جارٍ التحميل..."
+  },
+  "modal": {
+    "createTitle": "إضافة مورد جديد",
+    "createDescription": "أدخل بيانات المورد لإنشاء حساب جديد.",
+    "editTitle": "تعديل بيانات المورد",
+    "editDescription": "حدّث بيانات المورد وحالة الحساب.",
+    "detailsTitle": "تفاصيل المورد"
+  },
+  "details": {
+    "pageTitle": "حساب المورد | دفتر",
+    "pageDescription": "عرض ملف المورد والرصيد وتفاصيل الحساب.",
+    "title": "حساب المورد",
+    "subtitle": "إدارة بيانات المورد وحركة حسابه من صفحة مستقلة.",
+    "backToList": "الرجوع إلى الموردين",
+    "infoSectionTitle": "البيانات الأساسية",
+    "accountSectionTitle": "حركة الحساب",
+    "accountSectionDescription": "هذا القسم جاهز لإضافة فواتير المشتريات والمدفوعات وقيود حساب المورد مع توسعة الموديول.",
+    "meta": {
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "آخر تحديث"
+    }
+  },
+  "empty": {
+    "title": "لا يوجد موردون بعد",
+    "description": "ابدأ بإضافة أول مورد لتتبع الحسابات الدائنة والمشتريات."
+  },
+  "messages": {
+    "createSuccess": "تم إنشاء المورد بنجاح.",
+    "createError": "تعذر إنشاء المورد.",
+    "updateSuccess": "تم تحديث المورد بنجاح.",
+    "updateError": "تعذر تحديث المورد.",
+    "deleteSuccess": "تم حذف المورد بنجاح.",
+    "deleteError": "تعذر حذف المورد.",
+    "exportSuccess": "تم تصدير الموردين بنجاح.",
+    "exportError": "تعذر تصدير الموردين.",
+    "exportEmpty": "لا توجد بيانات موردين للتصدير."
+  },
+  "export": {
+    "sheetName": "الموردون",
+    "filePrefix": "الموردون"
+  },
+  "exportModal": {
+    "title": "تصدير الموردين",
+    "description": "حدّد الحد الأقصى للصفوف قبل تنزيل ملف Excel.",
+    "maxRecords": "الحد الأقصى للصفوف",
+    "maxRecordsHint": "اتركه فارغًا لتصدير كل النتائج المطابقة.",
+    "reset": "إعادة ضبط"
+  },
+  "delete": {
+    "confirm": "هل أنت متأكد من حذف المورد \"{name}\"؟"
+  },
+  "ledger": {
+    "title": "دفتر المورد",
+    "subtitle": "تابع كل حركات المورد والرصيد الجاري وسجل الحساب.",
+    "noPermission": "ليس لديك صلاحية عرض دفتر الحساب.",
+    "summary": {
+      "current": "الرصيد الحالي",
+      "opening": "رصيد بداية الفترة",
+      "closing": "رصيد نهاية الفترة"
+    },
+    "filters": {
+      "from": "من تاريخ",
+      "to": "إلى تاريخ",
+      "perPage": "عدد السطور",
+      "reset": "إعادة ضبط الفلاتر"
+    },
+    "actions": {
+      "addEntry": "إضافة حركة",
+      "createEntry": "تسجيل الحركة",
+      "openCentralLedger": "فتح في صفحة دفتر الأستاذ"
+    },
+    "form": {
+      "entryType": "نوع الحركة",
+      "amount": "المبلغ",
+      "increaseBalance": "زيادة رصيد المورد",
+      "entryDate": "تاريخ الحركة",
+      "dueDate": "تاريخ الاستحقاق",
+      "note": "ملاحظة"
+    },
+    "entryTypes": {
+      "INVOICE": "فاتورة",
+      "PAYMENT": "دفعة",
+      "RETURN": "مرتجع",
+      "ADJUSTMENT": "تسوية",
+      "ADVANCE": "سلفة",
+      "SALARY_PAYMENT": "دفع راتب",
+      "DEDUCTION": "خصم",
+      "SETTLEMENT": "مخالصة"
+    },
+    "modal": {
+      "title": "إضافة حركة حساب",
+      "description": "سجل حركة جديدة في حساب المورد مع تأثير صحيح على الرصيد."
+    },
+    "table": {
+      "date": "التاريخ",
+      "type": "النوع",
+      "note": "الملاحظة",
+      "amount": "المبلغ",
+      "runningBalance": "الرصيد التراكمي",
+      "actions": "إجراءات"
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "summary": "صفحة {page} من {totalPages} ({total} حركة)"
+    },
+    "messages": {
+      "createSuccess": "تم تسجيل الحركة بنجاح.",
+      "createError": "تعذر تسجيل الحركة.",
+      "deleteSuccess": "تم حذف الحركة بنجاح.",
+      "deleteError": "تعذر حذف الحركة.",
+      "deleteConfirm": "هل أنت متأكد من حذف هذه الحركة؟"
+    },
+    "empty": {
+      "title": "لا توجد حركات حساب",
+      "description": "لا توجد نتائج للفترة المحددة."
+    }
+  },
+  "purchases": {
+    "title": "فواتير المشتريات",
+    "subtitle": "إنشاء وإدارة فواتير مشتريات المورد.",
+    "noPermission": "ليس لديك صلاحية عرض فواتير المشتريات.",
+    "filters": {
+      "search": "ابحث برقم الفاتورة"
+    },
+    "actions": {
+      "addInvoice": "إضافة فاتورة مشتريات",
+      "createInvoice": "إنشاء الفاتورة",
+      "addItem": "إضافة بند",
+      "duplicate": "نسخ"
+    },
+    "modal": {
+      "title": "إنشاء فاتورة مشتريات",
+      "description": "أنشئ فاتورة مشتريات للمورد ببند واحد أو أكثر.",
+      "keyboardHint": "تلميح: اضغط Ctrl/Cmd + Enter لإضافة سطر منتج جديد بسرعة."
+    },
+    "form": {
+      "issueDate": "تاريخ الإصدار",
+      "taxAmount": "قيمة الضريبة",
+      "partyAddress": "عنوان المورد",
+      "items": "بنود الفاتورة",
+      "description": "وصف البند",
+      "quantity": "الكمية",
+      "unitPrice": "سعر الوحدة",
+      "notes": "ملاحظات",
+      "product": "اختر المنتج (اختياري)",
+      "searchProduct": "ابحث عن منتج",
+      "noProducts": "لا توجد منتجات"
+    },
+    "table": {
+      "invoiceNumber": "رقم الفاتورة",
+      "issueDate": "تاريخ الإصدار",
+      "total": "الإجمالي",
+      "tax": "الضريبة",
+      "createdBy": "أنشئت بواسطة",
+      "actions": "إجراءات"
+    },
+    "summary": {
+      "subtotal": "الإجمالي قبل الضريبة",
+      "tax": "الضريبة",
+      "total": "الإجمالي النهائي"
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "summary": "صفحة {page} من {totalPages} ({total} فاتورة)"
+    },
+    "messages": {
+      "createSuccess": "تم إنشاء فاتورة المشتريات بنجاح.",
+      "createError": "تعذر إنشاء فاتورة المشتريات.",
+      "deleteSuccess": "تم حذف فاتورة المشتريات بنجاح.",
+      "deleteError": "تعذر حذف فاتورة المشتريات.",
+      "deleteConfirm": "هل أنت متأكد من حذف الفاتورة {invoiceNumber}؟",
+      "duplicateError": "تعذر تحميل بيانات الفاتورة لعملية النسخ."
+    },
+    "empty": {
+      "title": "لا توجد فواتير مشتريات",
+      "description": "لا توجد فواتير مشتريات لهذا المورد."
+    }
+  }
+}

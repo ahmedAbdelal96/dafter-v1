@@ -1,0 +1,24 @@
+{
+  "mode": {
+    "disabled": "Cash reconciliation is disabled for this company."
+  },
+  "validation": {
+    "invalidBusinessDate": "Business date must be a valid date.",
+    "invalidDateRange": "dateFrom must be before or equal to dateTo."
+  },
+  "daily": {
+    "getSuccess": "Daily cash reconciliation retrieved.",
+    "historySuccess": "Daily cash reconciliation history retrieved.",
+    "created": "Daily reconciliation draft created.",
+    "existingDraftReturned": "Existing draft returned for this business date.",
+    "alreadyClosedForDate": "A closed reconciliation record already exists for this business date.",
+    "alreadyClosed": "This daily reconciliation is already closed.",
+    "updated": "Daily reconciliation draft updated.",
+    "closed": "Daily reconciliation closed.",
+    "notFound": "Daily reconciliation record not found.",
+    "lockedAfterClose": "This daily reconciliation is closed and cannot be edited."
+  },
+  "summary": {
+    "getSuccess": "Operational cash reconciliation summary retrieved."
+  }
+}

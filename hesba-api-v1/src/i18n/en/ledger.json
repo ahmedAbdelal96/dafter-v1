@@ -1,0 +1,32 @@
+{
+  "create": {
+    "success": "Ledger entry recorded successfully",
+    "failed": "Failed to record ledger entry",
+    "zeroAmount": "Amount cannot be zero",
+    "invalidDueDate": "Due date must be on or after the entry date",
+    "partyNotFound": "Party not found",
+    "limitReached": "Maximum number of ledger entries reached for your current plan"
+  },
+  "delete": {
+    "success": "Ledger entry deleted successfully",
+    "notFound": "Ledger entry not found",
+    "alreadyDeleted": "Ledger entry is already deleted"
+  },
+  "statement": {
+    "success": "Account statement retrieved successfully",
+    "partyNotFound": "The specified party does not exist or does not belong to this company"
+  },
+  "list": {
+    "success": "Ledger entries retrieved"
+  },
+  "entryType": {
+    "INVOICE": "Invoice",
+    "PAYMENT": "Payment",
+    "RETURN": "Return",
+    "ADJUSTMENT": "Adjustment",
+    "ADVANCE": "Advance",
+    "SALARY_PAYMENT": "Salary Payment",
+    "DEDUCTION": "Deduction",
+    "SETTLEMENT": "Settlement"
+  }
+}

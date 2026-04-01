@@ -1,0 +1,154 @@
+{
+  "pageTitle": "الفواتير | دفتر",
+  "pageDescription": "إنشاء وإدارة فواتير العملاء والموردين مع بنود الأصناف.",
+  "title": "الفواتير",
+  "subtitle": "إدارة فواتير المبيعات والمشتريات من شاشة واحدة سريعة.",
+  "filters": {
+    "search": "بحث برقم الفاتورة أو اسم الطرف",
+    "partyType": "نوع الطرف",
+    "partyTypeAll": "كل الأطراف",
+    "partyTypeCustomer": "عميل",
+    "partyTypeSupplier": "مورد",
+    "party": "الطرف",
+    "noParties": "لا توجد أطراف",
+    "pageSize": "عدد الصفوف",
+    "totalInvoices": "إجمالي الفواتير: {count}",
+    "status": "الحالة",
+    "statusAll": "كل الحالات"
+  },
+  "actions": {
+    "addInvoice": "إضافة فاتورة",
+    "createInvoice": "إنشاء الفاتورة",
+    "creating": "جارٍ الإنشاء...",
+    "addItem": "إضافة بند",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "view": "عرض",
+    "duplicate": "نسخ",
+    "export": "تصدير Excel",
+    "exporting": "جارٍ التصدير...",
+    "loading": "جارٍ التحميل...",
+    "submit": "رفع للاعتماد",
+    "approve": "اعتماد",
+    "reject": "رفض",
+    "cancelInvoice": "إلغاء الفاتورة",
+    "recordPayment": "تسجيل دفعة",
+    "recordPaymentAmount": "قيمة الدفعة",
+    "saveDraft": "Save draft",
+    "saveAndApprove": "Save and approve"
+  },
+  "status": {
+    "DRAFT": "مسودة",
+    "PENDING_APPROVAL": "قيد الاعتماد",
+    "APPROVED": "معتمدة",
+    "REJECTED": "مرفوضة",
+    "CANCELLED": "ملغاة"
+  },
+  "export": {
+    "sheetName": "الفواتير",
+    "filePrefix": "الفواتير"
+  },
+  "exportModal": {
+    "title": "تصدير الفواتير",
+    "description": "حدّد فترة تاريخية اختيارية وحدًا أقصى للنتائج قبل تنزيل ملف Excel.",
+    "fromDate": "من تاريخ",
+    "toDate": "إلى تاريخ",
+    "maxRecords": "الحد الأقصى للصفوف",
+    "maxRecordsHint": "اتركه فارغًا لتصدير كل النتائج المطابقة.",
+    "reset": "إعادة ضبط"
+  },
+  "table": {
+    "invoiceNumber": "رقم الفاتورة",
+    "status": "الحالة",
+    "issueDate": "تاريخ الإصدار",
+    "partyType": "نوع الطرف",
+    "partyName": "اسم الطرف",
+    "totalAmount": "الإجمالي",
+    "taxAmount": "الضريبة",
+    "createdBy": "تم الإنشاء بواسطة",
+    "actions": "الإجراءات",
+    "ariaLabel": "جدول الفواتير"
+  },
+  "pagination": {
+    "summary": "صفحة {page} من {totalPages} ({total} فاتورة)",
+    "previous": "السابق",
+    "next": "التالي"
+  },
+  "createModal": {
+    "title": "إنشاء فاتورة",
+    "description": "أنشئ فاتورة مرتبطة بعميل أو مورد مع بند واحد أو أكثر من الأصناف.",
+    "keyboardHint": "تلميح: اضغط Ctrl/Cmd + Enter لإضافة بند جديد بسرعة.",
+    "approvalHint": "Save draft keeps the invoice pending. Save and approve finishes the invoice immediately when approval permission is available."
+  },
+  "form": {
+    "partyType": "نوع الطرف",
+    "party": "الطرف",
+    "searchParty": "ابحث عن الطرف",
+    "noParties": "لا يوجد أطراف مطابقة",
+    "issueDate": "تاريخ الإصدار",
+    "taxAmount": "قيمة الضريبة",
+    "partyAddress": "عنوان الطرف",
+    "notes": "ملاحظات",
+    "items": "بنود الفاتورة",
+    "product": "الصنف",
+    "searchProduct": "ابحث عن الصنف",
+    "noProducts": "لا توجد أصناف",
+    "description": "الوصف",
+    "quantity": "الكمية",
+    "unitPrice": "سعر الوحدة"
+  },
+  "summary": {
+    "subtotal": "الإجمالي قبل الضريبة",
+    "tax": "الضريبة",
+    "total": "الإجمالي النهائي"
+  },
+  "messages": {
+    "createSuccess": "تم إنشاء الفاتورة بنجاح.",
+    "createError": "فشل إنشاء الفاتورة.",
+    "deleteSuccess": "تم حذف الفاتورة بنجاح.",
+    "deleteError": "فشل حذف الفاتورة.",
+    "deleteConfirm": "هل أنت متأكد من حذف الفاتورة {invoiceNumber}؟",
+    "duplicateError": "تعذر تحميل بيانات الفاتورة لنسخها.",
+    "exportSuccess": "تم تصدير الفواتير بنجاح.",
+    "exportError": "فشل تصدير الفواتير.",
+    "exportEmpty": "لا توجد فواتير للتصدير.",
+    "submitSuccess": "تم رفع الفاتورة للاعتماد.",
+    "approveSuccess": "تم اعتماد الفاتورة بنجاح.",
+    "rejectSuccess": "تم رفض الفاتورة.",
+    "cancelSuccess": "تم إلغاء الفاتورة.",
+    "recordPaymentSuccess": "تم تسجيل الدفعة بنجاح.",
+    "paymentAmountInvalid": "أدخل قيمة دفعة صحيحة.",
+    "lifecycleError": "فشل تنفيذ إجراء دورة حياة الفاتورة.",
+    "submitInvalidTransition": "لا يمكن رفع هذه الفاتورة في حالتها الحالية.",
+    "approveInvalidTransition": "لا يمكن اعتماد هذه الفاتورة في حالتها الحالية.",
+    "rejectInvalidTransition": "لا يمكن رفض هذه الفاتورة في حالتها الحالية.",
+    "cancelInvalidTransition": "يمكن إلغاء الفواتير المعتمدة فقط.",
+    "createDraftSuccess": "Invoice draft created successfully.",
+    "createAndApproveSuccess": "Invoice created and approved successfully.",
+    "createAndApproveError": "Failed to create and approve invoice."
+  },
+  "empty": {
+    "title": "لا توجد فواتير",
+    "description": "لا توجد فواتير مطابقة للفلاتر الحالية."
+  },
+  "details": {
+    "pageTitle": "تفاصيل الفاتورة | دفتر",
+    "pageDescription": "مراجعة بيانات الفاتورة والبنود.",
+    "title": "تفاصيل الفاتورة",
+    "subtitle": "مراجعة كاملة لرأس الفاتورة وبنودها.",
+    "backToList": "الرجوع إلى الفواتير",
+    "partyPhone": "هاتف الطرف",
+    "partyAddress": "عنوان الطرف",
+    "grandTotal": "الإجمالي النهائي",
+    "createdAt": "تاريخ الإنشاء",
+    "updatedAt": "آخر تحديث",
+    "notes": "ملاحظات",
+    "itemsTitle": "بنود الفاتورة",
+    "items": {
+      "description": "الوصف",
+      "quantity": "الكمية",
+      "unitPrice": "سعر الوحدة",
+      "total": "إجمالي البند"
+    }
+  }
+}

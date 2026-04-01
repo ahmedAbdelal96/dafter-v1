@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Header Section -->
+<header class="sticky top-0 z-50 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 border-b border-primary/10">
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_forward</span>
+</button>
+<h1 class="mr-2 text-xl font-bold leading-tight tracking-tight flex-1">أعمار المديونيات</h1>
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">search</span>
+</button>
+</header>
+<main class="flex-1 p-4 space-y-6">
+<!-- Aging Buckets Tabs -->
+<div class="flex">
+<div class="flex h-11 flex-1 items-center justify-center rounded-xl bg-primary/10 dark:bg-primary/5 p-1">
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 has-[:checked]:bg-primary has-[:checked]:text-white text-slate-600 dark:text-slate-400 text-sm font-semibold transition-all">
+<span class="truncate">الكل</span>
+<input checked="" class="invisible w-0" name="aging-filter" type="radio" value="all"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 has-[:checked]:bg-primary has-[:checked]:text-white text-slate-600 dark:text-slate-400 text-sm font-semibold transition-all">
+<span class="truncate">1-30 يوم</span>
+<input class="invisible w-0" name="aging-filter" type="radio" value="1-30"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 has-[:checked]:bg-primary has-[:checked]:text-white text-slate-600 dark:text-slate-400 text-sm font-semibold transition-all">
+<span class="truncate">31-60 يوم</span>
+<input class="invisible w-0" name="aging-filter" type="radio" value="31-60"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 has-[:checked]:bg-primary has-[:checked]:text-white text-slate-600 dark:text-slate-400 text-sm font-semibold transition-all">
+<span class="truncate">61+ يوم</span>
+<input class="invisible w-0" name="aging-filter" type="radio" value="61+"/>
+</label>
+</div>
+</div>
+<!-- KPI Summary Card -->
+<div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary to-emerald-800 p-6 shadow-xl shadow-primary/20">
+<div class="absolute -left-10 -top-10 size-40 rounded-full bg-white/5 blur-3xl"></div>
+<div class="relative z-10 flex flex-col gap-1">
+<div class="flex items-center gap-2 text-white/80">
+<span class="material-symbols-outlined text-lg">account_balance_wallet</span>
+<p class="text-sm font-medium">إجمالي المديونيات المتأخرة</p>
+</div>
+<div class="mt-2 flex items-baseline gap-2 text-white">
+<h2 class="text-3xl font-bold tracking-tight">1,250,000.00</h2>
+<span class="text-lg font-medium opacity-90">ر.س</span>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<div class="h-1.5 flex-1 rounded-full bg-white/20">
+<div class="h-full w-2/3 rounded-full bg-white"></div>
+</div>
+<span class="text-xs font-bold text-white">65% من الإجمالي</span>
+</div>
+</div>
+</div>
+<!-- Customer List Section -->
+<div class="space-y-4">
+<div class="flex items-center justify-between px-1">
+<h3 class="text-lg font-bold leading-tight">العملاء المدينون</h3>
+<span class="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-lg">12 عميل</span>
+</div>
+<!-- Customer Items -->
+<div class="grid gap-3">
+<!-- Item 1 - Critical (Amber/Red Highlight) -->
+<div class="flex flex-col gap-3 rounded-xl border border-primary/10 bg-white dark:bg-primary/5 p-4 shadow-sm hover:border-primary/30 transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="flex size-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-950 text-orange-600 dark:text-orange-400">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-bold text-slate-900 dark:text-slate-100">مؤسسة الحلول المتقدمة</p>
+<p class="text-xs text-slate-500">منذ 65 يوم</p>
+</div>
+</div>
+<div class="text-left">
+<p class="font-bold text-orange-600 dark:text-orange-400">450,000 ر.س</p>
+<p class="text-xs text-slate-500">8 فواتير</p>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-primary/10 pt-3">
+<button class="flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+<span>عرض التفاصيل</span>
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex flex-col gap-3 rounded-xl border border-primary/10 bg-white dark:bg-primary/5 p-4 shadow-sm hover:border-primary/30 transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-bold text-slate-900 dark:text-slate-100">شركة الرياض للتجارة</p>
+<p class="text-xs text-slate-500">منذ 22 يوم</p>
+</div>
+</div>
+<div class="text-left">
+<p class="font-bold text-slate-900 dark:text-slate-100">125,500 ر.س</p>
+<p class="text-xs text-slate-500">3 فواتير</p>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-primary/10 pt-3">
+<button class="flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+<span>عرض التفاصيل</span>
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex flex-col gap-3 rounded-xl border border-primary/10 bg-white dark:bg-primary/5 p-4 shadow-sm hover:border-primary/30 transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-bold text-slate-900 dark:text-slate-100">مطابع السلام الدولية</p>
+<p class="text-xs text-slate-500">منذ 15 يوم</p>
+</div>
+</div>
+<div class="text-left">
+<p class="font-bold text-slate-900 dark:text-slate-100">88,200 ر.س</p>
+<p class="text-xs text-slate-500">2 فاتورة</p>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-primary/10 pt-3">
+<button class="flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+<span>عرض التفاصيل</span>
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+</div>
+</div>
+<!-- Item 4 - High Warning -->
+<div class="flex flex-col gap-3 rounded-xl border border-primary/10 bg-white dark:bg-primary/5 p-4 shadow-sm hover:border-primary/30 transition-colors">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="flex size-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-bold text-slate-900 dark:text-slate-100">مجموعة الأفق القابضة</p>
+<p class="text-xs text-slate-500">منذ 90+ يوم</p>
+</div>
+</div>
+<div class="text-left">
+<p class="font-bold text-red-600 dark:text-red-400">586,300 ر.س</p>
+<p class="text-xs text-slate-500">14 فاتورة</p>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-primary/10 pt-3">
+<button class="flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+<span>عرض التفاصيل</span>
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="sticky bottom-0 z-50 flex border-t border-primary/10 bg-white dark:bg-background-dark px-4 pb-6 pt-2">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-[10px] font-medium leading-normal">الرئيسية</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assessment</span>
+<p class="text-[10px] font-medium leading-normal">التقارير</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<p class="text-[10px] font-medium leading-normal">العملاء</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-[10px] font-medium leading-normal">الإعدادات</p>
+</a>
+</nav>
+</div>
+</body></html>

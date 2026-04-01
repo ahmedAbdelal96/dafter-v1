@@ -1,0 +1,50 @@
+{
+  "title": "إدارة الاشتراك",
+  "currentPlan": "الخطة الحالية",
+  "endDate": "تاريخ انتهاء الاشتراك",
+  "daysLeft": "يوم متبقي",
+  "errorLoad": "تعذّر تحميل بيانات الاشتراك",
+  "retry": "إعادة المحاولة",
+
+  "status": {
+    "ACTIVE": "نشط",
+    "TRIAL": "تجريبي",
+    "SUSPENDED": "موقوف",
+    "EXPIRED": "منتهي",
+    "INACTIVE": "غير نشط"
+  },
+
+  "section": {
+    "quotas": "حدود الاستخدام",
+    "features": "المميزات المتاحة"
+  },
+
+  "quota": {
+    "customers": "العملاء",
+    "suppliers": "الموردون",
+    "employees": "الموظفون",
+    "users": "المستخدمون",
+    "ledgerEntries": "قيود الدفتر",
+    "unlimited": "غير محدود",
+    "atLimit": "وصلت للحد الأقصى"
+  },
+
+  "feature": {
+    "dashboard": "لوحة التحكم",
+    "customers": "العملاء",
+    "suppliers": "الموردون",
+    "employees": "الموظفون",
+    "ledger": "دفتر الحسابات",
+    "expenses": "المصروفات",
+    "products": "المنتجات",
+    "invoices": "الفواتير",
+    "deferred_sales": "البيع الآجل",
+    "installments": "التقسيط",
+    "reports": "التقارير"
+  },
+
+  "cta": {
+    "title": "هل تريد ترقية خطتك؟",
+    "desc": "تواصل معنا لترقية اشتراكك والاستفادة من مميزات أكثر."
+  }
+}

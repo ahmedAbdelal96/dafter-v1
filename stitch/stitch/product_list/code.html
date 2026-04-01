@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex min-h-screen w-full max-w-md mx-auto flex-col bg-background-light dark:bg-background-dark overflow-x-hidden border-x border-primary/10">
+<!-- Header Section -->
+<header class="sticky top-0 z-20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+<div class="flex items-center p-4 justify-between">
+<div class="flex items-center gap-3">
+<div class="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight">المنتجات</h1>
+</div>
+<button class="flex size-10 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<!-- Search Bar -->
+<div class="px-4 pb-4">
+<label class="relative flex items-center w-full">
+<span class="material-symbols-outlined absolute right-3 text-slate-400">search</span>
+<input class="w-full h-11 pr-10 pl-4 rounded-xl border-none bg-primary/5 dark:bg-primary/10 focus:ring-2 focus:ring-primary/50 text-sm placeholder:text-slate-500" placeholder="بحث عن منتج برقم الصنف أو الاسم..." type="text"/>
+</label>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-2 px-4 pb-4 overflow-x-auto no-scrollbar">
+<button class="flex h-9 shrink-0 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-white">الكل</button>
+<button class="flex h-9 shrink-0 items-center justify-center rounded-full bg-primary/5 dark:bg-primary/10 px-5 text-sm font-medium border border-primary/10">إلكترونيات</button>
+<button class="flex h-9 shrink-0 items-center justify-center rounded-full bg-primary/5 dark:bg-primary/10 px-5 text-sm font-medium border border-primary/10">خدمات</button>
+<button class="flex h-9 shrink-0 items-center justify-center rounded-full bg-primary/5 dark:bg-primary/10 px-5 text-sm font-medium border border-primary/10">أثاث</button>
+<button class="flex h-9 shrink-0 items-center justify-center rounded-full bg-primary/5 dark:bg-primary/10 px-5 text-sm font-medium border border-primary/10">قرطاسية</button>
+</div>
+</header>
+<!-- Product List -->
+<main class="flex-1 p-4 space-y-4 pb-24">
+<!-- Product Card 1 -->
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-primary/5 p-4 border border-primary/10 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="size-16 rounded-lg bg-cover bg-center border border-primary/10 shrink-0" data-alt="Modern smartphone with sleek design" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAD9R5M_2xiBidilGCWXna_tHJ6cKupsYecwhbBWtnsspRyqus6-EvBBC26prN-lxu9tis-XZUVgcpET6bzC8gyiAc3jl5Cg9yBAjSVZOFjn5FaX5vP99CxFAWrHYgskZA03oM12I3v6AwciSwKEi3uDgGPoAJ_eLh8F7KRvGJMZrchQ9tH0CQhUAGBk7KJkql2hQ-GAsoAldqNS2wTM9xlAWAj_iNLoOyR-JDo45H9j9MuoptITWA-MzRx8BMDkUel0sic4C5djqU')"></div>
+<div class="flex flex-col">
+<h3 class="font-bold text-base">آيفون 15 برو</h3>
+<span class="text-xs text-slate-500">إلكترونيات • #PRD-001</span>
+<div class="mt-2 flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+<span class="material-symbols-outlined text-[16px] fill-1">check_circle</span>
+<span class="text-xs font-semibold">متوفر: 42 وحدة</span>
+</div>
+</div>
+</div>
+<div class="text-left">
+<p class="text-lg font-bold text-primary">5,499</p>
+<p class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">ر.س / وحدة</p>
+</div>
+</div>
+</div>
+<!-- Product Card 2 (Low Stock) -->
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-primary/5 p-4 border border-primary/10 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="size-16 rounded-lg bg-cover bg-center border border-primary/10 shrink-0" data-alt="Professional wireless headphones over-ear" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCI3hnWDqNRGci7oXLqdiQ9TZd7oyzwqv-1ItmSb4hCSXZVNrQ8cwHk6_zWzfVuYB0CgPyJC6k-N7bLqMx9ptfswGDGEGLYzpOOtpxlVxT-iqfCO2_w64YfDQ03Xjc_mFjqrFnBeC-Ue7Vqfp_TTa1m_jMxZRMBYGHAO_XvBrN6SHJzM8iiUiAGk7LwqSunQIK4N2V5_OwJtbx-BMyX0DROLSfdxOwu2ylgFBP3gCVh6KthvZqC8piRmMrKi8drSPNhW9HM01TFBQ')"></div>
+<div class="flex flex-col">
+<h3 class="font-bold text-base">سماعات لاسلكية برو</h3>
+<span class="text-xs text-slate-500">إلكترونيات • #PRD-042</span>
+<div class="mt-2 flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+<span class="material-symbols-outlined text-[16px] fill-1">warning</span>
+<span class="text-xs font-semibold">مخزون منخفض: 3 وحدات</span>
+</div>
+</div>
+</div>
+<div class="text-left">
+<p class="text-lg font-bold text-primary">850</p>
+<p class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">ر.س / وحدة</p>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-primary/5 p-4 border border-primary/10 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="size-16 rounded-lg bg-cover bg-center border border-primary/10 shrink-0" data-alt="Ergonomic office chair minimalist design" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVYUwSQRGaVb2MRPgr05dsJ3mMmgKvR5xDsAZvhlVA3PY3cp_scIirtLPNvu465iFLM0SGA8eOBpuXb1Au7ek5_BeGGsa4jLRsNUeD11cGDDnBdW2lWLGFxIyNQATYUQSh6moOzi6LZTT4_Gz91h_azIDRkicDm3YIOtILxGoLvmeoEdhbc7jlkiGpAh5s-UVhynppgCE2J5Fzf3vj35KyNHm_teTBLATf3YLfYEtGDytfp6oT4WnNOdJdhKDC3Pj7Tuy4PzFihsY')"></div>
+<div class="flex flex-col">
+<h3 class="font-bold text-base">كرسي مكتب مريح</h3>
+<span class="text-xs text-slate-500">أثاث • #PRD-089</span>
+<div class="mt-2 flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+<span class="material-symbols-outlined text-[16px] fill-1">check_circle</span>
+<span class="text-xs font-semibold">متوفر: 12 وحدة</span>
+</div>
+</div>
+</div>
+<div class="text-left">
+<p class="text-lg font-bold text-primary">1,200</p>
+<p class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">ر.س / وحدة</p>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-primary/5 p-4 border border-primary/10 shadow-sm opacity-80">
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="size-16 rounded-lg bg-cover bg-center border border-primary/10 shrink-0 grayscale" data-alt="Modern laptop on a clean desk" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA7bXKwVRWv985bfXq9aOdJpaJoMyAiC7QkvvYzwACRTC5qrd8P46ehVFS28Jc2zTOrY6I7C9fUhDTFxxJHUuo52_Cvu7Zv4s7RoFarNAA-ZgwZj9c8mBmdW4schqUBizim6gIgfdAGejh73JV93r5Kg4IhoopsKiSGc8sJmdk9AKqKaXYkLUAZ_Pouxi6WFhXz04-hUtDIAjHO1s-o8EtdSkxOjPpnwze6tQ3puE31u13Gon64W0DOfvIPLty7AXiqN3qMBsQ7Epo')"></div>
+<div class="flex flex-col">
+<h3 class="font-bold text-base">ماك بوك آير M2</h3>
+<span class="text-xs text-slate-500">إلكترونيات • #PRD-102</span>
+<div class="mt-2 flex items-center gap-1.5 text-slate-500">
+<span class="material-symbols-outlined text-[16px]">block</span>
+<span class="text-xs font-semibold">نفذ من المخزون</span>
+</div>
+</div>
+</div>
+<div class="text-left">
+<p class="text-lg font-bold text-primary">4,800</p>
+<p class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">ر.س / وحدة</p>
+</div>
+</div>
+</div>
+<!-- Summary Stats (Optional but adds value) -->
+<div class="grid grid-cols-2 gap-4 pt-2">
+<div class="bg-primary/5 rounded-xl p-3 border border-primary/10">
+<p class="text-[10px] text-slate-500 uppercase">إجمالي الأصناف</p>
+<p class="text-xl font-bold">142</p>
+</div>
+<div class="bg-primary/5 rounded-xl p-3 border border-primary/10">
+<p class="text-[10px] text-slate-500 uppercase">قيمة المخزون</p>
+<p class="text-xl font-bold">840K <span class="text-xs font-normal">ر.س</span></p>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-primary/10 px-6 py-2 z-30">
+<div class="flex justify-between items-center">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium leading-none">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-medium leading-none">العملاء</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<div class="relative">
+<span class="material-symbols-outlined fill-1">inventory_2</span>
+<div class="absolute -top-1 -right-1 size-1.5 rounded-full bg-primary"></div>
+</div>
+<span class="text-[10px] font-bold leading-none">المنتجات</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="text-[10px] font-medium leading-none">الفواتير</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-[10px] font-medium leading-none">المزيد</span>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

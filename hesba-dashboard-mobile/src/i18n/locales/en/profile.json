@@ -1,0 +1,58 @@
+{
+  "title": "Profile",
+  "companyInfo": "Company Information",
+  "personalInfo": "Personal Information",
+  "account": "Account",
+  "fields": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "role": "Role",
+    "companyName": "Company Name",
+    "city": "City",
+    "plan": "Plan"
+  },
+  "roles": {
+    "OWNER": "Owner",
+    "SUPER_ADMIN": "Super Admin",
+    "RECEPTION": "Reception",
+    "STAFF": "Staff"
+  },
+  "plans": {
+    "BASIC": "Basic",
+    "PRO": "Pro",
+    "PREMIUM": "Premium"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Appearance",
+    "notifications": "Notifications",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "actions": {
+    "editProfile": "Edit Profile",
+    "changePassword": "Change Password",
+    "logout": "Sign Out",
+    "logoutConfirm": "Are you sure you want to sign out?"
+  },
+  "subscription": {
+    "title": "Subscription",
+    "manage": "Manage Subscription",
+    "plan": "Current Plan",
+    "status": "Status",
+    "expiresAt": "Expires at",
+    "TRIAL": "Trial",
+    "ACTIVE": "Active",
+    "PAST_DUE": "Past Due",
+    "CANCELLED": "Cancelled",
+    "SUSPENDED": "Suspended"
+  },
+  "language": {
+    "ar": "Arabic",
+    "en": "English",
+    "restartRequired": "App restart required to apply the new layout direction"
+  },
+  "editCompany": "Edit Company Profile"
+}

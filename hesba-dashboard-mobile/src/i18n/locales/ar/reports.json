@@ -1,0 +1,150 @@
+{
+  "title": "التقارير",
+  "tabs": {
+    "summary": "ملخص",
+    "overdue": "المتأخرون",
+    "collection": "جدول التحصيل",
+    "advanced": "متقدم"
+  },
+  "summary": {
+    "title": "الملخص المالي",
+    "totalReceivables": "إجمالي المستحقات",
+    "deferredSales": "البيوعات الآجلة",
+    "installments": "الأقساط",
+    "totalContracts": "إجمالي العقود",
+    "activeContracts": "عقود نشطة",
+    "totalAmount": "إجمالي المبلغ",
+    "remainingAmount": "المبلغ المتبقي",
+    "overdueCount": "عقود متأخرة",
+    "overdueSchedules": "أقساط متأخرة",
+    "overdueAmount": "المبلغ المتأخر"
+  },
+  "overdue": {
+    "title": "المتأخرون عن السداد",
+    "empty": "لا يوجد متأخرون",
+    "emptyDesc": "جميع الحسابات مسددة في مواعيدها",
+    "amount": "المبلغ المتأخر",
+    "remaining": "المتبقي",
+    "daysOverdue": "{{count}} يوم متأخر",
+    "dueDate": "استحقاق",
+    "installment": "قسط #{{num}}",
+    "deferredSales": "البيوعات الآجلة",
+    "installmentSchedules": "جداول الأقساط"
+  },
+  "collection": {
+    "title": "جدول التحصيل",
+    "empty": "لا توجد استحقاقات قادمة",
+    "emptyDesc": "لا توجد دفعات مستحقة في الفترة المحددة",
+    "dueDate": "تاريخ الاستحقاق",
+    "amount": "المبلغ المتوقع",
+    "today": "اليوم",
+    "type": {
+      "DEFERRED": "بيع آجل",
+      "INSTALLMENT": "قسط"
+    }
+  },
+  "errors": {
+    "loadFailed": "فشل تحميل التقرير",
+    "retry": "إعادة المحاولة"
+  },
+  "filter": {
+    "dateFrom": "من تاريخ",
+    "dateTo": "إلى تاريخ",
+    "apply": "إعادة المحاولة",
+    "thisMonth": "هذا الشهر",
+    "last3Months": "آخر 3 أشهر",
+    "thisYear": "هذا العام"
+  },
+  "export": {
+    "button": "تصدير",
+    "pdf": "تصدير PDF",
+    "excel": "تصدير Excel"
+  },
+  "advanced": {
+    "profitLoss": {
+      "title": "الأرباح والخسائر",
+      "netSales": "صافي المبيعات",
+      "expenses": "المصروفات",
+      "netProfit": "صافي الربح"
+    },
+    "cashFlow": {
+      "title": "التدفق النقدي",
+      "inflow": "التدفق الداخل",
+      "outflow": "التدفق الخارج",
+      "closingBalance": "رصيد الإقفال"
+    },
+    "customersAging": {
+      "title": "تقادم العملاء",
+      "parties": "عدد العملاء",
+      "outstanding": "إجمالي المستحق"
+    },
+    "suppliersAging": {
+      "title": "تقادم الموردين",
+      "parties": "عدد الموردين",
+      "outstanding": "إجمالي المستحق"
+    },
+    "salesDetailed": {
+      "title": "تفاصيل المبيعات",
+      "invoices": "عدد الفواتير",
+      "netAmount": "الصافي"
+    },
+    "collectionsFollowup": {
+      "title": "متابعة التحصيلات",
+      "expected": "المتوقع",
+      "collected": "المحصل",
+      "collectionRate": "نسبة التحصيل"
+    },
+    "expensesAnalytics": {
+      "title": "تحليل المصروفات",
+      "count": "عدد المصروفات",
+      "total": "الإجمالي",
+      "average": "المتوسط"
+    },
+    "debtsSummary": {
+      "title": "ملخص الديون",
+      "customersReceivable": "مديونية العملاء",
+      "suppliersPayable": "مستحقات الموردين",
+      "netReceivable": "صافي المديونية"
+    },
+    "productsPerformance": {
+      "title": "أداء المنتجات",
+      "products": "المنتجات",
+      "quantity": "الكمية المباعة",
+      "salesAmount": "قيمة المبيعات"
+    },
+    "operationalPerformance": {
+      "title": "الأداء التشغيلي",
+      "revenue": "الإيرادات",
+      "expenses": "المصروفات",
+      "collectionRate": "نسبة التحصيل"
+    },
+    "criticalAlerts": {
+      "title": "التنبيهات الحرجة",
+      "creditRisk": "خطر الائتمان",
+      "largeOverdues": "المتأخرات الكبيرة",
+      "upcomingInstallments": "الأقساط القادمة"
+    },
+    "staffActivity": {
+      "title": "نشاط الموظفين",
+      "users": "المستخدمون",
+      "activities": "الأنشطة",
+      "invoicesAmount": "قيمة الفواتير"
+    },
+    "ledgerStatement": {
+      "title": "كشف حساب",
+      "selectParty": "اختر الطرف",
+      "hint": "اختر عميلاً أو مورداً أو موظفاً لعرض كشف الحساب",
+      "openingBalance": "الرصيد الافتتاحي",
+      "totalDebit": "إجمالي المدين",
+      "totalCredit": "إجمالي الدائن",
+      "closingBalance": "رصيد الإقفال",
+      "currentBalance": "الرصيد الحالي",
+      "entriesCount": "عدد القيود",
+      "partyType": {
+        "CUSTOMER": "عميل",
+        "SUPPLIER": "مورد",
+        "EMPLOYEE": "موظف"
+      }
+    }
+  }
+}

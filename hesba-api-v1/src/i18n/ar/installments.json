@@ -1,0 +1,45 @@
+{
+  "contract": {
+    "create": {
+      "success": "تم إنشاء عقد التقسيط بنجاح",
+      "partyNotFound": "الطرف الحسابي غير موجود",
+      "customScheduleMismatch": "مجموع أقساط الجدول المخصص لا يساوي المبلغ بعد المقدم",
+      "customScheduleCountMismatch": "عدد الأقساط لا يتطابق مع الجدول المخصص"
+    },
+    "cancel": {
+      "success": "تم إلغاء عقد التقسيط بنجاح",
+      "notFound": "عقد التقسيط غير موجود",
+      "alreadyCompleted": "لا يمكن إلغاء عقد مكتمل",
+      "alreadyCancelled": "عقد التقسيط ملغي بالفعل"
+    },
+    "get": {
+      "notFound": "عقد التقسيط غير موجود"
+    },
+    "list": {}
+  },
+  "payment": {
+    "success": "تم تسجيل دفعة القسط بنجاح",
+    "scheduleNotFound": "القسط غير موجود أو لا ينتمي لهذا العقد",
+    "scheduleAlreadyPaid": "هذا القسط مسدد بالكامل بالفعل",
+    "scheduleWaived": "هذا القسط تم إعفاؤه",
+    "amountExceedsRemaining": "المبلغ يتجاوز المتبقي من هذا القسط ({remaining} جنيه)",
+    "contractCancelled": "لا يمكن الدفع على عقد ملغي"
+  },
+  "scheduleType": {
+    "FIXED": "أقساط ثابتة",
+    "CUSTOM": "أقساط مخصصة"
+  },
+  "status": {
+    "ACTIVE": "جاري",
+    "COMPLETED": "مكتمل",
+    "CANCELLED": "ملغي",
+    "DEFAULTED": "متوقف"
+  },
+  "scheduleStatus": {
+    "PENDING": "في الانتظار",
+    "PARTIAL": "مدفوع جزئياً",
+    "PAID": "مسدد",
+    "OVERDUE": "متأخر",
+    "WAIVED": "معفي"
+  }
+}

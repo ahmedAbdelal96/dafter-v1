@@ -1,0 +1,24 @@
+{
+  "create": {
+    "success": "Employee created successfully",
+    "failed": "Failed to create employee",
+    "limitReached": "Maximum number of employees reached for your current plan",
+    "nameExists": "An employee with this name already exists"
+  },
+  "get": {
+    "success": "Employee data retrieved",
+    "notFound": "Employee not found"
+  },
+  "list": { "success": "Employees list retrieved" },
+  "update": {
+    "success": "Employee updated successfully",
+    "notFound": "Employee not found",
+    "nameExists": "Another employee with this name already exists",
+    "conflict": "The employee data was modified by someone else. Please reload and try again"
+  },
+  "delete": {
+    "success": "Employee deleted successfully",
+    "hasEntries": "Cannot delete an employee with ledger entries. You can disable them instead",
+    "notFound": "Employee not found"
+  }
+}

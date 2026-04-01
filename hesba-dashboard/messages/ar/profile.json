@@ -1,0 +1,30 @@
+{
+  "page": {
+    "pageTitle": "ملفي الشخصي | دفتر",
+    "pageDescription": "إدارة معلوماتك الشخصية وإعدادات حسابك",
+    "title": "ملفي الشخصي",
+    "subtitle": "تحديث بياناتك الشخصية وتغيير كلمة المرور",
+    "accountSection": "تفاصيل الحساب",
+    "editSection": "تعديل الملف الشخصي",
+    "passwordSection": "تغيير كلمة المرور",
+    "email": "البريد الإلكتروني",
+    "role": "الدور",
+    "phone": "رقم الهاتف",
+    "fullName": "الاسم الكامل",
+    "fullNamePlaceholder": "اسمك الكامل",
+    "phonePlaceholder": "+966XXXXXXXXX",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "saveProfile": "حفظ التغييرات",
+    "changePassword": "تغيير كلمة المرور",
+    "saving": "جار الحفظ..."
+  },
+  "messages": {
+    "successUpdate": "تم تحديث الملف الشخصي بنجاح",
+    "errorUpdate": "فشل تحديث الملف الشخصي",
+    "successPasswordChange": "تم تغيير كلمة المرور بنجاح",
+    "errorPasswordChange": "فشل تغيير كلمة المرور",
+    "passwordMismatch": "كلمتا المرور الجديدتان غير متطابقتين"
+  }
+}

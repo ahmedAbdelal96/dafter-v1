@@ -1,0 +1,30 @@
+{
+  "page": {
+    "pageTitle": "My Profile | Daftar",
+    "pageDescription": "Manage your personal profile and account settings",
+    "title": "My Profile",
+    "subtitle": "Update your personal information and change your password",
+    "accountSection": "Account Details",
+    "editSection": "Edit Profile",
+    "passwordSection": "Change Password",
+    "email": "Email",
+    "role": "Role",
+    "phone": "Phone Number",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Your full name",
+    "phonePlaceholder": "+966XXXXXXXXX",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "saveProfile": "Save Changes",
+    "changePassword": "Change Password",
+    "saving": "Saving..."
+  },
+  "messages": {
+    "successUpdate": "Profile updated successfully",
+    "errorUpdate": "Failed to update profile",
+    "successPasswordChange": "Password changed successfully",
+    "errorPasswordChange": "Failed to change password",
+    "passwordMismatch": "New passwords do not match"
+  }
+}

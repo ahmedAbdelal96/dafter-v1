@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display">
+<div class="max-w-md mx-auto min-h-screen flex flex-col bg-background-light dark:bg-background-dark border-x border-primary/10">
+<!-- Header & Search Bar Area -->
+<header class="sticky top-0 z-20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md pt-6 pb-4 px-4 space-y-4">
+<div class="flex items-center justify-between">
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">البحث في حسبة</h1>
+<button class="text-primary font-medium text-sm hover:opacity-80">إلغاء</button>
+</div>
+<div class="relative group">
+<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+</div>
+<input class="block w-full bg-slate-200/50 dark:bg-primary/10 border-none rounded-xl py-3 pr-10 pl-4 text-slate-900 dark:text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-primary/50 transition-all text-sm" placeholder="ابحث عن العملاء، الفواتير، المنتجات..." type="text" value="أحمد"/>
+</div>
+<!-- Category Filter Chips -->
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-primary text-white text-xs font-semibold">الكل</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-slate-200 dark:bg-primary/20 text-slate-600 dark:text-primary text-xs font-medium hover:bg-primary/30 transition-colors">العملاء</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-slate-200 dark:bg-primary/20 text-slate-600 dark:text-primary text-xs font-medium hover:bg-primary/30 transition-colors">الفواتير</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-slate-200 dark:bg-primary/20 text-slate-600 dark:text-primary text-xs font-medium hover:bg-primary/30 transition-colors">المنتجات</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-slate-200 dark:bg-primary/20 text-slate-600 dark:text-primary text-xs font-medium hover:bg-primary/30 transition-colors">الموردون</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 px-4 pb-24 overflow-y-auto">
+<!-- Active Search Results -->
+<section class="space-y-6 mt-2">
+<!-- Section: Customers -->
+<div>
+<h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 pr-1">العملاء</h3>
+<div class="space-y-2">
+<div class="flex items-center p-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-transparent hover:border-primary/30 transition-all">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="mr-3 flex-1">
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">أحمد محمد العلي</p>
+<p class="text-xs text-slate-500">الرصيد المستحق</p>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold text-slate-900 dark:text-slate-100">1,250.00 ر.س</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Invoices -->
+<div>
+<h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 pr-1">الفواتير</h3>
+<div class="space-y-2">
+<div class="flex items-center p-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-transparent hover:border-primary/30 transition-all">
+<div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="mr-3 flex-1">
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">فاتورة #INV-2024-089</p>
+<p class="text-xs text-slate-500">أحمد محمود - منذ يومين</p>
+</div>
+<div class="text-left">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-500 uppercase">قيد الانتظار</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Products -->
+<div>
+<h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 pr-1">المنتجات</h3>
+<div class="space-y-2">
+<div class="flex items-center p-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-transparent hover:border-primary/30 transition-all">
+<div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-200 dark:bg-primary/10 shrink-0">
+<img alt="Product thumbnail" class="w-full h-full object-cover" data-alt="Simple modern product icon on green background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAca9SEFC6zuLOr-tOkq0skbFRHpY0X7yBbDDJqmVuRKmyL5MPM6GAlQPC4QPf4R8n5zs59QKi5pJb1agmfvMmS_BQVi-N7J6iJ5h6Uhlc3gmFLasPTHZET8c-It8u551MTy_PdPgYR4A5fYvv2gWG9ZgxpiM6ZJRcz-GgK1MiDQ2_lODF8yHosLmdht9xHKDazbxvINumRIB2O0SVIb87WTkD8YsVNzejslRDFxLUk-7ocVq4IT_LIBlH6XAntPB4CaVAQtTr4d0k"/>
+</div>
+<div class="mr-3 flex-1">
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">جهاز كمبيوتر محمول G-Pro</p>
+<p class="text-xs text-slate-500">التصنيف: إلكترونيات</p>
+</div>
+<div class="text-left">
+<p class="text-xs font-medium text-slate-500">المخزون</p>
+<p class="text-sm font-bold text-primary">42 وحدة</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Searches (Visible if input empty, but shown here for UI completeness) -->
+<div class="pt-4 border-t border-primary/10">
+<h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 pr-1">عمليات البحث الأخيرة</h3>
+<div class="space-y-1">
+<div class="flex items-center justify-between py-2 px-1 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors cursor-pointer">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">history</span>
+<span class="text-sm">توريدات الرواد</span>
+</div>
+<span class="material-symbols-outlined text-sm">close</span>
+</div>
+<div class="flex items-center justify-between py-2 px-1 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors cursor-pointer">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">history</span>
+<span class="text-sm">فواتير الربع الثالث</span>
+</div>
+<span class="material-symbols-outlined text-sm">close</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-30">
+<div class="flex border-t border-primary/10 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md px-4 pb-6 pt-3 shadow-2xl">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-[10px] font-medium leading-normal">الرئيسية</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">pie_chart</span>
+<p class="text-[10px] font-medium leading-normal">التقارير</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<div class="relative">
+<span class="material-symbols-outlined fill-1">search</span>
+<div class="absolute -top-1 -right-1 w-1.5 h-1.5 bg-primary rounded-full"></div>
+</div>
+<p class="text-[10px] font-bold leading-normal">البحث</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-[10px] font-medium leading-normal">الإعدادات</p>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

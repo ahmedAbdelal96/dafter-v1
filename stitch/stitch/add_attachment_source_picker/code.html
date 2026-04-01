@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex h-screen w-full flex-col overflow-hidden bg-background-light dark:bg-background-dark">
+<!-- Background Mockup Content (Blurred) -->
+<div class="flex-1 p-6 opacity-40 blur-sm pointer-events-none">
+<div class="h-8 w-32 bg-slate-300 dark:bg-slate-700 rounded mb-8"></div>
+<div class="space-y-4">
+<div class="h-24 w-full bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+<div class="h-24 w-full bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+<div class="h-24 w-full bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+</div>
+</div>
+<!-- Overlay / Backdrop -->
+<div class="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm flex flex-col justify-end">
+<!-- Bottom Sheet Container -->
+<div class="relative w-full max-w-md mx-auto bg-background-light dark:bg-background-dark rounded-t-xl shadow-2xl border-t border-slate-200 dark:border-primary/20 pb-8">
+<!-- BottomSheetHandle -->
+<div class="flex h-6 w-full items-center justify-center">
+<div class="h-1.5 w-12 rounded-full bg-slate-300 dark:bg-primary/30 mt-1"></div>
+</div>
+<!-- Header -->
+<div class="px-6 pt-4 pb-6">
+<h1 class="text-xl font-bold text-center text-slate-900 dark:text-slate-100">إضافة مرفق</h1>
+</div>
+<!-- Options List -->
+<div class="px-4 space-y-2">
+<!-- Option: Camera -->
+<button class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors group">
+<div class="flex items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20 text-primary shrink-0 size-12 group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-3xl">photo_camera</span>
+</div>
+<div class="flex-1 text-right">
+<p class="text-lg font-medium text-slate-900 dark:text-slate-100">الكاميرا</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">التقاط صورة مباشرة</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_left</span>
+</button>
+<!-- Option: Gallery -->
+<button class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors group">
+<div class="flex items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20 text-primary shrink-0 size-12 group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-3xl">image</span>
+</div>
+<div class="flex-1 text-right">
+<p class="text-lg font-medium text-slate-900 dark:text-slate-100">معرض الصور</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">اختيار من ألبوم الصور</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_left</span>
+</button>
+<!-- Option: Files -->
+<button class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors group">
+<div class="flex items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20 text-primary shrink-0 size-12 group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-3xl">folder_open</span>
+</div>
+<div class="flex-1 text-right">
+<p class="text-lg font-medium text-slate-900 dark:text-slate-100">الملفات</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">رفع مستند بصيغة PDF أو غيرها</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_left</span>
+</button>
+</div>
+<!-- Footer / Cancel Button -->
+<div class="px-6 mt-6">
+<button class="w-full py-4 text-center text-slate-600 dark:text-slate-400 font-semibold text-lg border-t border-slate-200 dark:border-primary/10 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+                        إلغاء
+                    </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

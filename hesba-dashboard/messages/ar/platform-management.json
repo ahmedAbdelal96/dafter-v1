@@ -1,0 +1,554 @@
+{
+  "filters": {
+    "searchPlaceholder": "ابحث باسم الشركة أو الهاتف أو العنوان",
+    "subscriptionStatus": {
+      "all": "كل حالات الاشتراك",
+      "TRIAL": "تجريبي",
+      "ACTIVE": "نشط",
+      "EXPIRED": "منتهي",
+      "SUSPENDED": "موقوف",
+      "DISABLED": "معطل"
+    },
+    "activeState": {
+      "all": "كل مساحات العمل",
+      "active": "مساحات عمل نشطة",
+      "inactive": "مساحات عمل غير نشطة"
+    },
+    "limitOption": "{count} صف",
+    "dateFrom": "من تاريخ",
+    "dateTo": "إلى تاريخ",
+    "reset": "إعادة تعيين الفلاتر",
+    "empty": "لا توجد خيارات",
+    "placeholders": {
+      "subscriptionStatus": "حالة الاشتراك",
+      "activeState": "حالة مساحة العمل",
+      "archivedMode": "نطاق الأرشفة",
+      "limit": "عدد الصفوف",
+      "sortBy": "ترتيب حسب",
+      "sortOrder": "الاتجاه"
+    },
+    "archivedMode": {
+      "activeOnly": "النشطة فقط",
+      "includeArchived": "يشمل المؤرشف",
+      "archivedOnly": "المؤرشف فقط"
+    },
+    "sortBy": {
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "تاريخ التحديث",
+      "name": "الاسم"
+    },
+    "sortOrder": {
+      "asc": "تصاعدي",
+      "desc": "تنازلي"
+    }
+  },
+  "details": {
+    "eyebrow": "تفاصيل الشركة",
+    "backToList": "العودة إلى الشركات",
+    "loading": "جارٍ تحميل تفاصيل الشركة...",
+    "active": "مساحة عمل نشطة",
+    "inactive": "مساحة عمل غير نشطة",
+    "archived": "مساحة عمل مؤرشفة",
+    "noPhone": "لا يوجد هاتف",
+    "noAddress": "لا يوجد عنوان",
+    "yes": "نعم",
+    "no": "لا",
+    "metrics": {
+      "users": "المستخدمون",
+      "customers": "العملاء",
+      "suppliers": "الموردون",
+      "employees": "الموظفون",
+      "ledgerEntries": "قيود الدفتر"
+    },
+    "subscription": {
+      "title": "الاشتراك الحالي",
+      "plan": "الخطة",
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ الانتهاء",
+      "paymentStatus": "حالة الدفع",
+      "autoRenew": "تجديد تلقائي",
+      "empty": "لا يوجد اشتراك مخصص حاليًا."
+    },
+    "history": {
+      "title": "سجل الاشتراكات الأخير",
+      "empty": "لا يوجد سجل اشتراكات حتى الآن."
+    },
+    "metadata": {
+      "title": "بيانات مساحة العمل",
+      "createdAt": "أُنشئت في",
+      "updatedAt": "آخر تحديث"
+    },
+    "restore": {
+      "action": "استرجاع مساحة العمل",
+      "submitting": "جارٍ الاسترجاع...",
+      "confirmPrompt": "هل تريد استرجاع مساحة العمل المؤرشفة وإعادة تفعيل الوصول؟",
+      "success": "تم استرجاع مساحة العمل بنجاح.",
+      "error": "فشل استرجاع مساحة العمل."
+    }
+  },
+  "tenants": {
+    "meta": {
+      "title": "إدارة الشركات | دفتر سوبر أدمن",
+      "description": "إدارة شركات المنصة وتحديث ملفاتها وحالة تفعيل مساحة العمل."
+    },
+    "eyebrow": "عمليات الشركات",
+    "heading": "إدارة الشركات",
+    "subheading": "راجع مساحات العمل على المنصة، وتحقق من حالة الاشتراك الحالية، واطلع على النشاط التشغيلي دون مغادرة لوحة السوبر أدمن.",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "tableAriaLabel": "جدول الشركات",
+    "tableCaption": "الشركات المسجلة على المنصة",
+    "status": {
+      "none": "بدون اشتراك"
+    },
+    "table": {
+      "company": "الشركة",
+      "users": "المستخدمون",
+      "subscription": "الاشتراك",
+      "plan": "الخطة",
+      "workspaceState": "حالة مساحة العمل",
+      "createdAt": "تاريخ الإنشاء"
+    },
+    "actions": {
+      "view": "عرض",
+      "create": "إنشاء شركة",
+      "edit": "تعديل",
+      "archive": "أرشفة",
+      "restore": "استرجاع",
+      "disable": "تعطيل",
+      "enable": "تفعيل",
+      "delete": "حذف",
+      "showArchived": "إظهار المؤرشف",
+      "hideArchived": "إخفاء المؤرشف"
+    },
+    "archived": "مؤرشف",
+    "empty": {
+      "title": "لا توجد شركات",
+      "description": "جرّب تعديل الفلاتر الحالية أو عبارة البحث.",
+      "retry": "إعادة المحاولة"
+    },
+    "createModal": {
+      "eyebrow": "إنشاء شركة",
+      "title": "إنشاء شركة ومالك",
+      "description": "أنشئ مساحة عمل شركة جديدة مع حساب مالك وتعيين اشتراك أولي.",
+      "sections": {
+        "company": "بيانات الشركة",
+        "owner": "حساب المالك",
+        "subscription": "الاشتراك الأولي"
+      },
+      "fields": {
+        "companyName": "اسم الشركة",
+        "companyPhone": "هاتف الشركة",
+        "companyAddress": "عنوان الشركة",
+        "currencyCode": "رمز العملة (مثال: EGP)",
+        "ownerFullName": "الاسم الكامل للمالك",
+        "ownerEmail": "بريد المالك الإلكتروني",
+        "ownerPassword": "كلمة مرور المالك",
+        "ownerPhone": "هاتف المالك",
+        "plan": "اختر الخطة",
+        "planSearch": "ابحث في الخطط",
+        "subscriptionMode": "نوع الاشتراك",
+        "subscriptionModeOptions": {
+          "trial": "تجريبي",
+          "paid": "مدفوع"
+        },
+        "trialDays": "مدة التجربة",
+        "trialDaysOption": "{days} يوم",
+        "termMonths": "مدة الاشتراك",
+        "termMonthsOption": "{months} شهر",
+        "planCycle": "دورة فوترة الخطة",
+        "planCycleOptions": {
+          "monthly": "شهري",
+          "yearly": "سنوي"
+        },
+        "planCycleValue": "{cycle}",
+        "autoRenew": "تفعيل التجديد التلقائي"
+      },
+      "passwordHint": "يجب أن تحتوي كلمة المرور على حرف كبير ورقم واحد على الأقل.",
+      "emptyPlans": "لا توجد خطط نشطة متاحة.",
+      "cancel": "إلغاء",
+      "submit": "إنشاء الشركة",
+      "submitting": "جارٍ الإنشاء...",
+      "errors": {
+        "requiredFields": "يرجى تعبئة جميع الحقول المطلوبة.",
+        "planRequired": "يرجى اختيار خطة.",
+        "trialDaysRequired": "يرجى اختيار مدة التجربة.",
+        "termMonthsRequired": "يرجى اختيار مدة الاشتراك.",
+        "currencyCodeInvalid": "يجب أن يكون رمز العملة مكوّنًا من 3 أحرف إنجليزية كبيرة."
+      },
+      "messages": {
+        "success": "تم إنشاء الشركة بنجاح.",
+        "error": "تعذر إنشاء الشركة."
+      }
+    },
+    "editModal": {
+      "eyebrow": "تعديل الشركة",
+      "title": "تحديث ملف الشركة",
+      "fields": {
+        "companyName": "اسم الشركة",
+        "companyPhone": "هاتف الشركة",
+        "companyAddress": "عنوان الشركة",
+        "currencyCode": "رمز العملة (مثال: EGP)"
+      },
+      "cancel": "إلغاء",
+      "submit": "حفظ التغييرات",
+      "submitting": "جارٍ الحفظ...",
+      "errors": {
+        "companyNameRequired": "اسم الشركة مطلوب.",
+        "currencyCodeInvalid": "يجب أن يكون رمز العملة مكوّنًا من 3 أحرف إنجليزية كبيرة."
+      },
+      "messages": {
+        "success": "تم تحديث الشركة بنجاح.",
+        "error": "تعذر تحديث الشركة."
+      }
+    },
+    "toggleModal": {
+      "eyebrow": "حالة الشركة",
+      "titles": {
+        "disable": "تعطيل الشركة",
+        "enable": "تفعيل الشركة"
+      },
+      "descriptions": {
+        "disable": "هل تريد تعطيل {companyName}؟ سيفقد المستخدمون الوصول حتى إعادة التفعيل.",
+        "enable": "تفعيل {companyName} واستعادة الوصول إلى مساحة العمل."
+      },
+      "cancel": "إلغاء",
+      "confirmDisable": "تعطيل",
+      "confirmEnable": "تفعيل",
+      "submitting": "جارٍ التطبيق...",
+      "messages": {
+        "disableSuccess": "تم تعطيل الشركة بنجاح.",
+        "enableSuccess": "تم تفعيل الشركة بنجاح.",
+        "error": "تعذر تحديث حالة الشركة."
+      }
+    },
+    "archiveModal": {
+      "eyebrow": "أرشفة الشركة",
+      "title": "أرشفة مساحة عمل الشركة",
+      "description": "أرشفة {companyName}. سيؤدي ذلك إلى إخفائها من قوائم الشركات النشطة وتعطيل الوصول.",
+      "reasonLabel": "السبب (اختياري)",
+      "reasonPlaceholder": "أضف سياقًا تشغيليًا لسجل المراجعة...",
+      "warning": "الأرشفة قابلة للاسترجاع، لكنها توقف الوصول فورًا وتزيل الشركة من قوائم التشغيل النشطة.",
+      "confirmLabel": "أؤكد أرشفة مساحة عمل هذه الشركة",
+      "cancel": "إلغاء",
+      "confirm": "أرشفة",
+      "submitting": "جارٍ الأرشفة...",
+      "messages": {
+        "success": "تمت أرشفة الشركة بنجاح.",
+        "error": "تعذرت أرشفة الشركة."
+      }
+    },
+    "deleteModal": {
+      "eyebrow": "منطقة خطرة",
+      "title": "حذف الشركة نهائيًا",
+      "description": "حذف {companyName} نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+      "confirmNameLabel": "اكتب اسم الشركة للتأكيد",
+      "confirmNamePlaceholder": "اكتب: {companyName}",
+      "confirmNameMismatch": "يجب أن يطابق الاسم المكتوب اسم الشركة تمامًا.",
+      "reasonLabel": "السبب (إلزامي، 5 أحرف على الأقل)",
+      "reasonPlaceholder": "أضف مبرر الحذف (التزام/طلب دعم، إلخ)",
+      "reasonMin": "الرجاء إدخال سبب لا يقل عن 5 أحرف للحذف النهائي.",
+      "warning": "الحذف النهائي يزيل بيانات الشركة من المنصة نهائيًا ولا يمكن التراجع عنه.",
+      "confirmCheckbox": "أفهم أن هذا الإجراء نهائي ولا يمكن استرجاعه",
+      "cancel": "إلغاء",
+      "confirm": "حذف نهائي",
+      "submitting": "جارٍ الحذف...",
+      "messages": {
+        "success": "تم حذف الشركة نهائيًا.",
+        "error": "تعذر حذف الشركة."
+      }
+    },
+    "restoreModal": {
+      "eyebrow": "استرجاع الشركة",
+      "title": "استرجاع مساحة العمل المؤرشفة",
+      "description": "استرجاع {companyName}. سيُعاد تفعيل الوصول وتظهر الشركة مجددًا ضمن القوائم التشغيلية النشطة.",
+      "reasonLabel": "السبب (اختياري)",
+      "reasonPlaceholder": "أضف سببًا تشغيليًا لعملية الاسترجاع...",
+      "warning": "الاسترجاع سيعيد تفعيل مساحة العمل فورًا لمستخدمي الشركة.",
+      "confirmLabel": "أؤكد استرجاع مساحة عمل هذه الشركة",
+      "cancel": "إلغاء",
+      "confirm": "استرجاع",
+      "submitting": "جارٍ الاسترجاع...",
+      "messages": {
+        "success": "تم استرجاع الشركة بنجاح.",
+        "error": "فشل استرجاع الشركة."
+      }
+    }
+  },
+  "subscriptions": {
+    "eyebrow": "عمليات الاشتراكات",
+    "heading": "الاشتراكات والفوترة",
+    "subheading": "تابع تعيين الخطط ومخاطر التجديد وإجراءات الاشتراك لكل الشركات من شاشة تشغيلية واحدة.",
+    "tableAriaLabel": "جدول الاشتراكات",
+    "tableCaption": "الشركات وحالة الاشتراك الحالية",
+    "cards": {
+      "active": {
+        "title": "اشتراكات نشطة",
+        "description": "الشركات التي تعمل حاليًا على خطة نشطة."
+      },
+      "expiring": {
+        "title": "تنتهي خلال 14 يومًا",
+        "description": "اشتراكات تحتاج متابعة قريبًا."
+      },
+      "suspended": {
+        "title": "اشتراكات موقوفة",
+        "description": "شركات محظورة على مستوى الاشتراك."
+      }
+    },
+    "plans": {
+      "title": "كتالوج الخطط",
+      "description": "راجع الخطط المتاحة قبل تنفيذ إجراءات الاشتراك.",
+      "emptyTitle": "لا توجد خطط",
+      "emptyDescription": "أنشئ أو فعّل الخطط في الباك إند قبل التعيين.",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "capacity": "المستخدمون: {users} - العملاء: {customers}",
+      "unlimited": "غير محدود"
+    },
+    "table": {
+      "company": "الشركة",
+      "plan": "الخطة",
+      "status": "الحالة",
+      "endDate": "تاريخ الانتهاء",
+      "createdAt": "تاريخ الإنشاء"
+    },
+    "status": {
+      "none": "بدون اشتراك",
+      "noExpiry": "بدون تاريخ انتهاء",
+      "daysLeft": "متبقي {count} يوم"
+    },
+    "actions": {
+      "view": "عرض",
+      "timeline": "الخط الزمني",
+      "activate": "تفعيل",
+      "changePlan": "تغيير الخطة",
+      "extend": "تمديد",
+      "suspend": "إيقاف"
+    },
+    "messages": {
+      "activateSuccess": "تم تفعيل الاشتراك بنجاح.",
+      "extendSuccess": "تم تمديد الاشتراك بنجاح.",
+      "suspendSuccess": "تم إيقاف الاشتراك بنجاح.",
+      "actionError": "تعذر إكمال إجراء الاشتراك."
+    },
+    "empty": {
+      "title": "لا توجد سجلات اشتراك",
+      "description": "عدّل الفلاتر الحالية لعرض شريحة أخرى."
+    },
+    "modal": {
+      "eyebrow": "إجراء الاشتراك",
+      "titles": {
+        "activate": "تفعيل الاشتراك",
+        "changePlan": "تغيير خطة الاشتراك",
+        "extend": "تمديد الاشتراك",
+        "suspend": "إيقاف الاشتراك"
+      },
+      "plan": "اختر الخطة",
+      "searchPlan": "ابحث في الخطط",
+      "emptyPlans": "لا توجد خطط نشطة متاحة للتفعيل.",
+      "endDate": "تاريخ الانتهاء",
+      "newEndDate": "تاريخ الانتهاء الجديد",
+      "reason": "السبب",
+      "note": "ملاحظة داخلية",
+      "autoRenew": "تفعيل التجديد التلقائي",
+      "cancel": "إلغاء",
+      "submitting": "جارٍ الحفظ...",
+      "submit": {
+        "activate": "تفعيل",
+        "changePlan": "تغيير الخطة",
+        "extend": "تمديد",
+        "suspend": "إيقاف"
+      },
+      "confirmLabel": "أؤكد هذا الإجراء وتأثيره على الشركة",
+      "validation": {
+        "planRequired": "يرجى اختيار خطة.",
+        "dateRequired": "يرجى اختيار تاريخ.",
+        "dateMustBeFuture": "يجب أن يكون التاريخ اليوم أو في المستقبل.",
+        "reasonMin": "يجب ألا يقل السبب عن 3 أحرف.",
+        "confirmRequired": "يجب التأكيد قبل الإرسال."
+      },
+      "context": {
+        "currentPlan": "الخطة الحالية",
+        "currentEndDate": "تاريخ الانتهاء الحالي"
+      },
+      "sections": {
+        "currentState": "الوضع الحالي",
+        "nextStep": "الخطوة التالية",
+        "setup": "إعداد الإجراء",
+        "notes": "ملاحظات تشغيلية"
+      },
+      "guidance": {
+        "activate": "اختر الخطة وتاريخ الانتهاء اللذين يجب تطبيقهما على هذه الشركة قبل تأكيد التفعيل.",
+        "changePlan": "راجع الخطة الحالية أولاً ثم اختر الخطة البديلة التي يجب تطبيقها فورًا.",
+        "extend": "حدد تاريخ الانتهاء الجديد الذي يجب اعتماده للاشتراك الحالي.",
+        "suspend": "استخدم التعليق عندما يجب إيقاف الوصول فورًا، ثم سجّل السبب التشغيلي قبل التأكيد."
+      },
+      "helpers": {
+        "planAndDate": "حدد الخطة المستهدفة والتاريخ الذي يجب أن يظل الاشتراك فعالاً حتى بلوغه.",
+        "extendDate": "اختر تاريخ التجديد الجديد الذي سيعتمد عليه فريق التشغيل والمالية.",
+        "noteOptional": "أضف ملاحظة داخلية إذا كان التفعيل يحتاج إلى مرجع واضح للدعم أو المتابعة المالية.",
+        "reasonOptional": "أضف سببًا تشغيليًا يوضح لماذا يتم تنفيذ هذا الإجراء على الاشتراك."
+      }
+    },
+    "governance": {
+      "title": "خط أساس الحوكمة",
+      "description": "كل إجراء عالي الخطورة يتطلب تأكيدًا صريحًا وتسجيل السبب.",
+      "requiredReason": "السبب مطلوب لتغيير الخطة والإيقاف.",
+      "requiredConfirm": "تأكيد الإجراء مطلوب قبل الإرسال."
+    },
+    "actionHistory": {
+      "title": "آخر الإجراءات التشغيلية (الجلسة الحالية)",
+      "description": "سجل مؤقت للإجراءات المنفذة حتى يتوفر Endpoint التدقيق في الباك إند.",
+      "empty": "لا توجد إجراءات منفذة في هذه الجلسة حتى الآن.",
+      "fields": {
+        "action": "الإجراء",
+        "company": "الشركة",
+        "at": "الوقت",
+        "reason": "السبب"
+      },
+      "kinds": {
+        "activate": "تفعيل",
+        "changePlan": "تغيير الخطة",
+        "extend": "تمديد",
+        "suspend": "إيقاف"
+      }
+    },
+    "timeline": {
+      "eyebrow": "سجل الاشتراكات",
+      "title": "الخط الزمني للاشتراك",
+      "fallbackCompany": "الشركة",
+      "emptyTitle": "لا يوجد خط زمني للاشتراك بعد",
+      "emptyDescription": "لم يتم العثور على سجلات اشتراك تاريخية لهذه الشركة.",
+      "createdAt": "أُنشئ في {date}",
+      "period": "فترة الاشتراك",
+      "paymentStatus": "حالة الدفع",
+      "autoRenew": "تجديد تلقائي",
+      "updatedAt": "آخر تحديث",
+      "daysLeft": "متبقي {count} يوم",
+      "noExpiry": "بدون تاريخ انتهاء",
+      "expiringSoon": "ينتهي قريبًا",
+      "yes": "نعم",
+      "no": "لا",
+      "payment": {
+        "PENDING": "معلق",
+        "PAID": "مدفوع",
+        "FAILED": "فشل",
+        "REFUNDED": "مسترد"
+      }
+    }
+  },
+  "plansManagement": {
+    "meta": {
+      "title": "إدارة الخطط | دفتر",
+      "description": "أنشئ وحدّث وتحكم في خطط المنصة من طبقة السوبر أدمن."
+    },
+    "eyebrow": "عمليات الخطط",
+    "heading": "إدارة الخطط",
+    "subheading": "تحكم في الأسعار والحدود وإتاحة الخطط المستخدمة عبر جميع تدفقات اشتراك الشركات.",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "unlimited": "غير محدود",
+    "billingCycle": {
+      "MONTHLY": "شهري",
+      "YEARLY": "سنوي"
+    },
+    "capacitySummary": "المستخدمون: {users} - العملاء: {customers}",
+    "cards": {
+      "total": {
+        "title": "إجمالي الخطط",
+        "description": "كل الخطط المعرفة في كتالوج المنصة."
+      },
+      "active": {
+        "title": "خطط نشطة",
+        "description": "الخطط المتاحة حاليًا للتعيين."
+      },
+      "monthly": {
+        "title": "خطط شهرية",
+        "description": "خطط بفوترة شهرية."
+      },
+      "assigned": {
+        "title": "خطط مُستخدمة",
+        "description": "الخطط المستخدمة حاليًا من شركة واحدة على الأقل."
+      }
+    },
+    "filters": {
+      "title": "فلاتر الخطط",
+      "description": "ابحث وضيّق نطاق الخطط قبل تطبيق التحديثات.",
+      "search": "ابحث باسم الخطة أو العملة",
+      "reset": "إعادة تعيين",
+      "status": {
+        "placeholder": "حالة الخطة",
+        "all": "كل الحالات",
+        "active": "خطط نشطة",
+        "inactive": "خطط غير نشطة"
+      },
+      "cycle": {
+        "placeholder": "دورة الفوترة",
+        "all": "كل الدورات"
+      }
+    },
+    "tableAriaLabel": "جدول خطط المنصة",
+    "tableCaption": "كتالوج خطط المنصة",
+    "table": {
+      "name": "الخطة",
+      "price": "السعر",
+      "capacity": "الحدود",
+      "features": "المزايا",
+      "assignedTenants": "الشركات المرتبطة",
+      "assignedEmpty": "لا توجد شركات",
+      "assignedSummary": "{count} شركة",
+      "assignedSubSummary": "نشطة: {active} - مؤرشفة: {archived}",
+      "status": "الحالة"
+    },
+    "actions": {
+      "create": "إنشاء خطة",
+      "edit": "تعديل",
+      "activate": "تفعيل",
+      "deactivate": "تعطيل"
+    },
+    "empty": {
+      "title": "لا توجد خطط",
+      "description": "جرّب تعديل الفلاتر أو أنشئ أول خطة."
+    },
+    "messages": {
+      "createSuccess": "تم إنشاء الخطة بنجاح.",
+      "createError": "تعذر إنشاء الخطة.",
+      "updateSuccess": "تم تحديث الخطة بنجاح.",
+      "updateError": "تعذر تحديث الخطة.",
+      "enableSuccess": "تم تفعيل الخطة بنجاح.",
+      "disableSuccess": "تم تعطيل الخطة بنجاح.",
+      "toggleError": "تعذر تغيير حالة الخطة.",
+      "invalidFeatures": "مفاتيح المزايا التالية غير صالحة: {features}",
+      "invalidFeaturesGeneric": "مفتاح ميزة واحد أو أكثر غير صالح."
+    },
+    "modal": {
+      "eyebrow": "نموذج الخطة",
+      "description": "حدّد تسعير الخطة وحدودها وإتاحتها.",
+      "titles": {
+        "create": "إنشاء خطة",
+        "edit": "تعديل الخطة"
+      },
+      "fields": {
+        "name": "اسم الخطة",
+        "price": "السعر",
+        "currencyCode": "رمز العملة",
+        "billingCycle": "دورة الفوترة",
+        "maxUsers": "الحد الأقصى للمستخدمين",
+        "maxCustomers": "الحد الأقصى للعملاء",
+        "maxSuppliers": "الحد الأقصى للموردين",
+        "maxEmployees": "الحد الأقصى للموظفين",
+        "maxLedgerEntries": "الحد الأقصى لقيود الدفتر",
+        "features": "المزايا (مفصولة بفواصل)",
+        "featuresHint": "مثال: تقارير, تصدير, فروع-متعددة",
+        "isActive": "الخطة نشطة"
+      },
+      "limitsHint": "اترك أي حقل حدود فارغًا ليبقى غير مقيّد افتراضيًا.",
+      "cancel": "إلغاء",
+      "submitting": "جارٍ الحفظ...",
+      "submit": {
+        "create": "إنشاء خطة",
+        "edit": "حفظ التغييرات"
+      }
+    }
+  }
+}

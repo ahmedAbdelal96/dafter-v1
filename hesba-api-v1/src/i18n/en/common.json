@@ -1,0 +1,44 @@
+{
+  "success": "Operation completed successfully",
+  "error": "An unexpected error occurred",
+  "badRequest": "Invalid request data",
+  "unauthorized": "Authentication required",
+  "forbidden": "You do not have permission to perform this action",
+  "notFound": "Requested resource not found",
+  "conflict": "Data conflict detected",
+  "internalServerError": "Internal server error. Please try again later",
+  "tooManyRequests": "Too many requests. Please wait",
+  "serviceUnavailable": "Service temporarily unavailable",
+  "validation": {
+    "isNotEmpty": "{field} is required",
+    "isString": "{field} must be a string",
+    "isNumber": "{field} must be a number",
+    "isEmail": "{field} must be a valid email",
+    "isPhoneNumber": "{field} must be a valid phone number",
+    "isDate": "{field} must be a valid date",
+    "isBoolean": "{field} must be true or false",
+    "isArray": "{field} must be an array",
+    "isUrl": "{field} must be a valid URL",
+    "isUUID": "{field} must be a valid UUID",
+    "isPositive": "{field} must be a positive number",
+    "min": "{field} must be at least {min}",
+    "max": "{field} must not exceed {max}",
+    "minLength": "{field} must be at least {min} characters",
+    "maxLength": "{field} must not exceed {max} characters",
+    "matches": "{field} format is invalid",
+    "isEnum": "{field} must be one of the allowed values"
+  },
+  "pagination": {
+    "invalidPage": "Invalid page number",
+    "invalidLimit": "Invalid page size"
+  },
+  "subscription": {
+    "noActiveSubscription": "No active subscription. Please contact platform admin",
+    "expired": "Your subscription has expired. Please renew",
+    "suspended": "Your subscription has been suspended",
+    "disabled": "Your subscription has been disabled. Please contact support",
+    "gracePeriod": "Your subscription has expired. {days} days remaining in grace period",
+    "trialExpiring": "{days} days remaining in your trial",
+    "limitReached": "You have reached the maximum limit for your current plan"
+  }
+}

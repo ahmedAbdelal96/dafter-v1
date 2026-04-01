@@ -1,0 +1,66 @@
+{
+  "title": "الدفتر",
+  "partyPicker": {
+    "title": "اختر طرف الحساب",
+    "searchPlaceholder": "بحث بالاسم...",
+    "tabs": {
+      "customers": "العملاء",
+      "suppliers": "الموردون",
+      "employees": "الموظفون"
+    },
+    "empty": "لا توجد أطراف مسجلة",
+    "emptyDesc": "أضف عملاء أو موردين أو موظفين أولاً"
+  },
+  "statement": {
+    "title": "كشف حساب",
+    "currentBalance": "الرصيد الحالي",
+    "openingBalance": "رصيد أول المدة",
+    "closingBalance": "رصيد آخر المدة",
+    "totalEntries": "عدد القيود",
+    "empty": "لا توجد قيود",
+    "emptyDesc": "لم يتم تسجيل أي معاملات لهذا الطرف بعد"
+  },
+  "entry": {
+    "create": "قيد جديد",
+    "type": "نوع القيد",
+    "amount": "المبلغ",
+    "amountPlaceholder": "0.00",
+    "description": "البيان",
+    "descriptionPlaceholder": "وصف المعاملة (اختياري)",
+    "date": "تاريخ القيد",
+    "dueDate": "تاريخ الاستحقاق",
+    "addDueDate": "إضافة تاريخ استحقاق",
+    "runningBalance": "الرصيد بعد القيد",
+    "createdAt": "تاريخ التسجيل",
+    "save": "حفظ القيد"
+  },
+  "entryType": {
+    "INVOICE": "فاتورة (مديونية)",
+    "PAYMENT": "سداد (دفعة)",
+    "RETURN": "مرتجع",
+    "ADJUSTMENT": "تسوية",
+    "ADVANCE": "سلفة",
+    "SALARY_PAYMENT": "دفع راتب",
+    "DEDUCTION": "خصم"
+  },
+  "balance": {
+    "positive": "مدين (له علينا)",
+    "negative": "دائن (علينا له)",
+    "zero": "رصيد متعادل"
+  },
+  "delete": {
+    "title": "حذف القيد",
+    "message": "هل أنت متأكد من حذف هذا القيد؟ سيتم تحديث الرصيد تلقائياً. لا يمكن التراجع.",
+    "confirm": "حذف القيد"
+  },
+  "errors": {
+    "loadFailed": "فشل تحميل كشف الحساب",
+    "retry": "إعادة المحاولة",
+    "createFailed": "فشل تسجيل القيد. تحقق من البيانات وأعد المحاولة."
+  },
+  "validation": {
+    "amountRequired": "المبلغ مطلوب",
+    "amountPositive": "يجب أن يكون المبلغ أكبر من صفر",
+    "typeRequired": "نوع القيد مطلوب"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "title": "Deferred Sales",
+  "singular": "Deferred Sale",
+  "list": {
+    "title": "Deferred Sales",
+    "empty": "No deferred sales yet",
+    "emptyDesc": "Record your first deferred sale",
+    "searchPlaceholder": "Search by name or reference..."
+  },
+  "detail": {
+    "title": "Deferred Sale Details",
+    "party": "Party",
+    "referenceNumber": "Reference Number",
+    "totalAmount": "Total Amount",
+    "paidAmount": "Paid",
+    "remainingAmount": "Remaining",
+    "progress": "Payment Progress",
+    "dueDate": "Due Date",
+    "entryDate": "Entry Date",
+    "status": "Status",
+    "description": "Description",
+    "paymentMethod": "Payment Method",
+    "payments": "Payment History",
+    "createInvoice": "Convert to Invoice",
+    "cancelSale": "Cancel Deferred Sale",
+    "cancelConfirm": "Are you sure you want to cancel this deferred sale?",
+    "cancelSuccess": "Deferred sale cancelled successfully"
+  },
+  "form": {
+    "create": "New Deferred Sale",
+    "partyType": "Party Type",
+    "partyTypePlaceholder": "Select party type",
+    "party": "Party",
+    "partyPlaceholder": "Party name / UUID",
+    "totalAmount": "Total Amount",
+    "amountPlaceholder": "0.00",
+    "dueDate": "Due Date",
+    "dueDatePlaceholder": "YYYY-MM-DD",
+    "description": "Description (optional)",
+    "descriptionPlaceholder": "Goods or service description",
+    "expectedPaymentMethod": "Expected Payment Method (optional)",
+    "paymentMethodPlaceholder": "Cash / Bank Transfer / Cheque",
+    "submit": "Save Deferred Sale"
+  },
+  "payment": {
+    "title": "Record Payment",
+    "amount": "Payment Amount",
+    "amountPlaceholder": "0.00",
+    "date": "Payment Date",
+    "datePlaceholder": "YYYY-MM-DD",
+    "method": "Payment Method (optional)",
+    "methodPlaceholder": "Cash / Transfer / Cheque",
+    "notes": "Notes (optional)",
+    "notesPlaceholder": "Transfer reference or any notes",
+    "submit": "Record Payment",
+    "empty": "No payments recorded yet"
+  },
+  "status": {
+    "PENDING": "Pending",
+    "PARTIAL": "Partially Paid",
+    "PAID": "Fully Paid",
+    "OVERDUE": "Overdue"
+  },
+  "partyType": {
+    "CUSTOMER": "Customer",
+    "SUPPLIER": "Supplier",
+    "EMPLOYEE": "Employee"
+  },
+  "filter": {
+    "all": "All",
+    "status": "Status",
+    "PENDING": "Pending",
+    "PARTIAL": "Partial",
+    "PAID": "Paid",
+    "OVERDUE": "Overdue"
+  },
+  "validation": {
+    "partyRequired": "Party is required",
+    "amountRequired": "Amount is required",
+    "amountPositive": "Amount must be greater than zero",
+    "dueDateRequired": "Due date is required",
+    "dueDateFormat": "Date format must be YYYY-MM-DD",
+    "paymentAmountRequired": "Payment amount is required",
+    "paymentDateRequired": "Payment date is required",
+    "paymentExceedsRemaining": "Payment amount exceeds remaining balance"
+  },
+  "error": {
+    "loadFailed": "Failed to load deferred sales",
+    "createFailed": "Failed to create deferred sale",
+    "paymentFailed": "Failed to record payment",
+    "cancelFailed": "Failed to cancel deferred sale"
+  }
+}

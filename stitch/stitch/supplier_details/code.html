@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex min-h-screen flex-col overflow-x-hidden">
+<!-- Header Section -->
+<header class="sticky top-0 z-10 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 border-b border-primary/10">
+<div class="flex w-12 items-center">
+<button class="p-2 hover:bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_forward</span>
+</button>
+</div>
+<h2 class="text-lg font-bold flex-1 text-center">تفاصيل المورد</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="p-2 hover:bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Supplier Profile Card -->
+<div class="p-6 flex flex-col items-center gap-4">
+<div class="relative">
+<div class="size-24 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary/30 overflow-hidden">
+<div class="w-full h-full bg-cover bg-center" data-alt="Supplier corporate logo placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC0-sMmVswF39Porl9oZ3Bc5wKLOa5rFzTPiHBXOLU2V3TLKK3pRq9i0Oi1-lCjRJfOoJA69tpkBWnoRM-d-VWxiZhnIA72m50smbmndY6hO1atJlX15zxqwr_H2f2PV_sAeTay8wZsWrSYug9UuidcUqFAWH99LQ9jcT9CDxsSt5EBUAcbEfLP7IIgkGt0fdn_6El5Wm_ylvmVkstkCApEOGwP4IqJX9gAm25qMI5qtcyQ6mJMu9n6Ds21YwCjT95IQPXFMWxVKbs');"></div>
+</div>
+<div class="absolute bottom-0 right-0 size-6 bg-primary rounded-full border-2 border-background-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-white">verified</span>
+</div>
+</div>
+<div class="text-center">
+<h1 class="text-2xl font-bold tracking-tight">شركة توريد الخليج المحدودة</h1>
+<p class="text-primary font-medium mt-1">مستلزمات مكتبية وتقنية</p>
+<div class="flex items-center justify-center gap-2 mt-2 text-slate-500 dark:text-slate-400 text-sm">
+<span class="material-symbols-outlined text-sm">person</span>
+<span>مسؤول التواصل: أحمد محمود</span>
+</div>
+</div>
+</div>
+<!-- KPI Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3 px-4 mb-6">
+<div class="bg-primary/10 dark:bg-primary/5 border border-primary/20 p-4 rounded-xl">
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium mb-1">إجمالي المشتريات</p>
+<p class="text-xl font-bold text-slate-900 dark:text-slate-100">٤٥,٠٠٠ <span class="text-xs font-normal">ر.س</span></p>
+</div>
+<div class="bg-primary border border-primary p-4 rounded-xl shadow-lg shadow-primary/20">
+<p class="text-white/80 text-xs font-medium mb-1">الرصيد الحالي المستحق</p>
+<p class="text-xl font-bold text-white">١٢,٥٠٠ <span class="text-xs font-normal">ر.س</span></p>
+</div>
+<div class="bg-primary/10 dark:bg-primary/5 border border-primary/20 p-4 rounded-xl">
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium mb-1">المبلغ المدفوع</p>
+<p class="text-xl font-bold text-slate-900 dark:text-slate-100">٣٢,٥٠٠ <span class="text-xs font-normal">ر.س</span></p>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="flex gap-2 px-4 mb-8 overflow-x-auto no-scrollbar">
+<button class="flex-1 flex items-center justify-center gap-2 bg-primary text-white py-3 px-4 rounded-xl font-bold text-sm whitespace-nowrap">
+<span class="material-symbols-outlined text-sm">add_shopping_cart</span>
+                شراء جديد
+            </button>
+<button class="flex-1 flex items-center justify-center gap-2 bg-primary/20 text-primary py-3 px-4 rounded-xl font-bold text-sm whitespace-nowrap">
+<span class="material-symbols-outlined text-sm">payments</span>
+                تسجيل دفعة
+            </button>
+<button class="flex items-center justify-center gap-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-3 px-4 rounded-xl font-bold text-sm whitespace-nowrap">
+<span class="material-symbols-outlined text-sm">description</span>
+                كشف حساب
+            </button>
+</div>
+<!-- Recent Transactions -->
+<div class="flex-1 bg-white dark:bg-slate-900/50 rounded-t-full pt-6 px-4 border-t border-primary/10">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-bold text-lg">العمليات الأخيرة</h3>
+<button class="text-primary text-sm font-medium">عرض الكل</button>
+</div>
+<div class="space-y-4 pb-24">
+<!-- Transaction Item 1 -->
+<div class="flex items-center justify-between p-3 rounded-xl hover:bg-primary/5 border border-transparent hover:border-primary/10 transition-all">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<div>
+<p class="font-bold text-sm">فاتورة مشتريات #INV-902</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">١٢ أكتوبر ٢٠٢٣</p>
+</div>
+</div>
+<div class="text-left">
+<p class="font-bold text-sm text-red-500">- ٤,٢٠٠ ر.س</p>
+<p class="text-[10px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded-full inline-block">آجل</p>
+</div>
+</div>
+<!-- Transaction Item 2 -->
+<div class="flex items-center justify-between p-3 rounded-xl hover:bg-primary/5 border border-transparent hover:border-primary/10 transition-all">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">receipt_long</span>
+</div>
+<div>
+<p class="font-bold text-sm">دفعة نقدية #PAY-441</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">٠٨ أكتوبر ٢٠٢٣</p>
+</div>
+</div>
+<div class="text-left">
+<p class="font-bold text-sm text-primary">+ ٣,٠٠٠ ر.س</p>
+<p class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full inline-block">مكتمل</p>
+</div>
+</div>
+<!-- Transaction Item 3 -->
+<div class="flex items-center justify-between p-3 rounded-xl hover:bg-primary/5 border border-transparent hover:border-primary/10 transition-all">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<div>
+<p class="font-bold text-sm">فاتورة مشتريات #INV-885</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">٠١ أكتوبر ٢٠٢٣</p>
+</div>
+</div>
+<div class="text-left">
+<p class="font-bold text-sm text-red-500">- ٧,٥٠٠ ر.س</p>
+<p class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full inline-block">مدفوع</p>
+</div>
+</div>
+<!-- Transaction Item 4 -->
+<div class="flex items-center justify-between p-3 rounded-xl hover:bg-primary/5 border border-transparent hover:border-primary/10 transition-all">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<div>
+<p class="font-bold text-sm">تحويل بنكي #PAY-430</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">٢٥ سبتمبر ٢٠٢٣</p>
+</div>
+</div>
+<div class="text-left">
+<p class="font-bold text-sm text-primary">+ ١٠,٠٠٠ ر.س</p>
+<p class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full inline-block">مكتمل</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 border-t border-primary/10 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-lg px-4 pb-6 pt-2 z-20">
+<div class="flex items-center justify-between gap-2 max-w-lg mx-auto">
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium leading-none">الرئيسية</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="text-[10px] font-medium leading-none">الموردين</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-[10px] font-medium leading-none">التقارير</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium leading-none">الإعدادات</span>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

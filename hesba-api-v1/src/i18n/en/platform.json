@@ -1,0 +1,136 @@
+{
+  "companies": {
+    "create": {
+      "success": "Company and owner account created successfully",
+      "emailExists": "This email is already registered in the system",
+      "planNotFound": "The specified plan was not found or is inactive",
+      "failed": "Failed to create company"
+    },
+    "update": {
+      "success": "Company updated successfully",
+      "notFound": "Company not found",
+      "failed": "Failed to update company"
+    },
+    "disable": {
+      "success": "Company disabled successfully",
+      "notFound": "Company not found",
+      "failed": "Failed to disable company"
+    },
+    "enable": {
+      "success": "Company enabled successfully",
+      "notFound": "Company not found",
+      "failed": "Failed to enable company"
+    },
+    "archive": {
+      "success": "Company archived successfully",
+      "notFound": "Company not found",
+      "failed": "Failed to archive company"
+    },
+    "restore": {
+      "success": "Company restored successfully",
+      "notFound": "Company not found",
+      "failed": "Failed to restore company"
+    },
+    "delete": {
+      "success": "Company deleted permanently",
+      "notFound": "Company not found",
+      "confirmNameMismatch": "Confirmation name does not match company name",
+      "mustDisableFirst": "Disable company before permanent deletion",
+      "hasActiveSubscriptions": "Cannot delete company with active/trial/suspended subscriptions",
+      "failed": "Failed to delete company"
+    },
+    "list": {
+      "success": "Companies retrieved successfully"
+    },
+    "get": {
+      "success": "Company details retrieved successfully",
+      "notFound": "Company not found"
+    },
+    "metrics": {
+      "success": "Company metrics retrieved successfully",
+      "notFound": "Company not found"
+    }
+  },
+  "plans": {
+    "create": {
+      "success": "Plan created successfully",
+      "nameExists": "A plan with this name already exists",
+      "failed": "Failed to create plan"
+    },
+    "list": {
+      "success": "Plans retrieved successfully"
+    },
+    "get": {
+      "success": "Plan details retrieved successfully",
+      "notFound": "Plan not found"
+    },
+    "update": {
+      "success": "Plan updated successfully",
+      "notFound": "Plan not found",
+      "nameExists": "Another plan with this name already exists"
+    }
+  },
+  "subscriptions": {
+    "activate": {
+      "success": "Subscription activated successfully",
+      "companyNotFound": "Company not found",
+      "planNotFound": "Plan not found or inactive",
+      "upgradeNotAllowed": "Plan upgrade is currently disabled by platform policy",
+      "downgradeNotAllowed": "Plan downgrade is currently disabled by platform policy",
+      "failed": "Failed to activate subscription"
+    },
+    "suspend": {
+      "success": "Subscription suspended successfully",
+      "companyNotFound": "Company not found",
+      "noActiveSubscription": "No active subscription found for this company",
+      "failed": "Failed to suspend subscription"
+    },
+    "extend": {
+      "success": "Subscription extended successfully",
+      "companyNotFound": "Company not found",
+      "noSubscription": "No subscription found for this company",
+      "invalidDate": "The new end date must be in the future",
+      "failed": "Failed to extend subscription"
+    }
+  },
+  "users": {
+    "create": {
+      "success": "Platform user created successfully"
+    },
+    "list": {
+      "success": "Platform users retrieved successfully"
+    },
+    "get": {
+      "success": "Platform user retrieved successfully"
+    },
+    "update": {
+      "success": "Platform user updated successfully"
+    },
+    "disable": {
+      "success": "Platform user disabled successfully"
+    },
+    "enable": {
+      "success": "Platform user enabled successfully"
+    },
+    "credentialsReset": {
+      "success": "Credentials reset code sent successfully"
+    },
+    "permissions": {
+      "updated": "Platform user permissions updated successfully"
+    },
+    "stats": {
+      "success": "Platform users statistics retrieved successfully"
+    }
+  },
+  "audit": {
+    "list": {
+      "success": "Platform audit logs retrieved successfully",
+      "invalidDateRange": "Invalid date range. \"fromDate\" must be before or equal to \"toDate\"",
+      "failed": "Failed to retrieve platform audit logs"
+    },
+    "lookups": {
+      "success": "Platform audit lookups retrieved successfully",
+      "failed": "Failed to retrieve platform audit lookups"
+    }
+  }
+}

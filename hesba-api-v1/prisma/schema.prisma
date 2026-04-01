@@ -1,0 +1,1265 @@
+// ============================================================
+// Hesabatak (حساباتك) — Production-ready Prisma Schema
+// Stack: NestJS + PostgreSQL + Prisma
+//
+// Design goals:
+// - Multi-tenant (single DB): every tenant-owned row has companyId
+// - Strong performance: thoughtful indexes for common queries
+// - Maintainability: clear enums, consistent naming, soft-delete fields
+// - Scalable RBAC: simple roles now, expandable to fine-grained permissions
+// - Ledger engine: unified ledger_entries + balances for fast reads
+// - SaaS billing: plans + subscriptions + payments (managed by Super Admin)
+//
+// Notes (IMPORTANT):
+// - Prisma cannot enforce Row Level Security (RLS). Tenant isolation MUST be enforced
+//   in NestJS services/guards by always scoping queries to companyId.
+// - Ledger write operations MUST run inside prisma.$transaction() to keep
+//   ledger_entries + balances + audit_logs consistent.
+// - Opening balances strategy (DECIDED):
+//   * openingBalance is stored on party (Customer/Supplier/Employee).
+//   * Balance.balance stores the CURRENT balance.
+//   * On party creation, the service MUST initialize Balance.balance = openingBalance (transaction).
+//   * Afterwards, every ledger entry updates Balance.balance incrementally.
+//   * Optional repair endpoint can recompute from openingBalance + SUM(ledger signedAmount).
+//
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// -------------------------
+// ENUMS
+// -------------------------
+
+enum UserRole {
+  // Company-level roles
+  OWNER
+  STAFF
+
+  // Platform-level role
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum PartyType {
+  CUSTOMER
+  SUPPLIER
+  EMPLOYEE
+}
+
+enum LedgerEntryType {
+  // Generic
+  INVOICE
+  PAYMENT
+  RETURN
+  ADJUSTMENT
+
+  // Employee-focused (optional in MVP)
+  ADVANCE
+  SALARY_PAYMENT
+  DEDUCTION
+  SETTLEMENT
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  EXPIRED
+  SUSPENDED
+  DISABLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum CashReconciliationMode {
+  DISABLED
+  SIMPLE_DAILY
+}
+
+enum CashReconciliationStatus {
+  DRAFT
+  CLOSED
+}
+
+// ── Phase 3: Expenses Enum ─────────────────────────────────────────────────
+
+// Classifies what the money was spent on — drives category filtering & pie charts.
+enum ExpenseCategory {
+  RENT // إيجار
+  SALARIES // رواتب
+  UTILITIES // مرافق (كهرباء / مياه / إنترنت)
+  SUPPLIES // مستلزمات / بضاعة
+  TRANSPORTATION // مواصلات / شحن
+  MAINTENANCE // صيانة
+  MARKETING // تسويق وإعلان
+  TAXES // ضرائب ورسوم
+  OTHER // أخرى
+}
+
+// ── Phase 2: Sale & Installment Enums ─────────────────────────────────────
+
+// Categorises a LedgerEntry so the frontend can distinguish
+// immediate cash sales from deferred (آجل) and installment (أقساط) sales.
+enum SaleType {
+  CASH
+  DEFERRED // بيع آجل — single future due date, supports partial payments
+  INSTALLMENT // بيع بالتقسيط — structured schedule of multiple payments
+}
+
+// Lifecycle of a single deferred (آجل) sale.
+// Transitions: PENDING → PARTIAL (first partial pay) → PAID (fully settled)
+//                      → OVERDUE (daily job flips after dueDate passes)
+enum DeferredSaleStatus {
+  PENDING // لم يُدفع بعد
+  PARTIAL // دُفع جزء منه
+  PAID // مسدد بالكامل
+  OVERDUE // متأخر — dueDate مرّ ولم يُسدَّد
+}
+
+// Lifecycle of an installment contract.
+enum InstallmentStatus {
+  ACTIVE // جاري — still has pending/partial schedules
+  COMPLETED // مكتمل — all schedules paid
+  CANCELLED // ملغي — cancelled before completion
+  DEFAULTED // متوقف عن السداد — admin/manual override
+}
+
+// Lifecycle of a single instalment row in the schedule.
+enum ScheduleStatus {
+  PENDING // لم يحل موعده أو حلّ ولم يُدفع
+  PARTIAL // دُفع جزء منه
+  PAID // مسدد
+  OVERDUE // متأخر — daily job flips after dueDate passes
+  WAIVED // أُعفي منه
+}
+
+// How the instalment schedule was built.
+enum ScheduleType {
+  FIXED // جميع الأقساط بنفس المبلغ — generated automatically
+  CUSTOM // التاجر يدخل كل قسط يدوياً — irregular amounts or intervals
+}
+
+// -------------------------
+// COMMON FIELD PATTERN NOTES
+// -------------------------
+// Soft delete:
+// - We keep isDeleted + deletedAt.
+// - Services must default-filter isDeleted=false for user-facing reads.
+// - Hard deletes are avoided for auditability.
+//
+// Date/time:
+// - createdAt/updatedAt are DateTime (timestamptz in Postgres).
+// - Ledger uses entryDate (date) for reporting and dueDate (date) for aging.
+// -------------------------
+
+// ============================================================
+// PLATFORM / AUTH
+// ============================================================
+
+model User {
+  id           String     @id @default(uuid()) @db.Uuid
+  email        String     @unique
+  passwordHash String
+  fullName     String?
+  phone        String?
+  status       UserStatus @default(ACTIVE)
+  role         UserRole   @default(STAFF)
+
+  // Tenant membership
+  // - SUPER_ADMIN users may have companyId = null.
+  companyId String?  @db.Uuid
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  // Simple, extendable permissions (for STAFF users)
+  // - OWNER can be treated as "all true" in code (no row required),
+  //   or you can still create a row for OWNER if you prefer consistency.
+  permissions StaffPermission?
+
+  // Security / sessions (refresh token rotation)
+  refreshTokens       RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+
+  // Notifications
+  deviceTokens  DeviceToken[]  @relation("UserDeviceTokens")
+  notifications Notification[] @relation("UserNotifications")
+
+  // Audit relations (who created ledger entries, etc.)
+  createdLedgerEntries LedgerEntry[] @relation("LedgerCreatedBy")
+  auditLogs            AuditLog[]    @relation("AuditActor")
+
+  // Phase 2: back-references for deferred sales & installments
+  createdDeferredSales        DeferredSale[]        @relation("DeferredSaleCreatedBy")
+  createdDeferredPayments     DeferredPayment[]     @relation("DeferredPaymentCreatedBy")
+  createdInstallmentContracts InstallmentContract[] @relation("InstallmentContractCreatedBy")
+  createdInstallmentPayments  InstallmentPayment[]  @relation("InstallmentPaymentCreatedBy")
+
+  // Phase 3: back-reference for expenses
+  createdExpenses Expense[] @relation("ExpenseCreatedBy")
+
+  // Phase 4: back-reference for products catalog
+  createdProducts Product[] @relation("ProductCreatedBy")
+
+  // Phase K: back-reference for invoices
+  createdInvoices Invoice[] @relation("InvoiceCreatedBy")
+
+  // P2-BE-1: back-reference for customer product prices
+  updatedCustomerProductPrices CustomerProductPrice[] @relation("CustomerProductPriceUpdatedBy")
+
+  // Optimistic locking
+  version Int @default(0)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  @@index([companyId, status])
+  @@index([role])
+  @@index([companyId, isDeleted]) // list company users fast
+}
+
+// ============================================================
+// PASSWORD RESET TOKENS
+// ============================================================
+// Flow: user requests reset → OTP generated → hashed OTP stored here
+//       → OTP sent via email (Gmail) or WhatsApp (Twilio)
+//       → user submits OTP + new password → token marked used + password updated
+//
+// Security:
+//   - Only the SHA-256 hash of the OTP is stored (never raw OTP)
+//   - Token is single-use (usedAt is set on consumption)
+//   - Expires after 15 minutes
+//   - All previous reset tokens for a user are deleted on new request
+// ============================================================
+
+model PasswordResetToken {
+  id String @id @default(uuid()) @db.Uuid
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // SHA-256 hash of the 6-digit OTP
+  tokenHash String
+
+  // Channel used to deliver the OTP
+  channel String // 'email' | 'whatsapp'
+
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model RefreshToken {
+  id String @id @default(uuid()) @db.Uuid
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Store a HASH of the refresh token (never store the raw token).
+  // Hash must be unique so stolen/duplicated tokens can be detected & revoked deterministically.
+  tokenHash String @unique
+
+  // Optional metadata (useful for "logout this device" and fraud detection)
+  deviceId  String?
+  userAgent String?
+  ip        String?
+
+  revokedAt DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+}
+
+// ============================================================
+// TENANT (COMPANY) + BILLING
+// ============================================================
+
+model Company {
+  id           String  @id @default(uuid()) @db.Uuid
+  name         String
+  phone        String?
+  address      String?
+  currencyCode String  @default("EGP")
+  cashReconciliationMode      CashReconciliationMode @default(DISABLED)
+  cashModeUpdatedByUserId     String?                @db.Uuid
+  cashModeUpdatedAt           DateTime?
+
+  // Emergency kill-switch by Super Admin (doesn't replace subscription logic)
+  isActive Boolean @default(true)
+
+  // Optimistic locking
+  version Int @default(0)
+
+  users         User[]
+  customers     Customer[]
+  suppliers     Supplier[]
+  employees     Employee[]
+  ledgerEntries LedgerEntry[]
+  balances      Balance[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
+  cashReconciliations CashReconciliationDaily[]
+
+  subscriptions CompanySubscription[]
+  payments      SubscriptionPayment[]
+
+  // Phase 2
+  deferredSales        DeferredSale[]
+  installmentContracts InstallmentContract[]
+
+  // Phase 3
+  expenses Expense[]
+
+  // Phase 4
+  products Product[]
+
+  // Phase K
+  invoices Invoice[]
+
+  // P2-BE-1
+  customerProductPrices CustomerProductPrice[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  @@index([isActive, isDeleted])
+  @@index([name])
+}
+
+model Plan {
+  id           String       @id @default(uuid()) @db.Uuid
+  name         String       @unique
+  price        Decimal      @default(0.00) @db.Decimal(14, 2)
+  currencyCode String       @default("EGP")
+  billingCycle BillingCycle
+
+  // Limits: null means unlimited
+  maxUsers         Int?
+  maxCustomers     Int?
+  maxSuppliers     Int?
+  maxEmployees     Int?
+  maxLedgerEntries BigInt?
+
+  // Flexible feature flags (future-proof)
+  features      Json                  @default("[]")
+  isActive      Boolean               @default(true)
+  subscriptions CompanySubscription[]
+
+  createdAt DateTime @default(now())
+
+  @@index([isActive])
+}
+
+model CompanySubscription {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  planId String @db.Uuid
+  plan   Plan   @relation(fields: [planId], references: [id])
+
+  status        SubscriptionStatus @default(TRIAL)
+  startDate     DateTime           @default(now())
+  endDate       DateTime
+  autoRenew     Boolean            @default(false)
+  paymentStatus PaymentStatus      @default(PENDING)
+
+  payments  SubscriptionPayment[]
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+
+  // IMPORTANT: This is queried frequently; keep index tight.
+  // NOTE: A partial unique index is enforced via SQL migration:
+  //   CompanySubscription_one_live_per_company_idx
+  // It guarantees at most one live subscription (TRIAL/ACTIVE/SUSPENDED)
+  // per company. Prisma schema cannot currently express partial unique indexes.
+  @@index([companyId, status, endDate])
+  @@index([companyId, endDate])
+  @@index([planId])
+}
+
+model CashReconciliationDaily {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  businessDate DateTime @db.Date
+  status       CashReconciliationStatus @default(DRAFT)
+
+  openingCash             Decimal @default(0.00) @db.Decimal(14, 2)
+  cashSalesOutsideSystem  Decimal @default(0.00) @db.Decimal(14, 2)
+  cashExpensesOutsideSystem Decimal @default(0.00) @db.Decimal(14, 2)
+  actualCashCounted       Decimal @default(0.00) @db.Decimal(14, 2)
+  expectedCash            Decimal @default(0.00) @db.Decimal(14, 2)
+  variance                Decimal @default(0.00) @db.Decimal(14, 2)
+
+  note String?
+
+  createdByUserId String? @db.Uuid
+  updatedByUserId String? @db.Uuid
+  closedByUserId  String? @db.Uuid
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  closedAt  DateTime?
+
+  @@unique([companyId, businessDate])
+  @@index([companyId, status, businessDate])
+  @@index([companyId, createdAt])
+}
+
+model SubscriptionPayment {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  subscriptionId String              @db.Uuid
+  subscription   CompanySubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  amount        Decimal       @db.Decimal(14, 2)
+  currencyCode  String        @default("EGP")
+  paymentMethod String?
+  paymentRef    String?
+  paymentDate   DateTime?
+  status        PaymentStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+
+  @@index([companyId, status, createdAt])
+  @@index([subscriptionId])
+}
+
+// ============================================================
+// RBAC (SIMPLE NOW, EXTENDABLE)
+// ============================================================
+// Simple approach for MVP:
+// - User.role: OWNER/STAFF within company
+// - StaffPermission: boolean flags for grouped capabilities
+// - Later: introduce Role + Permission tables for fine-grained keys.
+// ============================================================
+
+model StaffPermission {
+  id String @id @default(uuid()) @db.Uuid
+
+  userId String @unique @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // JSON map of permission flags.
+  // Shape: { manageUsers: bool, viewParties: bool, manageParties: bool, ... }
+  // Adding a new permission = no migration needed, just update the app code.
+  // Default is empty object → all permissions false by application logic.
+  permissions Json @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================
+// PARTIES (CUSTOMERS / SUPPLIERS / EMPLOYEES)
+// ============================================================
+// Opening balances:
+// - Stored here.
+// - Balance model stores CURRENT balance.
+// - Services MUST initialize Balance row upon party creation to openingBalance.
+// ============================================================
+
+model Customer {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name           String
+  phone          String?
+  address        String?
+  openingBalance Decimal  @default(0.00) @db.Decimal(14, 2)
+  creditLimit    Decimal? @db.Decimal(14, 2)
+  isActive       Boolean  @default(true)
+
+  // Optimistic locking — prevents concurrent update conflicts
+  // Client must send the version it read; if changed by another user → 409 Conflict
+  version Int @default(0)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  customerProductPrices CustomerProductPrice[] @relation("CustomerProductPrices")
+
+  @@index([companyId, isDeleted, isActive])
+  @@index([companyId, name])
+}
+
+model Supplier {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name           String
+  phone          String?
+  address        String?
+  openingBalance Decimal @default(0.00) @db.Decimal(14, 2)
+  isActive       Boolean @default(true)
+
+  // Optimistic locking
+  version Int @default(0)
+
+  // Phase 3: expenses linked to this supplier (optional)
+  expenses Expense[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  @@index([companyId, isDeleted, isActive])
+  @@index([companyId, name])
+}
+
+model Employee {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name           String
+  phone          String?
+  jobTitle       String?
+  openingBalance Decimal @default(0.00) @db.Decimal(14, 2)
+  isActive       Boolean @default(true)
+
+  // Optimistic locking
+  version Int @default(0)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  @@index([companyId, isDeleted, isActive])
+  @@index([companyId, name])
+}
+
+// ============================================================
+// LEDGER ENGINE (CORE)
+// ============================================================
+// Polymorphic party relation:
+// - partyType + partyId (UUID) identifies the party.
+// - No FK constraint possible here; enforce existence in service layer.
+// - Keep strong index for statements and lookups.
+// ============================================================
+
+model LedgerEntry {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  partyType PartyType
+  partyId   String    @db.Uuid
+
+  entryType    LedgerEntryType
+  signedAmount Decimal         @db.Decimal(14, 2)
+
+  entryDate DateTime  @db.Date
+  dueDate   DateTime? @db.Date
+  note      String?
+
+  // Phase 2: Sale type classification.
+  // null   → regular ledger entry (cash or non-sale)
+  // non-null → categorises the entry for frontend display and reporting.
+  saleType SaleType?
+
+  createdById String @db.Uuid
+  createdBy   User   @relation("LedgerCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  // Critical indexes for performance (statements, lists, due items):
+  @@index([companyId, partyType, partyId, entryDate(sort: Desc), createdAt(sort: Desc)])
+  @@index([companyId, dueDate])
+  @@index([companyId, createdAt(sort: Desc)])
+  @@index([createdById])
+}
+
+// Current balance per party for fast queries
+model Balance {
+  companyId String    @db.Uuid
+  partyType PartyType
+  partyId   String    @db.Uuid
+
+  // CURRENT balance (initialized with openingBalance on party create)
+  balance Decimal @default(0.00) @db.Decimal(14, 2)
+
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([companyId, partyType, partyId])
+  @@index([companyId, partyType])
+}
+
+// ============================================================
+// AUDIT LOGGING
+// ============================================================
+
+model AuditLog {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  actorUserId String @db.Uuid
+  actorUser   User   @relation("AuditActor", fields: [actorUserId], references: [id])
+
+  action     String // e.g. "invoice.approve", "invoice.update"
+  entityType String // e.g. "Invoice", "Customer"
+  entityId   String? @db.Uuid
+  metadata   Json    @default("{}")
+  diff       Json? // before/after snapshot for tracked fields (price, discount, status…)
+
+  createdAt DateTime @default(now())
+
+  @@index([companyId, createdAt(sort: Desc)])
+  @@index([actorUserId, createdAt(sort: Desc)])
+  @@index([entityType, entityId])
+  @@index([action])
+}
+
+// ============================================================
+// OPTIONAL: MATERIALIZED LIMIT COUNTERS (Future)
+// ============================================================
+// If you later want ultra-fast plan enforement without counting rows,
+// you can add CompanyUsage model to track counts incrementally.
+// For MVP, counts can be computed with indcexed count(*) queries.
+//
+// model CompanyUsage {
+//   companyId        String  @id @db.Uuid
+//   company          Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+//   usersCount       Int     @default(0)
+//   customersCount   Int     @default(0)
+//   suppliersCount   Int     @default(0)
+//   employeesCount   Int     @default(0)
+//   ledgerCount      BigInt  @default(0)
+//   updatedAt        DateTime @updatedAt
+// }
+//
+// ============================================================
+// END
+// ============================================================
+
+// ============================================================
+// PHASE 2: DEFERRED SALES (بيع الآجل)
+// ============================================================
+//
+// Design decisions:
+// - DeferredSale is the "header" that tracks aggregate state (paidAmount, status).
+// - DeferredPayment is a lightweight link between a PAYMENT LedgerEntry and its
+//   parent deferred sale — the actual financial record lives in LedgerEntry.
+// - partyType is stored (not just customerId) so deferred sales can be issued
+//   to Suppliers or Employees in the future without a schema migration.
+// - referenceNumber is human-readable: DEF-{YYYY}-{NNNN}.
+// - paidAmount is updated incrementally in the same transaction as the payment
+//   LedgerEntry to keep them consistent. Never compute from children in queries.
+// ============================================================
+
+model DeferredSale {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  // Polymorphic party — same pattern as LedgerEntry
+  partyType PartyType
+  partyId   String    @db.Uuid
+
+  // The INVOICE LedgerEntry that booked the full debt on party creation.
+  // Unique ensures 1:1 — one deferred sale = one opening invoice.
+  ledgerEntryId String @unique @db.Uuid
+
+  // Human-readable reference: DEF-2024-0001
+  referenceNumber String
+  description     String? @db.VarChar(500)
+
+  totalAmount Decimal @db.Decimal(14, 2)
+
+  // Incremented atomically on each payment. Stored for O(1) read.
+  // Rule: paidAmount <= totalAmount always.
+  paidAmount Decimal @default(0.00) @db.Decimal(14, 2)
+
+  dueDate DateTime           @db.Date
+  status  DeferredSaleStatus @default(PENDING)
+
+  createdById String @db.Uuid
+  createdBy   User   @relation("DeferredSaleCreatedBy", fields: [createdById], references: [id])
+
+  // Optimistic locking — concurrent payment recording prevention
+  version Int @default(0)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  payments DeferredPayment[]
+
+  // Phase K: an invoice can be generated from this sale (at most one)
+  invoice Invoice?
+
+  @@index([companyId, partyType, partyId, status])
+  @@index([companyId, dueDate, status]) // daily overdue job + collection report
+  @@index([companyId, referenceNumber]) // lookup by ref number
+  @@index([companyId, createdAt(sort: Desc)]) // list with default sort
+}
+
+// Each row represents one payment instalment against a DeferredSale.
+// The financial record is the referenced LedgerEntry (PAYMENT, saleType=DEFERRED).
+model DeferredPayment {
+  id        String @id @default(uuid()) @db.Uuid
+  companyId String @db.Uuid
+
+  deferredSaleId String       @db.Uuid
+  deferredSale   DeferredSale @relation(fields: [deferredSaleId], references: [id], onDelete: Cascade)
+
+  // The PAYMENT LedgerEntry created alongside this record (atomic transaction).
+  // Unique — one payment record per ledger entry.
+  ledgerEntryId String @unique @db.Uuid
+
+  amount        Decimal  @db.Decimal(14, 2)
+  paymentDate   DateTime @db.Date
+  paymentMethod String?  @db.VarChar(100) // نقد / تحويل بنكي / شيك / إلخ
+  notes         String?  @db.VarChar(500)
+
+  createdById String @db.Uuid
+  createdBy   User   @relation("DeferredPaymentCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([companyId, deferredSaleId])
+  @@index([companyId, paymentDate])
+}
+
+// ============================================================
+// PHASE 2: INSTALLMENT CONTRACTS (بيع بالتقسيط)
+// ============================================================
+//
+// Design decisions:
+// - InstallmentContract is the header; InstallmentSchedule holds individual
+//   due rows; InstallmentPayment records each payment hit against a schedule row.
+// - paidAmount on Contract is kept in sync (incremented atomically) for O(1) reads.
+// - scheduleType=FIXED: server generates rows automatically (totalAmount/n per month).
+//   scheduleType=CUSTOM: client sends rows manually (irregular amounts/dates).
+// - downPayment is recorded as a separate PAYMENT LedgerEntry on contract creation.
+// - contractNumber format: CNT-{YYYY}-{NNNN}.
+// ============================================================
+
+model InstallmentContract {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  // Polymorphic party — extensible to Supplier/Employee
+  partyType PartyType
+  partyId   String    @db.Uuid
+
+  // The INVOICE LedgerEntry that booked the full debt (totalAmount - downPayment).
+  ledgerEntryId String @unique @db.Uuid
+
+  contractNumber String // CNT-2024-0001
+  description    String? @db.VarChar(500)
+
+  totalAmount Decimal @db.Decimal(14, 2) // إجمالي قيمة البيع
+  downPayment Decimal @default(0.00) @db.Decimal(14, 2) // المقدم (paid upfront)
+
+  // Incremented atomically on each payment. Includes downPayment.
+  paidAmount Decimal @default(0.00) @db.Decimal(14, 2)
+
+  numberOfInstallments Int
+  scheduleType         ScheduleType
+  startDate            DateTime     @db.Date // تاريخ أول قسط
+
+  status InstallmentStatus @default(ACTIVE)
+
+  createdById String @db.Uuid
+  createdBy   User   @relation("InstallmentContractCreatedBy", fields: [createdById], references: [id])
+
+  // Optimistic locking
+  version Int @default(0)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  schedules InstallmentSchedule[]
+
+  @@index([companyId, partyType, partyId, status])
+  @@index([companyId, status])
+  @@index([companyId, contractNumber]) // lookup by number
+  @@index([companyId, createdAt(sort: Desc)])
+}
+
+// One row per instalment in the schedule.
+// Tracks how much was paid against each individual due date.
+model InstallmentSchedule {
+  id        String @id @default(uuid()) @db.Uuid
+  companyId String @db.Uuid
+
+  contractId String              @db.Uuid
+  contract   InstallmentContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  installmentNumber Int // 1, 2, 3, … for ordering and display
+  dueDate           DateTime @db.Date
+  amount            Decimal  @db.Decimal(14, 2) // المبلغ المستحق لهذا القسط
+
+  // Incremented atomically on each payment. Stored for O(1) reads.
+  paidAmount Decimal @default(0.00) @db.Decimal(14, 2)
+
+  status ScheduleStatus @default(PENDING)
+  paidAt DateTime? // set when status reaches PAID
+  notes  String?        @db.VarChar(500)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  payments InstallmentPayment[]
+
+  @@index([companyId, contractId, installmentNumber])
+  @@index([companyId, dueDate, status]) // daily overdue job + upcoming schedule report
+}
+
+// Records a single payment hit against a schedule row.
+// The financial record lives in the referenced PAYMENT LedgerEntry.
+model InstallmentPayment {
+  id        String @id @default(uuid()) @db.Uuid
+  companyId String @db.Uuid
+
+  contractId String @db.Uuid
+  scheduleId String @db.Uuid
+
+  schedule InstallmentSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  // The PAYMENT LedgerEntry created in the same transaction.
+  ledgerEntryId String @unique @db.Uuid
+
+  amount        Decimal  @db.Decimal(14, 2)
+  paymentDate   DateTime @db.Date
+  paymentMethod String?  @db.VarChar(100)
+  notes         String?  @db.VarChar(500)
+
+  createdById String @db.Uuid
+  createdBy   User   @relation("InstallmentPaymentCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([companyId, contractId])
+  @@index([companyId, scheduleId])
+  @@index([companyId, paymentDate])
+}
+
+// ============================================================
+// PUSH NOTIFICATIONS
+// ============================================================
+
+// Stores Expo push tokens per user per device.
+// One user can have many devices (phone + tablet, iOS + Android).
+// Tokens are deactivated on logout rather than deleted (preserves history).
+model DeviceToken {
+  id String @id @default(uuid()) @db.Uuid
+
+  userId String @db.Uuid
+  user   User   @relation("UserDeviceTokens", fields: [userId], references: [id], onDelete: Cascade)
+
+  // Expo push token format: "ExponentPushToken[xxxx]"
+  // Unique constraint prevents duplicate registrations for same device.
+  token String @unique
+
+  // Client platform — used for analytics and future platform-specific delivery
+  platform String // 'ios' | 'android' | 'web'
+
+  // Human-readable device name sent from the app (e.g. "iPhone 15 Pro")
+  deviceName String?
+
+  // false after explicit logout/unregister — kept for audit trail
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, isActive]) // fast: get all active tokens for a user
+  @@index([token]) // fast: look up token for deduplication
+}
+
+// In-app notification records.
+// Every push notification has a corresponding DB record for:
+//   1. In-app notification feed (unread badge, history list)
+//   2. Audit trail (when was it created/sent/read)
+//   3. Retry logic (sentAt=null means not yet pushed)
+model Notification {
+  id String @id @default(uuid()) @db.Uuid
+
+  // Personal notification — always targeted at a specific user
+  userId String @db.Uuid
+  user   User   @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+
+  // Optional company scope for multi-tenant context
+  companyId String?  @db.Uuid
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  // Notification type for client-side routing/icons
+  // Convention: '{module}.{event}', e.g. 'ledger.created', 'invoice.overdue'
+  type String
+
+  // Content
+  title String // Push title and in-app heading
+  body  String // Push body and in-app description
+
+  // Extra payload for deep-linking on the mobile side
+  // e.g. { screen: 'LedgerDetail', entryId: 'uuid' }
+  data Json @default("{}")
+
+  // State tracking
+  readAt DateTime? // null = unread
+  sentAt DateTime? // null = push not yet sent (queued or pending)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, readAt]) // fast: unread count + filter unread
+  @@index([userId, createdAt(sort: Desc)]) // fast: notification feed
+  @@index([companyId, createdAt(sort: Desc)]) // fast: company-level queries
+}
+
+// ============================================================
+// PHASE 3: EXPENSES (المصروفات)
+// ============================================================
+//
+// Design decisions:
+// - Each expense belongs to a Company; supplierId is optional (links a vendor).
+// - category (ExpenseCategory enum) drives UI grouping and pie-chart analytics.
+// - referenceNumber is free-text (receipt / invoice number from vendor).
+// - No LedgerEntry link in MVP — expenses live in their own table for simplicity.
+//   (A future migration can add a journal-entry bridge if double-entry is needed.)
+// - Soft-deleted with isDeleted + deletedAt for full auditability.
+// ============================================================
+
+model Expense {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  // Optional: link to a supplier / vendor this expense was paid to
+  supplierId String?   @db.Uuid
+  supplier   Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+
+  category    ExpenseCategory
+  amount      Decimal         @db.Decimal(14, 2)
+  expenseDate DateTime        @db.Date
+
+  // Human-readable note; stored in the expense itself (not i18n)
+  description String? @db.VarChar(500)
+
+  // Optional receipt / vendor invoice reference for physical paper trail
+  referenceNumber String? @db.VarChar(100)
+
+  // Cash / bank transfer / cheque / etc. — free text for flexibility
+  paymentMethod String? @db.VarChar(100)
+
+  // Extra internal notes (separate from public description)
+  notes String? @db.VarChar(1000)
+
+  createdById String @db.Uuid
+  createdBy   User   @relation("ExpenseCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  // Key query patterns:
+  // 1. List all expenses for a company sorted by date (default view)
+  // 2. Filter by category (category breakdown)
+  // 3. Filter by supplier (vendor spend)
+  // 4. Date-range reports
+  @@index([companyId, isDeleted, expenseDate(sort: Desc)]) // default list
+  @@index([companyId, isDeleted, category]) // category filter
+  @@index([companyId, isDeleted, supplierId]) // supplier filter
+  @@index([companyId, createdAt(sort: Desc)]) // audit sort
+}
+
+// ============================================================
+// PHASE 4: PRODUCTS / SERVICES CATALOG (كتالوج المنتجات والخدمات)
+// ============================================================
+//
+// Design decisions:
+// - `sku` is optional but unique per company when provided.
+//   PostgreSQL treats NULLs as distinct in UNIQUE constraints, so multiple
+//   products with sku = null are allowed — enforcement happens at the DB level.
+// - `category` is a free-text string (not an enum) — merchants have wildly
+//   different product taxonomies; a rigid enum would hurt adoption.
+// - `isActive` provides soft-disable: hides from catalog pickers without
+//   breaking historical data in InvoiceItems (Phase K).
+// - `unitPrice` stored at Decimal(14,2) — never do arithmetic in JS/TS.
+// - No InvoiceItem relation yet; Phase K will add it via migration.
+// - Soft-deleted with isDeleted + deletedAt for full auditability.
+// ============================================================
+
+model Product {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name        String  @db.VarChar(200)
+  description String? @db.VarChar(1000)
+
+  // كود المنتج — optional, unique per company (when provided)
+  sku String? @db.VarChar(50)
+
+  // Free-text category (e.g. "إلكترونيات", "ملابس", "خدمات") — not an enum by design
+  category String? @db.VarChar(100)
+
+  // Unit of measure (قطعة / كيلو / متر / خدمة / etc.) — free-text
+  unit String? @db.VarChar(20)
+
+  unitPrice Decimal @db.Decimal(14, 2)
+
+  // Soft disable: hides from catalog picker without removing history
+  isActive Boolean @default(true)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  createdById String @db.Uuid
+  createdBy   User   @relation("ProductCreatedBy", fields: [createdById], references: [id])
+
+  // Phase K: items in invoices that reference this product (snapshot FK — SetNull on delete)
+  invoiceItems InvoiceItem[]
+
+  customerPrices CustomerProductPrice[]
+
+  // SKU uniqueness: Postgres UNIQUE treats NULLs as distinct — multiple products
+  // with sku = null are allowed; sku conflicts are caught at the app layer first
+  // for a friendly Arabic error message before hitting DB.
+  @@unique([companyId, sku])
+  // Key query patterns:
+  // 1. Active product catalog (default view in picker)
+  // 2. Filter by category
+  // 3. Name search (ILIKE)
+  @@index([companyId, isDeleted, isActive]) // catalog list: active only
+  @@index([companyId, isDeleted, category]) // category filter
+  @@index([companyId, isDeleted, name]) // name search support
+  @@index([companyId, isDeleted, sku]) // SKU search support (B3)
+}
+
+// ============================================================
+// CustomerProductPrice — P2-BE-1
+// ============================================================
+// Stores a negotiated/custom price for a specific product when
+// sold to a specific customer.  Overrides unitPrice during
+// invoice creation if present.
+// ============================================================
+model CustomerProductPrice {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  customerId String   @db.Uuid
+  customer   Customer @relation("CustomerProductPrices", fields: [customerId], references: [id], onDelete: Cascade)
+
+  productId String  @db.Uuid
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  price Decimal @db.Decimal(14, 2)
+
+  updatedById String @db.Uuid
+  updatedBy   User   @relation("CustomerProductPriceUpdatedBy", fields: [updatedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, customerId, productId])
+  @@index([companyId, customerId]) // all prices for a customer
+  @@index([companyId, productId]) // all customers using a product
+  @@map("customer_product_prices")
+}
+
+model IdempotencyRecord {
+  id             String            @id @default(uuid()) @db.Uuid
+  scope          String            @db.VarChar(120)
+  operationType  String            @db.VarChar(80)
+  actorUserId    String            @db.Uuid
+  companyId      String            @db.Uuid
+  idempotencyKey String            @db.VarChar(128)
+  requestHash    String            @db.Char(64)
+  status         IdempotencyStatus @default(IN_PROGRESS)
+  responseStatus Int?
+  responseBody   Json?
+  errorCode      String?           @db.VarChar(120)
+  lockedUntil    DateTime?
+  expiresAt      DateTime
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@unique([companyId, operationType, idempotencyKey])
+  @@index([expiresAt])
+  @@index([companyId, operationType, status])
+  @@map("idempotency_records")
+}
+
+// ============================================================
+// PHASE K: INVOICES (الفواتير)
+// ============================================================
+
+enum InvoiceStatus {
+  DRAFT // حفظ مسودة — no financial effect
+  PENDING_APPROVAL // أُرسلت للاعتماد — no financial effect yet
+  APPROVED // معتمدة — ledger entry + balance created
+  REJECTED // مرفوضة — no financial effect
+  CANCELLED // ملغاة — ledger entry + balance reversed (if was APPROVED)
+}
+
+// Per-invoice payment tracking (B5).
+// Separate from the subscription PaymentStatus enum (line 81).
+// Only meaningful for APPROVED invoices — DRAFT/REJECTED/CANCELLED stay UNPAID by convention.
+enum InvoicePaymentStatus {
+  UNPAID // لم تُسدَّد — no payments received
+  PARTIAL // مسددة جزئيًا — paidAmount > 0 but < totalAmount
+  PAID // مسددة بالكامل — paidAmount >= totalAmount
+}
+
+enum IdempotencyStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+// ============================================================
+//
+// Design decisions:
+// - Invoice stores a snapshot of party data (name, phone, address) at
+//   creation time so the document remains accurate even if the party record
+//   changes later.
+// - InvoiceItem holds a snapshot of description + prices. productId is a
+//   soft link for historical traceability; deleting a product NULLs it out
+//   (SetNull) without breaking existing invoices.
+// - invoiceNumber is server-assigned (INV-YYYY-NNNN). Generation runs inside
+//   a $transaction to prevent duplicates under concurrent writes. A unique
+//   constraint per company enforces DB-level integrity.
+// - deferredSaleId is an optional @unique FK: one sale → at most one invoice.
+//   Cancelling (soft-deleting) the invoice does NOT reverse the deferred sale.
+// - taxAmount is stored separately so the net and gross totals are clear.
+// - Soft-delete only for full auditability.
+// ============================================================
+
+model Invoice {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  // Human-readable number: INV-2026-0001 (server-assigned, unique per company)
+  invoiceNumber String @db.VarChar(20)
+
+  // Optional: generated from a deferred sale — at most one invoice per sale
+  deferredSaleId String?       @unique @db.Uuid
+  deferredSale   DeferredSale? @relation(fields: [deferredSaleId], references: [id], onDelete: SetNull)
+
+  // Workflow status — financial effects (ledger + balance) only applied on APPROVED
+  status InvoiceStatus @default(DRAFT)
+
+  // LedgerEntry created when this invoice is APPROVED (manual invoices only).
+  // null for DRAFT/PENDING/REJECTED/CANCELLED and all DeferredSale-generated invoices.
+  ledgerEntryId String? @db.Uuid
+
+  // Snapshot of party data at invoice creation time
+  // (party details may change later — the invoice must remain accurate)
+  partyType    PartyType
+  partyId      String    @db.Uuid
+  partyName    String    @db.VarChar(200)
+  partyPhone   String?   @db.VarChar(20)
+  partyAddress String?   @db.VarChar(500)
+
+  items InvoiceItem[]
+
+  // Financial totals — server-computed from items + tax
+  // Rule: totalAmount = SUM(items[].total) + taxAmount
+  totalAmount Decimal @db.Decimal(14, 2)
+  taxAmount   Decimal @default(0.00) @db.Decimal(14, 2)
+
+  // Payment tracking (B5) — only meaningful for APPROVED invoices
+  paidAmount           Decimal              @default(0.00) @db.Decimal(14, 2)
+  invoicePaymentStatus InvoicePaymentStatus @default(UNPAID)
+
+  notes     String?   @db.VarChar(1000)
+  issueDate DateTime  @db.Date
+  dueDate   DateTime? @db.Date // B2.3 — payment due date for ageing/overdue queries
+
+  createdById String @db.Uuid
+  createdBy   User   @relation("InvoiceCreatedBy", fields: [createdById], references: [id])
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Key query patterns:
+  // 1. All invoices for a company sorted by issueDate desc (default view)
+  // 2. Invoices for a specific party (customer statement / supplier ledger)
+  // 3. Lookup by invoice number (search / sharing)
+  @@unique([companyId, invoiceNumber]) // DB-level dedup guard
+  @@index([companyId, isDeleted, issueDate(sort: Desc)]) // default list
+  @@index([companyId, isDeleted, status]) // status filter (workflow tabs)
+  @@index([companyId, isDeleted, partyType, partyId]) // party invoices
+  @@index([companyId, isDeleted, invoicePaymentStatus]) // unpaid invoice queries (B5)
+  @@index([companyId, isDeleted, partyType, partyId, issueDate(sort: Desc)]) // last invoices for party (B4)
+  @@index([companyId, isDeleted, partyId, status]) // B2.2 — snapshot: open invoices per party
+  @@index([companyId, isDeleted, dueDate]) // B2.3 — overdue/ageing queries
+  @@index([companyId, createdAt(sort: Desc)]) // audit sort
+}
+
+// One row per line-item in an invoice.
+// Values are frozen snapshots — independent from any catalog changes after creation.
+model InvoiceItem {
+  id        String  @id @default(uuid()) @db.Uuid
+  invoiceId String  @db.Uuid
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  // Soft link to product catalog. SetNull on delete keeps invoice intact.
+  productId String?  @db.Uuid
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  // Snapshot values (frozen at creation — never updated after the fact)
+  description String  @db.VarChar(500)
+  quantity    Decimal @db.Decimal(10, 3) // supports fractional units (e.g. 1.5 kg)
+  unitPrice   Decimal @db.Decimal(14, 2)
+  total       Decimal @db.Decimal(14, 2) // quantity × unitPrice (server-verified on create)
+
+  @@index([invoiceId])
+  @@index([productId]) // B12.4 — frequent-products query
+}

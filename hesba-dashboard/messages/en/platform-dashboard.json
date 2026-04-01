@@ -1,0 +1,96 @@
+{
+  "page": {
+    "eyebrow": "Platform control",
+    "heading": "Platform dashboard",
+    "subheading": "Monitor tenant growth, subscription health, plan usage, and platform revenue from one operational surface.",
+    "periodLabel": "Reporting window",
+    "loading": "Loading period...",
+    "error": "Platform dashboard data is temporarily unavailable. Verify the API is running and try again."
+  },
+  "filters": {
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "reset": "Reset",
+    "presets": {
+      "today": "Today",
+      "week": "This week",
+      "month": "This month",
+      "year": "This year",
+      "last30days": "Last 30 days"
+    }
+  },
+  "cards": {
+    "totalCompanies": "Total companies",
+    "activeCompanies": "{count} active companies",
+    "paidCompanies": "Paid companies",
+    "trialCompanies": "{count} in trial",
+    "totalUsers": "Tenant users",
+    "plansSummary": "{active} active plans out of {total}",
+    "renewSoon": "Renew soon",
+    "suspendedCompanies": "{count} suspended companies",
+    "revenueCollected": "Revenue collected",
+    "annualRunRate": "Annual run rate: {amount}",
+    "companiesCreated": "Companies added",
+    "subscriptionsCreated": "{count} subscriptions created",
+    "expiredCompanies": "Expired companies",
+    "statusWatch": "{active} active, {suspended} suspended",
+    "activePlans": "Active plans",
+    "platformCoverage": "Serving {count} workspaces"
+  },
+  "charts": {
+    "growthTitle": "Platform growth",
+    "growthDescription": "Compare new companies against subscription creation through the selected period.",
+    "companiesSeries": "Companies",
+    "subscriptionsSeries": "Subscriptions",
+    "revenueTitle": "Revenue trend",
+    "revenueDescription": "Paid subscription collections over time.",
+    "revenueSeries": "Revenue",
+    "plansTitle": "Plan distribution",
+    "plansDescription": "Current companies grouped by subscribed plan.",
+    "statusTitle": "Subscription states",
+    "statusDescription": "Latest active/trial/suspended/expired distribution.",
+    "statusLabels": {
+      "ACTIVE": "Active",
+      "TRIAL": "Trial",
+      "SUSPENDED": "Suspended",
+      "EXPIRED": "Expired",
+      "DISABLED": "Disabled"
+    }
+  },
+  "health": {
+    "recentCompaniesTitle": "Recent companies",
+    "recentCompaniesDescription": "Newest tenant workspaces created during the selected period.",
+    "expiringTitle": "Upcoming renewals",
+    "expiringDescription": "Current subscriptions closest to expiry.",
+    "plansWatchlistTitle": "Plan watchlist",
+    "plansWatchlistDescription": "Current plan concentration and normalized monthly revenue.",
+    "ownerFallback": "No owner email",
+    "usersLabel": "Users",
+    "customersLabel": "Customers",
+    "ledgerLabel": "Ledger",
+    "createdAt": "Created {date}",
+    "daysLeft": "{count} days left",
+    "companiesOnPlan": "{count} companies on this plan",
+    "empty": "No items found for the selected period.",
+    "status": {
+      "ACTIVE": "Active",
+      "TRIAL": "Trial",
+      "SUSPENDED": "Suspended",
+      "EXPIRED": "Expired",
+      "DISABLED": "Disabled",
+      "NONE": "No subscription"
+    }
+  },
+  "quickLinks": {
+    "title": "Quick access",
+    "description": "Open the platform surfaces most likely to follow an issue discovered on the dashboard.",
+    "tenants": {
+      "title": "Tenant management",
+      "description": "Review company details, operational footprint, and status before platform actions."
+    },
+    "subscriptions": {
+      "title": "Subscriptions",
+      "description": "Inspect plan assignments, renewals, and billing actions across the platform."
+    }
+  }
+}

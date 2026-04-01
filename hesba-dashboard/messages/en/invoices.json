@@ -1,0 +1,154 @@
+{
+  "pageTitle": "Invoices | Daftar",
+  "pageDescription": "Create and manage customer and supplier invoices with product line items.",
+  "title": "Invoices",
+  "subtitle": "Manage sales and purchase invoices from one fast workspace.",
+  "filters": {
+    "search": "Search by invoice number or party name",
+    "partyType": "Party type",
+    "partyTypeAll": "All parties",
+    "partyTypeCustomer": "Customer",
+    "partyTypeSupplier": "Supplier",
+    "status": "Status",
+    "statusAll": "All statuses",
+    "party": "Party",
+    "noParties": "No parties found",
+    "pageSize": "Rows per page",
+    "totalInvoices": "Total invoices: {count}"
+  },
+  "actions": {
+    "addInvoice": "Add invoice",
+    "createInvoice": "Create invoice",
+    "saveDraft": "Save draft",
+    "saveAndApprove": "Save and approve",
+    "creating": "Creating...",
+    "addItem": "Add item",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "view": "View",
+    "duplicate": "Duplicate",
+    "export": "Export Excel",
+    "exporting": "Exporting...",
+    "loading": "Loading...",
+    "submit": "Submit",
+    "approve": "Approve",
+    "reject": "Reject",
+    "cancelInvoice": "Cancel invoice",
+    "recordPayment": "Record payment",
+    "recordPaymentAmount": "Payment amount"
+  },
+  "status": {
+    "DRAFT": "Draft",
+    "PENDING_APPROVAL": "Pending approval",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected",
+    "CANCELLED": "Cancelled"
+  },
+  "export": {
+    "sheetName": "Invoices",
+    "filePrefix": "invoices"
+  },
+  "exportModal": {
+    "title": "Export invoices",
+    "description": "Choose an optional date range and max rows before downloading Excel.",
+    "fromDate": "From date",
+    "toDate": "To date",
+    "maxRecords": "Maximum rows",
+    "maxRecordsHint": "Leave empty to export all matched rows.",
+    "reset": "Reset"
+  },
+  "table": {
+    "invoiceNumber": "Invoice number",
+    "issueDate": "Issue date",
+    "status": "Status",
+    "partyType": "Party type",
+    "partyName": "Party name",
+    "totalAmount": "Total amount",
+    "taxAmount": "Tax",
+    "createdBy": "Created by",
+    "actions": "Actions",
+    "ariaLabel": "Invoices table"
+  },
+  "pagination": {
+    "summary": "Page {page} of {totalPages} ({total} invoices)",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "createModal": {
+    "title": "Create invoice",
+    "description": "Create an invoice linked to a customer or supplier with one or more product lines.",
+    "keyboardHint": "Tip: Press Ctrl/Cmd + Enter to add a new line item quickly.",
+    "approvalHint": "Save draft keeps the invoice pending. Save and approve finishes the invoice immediately when you have approval permission."
+  },
+  "form": {
+    "partyType": "Party type",
+    "party": "Party",
+    "searchParty": "Search party",
+    "noParties": "No matching parties",
+    "issueDate": "Issue date",
+    "taxAmount": "Tax amount",
+    "partyAddress": "Party address",
+    "notes": "Notes",
+    "items": "Invoice items",
+    "product": "Product",
+    "searchProduct": "Search product",
+    "noProducts": "No products found",
+    "description": "Description",
+    "quantity": "Qty",
+    "unitPrice": "Unit price"
+  },
+  "summary": {
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "total": "Total"
+  },
+  "messages": {
+    "createSuccess": "Invoice created successfully.",
+    "createDraftSuccess": "Invoice draft created successfully.",
+    "createAndApproveSuccess": "Invoice created and approved successfully.",
+    "createError": "Failed to create invoice.",
+    "createAndApproveError": "Failed to create and approve invoice.",
+    "deleteSuccess": "Invoice deleted successfully.",
+    "deleteError": "Failed to delete invoice.",
+    "deleteConfirm": "Are you sure you want to delete invoice {invoiceNumber}?",
+    "duplicateError": "Failed to load invoice data for duplication.",
+    "exportSuccess": "Invoices exported successfully.",
+    "exportError": "Failed to export invoices.",
+    "exportEmpty": "No invoices found for export.",
+    "submitSuccess": "Invoice submitted for approval.",
+    "approveSuccess": "Invoice approved successfully.",
+    "rejectSuccess": "Invoice rejected successfully.",
+    "cancelSuccess": "Invoice cancelled successfully.",
+    "recordPaymentSuccess": "Payment recorded successfully.",
+    "paymentAmountInvalid": "Enter a valid payment amount.",
+    "lifecycleError": "Invoice lifecycle action failed.",
+    "submitInvalidTransition": "This invoice cannot be submitted in its current status.",
+    "approveInvalidTransition": "This invoice cannot be approved in its current status.",
+    "rejectInvalidTransition": "This invoice cannot be rejected in its current status.",
+    "cancelInvalidTransition": "Only approved invoices can be cancelled."
+  },
+  "empty": {
+    "title": "No invoices found",
+    "description": "No invoices match your current filters."
+  },
+  "details": {
+    "pageTitle": "Invoice details | Daftar",
+    "pageDescription": "Review invoice header and line items.",
+    "title": "Invoice details",
+    "subtitle": "Review full invoice data and line items.",
+    "backToList": "Back to invoices",
+    "partyPhone": "Party phone",
+    "partyAddress": "Party address",
+    "grandTotal": "Grand total",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at",
+    "notes": "Notes",
+    "itemsTitle": "Invoice items",
+    "items": {
+      "description": "Description",
+      "quantity": "Quantity",
+      "unitPrice": "Unit price",
+      "total": "Line total"
+    }
+  }
+}

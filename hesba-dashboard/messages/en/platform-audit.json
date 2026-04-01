@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "title": "Audit Logs | Daftar Super Admin",
+    "description": "Review persisted governance audit logs with tenant, actor, action, and date filters."
+  },
+  "eyebrow": "Governance",
+  "heading": "Audit logs",
+  "subheading": "Track who did what, on which tenant, and when. Use filters to investigate operational decisions and high-risk actions quickly.",
+  "dateRangeInvalid": "Invalid date range. \"From date\" must be before or equal to \"To date\".",
+  "tableAriaLabel": "Platform audit logs table",
+  "tableCaption": "Persisted governance activity across the platform",
+  "actions": {
+    "viewMetadata": "View metadata",
+    "exportReport": "Export report",
+    "exporting": "Exporting..."
+  },
+  "messages": {
+    "exportSuccess": "Audit report exported successfully.",
+    "exportError": "Failed to export audit report.",
+    "exportEmpty": "No audit records to export with the selected filters.",
+    "exportDateRangeInvalid": "Cannot export while date range is invalid."
+  },
+  "exportModal": {
+    "title": "Export audit report",
+    "description": "Choose export scope and limits before generating report ({total} matching rows).",
+    "maxRecords": "Maximum records",
+    "maxRecordsHint": "Use a positive whole number (recommended: 5000 max per export).",
+    "reset": "Reset",
+    "cancel": "Cancel",
+    "confirm": "Export"
+  },
+  "export": {
+    "filePrefix": "platform-audit-report",
+    "summary": {
+      "sheetName": "Summary",
+      "metric": "Metric",
+      "value": "Value",
+      "totalLogs": "Total logs",
+      "uniqueCompanies": "Unique companies",
+      "uniqueActors": "Unique actors",
+      "highRiskActions": "High-risk actions",
+      "generatedAt": "Generated at (UTC)",
+      "appliedDateRange": "Applied date range",
+      "topAction": "Top action: {action}",
+      "topEntity": "Top entity: {entity}"
+    },
+    "details": {
+      "sheetName": "Logs",
+      "createdAt": "Created at",
+      "action": "Action",
+      "entityType": "Entity type",
+      "entityId": "Entity ID",
+      "company": "Company",
+      "companyId": "Company ID",
+      "actor": "Actor",
+      "actorEmail": "Actor email",
+      "actorId": "Actor ID",
+      "metadata": "Metadata"
+    }
+  },
+  "cards": {
+    "total": {
+      "title": "Total logs",
+      "description": "Matched records after applying current filters."
+    },
+    "companies": {
+      "title": "Companies (page)",
+      "description": "Distinct tenants currently visible in the result set."
+    },
+    "actors": {
+      "title": "Actors (page)",
+      "description": "Distinct users currently visible in the result set."
+    },
+    "highRisk": {
+      "title": "High-risk actions (page)",
+      "description": "Rows containing suspend/disable/delete action patterns."
+    }
+  },
+  "filters": {
+    "searchPlaceholder": "Search by action, actor, or company",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "loading": "Loading options...",
+    "empty": "No options found",
+    "limitOption": "{count} rows",
+    "reset": "Reset filters",
+    "placeholders": {
+      "company": "Company",
+      "actor": "Actor",
+      "action": "Action",
+      "entityType": "Entity type",
+      "limit": "Rows per page",
+      "sortBy": "Sort field",
+      "sortOrder": "Sort order"
+    },
+    "sortBy": {
+      "createdAt": "Created at",
+      "action": "Action",
+      "entityType": "Entity type"
+    },
+    "sortOrder": {
+      "asc": "Ascending",
+      "desc": "Descending"
+    }
+  },
+  "table": {
+    "createdAt": "Created at",
+    "action": "Action",
+    "company": "Company",
+    "actor": "Actor",
+    "entity": "Entity",
+    "metadata": "Metadata preview",
+    "unknownCompany": "Unknown company",
+    "unknownActor": "Unknown actor"
+  },
+  "empty": {
+    "title": "No audit logs found",
+    "description": "Try relaxing filters or expanding the date range."
+  },
+  "metadataModal": {
+    "eyebrow": "Audit details",
+    "title": "Metadata payload",
+    "description": "Action: {action} • Entity: {entityType}",
+    "close": "Close"
+  }
+}

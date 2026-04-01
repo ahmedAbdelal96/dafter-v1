@@ -1,0 +1,73 @@
+{
+  "pageTitle": "Notifications | Daftar",
+  "pageDescription": "Track all system notifications and reading status.",
+  "title": "Notifications",
+  "subtitle": "Review in-app notifications and keep your inbox clean.",
+  "noPermission": "You do not have permission to view notifications.",
+  "filters": {
+    "scope": "Filter scope",
+    "scopeAll": "All notifications",
+    "scopeUnread": "Unread only",
+    "perPage": "{count} rows per page"
+  },
+  "summary": {
+    "total": "Total notifications: {count}",
+    "unread": "Unread: {count}"
+  },
+  "table": {
+    "title": "Title",
+    "body": "Message",
+    "type": "Type",
+    "status": "Status",
+    "createdAt": "Created at",
+    "ariaLabel": "Notifications table"
+  },
+  "status": {
+    "read": "Read",
+    "unread": "Unread"
+  },
+  "actions": {
+    "export": "Export",
+    "exporting": "Exporting...",
+    "markAllRead": "Mark all as read",
+    "markingAll": "Updating...",
+    "markRead": "Mark as read",
+    "view": "View details",
+    "loading": "Loading...",
+    "close": "Close",
+    "cancel": "Cancel"
+  },
+  "empty": {
+    "title": "No notifications",
+    "description": "You do not have any notifications for this filter."
+  },
+  "messages": {
+    "markReadSuccess": "Notification marked as read.",
+    "markReadError": "Could not mark notification as read.",
+    "markAllReadSuccess": "{count} notifications marked as read.",
+    "markAllReadError": "Could not mark all notifications as read.",
+    "nothingToMark": "All notifications are already read.",
+    "exportSuccess": "Notifications exported successfully.",
+    "exportError": "Failed to export notifications.",
+    "exportEmpty": "No notifications found for export."
+  },
+  "export": {
+    "sheetName": "Notifications",
+    "filePrefix": "notifications"
+  },
+  "exportModal": {
+    "title": "Export notifications",
+    "description": "Choose the maximum number of rows to export.",
+    "maxRecords": "Max rows",
+    "maxRecordsHint": "Leave empty to export all matching rows.",
+    "reset": "Reset"
+  },
+  "modal": {
+    "detailsTitle": "Notification details",
+    "detailsDescription": "Review notification payload and metadata."
+  },
+  "details": {
+    "payload": "Payload"
+  }
+}
+

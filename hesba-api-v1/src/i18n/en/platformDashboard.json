@@ -1,0 +1,15 @@
+{
+  "overview": {
+    "success": "Platform dashboard overview retrieved successfully"
+  },
+  "charts": {
+    "success": "Platform dashboard charts retrieved successfully"
+  },
+  "health": {
+    "success": "Platform dashboard health data retrieved successfully"
+  },
+  "common": {
+    "invalidDateRange": "Start date must be before end date",
+    "missingDateRange": "Both dateFrom and dateTo must be provided together"
+  }
+}

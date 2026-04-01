@@ -1,0 +1,100 @@
+{
+  "pageTitle": "Ledger | Daftar",
+  "pageDescription": "Track balances and transactions for customers, suppliers, and employees.",
+  "title": "Ledger",
+  "subtitle": "Review statement lines and add manual accounting entries.",
+  "noPermission": "You don't have permission to view ledger statements.",
+  "summary": {
+    "current": "Current balance",
+    "opening": "Opening balance (period)",
+    "closing": "Closing balance (period)"
+  },
+  "filters": {
+    "partyType": "Party type",
+    "party": "Party",
+    "partyPlaceholder": "Select party",
+    "partySearchPlaceholder": "Search by name or phone",
+    "partyEmpty": "No matching records",
+    "partyLoading": "Loading records...",
+    "partyTypes": {
+      "CUSTOMER": "Customer",
+      "SUPPLIER": "Supplier",
+      "EMPLOYEE": "Employee"
+    },
+    "fromDate": "From date",
+    "toDate": "To date",
+    "perPage": "Rows per page",
+    "reset": "Reset filters"
+  },
+  "entryTypes": {
+    "INVOICE": "Invoice",
+    "PAYMENT": "Payment",
+    "RETURN": "Return",
+    "ADJUSTMENT": "Adjustment",
+    "ADVANCE": "Advance",
+    "SALARY_PAYMENT": "Salary payment",
+    "DEDUCTION": "Deduction",
+    "SETTLEMENT": "Settlement"
+  },
+  "table": {
+    "ariaLabel": "Ledger statement table",
+    "date": "Entry date",
+    "type": "Entry type",
+    "note": "Note",
+    "amount": "Amount",
+    "runningBalance": "Running balance",
+    "createdAt": "Created at"
+  },
+  "actions": {
+    "addEntry": "Add entry",
+    "createEntry": "Create entry",
+    "deleteEntry": "Delete entry",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "export": "Export Excel",
+    "exporting": "Exporting..."
+  },
+  "export": {
+    "sheetName": "Ledger Statement",
+    "filePrefix": "ledger-statement"
+  },
+  "exportModal": {
+    "title": "Export ledger statement",
+    "description": "Choose an optional date range and max rows before downloading Excel.",
+    "fromDate": "From date",
+    "toDate": "To date",
+    "maxRecords": "Maximum rows",
+    "maxRecordsHint": "Leave empty to export all matched rows.",
+    "reset": "Reset"
+  },
+  "form": {
+    "entryType": "Entry type",
+    "amount": "Amount",
+    "increaseBalance": "Increase balance (unchecked = decrease)",
+    "entryDate": "Entry date",
+    "dueDate": "Due date (optional)",
+    "note": "Note (optional)"
+  },
+  "modal": {
+    "title": "Create ledger entry",
+    "description": "Record a manual accounting movement for the selected party."
+  },
+  "emptySelection": {
+    "title": "Choose a party first",
+    "description": "Select party type and party to load statement lines."
+  },
+  "empty": {
+    "title": "No ledger entries",
+    "description": "No accounting movements found for the selected filters."
+  },
+  "messages": {
+    "createSuccess": "Ledger entry added successfully.",
+    "createError": "Failed to add ledger entry.",
+    "deleteSuccess": "Ledger entry deleted successfully.",
+    "deleteError": "Failed to delete ledger entry.",
+    "deleteConfirm": "Are you sure you want to delete this ledger entry?",
+    "exportSuccess": "Ledger statement exported successfully.",
+    "exportError": "Failed to export ledger statement.",
+    "exportEmpty": "No ledger entries found for export."
+  }
+}

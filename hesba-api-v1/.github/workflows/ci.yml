@@ -1,0 +1,35 @@
+name: API CI
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
+
+jobs:
+  policy-and-invariant-gates:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: dafter-api-v1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: dafter-api-v1/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Subscription invariant gate
+        run: npm run ci:check:subscription-invariant
+
+      - name: Feature policy gate
+        run: npm run ci:check:feature-policy

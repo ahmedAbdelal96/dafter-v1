@@ -1,0 +1,105 @@
+{
+  "title": "User Management",
+  "singular": "User",
+
+  "list": {
+    "empty": "No staff members yet",
+    "emptyDesc": "Add staff so they can access the system",
+    "emptySearch": "No results found",
+    "emptySearchDesc": "Try a different name or email"
+  },
+
+  "filter": {
+    "all": "All",
+    "active": "Active",
+    "disabled": "Disabled"
+  },
+
+  "search": {
+    "placeholder": "Search by name or email"
+  },
+
+  "role": {
+    "OWNER": "Owner",
+    "STAFF": "Staff",
+    "SUPER_ADMIN": "System Admin"
+  },
+
+  "status": {
+    "ACTIVE": "Active",
+    "DISABLED": "Disabled",
+    "INACTIVE": "Inactive"
+  },
+
+  "detail": {
+    "title": "User Details"
+  },
+
+  "form": {
+    "create": "Add Staff",
+    "edit": "Edit User",
+    "save": "Save",
+    "cancel": "Cancel",
+    "fullName": "Full Name",
+    "namePlaceholder": "Full name",
+    "email": "Email",
+    "emailPlaceholder": "example@email.com",
+    "password": "Password",
+    "passwordPlaceholder": "Min 8 chars, uppercase + digit",
+    "phone": "Phone",
+    "phonePlaceholder": "05XXXXXXXX"
+  },
+
+  "permissions": {
+    "title": "Permissions",
+    "ownerFullAccess": "Owner has full access to all features",
+    "viewParties": "View Customers & Suppliers",
+    "manageParties": "Manage Customers & Suppliers",
+    "viewLedger": "View Ledger",
+    "manageLedger": "Manage Ledger Entries",
+    "viewReports": "View Reports",
+    "manageUsers": "Manage Users"
+  },
+
+  "actions": {
+    "disable": "Disable Account",
+    "enable": "Enable Account",
+    "resetCredentials": "Reset Password",
+    "resetSuccess": "Password reset code sent successfully.",
+    "resetError": "Failed to send password reset code."
+  },
+
+  "reset": {
+    "title": "Reset Password",
+    "message": "This will send a one-time password reset code to the staff member via email or WhatsApp. They will need to set a new password to regain access.",
+    "confirm": "Send Reset Code",
+    "cancel": "Cancel"
+  },
+
+  "disable": {
+    "title": "Disable User",
+    "message": "Are you sure you want to disable this user? They will lose access to the system.",
+    "confirm": "Disable",
+    "cancel": "Cancel"
+  },
+
+  "validation": {
+    "nameRequired": "Full name is required",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email format",
+    "passwordRequired": "Password is required",
+    "passwordShort": "Password must be at least 8 characters",
+    "passwordWeak": "Must contain at least one uppercase letter and one digit"
+  },
+
+  "errors": {
+    "createFailed": "Failed to create user",
+    "updateFailed": "Failed to update user",
+    "emailExists": "This email is already in use",
+    "quotaExceeded": "You have reached the user limit on your current plan",
+    "disableFailed": "Failed to disable account",
+    "enableFailed": "Failed to enable account",
+    "enableLimitReached": "Cannot enable — active user limit reached on your plan",
+    "permUpdateFailed": "Failed to update permissions"
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "title": "Customers",
+  "singular": "Customer",
+  "list": {
+    "title": "Customers List",
+    "empty": "No customers yet",
+    "emptyDesc": "Add your first customer to start recording transactions",
+    "searchPlaceholder": "Search by name or phone number"
+  },
+  "detail": {
+    "title": "Customer Details",
+    "balance": "Current Balance",
+    "openingBalance": "Opening Balance",
+    "creditLimit": "Credit Limit",
+    "phone": "Phone Number",
+    "address": "Address",
+    "createdAt": "Date Added",
+    "active": "Active",
+    "inactive": "Inactive",
+    "viewStatement": "Statement",
+    "newEntry": "New Entry",
+    "newInvoice": "New Invoice",
+    "recordPayment": "Payment",
+    "openInvoices": "Open Invoices",
+    "totalPurchases": "Total Purchases",
+    "overdue": "Overdue",
+    "edit": "Edit",
+    "delete": "Delete",
+    "overdueRisk": "Late payer",
+    "paymentType": {
+      "CASH": "Cash",
+      "TRANSFER": "Transfer",
+      "DEFERRED": "Deferred",
+      "CHECK": "Check"
+    },
+    "tabs": {
+      "invoices": "Invoices",
+      "payments": "Payments",
+      "statement": "Statement",
+      "deferred": "Deferred",
+      "pricing": "Pricing",
+      "noInvoices": "No invoices yet",
+      "noPayments": "No payments recorded",
+      "noStatement": "No transactions",
+      "noDeferred": "No deferred sales",
+      "noPricing": "No custom prices set for this customer",
+      "viewAll": "View all",
+      "openingBalance": "Opening balance",
+      "remaining": "Remaining"
+    }
+  },
+  "invoiceStatus": {
+    "DRAFT": "Draft",
+    "PENDING_APPROVAL": "Pending",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected",
+    "CANCELLED": "Cancelled"
+  },
+  "deferredStatus": {
+    "PENDING": "Pending",
+    "PARTIAL": "Partial",
+    "PAID": "Paid",
+    "OVERDUE": "Overdue"
+  },
+  "form": {
+    "create": "Add Customer",
+    "edit": "Edit Customer",
+    "name": "Name",
+    "namePlaceholder": "Customer name",
+    "phone": "Phone",
+    "phonePlaceholder": "01xxxxxxxxx",
+    "address": "Address",
+    "addressPlaceholder": "Address (optional)",
+    "openingBalance": "Opening Balance",
+    "openingBalancePlaceholder": "0.00",
+    "openingBalanceHint": "Amount the customer already owes (leave 0 for new customers)",
+    "creditLimit": "Credit Limit",
+    "creditLimitPlaceholder": "0.00 (leave empty for unlimited)",
+    "isActive": "Customer Status",
+    "activeYes": "Active",
+    "activeNo": "Inactive",
+    "save": "Save"
+  },
+  "delete": {
+    "title": "Delete Customer",
+    "message": "Are you sure you want to delete this customer? This action cannot be undone.",
+    "confirm": "Delete",
+    "hasLedger": "Cannot delete customer because they have recorded ledger entries"
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "phoneInvalid": "Invalid phone number",
+    "invalidAmount": "Invalid amount"
+  },
+  "errors": {
+    "loadFailed": "Failed to load customers",
+    "createFailed": "Failed to create customer",
+    "updateFailed": "Failed to update customer",
+    "deleteFailed": "Failed to delete customer",
+    "nameTaken": "A customer with this name already exists",
+    "versionConflict": "Customer data was modified elsewhere. Please close and try again",
+    "quotaExceeded": "You have reached the maximum number of customers for your plan",
+    "retry": "Retry"
+  }
+}

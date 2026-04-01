@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10 border-b border-primary/10">
+<div class="text-slate-900 dark:text-slate-100 flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">دليل الشركات</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<main class="flex-1">
+<div class="px-4 py-4">
+<label class="flex flex-col min-w-40 h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full overflow-hidden shadow-sm">
+<div class="text-primary flex border-none bg-primary/10 items-center justify-center px-4">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-primary/10 text-slate-900 dark:text-slate-100 focus:ring-0 h-full placeholder:text-primary/50 text-base font-normal" placeholder="البحث عن اسم الشركة أو النطاق..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex gap-3 px-4 pb-4 overflow-x-auto no-scrollbar">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary px-4 text-white shadow-md">
+<span class="text-sm font-medium leading-normal">نشط</span>
+<span class="material-symbols-outlined text-sm">check_circle</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary/10 px-4 text-primary border border-primary/20">
+<span class="text-sm font-medium leading-normal">تجريبي</span>
+<span class="material-symbols-outlined text-sm">science</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary/10 px-4 text-primary border border-primary/20">
+<span class="text-sm font-medium leading-normal">معلق</span>
+<span class="material-symbols-outlined text-sm">pause_circle</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary/10 px-4 text-primary border border-primary/20">
+<span class="text-sm font-medium leading-normal">منتهي</span>
+<span class="material-symbols-outlined text-sm">history</span>
+</button>
+</div>
+<div class="flex flex-col divide-y divide-primary/10">
+<div class="flex flex-col bg-background-light dark:bg-background-dark/50 px-4 py-4">
+<div class="flex items-center gap-4 justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-14 flex items-center justify-center" data-alt="Corporate technology company logo placeholder">
+<span class="material-symbols-outlined text-primary text-3xl">corporate_fare</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">شركة التقنية المتقدمة</p>
+<p class="text-primary/70 text-sm font-medium mt-1">الباقة الاحترافية • 240 مستخدم</p>
+<div class="mt-2 flex">
+<span class="px-2 py-0.5 rounded-full bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold uppercase tracking-wider border border-green-500/30">نشط</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<button class="px-4 py-2 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 text-sm font-bold border border-red-500/20">تعليق</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col bg-background-light dark:bg-background-dark/50 px-4 py-4">
+<div class="flex items-center gap-4 justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-14 flex items-center justify-center" data-alt="Logistics company abstract branding">
+<span class="material-symbols-outlined text-primary text-3xl">local_shipping</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">حلول الخدمات اللوجستية</p>
+<p class="text-primary/70 text-sm font-medium mt-1">الباقة الأساسية • 15 مستخدم</p>
+<div class="mt-2 flex">
+<span class="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wider border border-blue-500/30">تجريبي</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<button class="px-4 py-2 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 text-sm font-bold border border-red-500/20">تعليق</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col bg-background-light dark:bg-background-dark/50 px-4 py-4">
+<div class="flex items-center gap-4 justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-14 flex items-center justify-center" data-alt="Education group logo icon">
+<span class="material-symbols-outlined text-primary text-3xl">school</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">مجموعة التعليم الرقمي</p>
+<p class="text-primary/70 text-sm font-medium mt-1">باقة المؤسسات • 1200 مستخدم</p>
+<div class="mt-2 flex">
+<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider border border-amber-500/30">معلق</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<button class="px-4 py-2 rounded-lg bg-primary text-white text-sm font-bold shadow-sm">تفعيل</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col bg-background-light dark:bg-background-dark/50 px-4 py-4">
+<div class="flex items-center gap-4 justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-14 flex items-center justify-center" data-alt="Retail store chain logo">
+<span class="material-symbols-outlined text-primary text-3xl">shopping_bag</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">سلسلة متاجر التجزئة</p>
+<p class="text-primary/70 text-sm font-medium mt-1">الباقة الاحترافية • 50 مستخدم</p>
+<div class="mt-2 flex">
+<span class="px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-600 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border border-slate-500/30">منتهي</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<button class="px-4 py-2 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 text-sm font-bold border border-red-500/20">تعليق</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<nav class="sticky bottom-0 w-full bg-background-light dark:bg-background-dark border-t border-primary/10 pb-6 pt-2 px-4">
+<div class="flex justify-between items-center">
+<a class="flex flex-1 flex-col items-center gap-1 text-primary/50" href="#">
+<span class="material-symbols-outlined text-2xl">home</span>
+<p class="text-[10px] font-bold">الرئيسية</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">business</span>
+<p class="text-[10px] font-bold">الشركات</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-primary/50" href="#">
+<span class="material-symbols-outlined text-2xl">bar_chart</span>
+<p class="text-[10px] font-bold">التقارير</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-primary/50" href="#">
+<span class="material-symbols-outlined text-2xl">settings</span>
+<p class="text-[10px] font-bold">الإعدادات</p>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans Arabic", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans Arabic', 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10 dark:border-primary/20">
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<button class="p-2 hover:bg-primary/10 rounded-xl transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_forward</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight">الأدوار والصلاحيات</h1>
+</div>
+<button class="p-2 hover:bg-primary/10 rounded-xl transition-colors">
+<span class="material-symbols-outlined text-primary">help</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto px-4 pb-24">
+<!-- Search & Action -->
+<div class="py-6 flex flex-col gap-4">
+<div class="relative group">
+<div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+<span class="material-symbols-outlined text-primary/60 group-focus-within:text-primary transition-colors">search</span>
+</div>
+<input class="w-full bg-primary/5 dark:bg-primary/10 border-none rounded-xl py-3 pr-12 pl-4 focus:ring-2 focus:ring-primary/50 text-sm transition-all placeholder:text-slate-500" placeholder="البحث عن دور أو مسمى وظيفي..." type="text"/>
+</div>
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95">
+<span class="material-symbols-outlined">add_circle</span>
+                إضافة دور جديد
+            </button>
+</div>
+<!-- Role Count Summary -->
+<div class="flex items-center justify-between mb-4 px-1">
+<h2 class="text-sm font-semibold text-primary uppercase tracking-wider">الأدوار الحالية (4)</h2>
+<span class="text-xs text-slate-500 dark:text-slate-400">آخر تحديث: اليوم، 10:30 ص</span>
+</div>
+<!-- Roles List -->
+<div class="space-y-4">
+<!-- Role Card: Owner -->
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl p-4 flex flex-col gap-3">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-xl bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">shield_person</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-900 dark:text-slate-100">مالك النظام</h3>
+<p class="text-xs text-primary font-medium">صلاحيات كاملة وغير محدودة</p>
+</div>
+</div>
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
+<span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">1 مستخدم</span>
+</div>
+</div>
+<div class="h-px bg-slate-100 dark:bg-primary/10 w-full"></div>
+<div class="flex items-center justify-between text-xs">
+<div class="flex -space-x-2 space-x-reverse">
+<div class="size-6 rounded-full border-2 border-background-dark bg-slate-400 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User avatar for owner" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCa--IIXBCcqbiU2hmTATBicpjgmuXgqX6xfNAbKI6VHxEuxUnBZjxUJaHYDn1ED86td-2JcId2tKg5PLPleTlef7VS1KP4im-MxpVnmseL7kYRzjMO1QSKQw7gwfqbFJ0zG7IoFsnlLKVOlJ_sMH4eNIqBxDHkV8kErZhy-WMOI3RYBLRJEvrwkuW2d87yhw11Smcc3EEfUfk-zCzX8pvIzeEVCFZRf8PAYE1fjJpOAmerYLpyyJ_5IepkCY5vAenxLo21wWitKVE"/>
+</div>
+</div>
+<button class="text-primary font-bold flex items-center gap-1">
+                        تعديل الصلاحيات
+                        <span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+</div>
+</div>
+<!-- Role Card: Accountant -->
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl p-4 flex flex-col gap-3">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-xl bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-900 dark:text-slate-100">محاسب قانوني</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">إدارة التقارير والقيود والضرائب</p>
+</div>
+</div>
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
+<span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">2 مستخدمين</span>
+</div>
+</div>
+<div class="h-px bg-slate-100 dark:bg-primary/10 w-full"></div>
+<div class="flex items-center justify-between text-xs">
+<div class="flex -space-x-2 space-x-reverse">
+<div class="size-6 rounded-full border-2 border-background-dark bg-slate-400 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User avatar for accountant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgVCZdJY30YWUMPcDOMUGKm4QbxRkDt3bf1S4PtASGh4esBcqZ8Cm92i0j-7DNAAEIdbBvmap4KIh8WsTMmH7wTPOXSuS-sAvSwuV1xM_8v1PtDV17U_yiGLngIMV9_2H_1lI3vsLCuGbNGvwRNNUAhyHPrMbLnwJsqjK0o8Pb8JK3mH0f5x-sQpa_wnW1_DF6-3hcGPIfqWa5WSNWmBq_h2QWasv6wSDpRQ2sXiTQFu6oD-TMlKNSEwPll0J3FzcYHVswDDtWbKM"/>
+</div>
+<div class="size-6 rounded-full border-2 border-background-dark bg-slate-500 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User avatar for second accountant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPPuQ34rK0VYBR8-0cYwy0kOas6HCSc5Y8vls4YMYe6RTH7R4FQRJMUYl7Te45sH-oNU62Sxn8JmADMxwVitQvAm2kyU2m1hJ0oW_okDtrFaMLfIgJv1aErR2hV8Gxx0fxvLQuGiYTwnvoyiy0ePrSS4NMuYGTxVZz79nwhgxxP2ItJrOljsUmsxQIswECfAZuw0yh2tzE-TBFBQMuZnFthNoUb-nrAesAawepZhEXDtmIA_grA2nsJmL8hfmcnaGFxvaql2mMuIg"/>
+</div>
+</div>
+<button class="text-primary font-bold flex items-center gap-1">
+                        تعديل الصلاحيات
+                        <span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+</div>
+</div>
+<!-- Role Card: Sales Manager -->
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl p-4 flex flex-col gap-3">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-xl bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">point_of_sale</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-900 dark:text-slate-100">مدير مبيعات</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">إدارة الفواتير، العملاء، والخصومات</p>
+</div>
+</div>
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
+<span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">3 مستخدمين</span>
+</div>
+</div>
+<div class="h-px bg-slate-100 dark:bg-primary/10 w-full"></div>
+<div class="flex items-center justify-between text-xs">
+<div class="flex -space-x-2 space-x-reverse">
+<div class="size-6 rounded-full border-2 border-background-dark bg-slate-400 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Sales avatar 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKHzSRgmMpJpqH9SNVUmAkLLztWYj_Zcontmo9l5ibEQLpwpH9iamZ6IFCxZnkgLjpbErfCflQryvSuPMkmANJGM5cxCnGiIqRb63Ms0xrHVoVK2khpVFjVxsHxoRumiAKiyaU14NkkejI1jE6pcE2SXNB-AEXHGgvsOc8o3W0jO6a0HTYeZ4wnmpIvfr3g4Hf452DIm345ZnyBaDVJCmMZLWj4sl9jmgDZgrJ6hNuWVtHb68oYqUxmi4bOBfxGLey68kzJKN2FUE"/>
+</div>
+<div class="size-6 rounded-full border-2 border-background-dark bg-slate-500 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Sales avatar 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQUKRFiWbLcUPhm0TlGRKGNhLSUlAPVb9GYIgAFFTgXTtygSlfQTX6p-eRhmtT8nIiWDLhR3yfEJmkhK0RhDByXU2ol-mHBT6C-JRu1QjSQJMbUznU6KISGkIf-e4KUplvv1q2PAkFMbr-5Zmz_BFQufrFozWNNGYhlgBmaKiGZsfG2zUzaPoiDgJ98YmrMgUk30cUr5WwNGXxPEITRVv1tXn1OpJLzMcEbJGW3N43oR9FNY-R8KX0vJNpZUo2HtiYNS-AhaYfqNg"/>
+</div>
+<div class="size-6 rounded-full border-2 border-background-dark bg-primary flex items-center justify-center text-[8px] font-bold text-white">
+                            +1
+                        </div>
+</div>
+<button class="text-primary font-bold flex items-center gap-1">
+                        تعديل الصلاحيات
+                        <span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+</div>
+</div>
+<!-- Role Card: Inventory Clerk -->
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl p-4 flex flex-col gap-3">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-xl bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">inventory_2</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-900 dark:text-slate-100">أمين مخزن</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">عرض المخزون وتسجيل التوريدات فقط</p>
+</div>
+</div>
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
+<span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">5 مستخدمين</span>
+</div>
+</div>
+<div class="h-px bg-slate-100 dark:bg-primary/10 w-full"></div>
+<div class="flex items-center justify-between text-xs">
+<div class="flex -space-x-2 space-x-reverse">
+<div class="size-6 rounded-full border-2 border-background-dark bg-slate-400 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Staff avatar 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb_pOXY1inTA50R1xi0EoeTKnkeaqmLyLkHUBmDHiBNmGJ0utMXhSLePiODQdlyGofxjQEMuqaYYISzAnI1jGauCf6dgbN9zaTaxv-_tLCajrmctzL5BmxoE5ZWvzDv4KCPZMYAC56b3KuJrFEY9JVRLq6Pr0xfgedl86qVvuFSPVWrJk0tmP2hQinPoAY8KODoxPWCbWxFnY6xwRFhVxLwaVLHkAQxuomiYYrAgUEwaWkjX1PMTWUJffZrKE4gBiCA3jRIySO1y0"/>
+</div>
+<div class="size-6 rounded-full border-2 border-background-dark bg-slate-500 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Staff avatar 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6lcMvrM2RRj6sI7jKRraa03rPj6Uap-_FESf_7yX5i7Kim7RpzxeW2a7HMWnN3-pbhrLLt3VBgzACgHiU9VmJBKdBHE2GvZnewpF6-KUw--KJObQbOf0c3RalwgaiLSbrhhOkIo6tfdkX4UY_OiwihInjY50iHxuqRvQhUeYyG1cfZoIELyzZiKr0xky0PpkrtLuGbGqngqm6k1I15TSnQRCdBKAwZzzTiHTpTC1X-o8DXDRU_7BJoFvYYrkc4FhXSfSRcJ1MiuU"/>
+</div>
+<div class="size-6 rounded-full border-2 border-background-dark bg-primary flex items-center justify-center text-[8px] font-bold text-white">
+                            +3
+                        </div>
+</div>
+<button class="text-primary font-bold flex items-center gap-1">
+                        تعديل الصلاحيات
+                        <span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-background-light dark:bg-background-dark border-t border-slate-200 dark:border-primary/20 pb-safe-area-inset-bottom">
+<div class="flex items-center justify-around py-2 px-4">
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px]">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="text-[10px]">التقارير</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined font-bold" style="font-variation-settings: 'FILL' 1">group</span>
+<span class="text-[10px] font-bold">الموظفين</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px]">الإعدادات</span>
+</a>
+</div>
+</nav>
+</body></html>

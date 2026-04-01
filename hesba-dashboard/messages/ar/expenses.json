@@ -1,0 +1,118 @@
+{
+  "pageTitle": "المصروفات | دفتر",
+  "pageDescription": "إدارة مصروفات النشاط مع الفلاتر والملخصات والتصدير.",
+  "title": "المصروفات",
+  "subtitle": "سجّل المصروفات التشغيلية وتابعها بدقة وسرعة.",
+  "filters": {
+    "searchPlaceholder": "ابحث بالوصف أو المرجع أو الملاحظات",
+    "allCategories": "كل الفئات",
+    "searchCategory": "ابحث عن فئة",
+    "noCategories": "لا توجد فئات",
+    "allSuppliers": "كل الموردين",
+    "searchSupplier": "ابحث عن مورد",
+    "noSuppliers": "لا يوجد موردون",
+    "perPage": "{count} لكل صفحة"
+  },
+  "summary": {
+    "totalExpenses": "إجمالي المصروفات: {count}",
+    "totalAmount": "إجمالي المبلغ",
+    "count": "عدد السجلات",
+    "itemsCount": "{count} سجل",
+    "noCategoryBreakdown": "توزيع الفئات",
+    "noData": "لا توجد بيانات"
+  },
+  "table": {
+    "ariaLabel": "جدول المصروفات",
+    "expenseDate": "تاريخ المصروف",
+    "category": "الفئة",
+    "amount": "المبلغ",
+    "supplier": "المورد",
+    "paymentMethod": "طريقة الدفع",
+    "referenceNumber": "الرقم المرجعي",
+    "description": "الوصف",
+    "notes": "الملاحظات"
+  },
+  "form": {
+    "category": "الفئة",
+    "amount": "المبلغ",
+    "expenseDate": "تاريخ المصروف",
+    "supplier": "المورد (اختياري)",
+    "paymentMethod": "طريقة الدفع",
+    "referenceNumber": "الرقم المرجعي",
+    "description": "الوصف",
+    "notes": "الملاحظات"
+  },
+  "actions": {
+    "addExpense": "إضافة مصروف",
+    "exportExcel": "تصدير Excel",
+    "exporting": "جارٍ التصدير...",
+    "create": "إنشاء",
+    "save": "حفظ التعديلات",
+    "saving": "جارٍ الحفظ...",
+    "cancel": "إلغاء",
+    "view": "عرض التفاصيل",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "loading": "جارٍ التحميل..."
+  },
+  "export": {
+    "sheetName": "المصروفات",
+    "filePrefix": "المصروفات"
+  },
+  "exportModal": {
+    "title": "تصدير المصروفات",
+    "description": "حدّد فترة تاريخية اختيارية وحدًا أقصى للنتائج قبل تنزيل ملف Excel.",
+    "fromDate": "من تاريخ",
+    "toDate": "إلى تاريخ",
+    "maxRecords": "الحد الأقصى للصفوف",
+    "maxRecordsHint": "اتركه فارغًا لتصدير كل النتائج المطابقة.",
+    "reset": "إعادة ضبط"
+  },
+  "modal": {
+    "createTitle": "إضافة مصروف جديد",
+    "createDescription": "أدخل بيانات المصروف وسجّله في النظام المحاسبي.",
+    "editTitle": "تعديل المصروف",
+    "editDescription": "حدّث بيانات المصروف."
+  },
+  "details": {
+    "pageTitle": "تفاصيل المصروف | دفتر",
+    "pageDescription": "عرض تفاصيل سجل المصروف بالكامل.",
+    "title": "تفاصيل المصروف",
+    "subtitle": "راجع كامل بيانات المصروف من شاشة واحدة.",
+    "backToList": "الرجوع إلى المصروفات",
+    "meta": {
+      "createdBy": "تم الإنشاء بواسطة",
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "آخر تحديث"
+    }
+  },
+  "empty": {
+    "title": "لا توجد مصروفات بعد",
+    "description": "ابدأ بإضافة أول مصروف لتتبع التكاليف."
+  },
+  "messages": {
+    "createSuccess": "تم إنشاء المصروف بنجاح.",
+    "createError": "تعذر إنشاء المصروف.",
+    "updateSuccess": "تم تحديث المصروف بنجاح.",
+    "updateError": "تعذر تحديث المصروف.",
+    "deleteSuccess": "تم حذف المصروف بنجاح.",
+    "deleteError": "تعذر حذف المصروف.",
+    "exportSuccess": "تم تصدير المصروفات بنجاح.",
+    "exportError": "تعذر تصدير المصروفات.",
+    "exportEmpty": "لا توجد بيانات مصروفات للتصدير."
+  },
+  "delete": {
+    "confirm": "هل أنت متأكد من حذف المصروف رقم #{id}؟"
+  },
+  "categories": {
+    "RENT": "إيجار",
+    "SALARIES": "رواتب",
+    "UTILITIES": "مرافق",
+    "SUPPLIES": "مستلزمات",
+    "TRANSPORTATION": "مواصلات",
+    "MAINTENANCE": "صيانة",
+    "MARKETING": "تسويق",
+    "TAXES": "ضرائب",
+    "OTHER": "أخرى"
+  }
+}

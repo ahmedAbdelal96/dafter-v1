@@ -1,0 +1,67 @@
+{
+  "title": "Dashboard",
+
+  "greeting": {
+    "morning":   "Good morning",
+    "afternoon": "Good afternoon",
+    "evening":   "Good evening"
+  },
+
+  "period": {
+    "today":        "Today",
+    "week":         "This Week",
+    "month":        "This Month",
+    "year":         "This Year",
+    "last_30_days": "Last 30 Days"
+  },
+
+  "kpis": {
+    "netProfit":        "Net Profit",
+    "totalSales":       "Sales",
+    "totalExpenses":    "Expenses",
+    "collectionAmount": "Collections",
+    "receivables":      "Receivables",
+    "payables":         "Payables",
+    "cashNetFlow":      "Cash Net Flow"
+  },
+
+  "sections": {
+    "operations":   "Operations",
+    "alerts":       "Needs Attention",
+    "quickActions": "Quick Actions",
+    "todaySnapshot": "Today's Snapshot",
+    "topOverdue":    "Top Overdue Customers"
+  },
+
+  "todayKpis": {
+    "sales":       "Today Sales",
+    "collections": "Collections",
+    "pending":     "Pending",
+    "overdue":     "Overdue"
+  },
+
+  "ctas": {
+    "newInvoice":    "New Invoice",
+    "recordPayment": "Record Payment",
+    "viewOverdue":   "View Overdue"
+  },
+
+  "operations": {
+    "invoices":      "Invoices",
+    "deferredSales": "Deferred",
+    "installments":  "Installments"
+  },
+
+  "alerts": {
+    "overdueDeferredSales":      "{{count}} deferred sale(s) overdue — tap to review",
+    "overdueInstallments":       "{{count}} installment(s) overdue — tap to review",
+    "criticalNegativeBalances":  "{{count}} critical negative balance(s) — tap to review"
+  },
+
+  "quickActions": {
+    "newInvoice":   "New Invoice",
+    "newExpense":   "New Expense",
+    "newCustomer":  "New Customer",
+    "viewLedger":   "Ledger"
+  }
+}

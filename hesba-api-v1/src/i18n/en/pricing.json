@@ -1,0 +1,11 @@
+{
+  "list": {
+    "success": "Customer prices retrieved successfully"
+  },
+  "get": {
+    "success": "Price retrieved successfully"
+  },
+  "set": {
+    "success": "Custom price saved successfully"
+  }
+}

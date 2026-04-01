@@ -1,0 +1,99 @@
+{
+  "title": "الموظفون",
+  "singular": "موظف",
+  "list": {
+    "title": "قائمة الموظفين",
+    "empty": "لا يوجد موظفون",
+    "emptyDesc": "أضف أول موظف لتتبع الرواتب والسلف",
+    "searchPlaceholder": "بحث بالاسم أو الهاتف أو المسمى"
+  },
+  "detail": {
+    "title": "بيانات الموظف",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "phone": "رقم الهاتف",
+    "jobTitle": "المسمى الوظيفي",
+    "openingBalance": "الرصيد الافتتاحي",
+    "balance": "الرصيد الحالي",
+    "createdAt": "تاريخ الإضافة",
+    "viewStatement": "عرض كشف الحساب",
+    "edit": "تعديل",
+    "delete": "حذف"
+  },
+  "form": {
+    "create": "إضافة موظف",
+    "edit": "تعديل بيانات الموظف",
+    "name": "الاسم",
+    "namePlaceholder": "اسم الموظف",
+    "phone": "رقم الهاتف",
+    "phonePlaceholder": "01xxxxxxxxx",
+    "jobTitle": "المسمى الوظيفي",
+    "jobTitlePlaceholder": "المسمى الوظيفي (اختياري)",
+    "openingBalance": "الرصيد الافتتاحي",
+    "openingBalancePlaceholder": "0.00",
+    "openingBalanceHint": "الرصيد عند إضافة الموظف (لا يمكن تعديله لاحقاً)",
+    "isActive": "الحالة",
+    "activeYes": "نشط",
+    "activeNo": "غير نشط",
+    "save": "حفظ"
+  },
+  "delete": {
+    "title": "حذف الموظف",
+    "message": "هل أنت متأكد من حذف هذا الموظف؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirm": "حذف",
+    "cancel": "إلغاء",
+    "hasLedger": "لا يمكن حذف الموظف لأن له معاملات مسجلة في الدفتر"
+  },
+  "errors": {
+    "loadFailed": "فشل تحميل الموظفين",
+    "retry": "إعادة المحاولة",
+    "createFailed": "فشل إضافة الموظف",
+    "updateFailed": "فشل تعديل بيانات الموظف",
+    "nameTaken": "يوجد موظف بهذا الاسم مسبقاً",
+    "quotaExceeded": "لقد وصلت للحد الأقصى من الموظفين في خطتك الحالية",
+    "versionConflict": "تم تعديل بيانات الموظف من جهاز آخر. يرجى إغلاق النافذة وإعادة المحاولة."
+  },
+  "validation": {
+    "nameRequired": "الاسم مطلوب",
+    "invalidAmount": "الرصيد يجب أن يكون رقماً صحيحاً"
+  },
+  "payroll": {
+    "title": "الرواتب",
+    "subtitle": "صرف الرواتب والسلف والخصومات",
+    "selectHint": "اختر موظفاً لعرض سجل رواتبه",
+    "entryTypes": {
+      "SALARY_PAYMENT": "صرف راتب",
+      "ADVANCE": "سلفة",
+      "DEDUCTION": "خصم"
+    },
+    "summary": {
+      "salaryPayments": "الرواتب",
+      "advances": "السلف",
+      "deductions": "الخصومات",
+      "net": "الصافي"
+    },
+    "empty": {
+      "title": "لا توجد قيود رواتب",
+      "desc": "لم يتم تسجيل أي رواتب أو سلف لهذا الموظف بعد."
+    },
+    "form": {
+      "title": "إضافة قيد راتب",
+      "type": "نوع القيد",
+      "amount": "المبلغ",
+      "amountPlaceholder": "0.00",
+      "date": "التاريخ (YYYY-MM-DD)",
+      "datePlaceholder": "2026-03-20",
+      "note": "ملاحظة (اختياري)",
+      "notePlaceholder": "أضف ملاحظة...",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ..."
+    },
+    "messages": {
+      "createSuccess": "تم تسجيل القيد بنجاح.",
+      "createError": "تعذر تسجيل القيد.",
+      "deleteSuccess": "تم حذف القيد.",
+      "deleteError": "تعذر حذف القيد.",
+      "deleteConfirm": "حذف قيد الراتب هذا؟"
+    }
+  }
+}

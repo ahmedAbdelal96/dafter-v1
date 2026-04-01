@@ -1,0 +1,8 @@
+/**
+ * NativeWind v4 global CSS entry point.
+ * Processed by Metro (via nativewind/metro in metro.config.js).
+ * Must be imported at the very top of src/app/_layout.tsx.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

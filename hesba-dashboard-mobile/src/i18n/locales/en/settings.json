@@ -1,0 +1,51 @@
+{
+  "title": "Settings",
+  "sections": {
+    "account": "Account",
+    "preferences": "Preferences",
+    "company": "Company Info",
+    "subscription": "Subscription",
+    "security": "Security",
+    "support": "Support"
+  },
+  "account": {
+    "profile": "Profile",
+    "changePassword": "Change Password",
+    "logout": "Log Out",
+    "logoutConfirm": "Are you sure you want to log out?"
+  },
+  "preferences": {
+    "language": "Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "languageAr": "Arabic",
+    "languageEn": "English",
+    "restartRequired": "App restart required to apply the change"
+  },
+  "company": {
+    "name": "Company Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "currency": "Currency"
+  },
+  "subscription": {
+    "currentPlan": "Current Plan",
+    "status": "Status",
+    "expiresAt": "Expires At",
+    "upgrade": "Upgrade Plan"
+  },
+  "security": {
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 8 characters"
+  },
+  "support": {
+    "contact": "Contact Us",
+    "version": "Version"
+  }
+}

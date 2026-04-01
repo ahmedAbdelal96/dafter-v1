@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<title>Subscriptions &amp; Billing</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Header -->
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 sticky top-0 z-10 border-b border-primary/10">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">menu</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight flex-1 text-center">الاشتراكات والفواتير</h2>
+<div class="flex w-10 items-center justify-end">
+<button class="relative flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-red-500"></span>
+</button>
+</div>
+</header>
+<!-- Stats Grid -->
+<main class="flex-1 pb-20">
+<div class="grid grid-cols-2 gap-4 p-4">
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-primary/10 border border-primary/20">
+<p class="text-slate-600 dark:text-slate-400 text-xs font-medium">إجمالي الإيرادات</p>
+<p class="text-slate-900 dark:text-slate-100 text-xl font-bold">45,200 ر.س</p>
+<div class="flex items-center gap-1 text-emerald-500 text-xs font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>+12.5%</span>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-primary/10 border border-primary/20">
+<p class="text-slate-600 dark:text-slate-400 text-xs font-medium">المشتركون النشطون</p>
+<p class="text-slate-900 dark:text-slate-100 text-xl font-bold">1,240</p>
+<div class="flex items-center gap-1 text-emerald-500 text-xs font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>+5.2%</span>
+</div>
+</div>
+</div>
+<!-- Chart Section -->
+<section class="px-4 py-2">
+<div class="rounded-xl bg-primary/5 p-4 border border-primary/10">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-slate-900 dark:text-slate-100 text-base font-bold">نمو الاشتراكات</h3>
+<span class="text-primary text-xs font-medium bg-primary/20 px-2 py-1 rounded">آخر 6 أشهر</span>
+</div>
+<div class="h-40 w-full">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 400 150">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#1f7a5a" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#1f7a5a" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,120 Q50,110 80,70 T160,80 T240,40 T320,60 T400,20 V150 H0 Z" fill="url(#chartGradient)"></path>
+<path d="M0,120 Q50,110 80,70 T160,80 T240,40 T320,60 T400,20" fill="none" stroke="#1f7a5a" stroke-width="3"></path>
+</svg>
+</div>
+<div class="flex justify-between mt-2 px-1">
+<span class="text-[10px] text-slate-500">يناير</span>
+<span class="text-[10px] text-slate-500">فبراير</span>
+<span class="text-[10px] text-slate-500">مارس</span>
+<span class="text-[10px] text-slate-500">أبريل</span>
+<span class="text-[10px] text-slate-500">مايو</span>
+<span class="text-[10px] text-slate-500">يونيو</span>
+</div>
+</div>
+</section>
+<!-- Pending Payments -->
+<section class="px-4 py-4">
+<h3 class="text-slate-900 dark:text-slate-100 text-base font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-500">pending_actions</span>
+                    مدفوعات معلقة
+                </h3>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-4 rounded-xl bg-slate-100 dark:bg-primary/5 border border-primary/10">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-500">person</span>
+</div>
+<div>
+<p class="text-sm font-semibold">شركة الأمل</p>
+<p class="text-xs text-slate-500">فاتورة #INV-2024</p>
+</div>
+</div>
+<div class="text-left">
+<p class="text-sm font-bold text-slate-900 dark:text-slate-100">1,200 ر.س</p>
+<p class="text-[10px] text-amber-500 font-medium">بانتظار التحويل</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Expiring Soon -->
+<section class="px-4 py-2">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-slate-900 dark:text-slate-100 text-base font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-red-500">timer</span>
+                        تنتهي صلاحيتها قريباً
+                    </h3>
+<button class="text-primary text-xs font-semibold">عرض الكل</button>
+</div>
+<div class="space-y-3">
+<!-- Item 1 -->
+<div class="flex items-center justify-between p-4 rounded-xl bg-slate-100 dark:bg-primary/5 border border-primary/10">
+<div class="flex flex-1 flex-col">
+<div class="flex items-center gap-2">
+<p class="text-sm font-semibold">أحمد محمد</p>
+<span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 text-[10px] font-bold uppercase">تجريبي</span>
+</div>
+<p class="text-xs text-slate-500">ينتهي خلال يومين</p>
+</div>
+<button class="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-lg">تجديد</button>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center justify-between p-4 rounded-xl bg-slate-100 dark:bg-primary/5 border border-primary/10">
+<div class="flex flex-1 flex-col">
+<div class="flex items-center gap-2">
+<p class="text-sm font-semibold">سارة خالد</p>
+<span class="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold uppercase">سنوي</span>
+</div>
+<p class="text-xs text-slate-500">ينتهي خلال 5 أيام</p>
+</div>
+<button class="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-lg">تجديد</button>
+</div>
+</div>
+</section>
+<!-- Quick Action -->
+<div class="p-4 mt-4">
+<button class="w-full flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">settings_suggest</span>
+                    إدارة الخطط والأسعار
+                </button>
+</div>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 z-20 flex border-t border-primary/10 bg-white dark:bg-background-dark px-4 pb-6 pt-2">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-[10px] font-medium">الرئيسية</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">receipt_long</span>
+<p class="text-[10px] font-medium">الفواتير</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">group</span>
+<p class="text-[10px] font-medium">المستخدمين</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-[10px] font-medium">الإعدادات</p>
+</a>
+</nav>
+</div>
+</body></html>

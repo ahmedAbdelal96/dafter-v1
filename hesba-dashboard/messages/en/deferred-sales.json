@@ -1,0 +1,133 @@
+{
+  "pageTitle": "Deferred Sales | Daftar",
+  "pageDescription": "Track deferred sales, payments, and collection status.",
+  "title": "Deferred Sales",
+  "subtitle": "Manage deferred balances and settle them quickly.",
+  "filters": {
+    "search": "Search by reference number or description",
+    "partyType": "Party type",
+    "partyTypeAll": "All party types",
+    "partyTypeCustomer": "Customer",
+    "partyTypeSupplier": "Supplier",
+    "partyTypeEmployee": "Employee",
+    "party": "Party",
+    "searchParty": "Search party",
+    "noParties": "No parties found",
+    "status": "Status",
+    "statusAll": "All statuses",
+    "perPage": "{count} rows",
+    "total": "Total deferred sales: {count}"
+  },
+  "partyType": {
+    "CUSTOMER": "Customer",
+    "SUPPLIER": "Supplier",
+    "EMPLOYEE": "Employee"
+  },
+  "status": {
+    "PENDING": "Pending",
+    "PARTIAL": "Partially paid",
+    "PAID": "Paid",
+    "OVERDUE": "Overdue"
+  },
+  "actions": {
+    "add": "Add deferred sale",
+    "create": "Create",
+    "recordPayment": "Record payment",
+    "cancelSale": "Cancel sale",
+    "createInvoice": "Create invoice",
+    "view": "View",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "loading": "Loading...",
+    "export": "Export Excel",
+    "exporting": "Exporting..."
+  },
+  "export": {
+    "sheetName": "Deferred Sales",
+    "filePrefix": "deferred-sales"
+  },
+  "exportModal": {
+    "title": "Export deferred sales",
+    "description": "Choose an optional date range and max rows before downloading Excel.",
+    "fromDate": "From date",
+    "toDate": "To date",
+    "maxRecords": "Maximum rows",
+    "maxRecordsHint": "Leave empty to export all matched rows.",
+    "reset": "Reset"
+  },
+  "table": {
+    "referenceNumber": "Reference",
+    "partyType": "Party type",
+    "partyName": "Party",
+    "totalAmount": "Total amount",
+    "paidAmount": "Paid",
+    "remaining": "Remaining",
+    "dueDate": "Due date",
+    "status": "Status",
+    "ariaLabel": "Deferred sales table"
+  },
+  "createModal": {
+    "title": "Create deferred sale",
+    "description": "Record a deferred sale for customer, supplier, or employee."
+  },
+  "paymentModal": {
+    "title": "Record payment",
+    "description": "Add a payment against this deferred sale."
+  },
+  "form": {
+    "partyType": "Party type",
+    "party": "Party",
+    "totalAmount": "Total amount",
+    "entryDate": "Entry date",
+    "dueDate": "Due date",
+    "expectedPaymentMethod": "Expected payment method",
+    "description": "Description"
+  },
+  "paymentForm": {
+    "amount": "Payment amount",
+    "paymentDate": "Payment date",
+    "paymentMethod": "Payment method",
+    "notes": "Notes"
+  },
+  "messages": {
+    "createSuccess": "Deferred sale created successfully.",
+    "createError": "Failed to create deferred sale.",
+    "paymentSuccess": "Payment recorded successfully.",
+    "paymentError": "Failed to record payment.",
+    "cancelSuccess": "Deferred sale cancelled successfully.",
+    "cancelError": "Failed to cancel deferred sale.",
+    "cancelConfirm": "Are you sure you want to cancel deferred sale {referenceNumber}?",
+    "createInvoiceSuccess": "Invoice created successfully.",
+    "createInvoiceError": "Failed to create invoice from deferred sale.",
+    "exportSuccess": "Deferred sales exported successfully.",
+    "exportError": "Failed to export deferred sales.",
+    "exportEmpty": "No deferred sales found for export."
+  },
+  "empty": {
+    "title": "No deferred sales found",
+    "description": "No deferred sales match the current filters."
+  },
+  "details": {
+    "pageTitle": "Deferred Sale Details | Daftar",
+    "pageDescription": "Review deferred sale details and payment history.",
+    "subtitle": "Detailed deferred sale view with settlement history.",
+    "back": "Back to deferred sales",
+    "partyType": "Party type",
+    "partyName": "Party name",
+    "createdAt": "Created at",
+    "description": "Description",
+    "empty": {
+      "title": "Deferred sale not found",
+      "description": "The requested deferred sale could not be loaded."
+    },
+    "payments": {
+      "title": "Payments",
+      "subtitle": "All recorded payments for this deferred sale.",
+      "paymentDate": "Payment date",
+      "amount": "Amount",
+      "paymentMethod": "Method",
+      "notes": "Notes",
+      "ariaLabel": "Deferred sale payments table"
+    }
+  }
+}

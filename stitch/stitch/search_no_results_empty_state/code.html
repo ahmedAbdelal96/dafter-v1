@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f7a5a",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-300">
+<div class="flex flex-col h-screen max-w-md mx-auto overflow-hidden border-x border-primary/10">
+<!-- Top App Bar -->
+<header class="flex items-center justify-between p-4 bg-background-light dark:bg-background-dark border-b border-primary/10">
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_forward</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Hasba</h1>
+</div>
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">more_vert</span>
+</button>
+</header>
+<!-- Search Input Section -->
+<div class="px-4 py-4 bg-background-light dark:bg-background-dark">
+<div class="relative flex items-center w-full">
+<div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+<span class="material-symbols-outlined text-primary">search</span>
+</div>
+<input class="block w-full h-12 pr-12 pl-12 bg-primary/5 dark:bg-primary/10 border-none rounded-xl focus:ring-2 focus:ring-primary text-slate-900 dark:text-slate-100 placeholder-primary/50 text-base" placeholder="البحث العالمي" type="text" value="المحفظة الرقمية الذكية"/>
+<div class="absolute inset-y-0 left-0 flex items-center pl-2">
+<button class="flex items-center justify-center size-8 rounded-full text-primary/60 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">cancel</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Main Content: Empty State -->
+<main class="flex-1 flex flex-col items-center justify-center px-8 text-center bg-background-light dark:bg-background-dark">
+<div class="relative mb-8">
+<!-- Abstract Premium Shape -->
+<div class="absolute inset-0 bg-primary/10 blur-3xl rounded-full scale-150"></div>
+<div class="relative flex items-center justify-center size-40 rounded-full bg-gradient-to-br from-primary/20 to-transparent border border-primary/20">
+<span class="material-symbols-outlined text-6xl text-primary/40 select-none" style="font-variation-settings: 'wght' 200;">search_off</span>
+</div>
+</div>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3 tracking-tight">لا توجد نتائج</h2>
+<p class="text-slate-600 dark:text-slate-400 text-base leading-relaxed max-w-[280px]">
+                لم نتمكن من العثور على ما تبحث عنه. يرجى المحاولة باستخدام كلمات رئيسية أخرى أو التحقق من الأخطاء الإملائية.
+            </p>
+<button class="mt-8 flex items-center justify-center gap-2 px-8 h-12 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all active:scale-95 shadow-lg shadow-primary/20">
+<span>إعادة المحاولة</span>
+<span class="material-symbols-outlined text-sm">refresh</span>
+</button>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="flex items-center justify-around h-20 bg-background-light dark:bg-background-dark border-t border-primary/10 px-4">
+<a class="flex flex-col items-center justify-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">home</span>
+<span class="text-xs font-medium text-slate-400 group-hover:text-primary">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 group" href="#">
+<div class="relative flex flex-col items-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">search</span>
+<div class="absolute -bottom-2 size-1 bg-primary rounded-full"></div>
+</div>
+<span class="text-xs font-medium text-primary">البحث</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">account_balance_wallet</span>
+<span class="text-xs font-medium text-slate-400 group-hover:text-primary">المحفظة</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">person</span>
+<span class="text-xs font-medium text-slate-400 group-hover:text-primary">الحساب</span>
+</a>
+</nav>
+</div>
+</body></html>

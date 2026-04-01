@@ -1,0 +1,315 @@
+{
+  "tabs": {
+    "dashboard": "Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©",
+    "companies": "Ø§Ù„Ø´Ø±ÙƒØ§Øª",
+    "subscriptions": "Ø§Ù„Ø§Ø´ØªØ±Ø§ÙƒØ§Øª",
+    "plans": "Ø§Ù„Ø®Ø·Ø·",
+    "more": "Ø§Ù„Ù…Ø²ÙŠØ¯"
+  },
+  "subStatus": {
+    "ACTIVE": "Ù†Ø´Ø·",
+    "TRIAL": "ØªØ¬Ø±ÙŠØ¨ÙŠ",
+    "SUSPENDED": "Ù…ÙˆÙ‚ÙˆÙ",
+    "EXPIRED": "Ù…Ù†ØªÙ‡ÙŠ",
+    "CANCELLED": "Ù…Ù„ØºÙŠ"
+  },
+  "billing": {
+    "MONTHLY": "Ø´Ù‡Ø±ÙŠÙ‹Ø§",
+    "YEARLY": "Ø³Ù†ÙˆÙŠÙ‹Ø§",
+    "QUARTERLY": "Ø±Ø¨Ø¹ Ø³Ù†ÙˆÙŠ"
+  },
+  "stats": {
+    "total": "Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø´Ø±ÙƒØ§Øª",
+    "active": "Ù†Ø´Ø·Ø©",
+    "trial": "ØªØ¬Ø±ÙŠØ¨ÙŠØ©",
+    "suspended": "Ù…ÙˆÙ‚ÙˆÙØ©"
+  },
+  "dashboard": {
+    "title": "Ù„ÙˆØ­Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©",
+    "adminBadge": "Ù…Ø¯ÙŠØ± Ø§Ù„Ù†Ø¸Ø§Ù…",
+    "quickLinks": "Ø±ÙˆØ§Ø¨Ø· Ø³Ø±ÙŠØ¹Ø©",
+    "newCompany": "Ø´Ø±ÙƒØ© Ø¬Ø¯ÙŠØ¯Ø©",
+    "recentCompanies": "Ø¢Ø®Ø± Ø§Ù„Ø´Ø±ÙƒØ§Øª"
+  },
+  "companies": {
+    "title": "Ø§Ù„Ø´Ø±ÙƒØ§Øª",
+    "searchPlaceholder": "Ø¨Ø­Ø« Ø¨Ø§Ù„Ø§Ø³Ù… Ø£Ùˆ Ø§Ù„Ù‡Ø§ØªÙâ€¦",
+    "empty": "Ù„Ø§ ØªÙˆØ¬Ø¯ Ø´Ø±ÙƒØ§Øª"
+  },
+  "subscriptions": {
+    "title": "Ø§Ù„Ø§Ø´ØªØ±Ø§ÙƒØ§Øª",
+    "searchPlaceholder": "Ø¨Ø­Ø« Ø¨Ø§Ø³Ù… Ø§Ù„Ø´Ø±ÙƒØ©â€¦",
+    "empty": "Ù„Ø§ ØªÙˆØ¬Ø¯ Ø§Ø´ØªØ±Ø§ÙƒØ§Øª",
+    "noSub": "Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø§Ø´ØªØ±Ø§Ùƒ",
+    "daysLeft": "{{count}} ÙŠÙˆÙ… Ù…ØªØ¨Ù‚Ù",
+    "expired": "Ù…Ù†ØªÙ‡ÙŠ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©"
+  },
+  "filter": {
+    "all": "Ø§Ù„ÙƒÙ„"
+  },
+  "detail": {
+    "title": "ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø´Ø±ÙƒØ©",
+    "noSubscription": "Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø§Ø´ØªØ±Ø§Ùƒ Ù†Ø´Ø·",
+    "currentPlan": "Ø§Ù„Ø®Ø·Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©",
+    "companyActive": "Ù†Ø´Ø·Ø©",
+    "companyDisabled": "Ù…Ø¹Ø·Ù‘Ù„Ø©",
+    "startDate": "ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©",
+    "endDate": "ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡",
+    "since": "Ù…Ù†Ø° {{date}}",
+    "subscription": "Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+    "actions": "Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª",
+    "noActiveSub": "Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø§Ø´ØªØ±Ø§Ùƒ Ù†Ø´Ø·",
+    "companyActions": "إجراءات الشركة",
+    "companyActionsDescription": "حدّث بيانات مساحة العمل، وأدر المستخدمين، وتحكم في إتاحة الشركة اليومية.",
+    "subscriptionActions": "إجراءات الاشتراك",
+    "subscriptionActionsDescription": "أدر مدة الاشتراك الحالية، والخطة، وحالة الوصول الخاصة بهذه الشركة.",
+    "governanceActions": "الأرشفة والإجراءات الحساسة",
+    "governanceActionsDescription": "استخدم هذه الإجراءات فقط للحالات الإدارية أو التنظيف أو التعامل مع المساحات المؤرشفة."
+  },
+  "metrics": {
+    "users": "Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙˆÙ†",
+    "customers": "Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡",
+    "suppliers": "Ø§Ù„Ù…ÙˆØ±Ø¯ÙˆÙ†",
+    "employees": "Ø§Ù„Ù…ÙˆØ¸ÙÙˆÙ†"
+  },
+  "actions": {
+    "activate": "ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+    "extend": "ØªÙ…Ø¯ÙŠØ¯ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+    "suspend": "ØªØ¹Ù„ÙŠÙ‚ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+    "disable": "ØªØ¹Ø·ÙŠÙ„ Ø§Ù„Ø´Ø±ÙƒØ©",
+    "enable": "ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø´Ø±ÙƒØ©",
+    "viewUsers": "Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙˆÙ†",
+    "disableCompany": "ØªØ¹Ø·ÙŠÙ„",
+    "enableCompany": "ØªÙØ¹ÙŠÙ„",
+    "changePlan": "Change Plan",
+    "editCompany": "Edit Company",
+    "archiveCompany": "Archive Company",
+    "restoreCompany": "Restore Company",
+    "deleteCompany": "Delete Company"
+  },
+  "createCompany": {
+    "title": "Ø¥Ø¶Ø§ÙØ© Ø´Ø±ÙƒØ© Ø¬Ø¯ÙŠØ¯Ø©",
+    "sectionCompany": "Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø´Ø±ÙƒØ©",
+    "sectionOwner": "Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…Ø§Ù„Ùƒ",
+    "sectionSubscription": "Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+    "companyName": "Ø§Ø³Ù… Ø§Ù„Ø´Ø±ÙƒØ©",
+    "companyPhone": "Ù‡Ø§ØªÙ Ø§Ù„Ø´Ø±ÙƒØ© (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)",
+    "currency": "Ø±Ù…Ø² Ø§Ù„Ø¹Ù…Ù„Ø©",
+    "ownerFullName": "Ø§Ø³Ù… Ø§Ù„Ù…Ø§Ù„Ùƒ Ø§Ù„ÙƒØ§Ù…Ù„",
+    "ownerEmail": "Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ",
+    "ownerPassword": "ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±",
+    "ownerPhone": "Ù‡Ø§ØªÙ Ø§Ù„Ù…Ø§Ù„Ùƒ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)",
+    "selectPlan": "Ø§Ø®ØªØ± Ø§Ù„Ø®Ø·Ø©",
+    "trial": "ØªØ¬Ø±ÙŠØ¨ÙŠ",
+    "paid": "Ù…Ø¯ÙÙˆØ¹",
+    "trialDays": "Ø¹Ø¯Ø¯ Ø£ÙŠØ§Ù… Ø§Ù„ØªØ¬Ø±Ø¨Ø©",
+    "termMonths": "Ù…Ø¯Ø© Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ (Ø£Ø´Ù‡Ø±)",
+    "confirm": "Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø´Ø±ÙƒØ©",
+    "success": "ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø´Ø±ÙƒØ© Ø¨Ù†Ø¬Ø§Ø­",
+    "failed": "ÙØ´Ù„ Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø´Ø±ÙƒØ©",
+    "validation": {
+      "companyNameRequired": "Ø§Ø³Ù… Ø§Ù„Ø´Ø±ÙƒØ© Ù…Ø·Ù„ÙˆØ¨",
+      "ownerNameRequired": "Ø§Ø³Ù… Ø§Ù„Ù…Ø§Ù„Ùƒ Ù…Ø·Ù„ÙˆØ¨",
+      "emailRequired": "Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ù…Ø·Ù„ÙˆØ¨",
+      "emailInvalid": "Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ØºÙŠØ± ØµØ§Ù„Ø­",
+      "passwordRequired": "ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ù…Ø·Ù„ÙˆØ¨Ø©",
+      "passwordTooShort": "ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± 8 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„",
+      "passwordNeedsUppercase": "ÙŠØ¬Ø¨ Ø£Ù† ØªØ­ØªÙˆÙŠ Ø¹Ù„Ù‰ Ø­Ø±Ù ÙƒØ¨ÙŠØ±",
+      "passwordNeedsNumber": "ÙŠØ¬Ø¨ Ø£Ù† ØªØ­ØªÙˆÙŠ Ø¹Ù„Ù‰ Ø±Ù‚Ù…",
+      "planRequired": "ÙŠØ±Ø¬Ù‰ Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø®Ø·Ø©",
+      "trialDaysRequired": "Ø£Ø¯Ø®Ù„ Ø¹Ø¯Ø¯ Ø£ÙŠØ§Ù… Ø§Ù„ØªØ¬Ø±Ø¨Ø©"
+    }
+  },
+  "users": {
+    "title": "Ù…Ø³ØªØ®Ø¯Ù…Ùˆ Ø§Ù„Ø´Ø±ÙƒØ©",
+    "statsTotal": "Ø§Ù„ÙƒÙ„",
+    "statsActive": "Ù†Ø´Ø·ÙˆÙ†",
+    "statsDisabled": "Ù…Ø¹Ø·Ù‘Ù„ÙˆÙ†",
+    "searchPlaceholder": "Ø¨Ø­Ø« Ø¨Ø§Ù„Ø§Ø³Ù… Ø£Ùˆ Ø§Ù„Ø¨Ø±ÙŠØ¯â€¦",
+    "empty": "Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ø³ØªØ®Ø¯Ù…ÙˆÙ†",
+    "addStaff": "Ø¥Ø¶Ø§ÙØ© Ù…ÙˆØ¸Ù",
+    "roleOwner": "Ù…Ø§Ù„Ùƒ",
+    "roleStaff": "Ù…ÙˆØ¸Ù",
+    "active": "Ù†Ø´Ø·",
+    "disabled": "Ù…Ø¹Ø·Ù‘Ù„",
+    "disableConfirmTitle": "ØªØ¹Ø·ÙŠÙ„ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…",
+    "disableConfirmMsg": "Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† ØªØ¹Ø·ÙŠÙ„ Ù‡Ø°Ø§ Ø§Ù„Ø­Ø³Ø§Ø¨ØŸ",
+    "enableConfirmTitle": "ØªÙØ¹ÙŠÙ„ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…",
+    "enableConfirmMsg": "Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† ØªÙØ¹ÙŠÙ„ Ù‡Ø°Ø§ Ø§Ù„Ø­Ø³Ø§Ø¨ØŸ"
+  },
+  "createStaff": {
+    "title": "Ø¥Ø¶Ø§ÙØ© Ù…ÙˆØ¸Ù Ø¬Ø¯ÙŠØ¯",
+    "fullName": "Ø§Ù„Ø§Ø³Ù… Ø§Ù„ÙƒØ§Ù…Ù„",
+    "email": "Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ",
+    "password": "ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±",
+    "phone": "Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)",
+    "confirm": "Ø¥Ø¶Ø§ÙØ©",
+    "success": "ØªÙ… Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù…ÙˆØ¸Ù Ø¨Ù†Ø¬Ø§Ø­",
+    "failed": "ÙØ´Ù„ Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù…ÙˆØ¸Ù",
+    "validation": {
+      "nameRequired": "Ø§Ù„Ø§Ø³Ù… Ø§Ù„ÙƒØ§Ù…Ù„ Ù…Ø·Ù„ÙˆØ¨",
+      "emailInvalid": "Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ØºÙŠØ± ØµØ§Ù„Ø­",
+      "passwordWeak": "ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø¶Ø¹ÙŠÙØ© (8 Ø£Ø­Ø±ÙØŒ Ø­Ø±Ù ÙƒØ¨ÙŠØ±ØŒ Ø±Ù‚Ù…)"
+    }
+  },
+  "activate": {
+    "title": "ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+    "selectPlan": "Ø§Ø®ØªØ± Ø§Ù„Ø®Ø·Ø©",
+    "startDate": "ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©",
+    "endDate": "ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡",
+    "note": "Ù…Ù„Ø§Ø­Ø¸Ø© (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)",
+    "notePlaceholder": "Ù…Ø«Ø§Ù„: ØªÙØ¹ÙŠÙ„ ÙŠØ¯ÙˆÙŠ",
+    "confirm": "ØªÙØ¹ÙŠÙ„",
+    "success": "ØªÙ… ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ Ø¨Ù†Ø¬Ø§Ø­"
+  },
+  "extend": {
+    "title": "ØªÙ…Ø¯ÙŠØ¯ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+    "newEndDate": "ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ø¬Ø¯ÙŠØ¯",
+    "reason": "Ø³Ø¨Ø¨ Ø§Ù„ØªÙ…Ø¯ÙŠØ¯ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)",
+    "reasonPlaceholder": "Ù…Ø«Ø§Ù„: ÙØªØ±Ø© Ø³Ù…Ø§Ø­",
+    "confirm": "ØªÙ…Ø¯ÙŠØ¯",
+    "success": "ØªÙ… ØªÙ…Ø¯ÙŠØ¯ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ Ø¨Ù†Ø¬Ø§Ø­"
+  },
+  "suspend": {
+    "title": "ØªØ¹Ù„ÙŠÙ‚ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+    "warning": "Ø³ÙŠØªÙˆÙ‚Ù ÙˆØµÙˆÙ„ Ø£ÙØ±Ø§Ø¯ Ø§Ù„Ø´Ø±ÙƒØ© Ø¥Ù„Ù‰ Ø§Ù„Ù†Ø¸Ø§Ù… ÙÙˆØ± Ø§Ù„ØªØ¹Ù„ÙŠÙ‚.",
+    "reason": "Ø³Ø¨Ø¨ Ø§Ù„ØªØ¹Ù„ÙŠÙ‚ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)",
+    "reasonPlaceholder": "Ù…Ø«Ø§Ù„: ØªØ£Ø®Ø± Ø§Ù„Ø³Ø¯Ø§Ø¯",
+    "confirm": "ØªØ¹Ù„ÙŠÙ‚",
+    "success": "ØªÙ… ØªØ¹Ù„ÙŠÙ‚ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ"
+  },
+  "disableCompany": {
+    "title": "ØªØ¹Ø·ÙŠÙ„ Ø§Ù„Ø´Ø±ÙƒØ©",
+    "message": "Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† ØªØ¹Ø·ÙŠÙ„ Ù‡Ø°Ù‡ Ø§Ù„Ø´Ø±ÙƒØ©ØŸ Ù„Ù† ÙŠØªÙ…ÙƒÙ† Ø£ÙØ±Ø§Ø¯Ù‡Ø§ Ù…Ù† ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„.",
+    "confirm": "ØªØ¹Ø·ÙŠÙ„",
+    "cancel": "Ø¥Ù„ØºØ§Ø¡",
+    "success": "ØªÙ… ØªØ¹Ø·ÙŠÙ„ Ø§Ù„Ø´Ø±ÙƒØ©"
+  },
+  "enableCompany": {
+    "title": "ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø´Ø±ÙƒØ©",
+    "message": "Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† ØªÙØ¹ÙŠÙ„ Ù‡Ø°Ù‡ Ø§Ù„Ø´Ø±ÙƒØ©ØŸ Ø³ÙŠØªÙ…ÙƒÙ† Ø£ÙØ±Ø§Ø¯Ù‡Ø§ Ù…Ù† ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù…Ø¬Ø¯Ø¯Ø§Ù‹.",
+    "confirm": "ØªÙØ¹ÙŠÙ„",
+    "cancel": "Ø¥Ù„ØºØ§Ø¡",
+    "success": "ØªÙ… ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø´Ø±ÙƒØ©"
+  },
+  "plans": {
+    "title": "Ø®Ø·Ø· Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+    "active": "Ù†Ø´Ø·Ø©",
+    "inactive": "ØºÙŠØ± Ù†Ø´Ø·Ø©",
+    "hideInactive": "Ø¥Ø®ÙØ§Ø¡ ØºÙŠØ± Ø§Ù„Ù†Ø´Ø·Ø©",
+    "showInactive": "Ø¥Ø¸Ù‡Ø§Ø± ØºÙŠØ± Ø§Ù„Ù†Ø´Ø·Ø©",
+    "empty": "Ù„Ø§ ØªÙˆØ¬Ø¯ Ø®Ø·Ø·",
+    "maxUsers": "Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙˆÙ†",
+    "maxCustomers": "Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡",
+    "maxEmployees": "Ø§Ù„Ù…ÙˆØ¸ÙÙˆÙ†",
+    "featuresCount": "{{count}} Ù…ÙŠØ²Ø©"
+  },
+  "more": {
+    "title": "Ø§Ù„Ù…Ø²ÙŠØ¯",
+    "superAdmin": "Ù…Ø¯ÙŠØ± Ø§Ù„Ù†Ø¸Ø§Ù…",
+    "adminNote": "Ø£Ù†Øª ØªØ¯ÙŠØ± Ø§Ù„Ù…Ù†ØµØ© Ø¨Ø§Ù„ÙƒØ§Ù…Ù„. Ø§Ø³ØªØ®Ø¯Ù… Ù‡Ø°Ø§ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ Ù„Ù„Ø¥Ø´Ø±Ø§Ù Ø¹Ù„Ù‰ Ø§Ù„Ø´Ø±ÙƒØ§Øª ÙˆØ§Ù„Ø®Ø·Ø·.",
+    "logout": "ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬",
+    "auditLogs": "سجل التدقيق",
+    "platformSettings": "إعدادات المنصة"
+  },
+  "auditLogs": {
+    "title": "Ø³Ø¬Ù„ Ø§Ù„ØªØ¯Ù‚ÙŠÙ‚",
+    "subtitle": "Ù…ØªØ§Ø¨Ø¹Ø© Ø¹Ù…Ù„ÙŠØ§Øª Ø§Ù„Ù…Ù†ØµØ© ÙˆØ£Ø­Ø¯Ø§Ø« Ø§Ù„Ø­ÙˆÙƒÙ…Ø©.",
+    "searchPlaceholder": "Ø§Ø¨Ø­Ø« Ø¯Ø§Ø®Ù„ Ø§Ù„Ø³Ø¬Ù„...",
+    "empty": "Ù„Ø§ ØªÙˆØ¬Ø¯ Ø³Ø¬Ù„Ø§Øª ØªØ¯Ù‚ÙŠÙ‚",
+    "total": "Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø¬Ù„Ø§Øª: {{count}}",
+    "filters": {
+      "allActions": "ÙƒÙ„ Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª",
+      "allEntities": "ÙƒÙ„ Ø§Ù„ÙƒÙŠØ§Ù†Ø§Øª"
+    }
+  },
+  "platformSettings": {
+    "title": "Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…Ù†ØµØ©",
+    "subtitle": "Ø³ÙŠØ§Ø³Ø§Øª Ø¹Ø§Ù…Ø© ÙˆØªØ­ÙƒÙ… ÙÙŠ Ø§Ù„Ù…ÙŠØ²Ø§Øª.",
+    "readOnlyNote": "Ù‡Ø°Ù‡ Ø§Ù„Ø´Ø§Ø´Ø© Ù„Ù„Ù‚Ø±Ø§Ø¡Ø© ÙÙ‚Ø· ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„Ø³Ø¨Ø±Ù†Øª. Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ Ø³ÙŠØªØ§Ø­ ÙÙŠ Ù…Ø±Ø­Ù„Ø© Ù„Ø§Ø­Ù‚Ø©.",
+    "enabled": "Ù…ÙØ¹Ù‘Ù„",
+    "disabled": "Ù…Ø¹Ø·Ù‘Ù„",
+    "noFlags": "Ù„Ø§ ØªÙˆØ¬Ø¯ Ø£Ø¹Ù„Ø§Ù… Ù…ÙŠØ²Ø§Øª",
+    "sections": {
+      "trialDefaults": "Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„ÙØªØ±Ø© Ø§Ù„ØªØ¬Ø±ÙŠØ¨ÙŠØ©",
+      "subscriptionPolicies": "Ø³ÙŠØ§Ø³Ø§Øª Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+      "governanceGuardrails": "Ø¶ÙˆØ§Ø¨Ø· Ø§Ù„Ø­ÙˆÙƒÙ…Ø©",
+      "featureFlags": "Ø£Ø¹Ù„Ø§Ù… Ø§Ù„Ù…ÙŠØ²Ø§Øª"
+    },
+    "fields": {
+      "durationDays": "Ø¹Ø¯Ø¯ Ø£ÙŠØ§Ù… Ø§Ù„ØªØ¬Ø±Ø¨Ø© Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ",
+      "autoActivateOnSignup": "ØªÙØ¹ÙŠÙ„ ØªÙ„Ù‚Ø§Ø¦ÙŠ Ø¹Ù†Ø¯ Ø§Ù„ØªØ³Ø¬ÙŠÙ„",
+      "requireCompanyPhone": "Ø¥Ù„Ø²Ø§Ù… Ù‡Ø§ØªÙ Ø§Ù„Ø´Ø±ÙƒØ©",
+      "gracePeriodDays": "ÙØªØ±Ø© Ø§Ù„Ø³Ù…Ø§Ø­ (Ø£ÙŠØ§Ù…)",
+      "allowPlanDowngrade": "Ø§Ù„Ø³Ù…Ø§Ø­ Ø¨Ø®ÙØ¶ Ø§Ù„Ø®Ø·Ø©",
+      "allowPlanUpgrade": "Ø§Ù„Ø³Ù…Ø§Ø­ Ø¨ØªØ±Ù‚ÙŠØ© Ø§Ù„Ø®Ø·Ø©",
+      "enforceSingleActiveSubscription": "ÙØ±Ø¶ Ø§Ø´ØªØ±Ø§Ùƒ Ø­ÙŠ ÙˆØ§Ø­Ø¯ ÙÙ‚Ø·",
+      "prorationMode": "ÙˆØ¶Ø¹ Ø§Ø­ØªØ³Ø§Ø¨ Ø§Ù„ÙØ±ÙˆÙ‚Ø§Øª",
+      "strictQuotaEnforcement": "ØªØ·Ø¨ÙŠÙ‚ ØµØ§Ø±Ù… Ù„Ù„Ø­ØµØµ",
+      "blockOnExpiredSubscription": "Ø§Ù„Ø­Ø¬Ø¨ Ø¹Ù†Ø¯ Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+      "allowReadOnlyDuringGracePeriod": "Ø§Ù„Ø³Ù…Ø§Ø­ Ø¨ÙˆØ¶Ø¹ Ø§Ù„Ù‚Ø±Ø§Ø¡Ø© Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø³Ù…Ø§Ø­"
+    }
+  },
+  "validation": {
+    "required": "Ù‡Ø°Ø§ Ø§Ù„Ø­Ù‚Ù„ Ù…Ø·Ù„ÙˆØ¨",
+    "selectPlan": "ÙŠØ±Ø¬Ù‰ Ø§Ø®ØªÙŠØ§Ø± Ø®Ø·Ø©",
+    "selectDate": "ÙŠØ±Ø¬Ù‰ ØªØ­Ø¯ÙŠØ¯ Ø§Ù„ØªØ§Ø±ÙŠØ®",
+    "planRequired": "ÙŠØ±Ø¬Ù‰ Ø§Ø®ØªÙŠØ§Ø± Ø®Ø·Ø©",
+    "endDateRequired": "ÙŠØ±Ø¬Ù‰ ØªØ­Ø¯ÙŠØ¯ ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡"
+  },
+  "errors": {
+    "activateFailed": "ÙØ´Ù„ ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+    "extendFailed": "ÙØ´Ù„ ØªÙ…Ø¯ÙŠØ¯ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+    "suspendFailed": "ÙØ´Ù„ ØªØ¹Ù„ÙŠÙ‚ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ",
+    "disableFailed": "ÙØ´Ù„ ØªØ¹Ø·ÙŠÙ„ Ø§Ù„Ø´Ø±ÙƒØ©",
+    "enableFailed": "ÙØ´Ù„ ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø´Ø±ÙƒØ©",
+    "generic": "Ø­Ø¯Ø« Ø®Ø·Ø£ Ù…Ø§",
+    "changePlanFailed": "Failed to change subscription plan",
+    "updateCompanyFailed": "Failed to update company",
+    "archiveFailed": "Failed to archive company",
+    "restoreFailed": "Failed to restore company",
+    "deleteFailed": "Failed to delete company",
+    "hardDeleteDisabled": "Hard delete is disabled by policy. Please archive instead.",
+    "idempotencyHashMismatch": "Request key already used with different data. Retry with a new operation.",
+    "idempotencyInProgress": "The same operation is already being processed. Please wait a moment.",
+    "liveSubscriptionConflict": "Another subscription update happened at the same time. Please refresh and retry."
+  },
+  "archiveCompany": {
+    "title": "Archive Company",
+    "message": "Archive {{name}}?",
+    "confirm": "Archive",
+    "cancel": "Cancel",
+    "success": "Company archived"
+  },
+  "restoreCompany": {
+    "title": "Restore Company",
+    "message": "Restore {{name}}?",
+    "confirm": "Restore",
+    "cancel": "Cancel",
+    "success": "Company restored"
+  },
+  "editCompany": {
+    "title": "Edit Company",
+    "name": "Company Name",
+    "phone": "Phone",
+    "address": "Address",
+    "currencyCode": "Currency Code",
+    "confirm": "Save Changes"
+  },
+  "changePlan": {
+    "title": "Change Plan",
+    "currentPlan": "Current Plan",
+    "reason": "Reason (optional)",
+    "reasonPlaceholder": "e.g. customer requested upgrade",
+    "confirm": "Change Plan Now"
+  },
+  "deleteCompany": {
+    "title": "Delete Company Permanently",
+    "warning": "This action is irreversible.",
+    "confirmNameLabel": "Type company name to confirm",
+    "nameRequired": "Please type the company name",
+    "reason": "Reason (optional)",
+    "reasonPlaceholder": "e.g. duplicate test tenant",
+    "confirm": "Delete Permanently"
+  }
+}

@@ -1,0 +1,199 @@
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#1f7a5a",
+            "background-light": "#f6f8f7",
+            "background-dark": "#131f1b",
+          },
+          fontFamily: {
+            "display": ["Noto Sans Arabic", "Inter"]
+          },
+          borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Noto Sans Arabic', 'Inter', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_forward</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight">سجل التدقيق</h1>
+</div>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-3 px-4 pb-4 overflow-x-auto no-scrollbar">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary px-6 text-white text-sm font-medium">
+        الكل
+      </button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary/10 dark:bg-primary/20 px-6 text-primary dark:text-primary text-sm font-medium border border-primary/20">
+        المعاملات
+      </button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary/10 dark:bg-primary/20 px-6 text-primary dark:text-primary text-sm font-medium border border-primary/20">
+        النظام
+      </button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary/10 dark:bg-primary/20 px-6 text-primary dark:text-primary text-sm font-medium border border-primary/20">
+        الأمان
+      </button>
+</div>
+</header>
+<!-- Content Area -->
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Today's Logs -->
+<section>
+<div class="px-4 py-3 bg-primary/5 dark:bg-primary/10">
+<h2 class="text-sm font-bold text-primary uppercase tracking-wider">اليوم - 24 مايو 2024</h2>
+</div>
+<!-- Log Entry 1: Invoice -->
+<div class="flex items-start gap-4 p-4 border-b border-primary/5 hover:bg-primary/5 transition-colors">
+<div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex flex-col flex-1 gap-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">أحمد محمد أنشأ فاتورة جديدة</p>
+<span class="text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">المعاملات</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400">تم إصدار الفاتورة رقم #INV-2024-001 بقيمة 4,500 ر.س</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-[14px] text-slate-400">schedule</span>
+<span class="text-[11px] text-slate-400">10:30 ص</span>
+</div>
+</div>
+</div>
+<!-- Log Entry 2: Payment -->
+<div class="flex items-start gap-4 p-4 border-b border-primary/5 hover:bg-primary/5 transition-colors">
+<div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div class="flex flex-col flex-1 gap-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">تسجيل دفعة واردة</p>
+<span class="text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">المعاملات</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400">بواسطة سارة علي - العميل: شركة الأمل المحدودة</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-[14px] text-slate-400">schedule</span>
+<span class="text-[11px] text-slate-400">09:15 ص</span>
+</div>
+</div>
+</div>
+<!-- Log Entry 3: Security -->
+<div class="flex items-start gap-4 p-4 border-b border-primary/5 hover:bg-primary/5 transition-colors">
+<div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
+<span class="material-symbols-outlined">security</span>
+</div>
+<div class="flex flex-col flex-1 gap-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">محاولة دخول ناجحة</p>
+<span class="text-[10px] font-medium text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded">الأمان</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400">المسؤول: فهد العتيبي - من عنوان IP: 192.168.1.45</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-[14px] text-slate-400">schedule</span>
+<span class="text-[11px] text-slate-400">08:02 ص</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Yesterday's Logs -->
+<section class="mt-4">
+<div class="px-4 py-3 bg-primary/5 dark:bg-primary/10">
+<h2 class="text-sm font-bold text-primary uppercase tracking-wider">أمس - 23 مايو 2024</h2>
+</div>
+<!-- Log Entry 4: Customer Update -->
+<div class="flex items-start gap-4 p-4 border-b border-primary/5 hover:bg-primary/5 transition-colors">
+<div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500">
+<span class="material-symbols-outlined">person_add</span>
+</div>
+<div class="flex flex-col flex-1 gap-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">تحديث بيانات عميل</p>
+<span class="text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">النظام</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400">بواسطة خالد منصور - تعديل العنوان الوطني للعميل #442</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-[14px] text-slate-400">schedule</span>
+<span class="text-[11px] text-slate-400">11:45 م</span>
+</div>
+</div>
+</div>
+<!-- Log Entry 5: System Backup -->
+<div class="flex items-start gap-4 p-4 border-b border-primary/5 hover:bg-primary/5 transition-colors">
+<div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+<span class="material-symbols-outlined">cloud_done</span>
+</div>
+<div class="flex flex-col flex-1 gap-1">
+<div class="flex items-center justify-between">
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">نسخ احتياطي تلقائي للنظام</p>
+<span class="text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">النظام</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400">تم اكتمال النسخ الاحتياطي السحابي اليومي بنجاح</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-[14px] text-slate-400">schedule</span>
+<span class="text-[11px] text-slate-400">03:00 ص</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 border-t border-primary/10 bg-background-light dark:bg-background-dark pb-safe-area-inset-bottom">
+<div class="flex items-center justify-around h-20 px-4">
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[26px]">home</span>
+<span class="text-[10px] font-medium">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[26px]">analytics</span>
+<span class="text-[10px] font-medium">التقارير</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<div class="relative">
+<span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">history</span>
+<div class="absolute -top-1 -right-1 size-2 bg-primary rounded-full"></div>
+</div>
+<span class="text-[10px] font-bold">السجل</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[26px]">settings</span>
+<span class="text-[10px] font-medium">الإعدادات</span>
+</a>
+</div>
+</nav>
+</body></html>

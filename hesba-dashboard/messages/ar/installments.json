@@ -1,0 +1,170 @@
+{
+  "pageTitle": "التقسيط | دفتر",
+  "pageDescription": "إدارة عقود التقسيط وجداول الأقساط والتحصيل.",
+  "title": "التقسيط",
+  "subtitle": "أنشئ العقود وتابع الأقساط وسجّل المدفوعات بشكل واضح.",
+  "actions": {
+    "addContract": "إضافة عقد",
+    "export": "تصدير Excel",
+    "exporting": "جارٍ التصدير...",
+    "view": "عرض",
+    "cancelContract": "إلغاء العقد",
+    "recordPayment": "تسجيل دفعة",
+    "remove": "حذف",
+    "cancel": "إلغاء",
+    "create": "إنشاء",
+    "saving": "جارٍ الحفظ..."
+  },
+  "export": {
+    "sheetName": "التقسيط",
+    "filePrefix": "التقسيط"
+  },
+  "exportModal": {
+    "title": "تصدير عقود التقسيط",
+    "description": "حدّد فترة تاريخية اختيارية وحدًا أقصى للنتائج قبل تنزيل ملف Excel.",
+    "fromDate": "من تاريخ",
+    "toDate": "إلى تاريخ",
+    "maxRecords": "الحد الأقصى للصفوف",
+    "maxRecordsHint": "اتركه فارغًا لتصدير كل النتائج المطابقة.",
+    "reset": "إعادة ضبط"
+  },
+  "filters": {
+    "search": "ابحث برقم العقد أو الوصف",
+    "partyType": "نوع الطرف",
+    "party": "الطرف",
+    "partyTypeAll": "كل الأطراف",
+    "partyTypeCustomer": "عميل",
+    "partyTypeSupplier": "مورد",
+    "partyTypeEmployee": "موظف",
+    "status": "حالة العقد",
+    "statusAll": "كل الحالات",
+    "scheduleStatus": "حالة القسط",
+    "scheduleStatusAll": "كل حالات الأقساط",
+    "dateFrom": "من تاريخ",
+    "dateTo": "إلى تاريخ",
+    "perPage": "{count} لكل صفحة",
+    "total": "{count} عقد",
+    "searchParty": "ابحث عن الطرف",
+    "noParties": "لا يوجد أطراف"
+  },
+  "table": {
+    "contractNumber": "العقد",
+    "partyType": "نوع الطرف",
+    "totalAmount": "إجمالي المبلغ",
+    "paidAmount": "المسدّد",
+    "installmentsCount": "عدد الأقساط",
+    "startDate": "تاريخ البداية",
+    "status": "الحالة",
+    "ariaLabel": "جدول عقود التقسيط"
+  },
+  "status": {
+    "ACTIVE": "نشط",
+    "COMPLETED": "مكتمل",
+    "CANCELLED": "ملغي"
+  },
+  "scheduleStatus": {
+    "PENDING": "معلّق",
+    "PARTIAL": "سداد جزئي",
+    "PAID": "مسدّد",
+    "OVERDUE": "متأخر",
+    "WAIVED": "معفى"
+  },
+  "scheduleType": {
+    "FIXED": "ثابت",
+    "CUSTOM": "مخصص"
+  },
+  "partyType": {
+    "CUSTOMER": "عميل",
+    "SUPPLIER": "مورد",
+    "EMPLOYEE": "موظف"
+  },
+  "form": {
+    "partyType": "نوع الطرف",
+    "party": "الطرف",
+    "scheduleType": "نوع الجدول",
+    "totalAmount": "إجمالي المبلغ",
+    "downPayment": "الدفعة المقدمة",
+    "numberOfInstallments": "عدد الأقساط",
+    "startDate": "تاريخ أول قسط",
+    "description": "الوصف"
+  },
+  "createModal": {
+    "title": "إنشاء عقد تقسيط",
+    "description": "أنشئ عقد تقسيط جديد وحدد إعدادات الجدول.",
+    "scheduleTypeFixed": "جدول ثابت",
+    "scheduleTypeCustom": "جدول مخصص",
+    "customScheduleTitle": "عناصر الجدول المخصص",
+    "addScheduleItem": "إضافة عنصر",
+    "scheduleDueDate": "تاريخ الاستحقاق",
+    "scheduleAmount": "المبلغ",
+    "scheduleNotes": "ملاحظات"
+  },
+  "empty": {
+    "title": "لا توجد عقود تقسيط",
+    "description": "أنشئ أول عقد تقسيط لبدء متابعة المدفوعات."
+  },
+  "scheduleSection": {
+    "title": "الأقساط المستحقة",
+    "subtitle": "تابع الأقساط المستحقة خلال الفترة المحددة."
+  },
+  "scheduleTable": {
+    "contractNumber": "العقد",
+    "partyType": "نوع الطرف",
+    "installmentNumber": "رقم القسط",
+    "dueDate": "تاريخ الاستحقاق",
+    "amount": "المبلغ",
+    "remaining": "المتبقي",
+    "status": "الحالة",
+    "ariaLabel": "جدول الأقساط المستحقة"
+  },
+  "details": {
+    "pageTitle": "تفاصيل عقد التقسيط | دفتر",
+    "pageDescription": "عرض تفاصيل العقد وجدول الأقساط وسجل المدفوعات.",
+    "title": "عقد التقسيط",
+    "subtitle": "تفاصيل كاملة للعقد مع جدول الأقساط والإجراءات.",
+    "backToList": "الرجوع إلى التقسيط",
+    "partyName": "اسم الطرف",
+    "downPayment": "الدفعة المقدمة",
+    "remaining": "المبلغ المتبقي",
+    "scheduleType": "نوع الجدول",
+    "createdAt": "تاريخ الإنشاء",
+    "description": "الوصف",
+    "empty": {
+      "title": "العقد غير موجود",
+      "description": "العقد المطلوب غير موجود أو لا تملك صلاحية الوصول."
+    },
+    "schedule": {
+      "title": "جدول الأقساط",
+      "subtitle": "تابع كل قسط ومبلغ السداد وحالته.",
+      "installmentNumber": "رقم القسط",
+      "dueDate": "تاريخ الاستحقاق",
+      "amount": "المبلغ",
+      "paidAmount": "المسدّد",
+      "remaining": "المتبقي",
+      "status": "الحالة",
+      "paidAt": "تاريخ السداد",
+      "ariaLabel": "جدول أقساط العقد"
+    }
+  },
+  "paymentModal": {
+    "title": "تسجيل دفعة قسط",
+    "description": "العقد {contractId} - القسط رقم #{installmentNumber}",
+    "remaining": "المبلغ المتبقي",
+    "amount": "مبلغ الدفعة",
+    "paymentDate": "تاريخ الدفع",
+    "paymentMethod": "طريقة الدفع",
+    "notes": "ملاحظات"
+  },
+  "messages": {
+    "createSuccess": "تم إنشاء عقد التقسيط بنجاح.",
+    "createError": "تعذر إنشاء عقد التقسيط.",
+    "cancelConfirm": "هل أنت متأكد من إلغاء العقد {contractNumber}؟",
+    "cancelSuccess": "تم إلغاء العقد بنجاح.",
+    "cancelError": "تعذر إلغاء العقد.",
+    "paymentSuccess": "تم تسجيل الدفعة بنجاح.",
+    "paymentError": "تعذر تسجيل الدفعة.",
+    "exportSuccess": "تم تصدير البيانات بنجاح.",
+    "exportError": "تعذر تصدير البيانات.",
+    "exportEmpty": "لا توجد بيانات للتصدير."
+  }
+}
