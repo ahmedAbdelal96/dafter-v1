@@ -1,0 +1,58 @@
+name: Web Dashboard CI
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "hesba-dashboard/**"
+      - ".github/workflows/web-ci.yml"
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "hesba-dashboard/**"
+
+defaults:
+  run:
+    working-directory: hesba-dashboard
+
+jobs:
+  ci:
+    name: Lint · Type-check · Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: hesba-dashboard/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint -- --max-warnings=0
+        continue-on-error: true
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Contract checks
+        run: npm run contracts:check && npm run roles:check
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: "http://localhost:7000/api/v1"
+          NEXT_PUBLIC_APP_NAME: "Hesba Dashboard"
+          NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+          NEXT_PUBLIC_TOKEN_EXPIRY_DAYS: "7"
+          NEXT_PUBLIC_REFRESH_TOKEN_EXPIRY_DAYS: "30"
+          NEXT_PUBLIC_ENABLE_ANALYTICS: "false"
+          NEXT_PUBLIC_ENABLE_NOTIFICATIONS: "true"
+          NEXT_PUBLIC_ENABLE_DEVTOOLS: "false"

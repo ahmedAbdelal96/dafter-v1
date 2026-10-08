@@ -1,0 +1,151 @@
+{
+  "pageTitle": "مستخدمو المنصة | دفتر",
+  "pageDescription": "إدارة مستخدمي أي شركة من لوحة السوبر أدمن.",
+  "title": "مستخدمو المنصة",
+  "subtitle": "اختر شركة، ثم أدر المستخدمين وصلاحيات الموظفين مركزيًا.",
+  "filters": {
+    "company": "اختر الشركة",
+    "companySearch": "ابحث عن شركة",
+    "companyEmpty": "لا توجد شركات",
+    "companyLoading": "جار تحميل الشركات...",
+    "search": "ابحث بالاسم أو البريد الإلكتروني",
+    "status": "الحالة",
+    "statusAll": "كل الحالات",
+    "perPage": "{count} صف"
+  },
+  "summary": {
+    "total": "إجمالي المستخدمين: {count}"
+  },
+  "stats": {
+    "total": "إجمالي المستخدمين",
+    "active": "المستخدمون النشطون",
+    "disabled": "المستخدمون المعطلون",
+    "owners": "المالكون"
+  },
+  "role": {
+    "OWNER": "مالك",
+    "STAFF": "موظف",
+    "SUPER_ADMIN": "سوبر أدمن"
+  },
+  "status": {
+    "ACTIVE": "نشط",
+    "DISABLED": "معطل"
+  },
+  "permissions": {
+    "manageUsers": "إدارة المستخدمين",
+    "viewParties": "عرض الأطراف",
+    "manageParties": "إدارة الأطراف",
+    "viewLedger": "عرض الدفتر",
+    "manageLedger": "إدارة الدفتر",
+    "viewReports": "عرض التقارير",
+    "taxSetupView": "??? ????? ???????",
+    "taxSetupManageRegistrationProfile": "????? ??? ??????? ???????",
+    "taxSetupCreateRate": "????? ???? ??????",
+    "taxSetupEditRate": "????? ???? ??????",
+    "taxSetupArchiveRate": "????? ???? ??????",
+    "taxSetupManageTreatments": "????? ????????? ????????",
+    "taxSetupManageDefaults": "????? ????????? ?????????? ???????",
+    "taxSetupManageAccountBindings": "????? ???????? ???????? ????????",
+    "taxSetupManageModuleApplicability": "????? ?????? ????? ??????? ???????"
+  },
+  "table": {
+    "fullName": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "role": "الدور",
+    "status": "الحالة",
+    "ariaLabel": "جدول مستخدمي المنصة"
+  },
+  "actions": {
+    "addStaff": "إضافة موظف",
+    "view": "عرض",
+    "edit": "تعديل",
+    "permissions": "الصلاحيات",
+    "resetCredentials": "إعادة ضبط بيانات الدخول",
+    "disable": "تعطيل",
+    "enable": "تفعيل",
+    "create": "إنشاء",
+    "save": "حفظ",
+    "savePermissions": "حفظ الصلاحيات",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "loading": "جار التحميل...",
+    "saving": "جار الحفظ...",
+    "export": "تصدير Excel",
+    "exporting": "جار التصدير..."
+  },
+  "form": {
+    "fullName": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "password": "كلمة المرور",
+    "passwordHint": "8 أحرف على الأقل وتحتوي على حرف كبير ورقم.",
+    "permissions": "صلاحيات الموظف",
+    "resetChannel": "قناة الإرسال",
+    "resetReason": "السبب (اختياري)",
+    "resetReasonPlaceholder": "ملاحظة اختيارية لسجل التدقيق"
+  },
+  "channels": {
+    "email": "البريد الإلكتروني",
+    "whatsapp": "واتساب"
+  },
+  "modal": {
+    "createTitle": "إنشاء مستخدم موظف",
+    "createDescription": "أنشئ حساب موظف جديد للشركة المحددة وحدد الصلاحيات المناسبة.",
+    "editTitle": "تعديل المستخدم",
+    "editDescription": "عدّل بيانات المستخدم الأساسية.",
+    "permissionsTitle": "تعديل الصلاحيات",
+    "permissionsDescription": "عدّل صلاحيات هذا الموظف داخل النظام.",
+    "detailsTitle": "تفاصيل المستخدم",
+    "detailsDescription": "استعرض بيانات المستخدم ومستوى الوصول الحالي.",
+    "resetCredentialsTitle": "إعادة ضبط بيانات الدخول",
+    "resetCredentialsDescription": "سيتم إرسال رمز إعادة ضبط لمرة واحدة مع تسجيل خروج كل الجلسات الحالية."
+  },
+  "details": {
+    "createdAt": "تاريخ الإنشاء",
+    "company": "الشركة"
+  },
+  "messages": {
+    "createSuccess": "تم إنشاء مستخدم الموظف بنجاح.",
+    "createError": "فشل إنشاء مستخدم الموظف.",
+    "updateSuccess": "تم تحديث المستخدم بنجاح.",
+    "updateError": "فشل تحديث المستخدم.",
+    "permissionsSuccess": "تم تحديث الصلاحيات بنجاح.",
+    "permissionsError": "فشل تحديث الصلاحيات.",
+    "disableSuccess": "تم تعطيل المستخدم بنجاح.",
+    "disableError": "فشل تعطيل المستخدم.",
+    "disableConfirm": "هل تريد تعطيل حساب {name}؟",
+    "enableSuccess": "تم تفعيل المستخدم بنجاح.",
+    "enableError": "فشل تفعيل المستخدم.",
+    "enableConfirm": "هل تريد تفعيل حساب {name}؟",
+    "resetSuccess": "تم إرسال رمز إعادة الضبط عبر {channel}.",
+    "resetError": "فشل إعادة ضبط بيانات الدخول.",
+    "resetWhatsappUnavailable": "لا يمكن استخدام واتساب لأن المستخدم لا يملك رقم هاتف.",
+    "exportSuccess": "تم تصدير المستخدمين بنجاح.",
+    "exportError": "فشل تصدير المستخدمين.",
+    "exportEmpty": "لا يوجد مستخدمون للتصدير."
+  },
+  "emptyCompany": {
+    "title": "لا توجد شركة محددة",
+    "description": "اختر شركة أولًا لعرض وإدارة المستخدمين الخاصين بها."
+  },
+  "empty": {
+    "title": "لا يوجد مستخدمون",
+    "description": "لا توجد نتائج مطابقة للفلاتر الحالية."
+  },
+  "export": {
+    "sheetName": "مستخدمو المنصة",
+    "filePrefix": "platform-users"
+  },
+  "exportModal": {
+    "title": "تصدير المستخدمين",
+    "description": "اختر الحد الأقصى للصفوف قبل تنزيل ملف Excel.",
+    "maxRecords": "الحد الأقصى للصفوف",
+    "maxRecordsHint": "اتركها فارغة لتصدير كل السجلات المطابقة.",
+    "reset": "إعادة ضبط"
+  },
+  "labels": {
+    "enabled": "مفعّل",
+    "disabled": "معطّل"
+  }
+}

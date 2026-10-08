@@ -1,0 +1,55 @@
+{
+  "main": {
+    "menu": "Menu",
+    "dashboard": "Dashboard",
+    "customers": "Customers",
+    "suppliers": "Suppliers",
+    "employees": "Employees",
+    "products": "Products",
+    "tenants": "Organizations",
+    "subscriptions": "Subscriptions",
+    "plans": "Plans",
+    "platformUsers": "Platform Users",
+    "auditLogs": "Audit Logs"
+  },
+  "accounting": {
+    "title": "Accounting",
+    "sales": "Sales",
+    "invoices": "Invoices",
+    "deferredSales": "Deferred Sales",
+    "installments": "Installments",
+    "finance": "Finance",
+    "expenses": "Expenses",
+    "payments": "Payments",
+    "ledger": "Ledger",
+    "payroll": "Payroll",
+    "reports": "Reports"
+  },
+  "settings": {
+    "title": "Management",
+    "users": "Users",
+    "notifications": "Notifications",
+    "subscription": "Subscription",
+    "profile": "My Profile",
+    "settings": "Settings",
+    "platformSettings": "Platform Settings",
+    "taxSetup": "Tax Setup"
+  },
+  "accessNote": {
+    "role": {
+      "title": "Some workspace items are role-based",
+      "description": "Your current role does not include every module in this workspace menu.",
+      "hint": "If you need a hidden area for daily work, ask the workspace owner to review your role permissions."
+    },
+    "plan": {
+      "title": "Some workspace items depend on your plan",
+      "description": "Your current subscription does not include every module available in this product.",
+      "hint": "Review the Subscription page if you need more modules enabled for this workspace."
+    },
+    "mixed": {
+      "title": "Some workspace items are unavailable",
+      "description": "Hidden modules may depend on your role permissions, your active subscription features, or both.",
+      "hint": "Use the Subscription page for plan-based limits, or ask the workspace owner to review role access."
+    }
+  }
+}

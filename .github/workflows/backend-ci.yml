@@ -1,0 +1,57 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "hesba-api-v1/**"
+      - ".github/workflows/backend-ci.yml"
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "hesba-api-v1/**"
+
+defaults:
+  run:
+    working-directory: hesba-api-v1
+
+jobs:
+  ci:
+    name: Lint · Type-check · Prisma · Test · Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: hesba-api-v1/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint -- --max-warnings=0
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Prisma validate
+        run: npx prisma validate
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daftar_test"
+
+      - name: Run tests
+        run: npm test -- --passWithNoTests
+        env:
+          NODE_ENV: test
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daftar_test"
+          JWT_SECRET: "ci-test-secret-at-least-32-chars-long"
+          REDIS_URL: "redis://localhost:6379"
+
+      - name: Build
+        run: npm run build

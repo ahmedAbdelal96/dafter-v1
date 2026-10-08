@@ -1,0 +1,50 @@
+﻿# Hesba repository-wide ignore rules
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+coverage/
+.nyc_output/
+
+# Runtime logs and diagnostics
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Local environment files (keep examples committed)
+.env
+.env.local
+.env.*.local
+
+# Temp files/scripts
+tmp/
+.temp/
+.tmp/
+tmp_*
+tmp-*
+
+# Caches
+.cache/
+.turbo/
+.eslintcache
+.parcel-cache/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Archives / accidental exports
+*.zip
+*.7z
+*.rar
