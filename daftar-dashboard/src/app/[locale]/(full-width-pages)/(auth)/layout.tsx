@@ -1,5 +1,4 @@
 import ThemeTogglerTwo from "@/components/common/ThemeTogglerTwo";
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -9,13 +8,13 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f8fbff_0%,#eef4fb_45%,#e7eef7_100%)] p-4 dark:bg-[linear-gradient(180deg,#07101d_0%,#0a1422_55%,#0b1526_100%)] sm:p-6">
+    <div className="relative h-dvh max-h-dvh overflow-hidden bg-[linear-gradient(180deg,#f8fbff_0%,#eef4fb_45%,#e7eef7_100%)] p-3 dark:bg-[linear-gradient(180deg,#07101d_0%,#0a1422_55%,#0b1526_100%)] sm:p-4 lg:p-5">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.12),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(15,23,42,0.10),transparent_18%)]" />
-      <div className="relative flex min-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-[32px] border border-white/60 bg-white/55 shadow-[0_40px_120px_-48px_rgba(15,23,42,0.35)] backdrop-blur-2xl dark:border-white/8 dark:bg-white/[0.03] sm:min-h-[calc(100vh-3rem)] lg:flex-row">
+      <div className="relative flex h-full min-h-0 max-h-full w-full flex-col overflow-hidden rounded-[28px] border border-white/60 bg-white/55 shadow-[0_40px_120px_-48px_rgba(15,23,42,0.35)] backdrop-blur-2xl dark:border-white/8 dark:bg-white/[0.03] sm:rounded-[32px] lg:flex-row">
         {children}
         
         {/* Right Side - Branding */}
-        <div className="relative hidden h-full w-full overflow-hidden lg:grid lg:w-1/2 lg:items-center">
+        <div className="relative hidden h-full min-h-0 w-full overflow-hidden lg:grid lg:w-1/2 lg:items-center">
           {/* Background Pattern / Gradient */}
           <div className="absolute inset-0 z-0 bg-[linear-gradient(145deg,#071425_0%,#0b2038_46%,#12376b_100%)]" />
           
@@ -25,14 +24,13 @@ export default function AuthLayout({
           <div className="absolute inset-0 z-0 bg-[linear-gradient(135deg,transparent_0%,rgba(255,255,255,0.04)_50%,transparent_100%)]" />
 
           <div className="relative z-10 flex flex-col items-center justify-center p-12">
-            <Link href="/" className="block mb-8 transition-transform hover:scale-105">
-              <Image
-                width={200}
-                height={60}
-                src="/images/logo/logo.svg" 
-                alt="dafter Logo"
-                className="h-auto w-auto brightness-0 invert"
-              />
+            <Link href="/" className="mb-8 inline-flex items-center gap-3 transition-transform hover:scale-105" aria-label="dafter Logo">
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-white text-xl font-bold text-[#0b2038] shadow-lg shadow-black/10">
+                D
+              </span>
+              <span className="font-outfit text-3xl font-semibold tracking-tight text-white">
+                dafter
+              </span>
             </Link>
             
             <div className="max-w-md text-center">

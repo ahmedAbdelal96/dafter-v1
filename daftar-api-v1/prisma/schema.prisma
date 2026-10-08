@@ -197,6 +197,94 @@ enum ScheduleType {
   CUSTOM // التاجر يدخل كل قسط يدوياً — irregular amounts or intervals
 }
 
+// ============================================================
+// B01: AUTHORITATIVE ACCOUNTING CORE
+// ============================================================
+
+enum AccountingAccountType {
+  ASSET_RECEIVABLE
+  ASSET_CASH
+  ASSET_BANK
+  ASSET_CURRENT
+  ASSET_INVENTORY
+  ASSET_PREPAID
+  ASSET_FIXED
+  ASSET_OTHER
+  LIABILITY_PAYABLE
+  LIABILITY_CURRENT
+  LIABILITY_NON_CURRENT
+  LIABILITY_TAX
+  EQUITY
+  INCOME_OPERATING_REVENUE
+  INCOME_OTHER
+  EXPENSE_COGS
+  EXPENSE_OPERATING
+  EXPENSE_DEPRECIATION
+  EXPENSE_OTHER
+}
+
+enum AccountingJournalType {
+  GENERAL
+  SALES
+  PURCHASE
+  CASH
+  BANK
+}
+
+enum FiscalYearStatus {
+  OPEN
+  CLOSED
+}
+
+enum AccountingPeriodStatus {
+  OPEN
+  SOFT_CLOSED
+  CLOSED
+}
+
+enum JournalEntryStatus {
+  DRAFT
+  POSTED
+  REVERSED
+}
+
+enum JournalSourceType {
+  MANUAL_JOURNAL
+  OPENING_BALANCE
+  SALES_INVOICE
+  CUSTOMER_PAYMENT
+  PURCHASE_INVOICE
+  SUPPLIER_PAYMENT
+  EXPENSE
+  CASH_TRANSFER
+  REVERSAL
+  MIGRATION
+}
+
+enum AccountingConfigAccountKey {
+  RECEIVABLE
+  PAYABLE
+  INCOME
+  EXPENSE
+  RETAINED_EARNINGS
+  EXCHANGE_GAIN
+  EXCHANGE_LOSS
+  ROUNDING
+  TAX_PAYABLE
+  TAX_RECOVERABLE
+  INVENTORY
+  COGS
+}
+
+enum AccountingConfigJournalKey {
+  GENERAL
+  SALES
+  PURCHASE
+  CASH
+  BANK
+  EXCHANGE_DIFFERENCE
+}
+
 // -------------------------
 // COMMON FIELD PATTERN NOTES
 // -------------------------
@@ -259,6 +347,9 @@ model User {
 
   // Phase K: back-reference for invoices
   createdInvoices Invoice[] @relation("InvoiceCreatedBy")
+
+  // B01: authoritative accounting postings
+  postedAccountingEntries JournalEntry[] @relation("AccountingEntryPostedBy")
 
   // P2-BE-1: back-reference for customer product prices
   updatedCustomerProductPrices CustomerProductPrice[] @relation("CustomerProductPriceUpdatedBy")
@@ -339,14 +430,14 @@ model RefreshToken {
 // ============================================================
 
 model Company {
-  id           String  @id @default(uuid()) @db.Uuid
-  name         String
-  phone        String?
-  address      String?
-  currencyCode String  @default("EGP")
-  cashReconciliationMode      CashReconciliationMode @default(DISABLED)
-  cashModeUpdatedByUserId     String?                @db.Uuid
-  cashModeUpdatedAt           DateTime?
+  id                      String                 @id @default(uuid()) @db.Uuid
+  name                    String
+  phone                   String?
+  address                 String?
+  currencyCode            String                 @default("EGP")
+  cashReconciliationMode  CashReconciliationMode @default(DISABLED)
+  cashModeUpdatedByUserId String?                @db.Uuid
+  cashModeUpdatedAt       DateTime?
 
   // Emergency kill-switch by Super Admin (doesn't replace subscription logic)
   isActive Boolean @default(true)
@@ -354,14 +445,14 @@ model Company {
   // Optimistic locking
   version Int @default(0)
 
-  users         User[]
-  customers     Customer[]
-  suppliers     Supplier[]
-  employees     Employee[]
-  ledgerEntries LedgerEntry[]
-  balances      Balance[]
-  auditLogs     AuditLog[]
-  notifications Notification[]
+  users               User[]
+  customers           Customer[]
+  suppliers           Supplier[]
+  employees           Employee[]
+  ledgerEntries       LedgerEntry[]
+  balances            Balance[]
+  auditLogs           AuditLog[]
+  notifications       Notification[]
   cashReconciliations CashReconciliationDaily[]
 
   subscriptions CompanySubscription[]
@@ -390,6 +481,16 @@ model Company {
   taxDefaultPolicy       TaxDefaultPolicy?
   taxAccountBinding      TaxAccountBinding?
   taxApplicabilityRules  TaxModuleApplicabilityRule[]
+
+  // B01: authoritative accounting core
+  accountingConfiguration  AccountingConfiguration?
+  accountingAccounts       AccountingAccount[]
+  accountingJournals       AccountingJournal[]
+  fiscalYears              FiscalYear[]
+  accountingPeriods        AccountingPeriod[]
+  accountingEntrySequences AccountingEntrySequence[]
+  accountingJournalEntries JournalEntry[]
+  accountingJournalLines   JournalLine[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -457,15 +558,15 @@ model CashReconciliationDaily {
   companyId String  @db.Uuid
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  businessDate DateTime @db.Date
+  businessDate DateTime                 @db.Date
   status       CashReconciliationStatus @default(DRAFT)
 
-  openingCash             Decimal @default(0.00) @db.Decimal(14, 2)
-  cashSalesOutsideSystem  Decimal @default(0.00) @db.Decimal(14, 2)
+  openingCash               Decimal @default(0.00) @db.Decimal(14, 2)
+  cashSalesOutsideSystem    Decimal @default(0.00) @db.Decimal(14, 2)
   cashExpensesOutsideSystem Decimal @default(0.00) @db.Decimal(14, 2)
-  actualCashCounted       Decimal @default(0.00) @db.Decimal(14, 2)
-  expectedCash            Decimal @default(0.00) @db.Decimal(14, 2)
-  variance                Decimal @default(0.00) @db.Decimal(14, 2)
+  actualCashCounted         Decimal @default(0.00) @db.Decimal(14, 2)
+  expectedCash              Decimal @default(0.00) @db.Decimal(14, 2)
+  variance                  Decimal @default(0.00) @db.Decimal(14, 2)
 
   note String?
 
@@ -473,8 +574,8 @@ model CashReconciliationDaily {
   updatedByUserId String? @db.Uuid
   closedByUserId  String? @db.Uuid
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   closedAt  DateTime?
 
   @@unique([companyId, businessDate])
@@ -512,19 +613,19 @@ model TaxRegistrationProfile {
   companyId String  @unique @db.Uuid
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  countryCode             String
-  regimeCode              String?
-  vatRegistrationStatus   TaxRegistrationStatus @default(NOT_REGISTERED)
-  vatRegistrationNumber   String?
-  legalTaxName            String?
+  countryCode               String
+  regimeCode                String?
+  vatRegistrationStatus     TaxRegistrationStatus   @default(NOT_REGISTERED)
+  vatRegistrationNumber     String?
+  legalTaxName              String?
   registrationEffectiveDate DateTime?
-  taxAddressLine1         String?
-  taxAddressLine2         String?
-  city                    String?
-  region                  String?
-  postalCode              String?
-  readinessStatus         TaxSetupReadinessStatus @default(NOT_CONFIGURED)
-  notes                   String?
+  taxAddressLine1           String?
+  taxAddressLine2           String?
+  city                      String?
+  region                    String?
+  postalCode                String?
+  readinessStatus           TaxSetupReadinessStatus @default(NOT_CONFIGURED)
+  notes                     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -534,24 +635,24 @@ model TaxRegistrationProfile {
 }
 
 model TaxTreatment {
-  id             String               @id @default(uuid()) @db.Uuid
-  companyId      String               @db.Uuid
-  company        Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  code           String
-  normalizedCode String
-  name           String
-  category       TaxTreatmentCategory
+  code            String
+  normalizedCode  String
+  name            String
+  category        TaxTreatmentCategory
   calculationMode TaxCalculationMode
-  description    String?
-  isDefault      Boolean              @default(false)
-  status         TaxLifecycleStatus   @default(ACTIVE)
-  effectiveFrom  DateTime?
-  effectiveTo    DateTime?
+  description     String?
+  isDefault       Boolean              @default(false)
+  status          TaxLifecycleStatus   @default(ACTIVE)
+  effectiveFrom   DateTime?
+  effectiveTo     DateTime?
 
-  rates          TaxRate[]
-  defaultPolicies TaxDefaultPolicy[] @relation("DefaultPolicyTreatment")
-  moduleRules    TaxModuleApplicabilityRule[] @relation("ApplicabilityTreatment")
+  rates           TaxRate[]
+  defaultPolicies TaxDefaultPolicy[]           @relation("DefaultPolicyTreatment")
+  moduleRules     TaxModuleApplicabilityRule[] @relation("ApplicabilityTreatment")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -562,12 +663,12 @@ model TaxTreatment {
 }
 
 model TaxRate {
-  id             String             @id @default(uuid()) @db.Uuid
-  companyId      String             @db.Uuid
-  company        Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  treatmentId    String?            @db.Uuid
-  treatment      TaxTreatment?      @relation(fields: [treatmentId], references: [id], onDelete: SetNull)
+  treatmentId String?       @db.Uuid
+  treatment   TaxTreatment? @relation(fields: [treatmentId], references: [id], onDelete: SetNull)
 
   code           String
   normalizedCode String
@@ -579,7 +680,7 @@ model TaxRate {
   description    String?
   isDefault      Boolean            @default(false)
 
-  defaultPolicies TaxDefaultPolicy[] @relation("DefaultPolicyRate")
+  defaultPolicies TaxDefaultPolicy[]           @relation("DefaultPolicyRate")
   moduleRules     TaxModuleApplicabilityRule[] @relation("ApplicabilityRate")
 
   createdAt DateTime @default(now())
@@ -598,10 +699,10 @@ model TaxDefaultPolicy {
 
   defaultCalculationMode TaxCalculationMode @default(TAX_EXCLUSIVE)
 
-  defaultRateId String? @db.Uuid
+  defaultRateId String?  @db.Uuid
   defaultRate   TaxRate? @relation("DefaultPolicyRate", fields: [defaultRateId], references: [id], onDelete: SetNull)
 
-  defaultTreatmentId String? @db.Uuid
+  defaultTreatmentId String?       @db.Uuid
   defaultTreatment   TaxTreatment? @relation("DefaultPolicyTreatment", fields: [defaultTreatmentId], references: [id], onDelete: SetNull)
 
   allowManualOverride Boolean @default(true)
@@ -637,13 +738,13 @@ model TaxModuleApplicabilityRule {
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   moduleKey     TaxModuleKey
-  isEnabled     Boolean @default(true)
-  allowOverride Boolean @default(true)
+  isEnabled     Boolean      @default(true)
+  allowOverride Boolean      @default(true)
 
-  defaultRateId String? @db.Uuid
+  defaultRateId String?  @db.Uuid
   defaultRate   TaxRate? @relation("ApplicabilityRate", fields: [defaultRateId], references: [id], onDelete: SetNull)
 
-  defaultTreatmentId String? @db.Uuid
+  defaultTreatmentId String?       @db.Uuid
   defaultTreatment   TaxTreatment? @relation("ApplicabilityTreatment", fields: [defaultTreatmentId], references: [id], onDelete: SetNull)
 
   notes     String?
@@ -1460,4 +1561,229 @@ model InvoiceItem {
 
   @@index([invoiceId])
   @@index([productId]) // B12.4 — frequent-products query
+}
+
+// ============================================================
+// B01: AUTHORITATIVE GENERAL LEDGER FOUNDATION
+// ============================================================
+
+model AccountingAccount {
+  id        String  @id @default(uuid()) @db.Uuid
+  companyId String  @db.Uuid
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  code                   String                @db.VarChar(40)
+  name                   String                @db.VarChar(200)
+  accountType            AccountingAccountType
+  currencyCode           String?               @db.Char(3)
+  parentId               String?               @db.Uuid
+  parent                 AccountingAccount?    @relation("AccountingAccountHierarchy", fields: [parentId, companyId], references: [id, companyId], onDelete: Restrict)
+  children               AccountingAccount[]   @relation("AccountingAccountHierarchy")
+  isActive               Boolean               @default(true)
+  allowDirectPosting     Boolean               @default(true)
+  isControlAccount       Boolean               @default(false)
+  reconciliationEligible Boolean               @default(false)
+  archivedAt             DateTime?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+
+  journalLines          JournalLine[]
+  configurationDefaults AccountingConfigurationAccount[]
+
+  @@unique([id, companyId])
+  @@unique([companyId, code])
+  @@index([companyId, parentId])
+  @@index([companyId, accountType, isActive])
+}
+
+model AccountingJournal {
+  id           String                @id @default(uuid()) @db.Uuid
+  companyId    String                @db.Uuid
+  company      Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  code         String                @db.VarChar(40)
+  name         String                @db.VarChar(200)
+  type         AccountingJournalType
+  currencyCode String?               @db.Char(3)
+  isActive     Boolean               @default(true)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  entries               JournalEntry[]
+  configurationDefaults AccountingConfigurationJournal[]
+
+  @@unique([id, companyId])
+  @@unique([companyId, code])
+  @@index([companyId, type, isActive])
+}
+
+model FiscalYear {
+  id        String           @id @default(uuid()) @db.Uuid
+  companyId String           @db.Uuid
+  company   Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name      String           @db.VarChar(40)
+  startDate DateTime         @db.Date
+  endDate   DateTime         @db.Date
+  status    FiscalYearStatus @default(OPEN)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  periods   AccountingPeriod[]
+  sequences AccountingEntrySequence[]
+
+  @@unique([id, companyId])
+  @@unique([companyId, name])
+  @@index([companyId, startDate, endDate])
+}
+
+model AccountingPeriod {
+  id           String                 @id @default(uuid()) @db.Uuid
+  companyId    String                 @db.Uuid
+  company      Company                @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  fiscalYearId String                 @db.Uuid
+  fiscalYear   FiscalYear             @relation(fields: [fiscalYearId, companyId], references: [id, companyId], onDelete: Restrict)
+  name         String                 @db.VarChar(80)
+  startDate    DateTime               @db.Date
+  endDate      DateTime               @db.Date
+  status       AccountingPeriodStatus @default(OPEN)
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+
+  journalEntries JournalEntry[]
+
+  @@unique([id, companyId])
+  @@unique([companyId, fiscalYearId, name])
+  @@index([companyId, startDate, endDate, status])
+}
+
+model AccountingEntrySequence {
+  companyId    String     @db.Uuid
+  company      Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  fiscalYearId String     @db.Uuid
+  fiscalYear   FiscalYear @relation(fields: [fiscalYearId, companyId], references: [id, companyId], onDelete: Cascade)
+  nextValue    Int        @default(1)
+  updatedAt    DateTime   @updatedAt
+
+  @@id([companyId, fiscalYearId])
+}
+
+model JournalEntry {
+  id                 String            @id @default(uuid()) @db.Uuid
+  companyId          String            @db.Uuid
+  company            Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  journalId          String            @db.Uuid
+  journal            AccountingJournal @relation(fields: [journalId, companyId], references: [id, companyId], onDelete: Restrict)
+  accountingPeriodId String            @db.Uuid
+  accountingPeriod   AccountingPeriod  @relation(fields: [accountingPeriodId, companyId], references: [id, companyId], onDelete: Restrict)
+
+  entryNumber             String             @db.VarChar(40)
+  status                  JournalEntryStatus @default(DRAFT)
+  postingDate             DateTime           @db.Date
+  documentDate            DateTime?          @db.Date
+  dueDate                 DateTime?          @db.Date
+  transactionCurrencyCode String             @db.Char(3)
+  exchangeRate            Decimal            @db.Decimal(19, 8)
+  documentReference       String?            @db.VarChar(120)
+  description             String             @db.VarChar(500)
+  sourceType              JournalSourceType
+  sourceId                String?            @db.Uuid
+  idempotencyKey          String             @db.VarChar(128)
+  requestHash             String             @db.Char(64)
+  postedById              String?            @db.Uuid
+  postedBy                User?              @relation("AccountingEntryPostedBy", fields: [postedById], references: [id], onDelete: Restrict)
+  postedAt                DateTime?
+  reversalOfEntryId       String?            @db.Uuid
+  reversalOf              JournalEntry?      @relation("JournalEntryReversal", fields: [reversalOfEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  reversals               JournalEntry[]     @relation("JournalEntryReversal")
+  reversalReason          String?            @db.VarChar(500)
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+
+  lines JournalLine[]
+
+  @@unique([id, companyId])
+  @@unique([companyId, entryNumber])
+  @@unique([companyId, sourceType, idempotencyKey])
+  @@unique([companyId, reversalOfEntryId])
+  @@index([companyId, postingDate])
+  @@index([companyId, journalId, postingDate])
+  @@index([companyId, sourceType, sourceId])
+  @@index([companyId, status])
+  @@index([companyId, accountingPeriodId])
+}
+
+model JournalLine {
+  id                      String            @id @default(uuid()) @db.Uuid
+  companyId               String            @db.Uuid
+  company                 Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  journalEntryId          String            @db.Uuid
+  journalEntry            JournalEntry      @relation(fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  accountId               String            @db.Uuid
+  account                 AccountingAccount @relation(fields: [accountId, companyId], references: [id, companyId], onDelete: Restrict)
+  debit                   Decimal           @db.Decimal(19, 4)
+  credit                  Decimal           @db.Decimal(19, 4)
+  transactionDebit        Decimal           @db.Decimal(19, 4)
+  transactionCredit       Decimal           @db.Decimal(19, 4)
+  description             String?           @db.VarChar(500)
+  partyType               PartyType?
+  partyId                 String?           @db.Uuid
+  dueDate                 DateTime?         @db.Date
+  documentReference       String?           @db.VarChar(120)
+  reconciliationReference String?           @db.VarChar(160)
+  taxCode                 String?           @db.VarChar(40)
+  taxTreatmentCode        String?           @db.VarChar(40)
+  taxRate                 Decimal?          @db.Decimal(9, 4)
+  createdAt               DateTime          @default(now())
+
+  @@index([companyId, accountId])
+  @@index([companyId, journalEntryId])
+  @@index([accountId, createdAt])
+}
+
+model AccountingConfiguration {
+  id                    String   @id @default(uuid()) @db.Uuid
+  companyId             String   @unique @db.Uuid
+  company               Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  baseCurrencyCode      String   @db.Char(3)
+  reportingCurrencyCode String?  @db.Char(3)
+  countryCode           String   @db.Char(2)
+  localeCode            String   @db.VarChar(20)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  accountDefaults AccountingConfigurationAccount[]
+  journalDefaults AccountingConfigurationJournal[]
+
+  @@unique([id, companyId])
+}
+
+model AccountingConfigurationAccount {
+  id              String                     @id @default(uuid()) @db.Uuid
+  companyId       String                     @db.Uuid
+  configurationId String                     @db.Uuid
+  configuration   AccountingConfiguration    @relation(fields: [configurationId, companyId], references: [id, companyId], onDelete: Cascade)
+  settingKey      AccountingConfigAccountKey
+  accountId       String                     @db.Uuid
+  account         AccountingAccount          @relation(fields: [accountId, companyId], references: [id, companyId], onDelete: Restrict)
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  @@unique([id, companyId])
+  @@unique([companyId, configurationId, settingKey])
+  @@index([companyId, accountId])
+}
+
+model AccountingConfigurationJournal {
+  id              String                     @id @default(uuid()) @db.Uuid
+  companyId       String                     @db.Uuid
+  configurationId String                     @db.Uuid
+  configuration   AccountingConfiguration    @relation(fields: [configurationId, companyId], references: [id, companyId], onDelete: Cascade)
+  settingKey      AccountingConfigJournalKey
+  journalId       String                     @db.Uuid
+  journal         AccountingJournal          @relation(fields: [journalId, companyId], references: [id, companyId], onDelete: Restrict)
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  @@unique([id, companyId])
+  @@unique([companyId, configurationId, settingKey])
+  @@index([companyId, journalId])
 }

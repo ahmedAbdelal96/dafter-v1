@@ -78,6 +78,7 @@ import { AuditModule } from './modules/audit/audit.module';
 // Cash Reconciliation
 import { CashReconciliationModule } from './modules/cash-reconciliation/cash-reconciliation.module';
 import { TaxSetupModule } from './modules/tax-setup/tax-setup.module';
+import { AccountingModule } from './modules/accounting/accounting.module';
 
 @Module({
   imports: [
@@ -180,6 +181,7 @@ import { TaxSetupModule } from './modules/tax-setup/tax-setup.module';
 
     // Cash Reconciliation
     CashReconciliationModule,
+    AccountingModule,
   ],
   controllers: [AppController],
   providers: [
@@ -213,4 +215,3 @@ function resolveI18nPath(): string {
   }
   return candidates[0];
 }
-

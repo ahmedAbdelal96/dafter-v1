@@ -8,9 +8,15 @@ export type ControllerFeaturePolicy =
  * Explicit feature-policy intent for each controller.
  * This keeps policy decisions auditable and prevents accidental ungated growth.
  */
-export const CONTROLLER_FEATURE_POLICY: Record<string, ControllerFeaturePolicy> = {
+export const CONTROLLER_FEATURE_POLICY: Record<
+  string,
+  ControllerFeaturePolicy
+> = {
   'audit/audit.controller.ts': 'platform-admin',
+  'accounting/accounting.controller.ts': 'role-guarded',
   'auth/auth.controller.ts': 'auth-public',
+  'cash-reconciliation/cash-reconciliation.controller.ts': 'role-guarded',
+  'companies/companies.controller.ts': 'role-guarded',
   'customers/customers.controller.ts': 'feature-gated',
   'dashboard/dashboard.controller.ts': 'feature-gated',
   'deferred-sales/deferred-sales.controller.ts': 'feature-gated',
@@ -30,5 +36,6 @@ export const CONTROLLER_FEATURE_POLICY: Record<string, ControllerFeaturePolicy> 
   'reports/reports.controller.ts': 'feature-gated',
   'statements/statements.controller.ts': 'role-guarded',
   'suppliers/suppliers.controller.ts': 'feature-gated',
+  'tax-setup/controllers/tax-setup.controller.ts': 'role-guarded',
   'users/users.controller.ts': 'role-guarded',
 };
