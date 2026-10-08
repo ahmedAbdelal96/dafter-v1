@@ -6,12 +6,16 @@ import {
 } from '@nestjs/common';
 import {
   AccountingAccountType,
+  AccountingConfigAccountKey,
+  AccountingConfigJournalKey,
+  AccountingJournalType,
   AccountingPeriodStatus,
   FiscalYearStatus,
   JournalEntryStatus,
   JournalSourceType,
   PartyType,
   Prisma,
+  UserRole,
 } from '@prisma/client';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { PlatformIdempotencyService } from '../platform/idempotency/platform-idempotency.service';
@@ -23,9 +27,10 @@ import {
   CreateAccountingPeriodDto,
   CreateFiscalYearDto,
   CreateAccountingConfigurationDto,
-  JournalLineDto,
-  PostJournalEntryDto,
+  ManualJournalEntryDto,
   ReverseJournalEntryDto,
+  SetAccountingAccountDefaultDto,
+  SetAccountingJournalDefaultDto,
   UpdateAccountingAccountDto,
   UpdateAccountingJournalDto,
   UpdateAccountingPeriodStatusDto,
@@ -34,10 +39,8 @@ import {
 
 interface AccountingLineCommand {
   accountId: string;
-  debit: string;
-  credit: string;
-  transactionDebit?: string;
-  transactionCredit?: string;
+  transactionDebit: string;
+  transactionCredit: string;
   description?: string;
   partyType?: PartyType;
   partyId?: string;
@@ -49,7 +52,7 @@ interface AccountingLineCommand {
   taxRate?: string;
 }
 
-interface PostJournalCommand {
+export interface AccountingPostingCommand {
   companyId: string;
   actorUserId: string;
   journalId: string;
@@ -64,11 +67,13 @@ interface PostJournalCommand {
   sourceType: JournalSourceType;
   sourceId?: string;
   idempotencyKey: string;
-  allowSoftClosedOverride?: boolean;
+  periodOverrideReason?: string;
   reversalOfEntryId?: string;
   reversalReason?: string;
   lines: AccountingLineCommand[];
 }
+
+type PostJournalCommand = AccountingPostingCommand;
 
 type TransactionDb = Prisma.TransactionClient;
 
@@ -88,24 +93,39 @@ export class AccountingService {
     return rows;
   }
 
-  async createAccount(companyId: string, dto: CreateAccountingAccountDto) {
+  async createAccount(
+    companyId: string,
+    actorUserId: string,
+    dto: CreateAccountingAccountDto,
+  ) {
     const code = this.requireText(dto.code, 'Account code');
     const name = this.requireText(dto.name, 'Account name');
     if (dto.parentId) await this.assertParent(companyId, dto.parentId);
+    if (dto.currencyCode) {
+      await this.assertActiveCurrency(this.prisma, dto.currencyCode);
+    }
 
     try {
-      return await this.prisma.accountingAccount.create({
-        data: {
-          companyId,
-          code,
-          name,
-          accountType: dto.accountType,
-          parentId: dto.parentId ?? null,
-          currencyCode: dto.currencyCode ?? null,
-          allowDirectPosting: dto.allowDirectPosting ?? true,
-          isControlAccount: dto.isControlAccount ?? false,
-          reconciliationEligible: dto.reconciliationEligible ?? false,
-        },
+      return await this.prisma.$transaction(async (tx) => {
+        const account = await tx.accountingAccount.create({
+          data: {
+            companyId,
+            code,
+            name,
+            accountType: dto.accountType,
+            parentId: dto.parentId ?? null,
+            currencyCode: dto.currencyCode?.toUpperCase() ?? null,
+            allowDirectPosting: dto.allowDirectPosting ?? true,
+            isControlAccount: dto.isControlAccount ?? false,
+            reconciliationEligible: dto.reconciliationEligible ?? false,
+          },
+        });
+        await this.auditMasterMutation(tx, companyId, actorUserId, {
+          action: 'accounting.account.created',
+          entityId: account.id,
+          metadata: { after: account, reason: dto.reason ?? null },
+        });
+        return account;
       });
     } catch (error) {
       this.throwMappedPrismaConflict(error, 'Account code already exists');
@@ -115,6 +135,7 @@ export class AccountingService {
 
   async updateAccount(
     companyId: string,
+    actorUserId: string,
     id: string,
     dto: UpdateAccountingAccountDto,
   ) {
@@ -124,27 +145,76 @@ export class AccountingService {
     if (!existing) throw new NotFoundException('Accounting account not found');
 
     if (dto.parentId) await this.assertParent(companyId, dto.parentId, id);
-    return this.prisma.accountingAccount.update({
-      where: { id },
-      data: {
-        ...(dto.name !== undefined
-          ? { name: this.requireText(dto.name, 'Account name') }
-          : {}),
-        ...(dto.parentId !== undefined ? { parentId: dto.parentId } : {}),
-        ...(dto.allowDirectPosting !== undefined
-          ? { allowDirectPosting: dto.allowDirectPosting }
-          : {}),
-        ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
-        ...(dto.isControlAccount !== undefined
-          ? { isControlAccount: dto.isControlAccount }
-          : {}),
-        ...(dto.currencyCode !== undefined
-          ? { currencyCode: dto.currencyCode }
-          : {}),
-        ...(dto.reconciliationEligible !== undefined
-          ? { reconciliationEligible: dto.reconciliationEligible }
-          : {}),
-      },
+    const normalizedCurrency = dto.currencyCode?.toUpperCase();
+    if (normalizedCurrency) {
+      await this.assertActiveCurrency(this.prisma, normalizedCurrency);
+    }
+    const currencyChanged =
+      dto.currencyCode !== undefined &&
+      normalizedCurrency !== existing.currencyCode;
+    const sensitiveChange =
+      currencyChanged ||
+      dto.parentId !== undefined ||
+      dto.isActive !== undefined;
+    if (sensitiveChange && !dto.reason?.trim()) {
+      throw new BadRequestException(
+        'A reason is required for this account change',
+      );
+    }
+    if (currencyChanged) {
+      const postedUse = await this.prisma.journalEntry.count({
+        where: {
+          companyId,
+          status: {
+            in: [JournalEntryStatus.POSTED, JournalEntryStatus.REVERSED],
+          },
+          lines: { some: { accountId: id } },
+        },
+      });
+      if (postedUse > 0) {
+        throw new ConflictException(
+          'An account currency cannot change after posted history exists',
+        );
+      }
+    }
+    return this.prisma.$transaction(async (tx) => {
+      const account = await tx.accountingAccount.update({
+        where: { id },
+        data: {
+          ...(dto.name !== undefined
+            ? { name: this.requireText(dto.name, 'Account name') }
+            : {}),
+          ...(dto.parentId !== undefined ? { parentId: dto.parentId } : {}),
+          ...(dto.allowDirectPosting !== undefined
+            ? { allowDirectPosting: dto.allowDirectPosting }
+            : {}),
+          ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
+          ...(dto.isControlAccount !== undefined
+            ? { isControlAccount: dto.isControlAccount }
+            : {}),
+          ...(dto.currencyCode !== undefined
+            ? { currencyCode: normalizedCurrency ?? null }
+            : {}),
+          ...(dto.reconciliationEligible !== undefined
+            ? { reconciliationEligible: dto.reconciliationEligible }
+            : {}),
+        },
+      });
+      await this.auditMasterMutation(tx, companyId, actorUserId, {
+        action:
+          currencyChanged || dto.parentId !== undefined
+            ? 'accounting.account.structure_changed'
+            : dto.isActive !== undefined
+              ? 'accounting.account.activation_changed'
+              : 'accounting.account.updated',
+        entityId: id,
+        metadata: {
+          before: existing,
+          after: account,
+          reason: dto.reason ?? null,
+        },
+      });
+      return account;
     });
   }
 
@@ -155,16 +225,31 @@ export class AccountingService {
     });
   }
 
-  async createJournal(companyId: string, dto: CreateAccountingJournalDto) {
+  async createJournal(
+    companyId: string,
+    actorUserId: string,
+    dto: CreateAccountingJournalDto,
+  ) {
+    if (dto.currencyCode) {
+      await this.assertActiveCurrency(this.prisma, dto.currencyCode);
+    }
     try {
-      return await this.prisma.accountingJournal.create({
-        data: {
-          companyId,
-          code: this.requireText(dto.code, 'Journal code'),
-          name: this.requireText(dto.name, 'Journal name'),
-          type: dto.type,
-          currencyCode: dto.currencyCode ?? null,
-        },
+      return await this.prisma.$transaction(async (tx) => {
+        const journal = await tx.accountingJournal.create({
+          data: {
+            companyId,
+            code: this.requireText(dto.code, 'Journal code'),
+            name: this.requireText(dto.name, 'Journal name'),
+            type: dto.type,
+            currencyCode: dto.currencyCode?.toUpperCase() ?? null,
+          },
+        });
+        await this.auditMasterMutation(tx, companyId, actorUserId, {
+          action: 'accounting.journal.created',
+          entityId: journal.id,
+          metadata: { after: journal, reason: dto.reason ?? null },
+        });
+        return journal;
       });
     } catch (error) {
       this.throwMappedPrismaConflict(error, 'Journal code already exists');
@@ -174,6 +259,7 @@ export class AccountingService {
 
   async updateJournal(
     companyId: string,
+    actorUserId: string,
     id: string,
     dto: UpdateAccountingJournalDto,
   ) {
@@ -181,17 +267,64 @@ export class AccountingService {
       where: { id, companyId },
     });
     if (!existing) throw new NotFoundException('Accounting journal not found');
-    return this.prisma.accountingJournal.update({
-      where: { id },
-      data: {
-        ...(dto.name !== undefined
-          ? { name: this.requireText(dto.name, 'Journal name') }
-          : {}),
-        ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
-        ...(dto.currencyCode !== undefined
-          ? { currencyCode: dto.currencyCode }
-          : {}),
-      },
+    const normalizedCurrency = dto.currencyCode?.toUpperCase();
+    if (normalizedCurrency) {
+      await this.assertActiveCurrency(this.prisma, normalizedCurrency);
+    }
+    const currencyChanged =
+      dto.currencyCode !== undefined &&
+      normalizedCurrency !== existing.currencyCode;
+    if (
+      (currencyChanged || dto.isActive !== undefined) &&
+      !dto.reason?.trim()
+    ) {
+      throw new BadRequestException(
+        'A reason is required for this journal change',
+      );
+    }
+    if (currencyChanged) {
+      const postedUse = await this.prisma.journalEntry.count({
+        where: {
+          companyId,
+          journalId: id,
+          status: {
+            in: [JournalEntryStatus.POSTED, JournalEntryStatus.REVERSED],
+          },
+        },
+      });
+      if (postedUse > 0) {
+        throw new ConflictException(
+          'A journal currency cannot change after posted history exists',
+        );
+      }
+    }
+    return this.prisma.$transaction(async (tx) => {
+      const journal = await tx.accountingJournal.update({
+        where: { id },
+        data: {
+          ...(dto.name !== undefined
+            ? { name: this.requireText(dto.name, 'Journal name') }
+            : {}),
+          ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
+          ...(dto.currencyCode !== undefined
+            ? { currencyCode: normalizedCurrency ?? null }
+            : {}),
+        },
+      });
+      await this.auditMasterMutation(tx, companyId, actorUserId, {
+        action: currencyChanged
+          ? 'accounting.journal.currency_changed'
+          : dto.isActive !== undefined
+            ? 'accounting.journal.activation_changed'
+            : 'accounting.journal.updated',
+        entityId: id,
+        metadata: {
+          before: existing,
+          after: journal,
+          reason: dto.reason ?? null,
+        },
+      });
+      return journal;
     });
   }
 
@@ -203,7 +336,11 @@ export class AccountingService {
     });
   }
 
-  async createFiscalYear(companyId: string, dto: CreateFiscalYearDto) {
+  async createFiscalYear(
+    companyId: string,
+    actorUserId: string,
+    dto: CreateFiscalYearDto,
+  ) {
     const startDate = this.parseDate(dto.startDate, 'startDate');
     const endDate = this.parseDate(dto.endDate, 'endDate');
     this.assertDateOrder(
@@ -213,13 +350,21 @@ export class AccountingService {
     );
 
     try {
-      return await this.prisma.fiscalYear.create({
-        data: {
-          companyId,
-          name: this.requireText(dto.name, 'Fiscal year name'),
-          startDate,
-          endDate,
-        },
+      return await this.prisma.$transaction(async (tx) => {
+        const fiscalYear = await tx.fiscalYear.create({
+          data: {
+            companyId,
+            name: this.requireText(dto.name, 'Fiscal year name'),
+            startDate,
+            endDate,
+          },
+        });
+        await this.auditMasterMutation(tx, companyId, actorUserId, {
+          action: 'accounting.fiscal_year.created',
+          entityId: fiscalYear.id,
+          metadata: { after: fiscalYear },
+        });
+        return fiscalYear;
       });
     } catch (error) {
       this.throwMappedPrismaConflict(
@@ -232,6 +377,7 @@ export class AccountingService {
 
   async changeFiscalYearStatus(
     companyId: string,
+    actorUserId: string,
     id: string,
     dto: UpdateFiscalYearStatusDto,
   ) {
@@ -247,9 +393,17 @@ export class AccountingService {
         'A closed fiscal year cannot be reopened through this endpoint',
       );
     }
-    return this.prisma.fiscalYear.update({
-      where: { id },
-      data: { status: dto.status },
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await tx.fiscalYear.update({
+        where: { id },
+        data: { status: dto.status },
+      });
+      await this.auditMasterMutation(tx, companyId, actorUserId, {
+        action: 'accounting.fiscal_year.status_changed',
+        entityId: id,
+        metadata: { before: fiscalYear, after: updated },
+      });
+      return updated;
     });
   }
 
@@ -261,7 +415,11 @@ export class AccountingService {
     });
   }
 
-  async createPeriod(companyId: string, dto: CreateAccountingPeriodDto) {
+  async createPeriod(
+    companyId: string,
+    actorUserId: string,
+    dto: CreateAccountingPeriodDto,
+  ) {
     const startDate = this.parseDate(dto.startDate, 'startDate');
     const endDate = this.parseDate(dto.endDate, 'endDate');
     this.assertDateOrder(
@@ -286,14 +444,22 @@ export class AccountingService {
     }
 
     try {
-      return await this.prisma.accountingPeriod.create({
-        data: {
-          companyId,
-          fiscalYearId: dto.fiscalYearId,
-          name: this.requireText(dto.name, 'Accounting period name'),
-          startDate,
-          endDate,
-        },
+      return await this.prisma.$transaction(async (tx) => {
+        const period = await tx.accountingPeriod.create({
+          data: {
+            companyId,
+            fiscalYearId: dto.fiscalYearId,
+            name: this.requireText(dto.name, 'Accounting period name'),
+            startDate,
+            endDate,
+          },
+        });
+        await this.auditMasterMutation(tx, companyId, actorUserId, {
+          action: 'accounting.period.created',
+          entityId: period.id,
+          metadata: { after: period },
+        });
+        return period;
       });
     } catch (error) {
       this.throwMappedPrismaConflict(
@@ -306,6 +472,7 @@ export class AccountingService {
 
   async changePeriodStatus(
     companyId: string,
+    actorUserId: string,
     id: string,
     dto: UpdateAccountingPeriodStatusDto,
   ) {
@@ -330,56 +497,238 @@ export class AccountingService {
         'A period in a closed fiscal year cannot be reopened',
       );
     }
-    return this.prisma.accountingPeriod.update({
-      where: { id },
-      data: { status: dto.status },
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await tx.accountingPeriod.update({
+        where: { id },
+        data: { status: dto.status },
+      });
+      await this.auditMasterMutation(tx, companyId, actorUserId, {
+        action: 'accounting.period.status_changed',
+        entityId: id,
+        metadata: { before: period, after: updated },
+      });
+      return updated;
     });
   }
 
-  async getConfiguration(companyId: string) {
+  async getConfiguration(companyId: string, actorUserId: string) {
     const company = await this.prisma.company.findFirst({
       where: { id: companyId, isDeleted: false },
       select: { currencyCode: true },
     });
     if (!company) throw new NotFoundException('Company not found');
 
-    return this.prisma.accountingConfiguration.upsert({
+    const existing = await this.prisma.accountingConfiguration.findUnique({
       where: { companyId },
-      create: {
-        companyId,
-        baseCurrencyCode: company.currencyCode.toUpperCase().slice(0, 3),
-        countryCode: 'EG',
-        localeCode: 'ar-EG',
-      },
-      update: {},
-      include: { accountDefaults: true, journalDefaults: true },
+    });
+    if (existing) {
+      return this.prisma.accountingConfiguration.findUniqueOrThrow({
+        where: { companyId },
+        include: { accountDefaults: true, journalDefaults: true },
+      });
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const configuration = await tx.accountingConfiguration.create({
+        data: {
+          companyId,
+          baseCurrencyCode: company.currencyCode.toUpperCase().slice(0, 3),
+          countryCode: 'EG',
+          localeCode: 'ar-EG',
+        },
+        include: { accountDefaults: true, journalDefaults: true },
+      });
+      await this.auditMasterMutation(tx, companyId, actorUserId, {
+        action: 'accounting.configuration.created',
+        entityId: configuration.id,
+        metadata: {
+          after: configuration,
+          reason: 'Initialized from company currency',
+        },
+      });
+      return configuration;
     });
   }
 
   async updateConfiguration(
     companyId: string,
+    actorUserId: string,
     dto: CreateAccountingConfigurationDto,
   ) {
-    return this.prisma.accountingConfiguration.upsert({
+    const baseCurrencyCode = dto.baseCurrencyCode.toUpperCase();
+    const reportingCurrencyCode =
+      dto.reportingCurrencyCode?.toUpperCase() ?? null;
+    await this.assertActiveCurrency(this.prisma, baseCurrencyCode);
+    if (reportingCurrencyCode) {
+      await this.assertActiveCurrency(this.prisma, reportingCurrencyCode);
+    }
+    if (reportingCurrencyCode === baseCurrencyCode) {
+      throw new BadRequestException(
+        'Reporting currency must differ from base currency',
+      );
+    }
+
+    const existing = await this.prisma.accountingConfiguration.findUnique({
       where: { companyId },
-      create: {
-        companyId,
-        baseCurrencyCode: dto.baseCurrencyCode,
-        reportingCurrencyCode: dto.reportingCurrencyCode ?? null,
-        countryCode: dto.countryCode,
-        localeCode: dto.localeCode,
-      },
-      update: {
-        baseCurrencyCode: dto.baseCurrencyCode,
-        reportingCurrencyCode: dto.reportingCurrencyCode ?? null,
-        countryCode: dto.countryCode,
-        localeCode: dto.localeCode,
-      },
-      include: { accountDefaults: true, journalDefaults: true },
+    });
+    if (existing && existing.baseCurrencyCode !== baseCurrencyCode) {
+      const postedCount = await this.prisma.journalEntry.count({
+        where: {
+          companyId,
+          status: {
+            in: [JournalEntryStatus.POSTED, JournalEntryStatus.REVERSED],
+          },
+        },
+      });
+      if (postedCount > 0) {
+        throw new ConflictException(
+          'Base currency cannot change after posted accounting history exists',
+        );
+      }
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const configuration = await tx.accountingConfiguration.upsert({
+        where: { companyId },
+        create: {
+          companyId,
+          baseCurrencyCode,
+          reportingCurrencyCode,
+          countryCode: dto.countryCode.toUpperCase(),
+          localeCode: dto.localeCode,
+        },
+        update: {
+          baseCurrencyCode,
+          reportingCurrencyCode,
+          countryCode: dto.countryCode.toUpperCase(),
+          localeCode: dto.localeCode,
+        },
+        include: { accountDefaults: true, journalDefaults: true },
+      });
+      await this.auditMasterMutation(tx, companyId, actorUserId, {
+        action: 'accounting.configuration.changed',
+        entityId: configuration.id,
+        metadata: {
+          before: existing,
+          after: configuration,
+          currencySensitive: existing?.baseCurrencyCode !== baseCurrencyCode,
+        },
+      });
+      return configuration;
     });
   }
 
-  async post(companyId: string, actorUserId: string, dto: PostJournalEntryDto) {
+  async setDefaultAccount(
+    companyId: string,
+    actorUserId: string,
+    dto: SetAccountingAccountDefaultDto,
+  ) {
+    const configuration = await this.ensureConfiguration(
+      companyId,
+      actorUserId,
+    );
+    const account = await this.prisma.accountingAccount.findFirst({
+      where: { id: dto.accountId, companyId },
+    });
+    if (!account)
+      throw new NotFoundException(
+        'Accounting account not found for this company',
+      );
+    this.assertAccountMappingCompatibility(dto.settingKey, account.accountType);
+
+    return this.prisma.$transaction(async (tx) => {
+      const existing = await tx.accountingConfigurationAccount.findUnique({
+        where: {
+          companyId_configurationId_settingKey: {
+            companyId,
+            configurationId: configuration.id,
+            settingKey: dto.settingKey,
+          },
+        },
+      });
+      const mapping = await tx.accountingConfigurationAccount.upsert({
+        where: {
+          companyId_configurationId_settingKey: {
+            companyId,
+            configurationId: configuration.id,
+            settingKey: dto.settingKey,
+          },
+        },
+        create: {
+          companyId,
+          configurationId: configuration.id,
+          settingKey: dto.settingKey,
+          accountId: dto.accountId,
+        },
+        update: { accountId: dto.accountId },
+      });
+      await this.auditMasterMutation(tx, companyId, actorUserId, {
+        action: 'accounting.configuration.default_account_changed',
+        entityId: mapping.id,
+        metadata: { before: existing, after: mapping, reason: dto.reason },
+      });
+      return mapping;
+    });
+  }
+
+  async setDefaultJournal(
+    companyId: string,
+    actorUserId: string,
+    dto: SetAccountingJournalDefaultDto,
+  ) {
+    const configuration = await this.ensureConfiguration(
+      companyId,
+      actorUserId,
+    );
+    const journal = await this.prisma.accountingJournal.findFirst({
+      where: { id: dto.journalId, companyId },
+    });
+    if (!journal)
+      throw new NotFoundException(
+        'Accounting journal not found for this company',
+      );
+    this.assertJournalMappingCompatibility(dto.settingKey, journal.type);
+
+    return this.prisma.$transaction(async (tx) => {
+      const existing = await tx.accountingConfigurationJournal.findUnique({
+        where: {
+          companyId_configurationId_settingKey: {
+            companyId,
+            configurationId: configuration.id,
+            settingKey: dto.settingKey,
+          },
+        },
+      });
+      const mapping = await tx.accountingConfigurationJournal.upsert({
+        where: {
+          companyId_configurationId_settingKey: {
+            companyId,
+            configurationId: configuration.id,
+            settingKey: dto.settingKey,
+          },
+        },
+        create: {
+          companyId,
+          configurationId: configuration.id,
+          settingKey: dto.settingKey,
+          journalId: dto.journalId,
+        },
+        update: { journalId: dto.journalId },
+      });
+      await this.auditMasterMutation(tx, companyId, actorUserId, {
+        action: 'accounting.configuration.default_journal_changed',
+        entityId: mapping.id,
+        metadata: { before: existing, after: mapping, reason: dto.reason },
+      });
+      return mapping;
+    });
+  }
+
+  async postManualJournal(
+    companyId: string,
+    actorUserId: string,
+    dto: ManualJournalEntryDto,
+  ) {
     const command: PostJournalCommand = {
       companyId,
       actorUserId,
@@ -392,13 +741,28 @@ export class AccountingService {
       exchangeRate: dto.exchangeRate,
       documentReference: dto.documentReference,
       description: dto.description,
-      sourceType: dto.sourceType,
-      sourceId: dto.sourceId,
+      periodOverrideReason: dto.periodOverrideReason,
+      sourceType: JournalSourceType.MANUAL_JOURNAL,
       idempotencyKey: dto.idempotencyKey,
-      allowSoftClosedOverride: dto.allowSoftClosedOverride,
       lines: dto.lines,
     };
 
+    return this.executePosting(command);
+  }
+
+  /**
+   * Trusted backend boundary for future business modules. Controllers must
+   * never expose sourceType/sourceId selection to clients.
+   */
+  async postInternal(
+    companyId: string,
+    actorUserId: string,
+    command: Omit<PostJournalCommand, 'companyId' | 'actorUserId'>,
+  ) {
+    return this.executePosting({ companyId, actorUserId, ...command });
+  }
+
+  private async executePosting(command: PostJournalCommand) {
     try {
       return await this.prisma.$transaction((tx) =>
         this.postInTransaction(tx, command),
@@ -406,7 +770,7 @@ export class AccountingService {
     } catch (error) {
       if (this.isUniqueViolation(error)) {
         const existing = await this.findByIdempotencyKey(
-          companyId,
+          command.companyId,
           command.sourceType,
           command.idempotencyKey,
         );
@@ -473,100 +837,107 @@ export class AccountingService {
     id: string,
     dto: ReverseJournalEntryDto,
   ) {
-    return this.prisma.$transaction(async (tx) => {
-      const original = await tx.journalEntry.findFirst({
-        where: { id, companyId },
-        include: { lines: { include: { account: true } }, journal: true },
-      });
-      if (!original) throw new NotFoundException('Journal entry not found');
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        const original = await tx.journalEntry.findFirst({
+          where: { id, companyId },
+          include: { lines: { include: { account: true } }, journal: true },
+        });
+        if (!original) throw new NotFoundException('Journal entry not found');
 
-      const reversalCommand: PostJournalCommand = {
-        companyId,
-        actorUserId,
-        journalId: original.journalId,
-        accountingPeriodId: dto.accountingPeriodId,
-        postingDate: dto.postingDate,
-        documentDate: dto.postingDate,
-        dueDate: original.dueDate?.toISOString(),
-        transactionCurrencyCode: original.transactionCurrencyCode,
-        exchangeRate: original.exchangeRate.toFixed(8),
-        documentReference: original.documentReference ?? undefined,
-        description: `Reversal of ${original.entryNumber}: ${this.requireText(dto.reason, 'Reversal reason')}`,
-        sourceType: JournalSourceType.REVERSAL,
-        sourceId: original.id,
-        idempotencyKey: dto.idempotencyKey,
-        reversalOfEntryId: original.id,
-        reversalReason: dto.reason,
-        lines: original.lines.map((line) => ({
-          accountId: line.accountId,
-          debit: line.credit.toFixed(4),
-          credit: line.debit.toFixed(4),
-          transactionDebit: line.transactionCredit.toFixed(4),
-          transactionCredit: line.transactionDebit.toFixed(4),
-          description: line.description ?? undefined,
-          partyType: line.partyType ?? undefined,
-          partyId: line.partyId ?? undefined,
-          dueDate: line.dueDate?.toISOString(),
-          documentReference: line.documentReference ?? undefined,
-          reconciliationReference: line.reconciliationReference ?? undefined,
-          taxCode: line.taxCode ?? undefined,
-          taxTreatmentCode: line.taxTreatmentCode ?? undefined,
-          taxRate: line.taxRate?.toFixed(4),
-        })),
-      };
-
-      const existingReversal = await tx.journalEntry.findFirst({
-        where: {
-          companyId,
-          sourceType: JournalSourceType.REVERSAL,
-          idempotencyKey: dto.idempotencyKey,
-        },
-        include: {
-          lines: { include: { account: true } },
-          journal: true,
-          accountingPeriod: true,
-        },
-      });
-      if (existingReversal) {
-        if (
-          existingReversal.requestHash !== this.hashCommand(reversalCommand)
-        ) {
-          throw new ConflictException(
-            'Idempotency key is already used with another reversal',
-          );
-        }
-        return this.serializeEntry(existingReversal);
-      }
-
-      if (original.status !== JournalEntryStatus.POSTED) {
-        throw new ConflictException(
-          'Only a posted journal entry can be reversed',
-        );
-      }
-      const previousReversal = await tx.journalEntry.findFirst({
-        where: { companyId, reversalOfEntryId: original.id },
-        select: { id: true },
-      });
-      if (previousReversal)
-        throw new ConflictException('Journal entry is already reversed');
-
-      const reversal = await this.postInTransaction(tx, reversalCommand);
-      await tx.journalEntry.update({
-        where: { id: original.id },
-        data: { status: JournalEntryStatus.REVERSED },
-      });
-      await tx.auditLog.create({
-        data: {
+        const reversalCommand: PostJournalCommand = {
           companyId,
           actorUserId,
-          action: 'accounting.journal.reversed',
-          entityType: 'journal_entry',
-          entityId: original.id,
-          metadata: { reversalEntryId: reversal.id, reason: dto.reason },
-        },
+          journalId: original.journalId,
+          accountingPeriodId: dto.accountingPeriodId,
+          postingDate: dto.postingDate,
+          documentDate: dto.postingDate,
+          dueDate: original.dueDate?.toISOString(),
+          transactionCurrencyCode: original.transactionCurrencyCode,
+          exchangeRate: original.exchangeRate.toFixed(8),
+          documentReference: original.documentReference ?? undefined,
+          description: `Reversal of ${original.entryNumber}: ${this.requireText(dto.reason, 'Reversal reason')}`,
+          sourceType: JournalSourceType.REVERSAL,
+          sourceId: original.id,
+          idempotencyKey: dto.idempotencyKey,
+          reversalOfEntryId: original.id,
+          reversalReason: dto.reason,
+          lines: original.lines.map((line) => ({
+            accountId: line.accountId,
+            transactionDebit: line.transactionCredit.toFixed(4),
+            transactionCredit: line.transactionDebit.toFixed(4),
+            description: line.description ?? undefined,
+            partyType: line.partyType ?? undefined,
+            partyId: line.partyId ?? undefined,
+            dueDate: line.dueDate?.toISOString(),
+            documentReference: line.documentReference ?? undefined,
+            reconciliationReference: line.reconciliationReference ?? undefined,
+            taxCode: line.taxCode ?? undefined,
+            taxTreatmentCode: line.taxTreatmentCode ?? undefined,
+            taxRate: line.taxRate?.toFixed(4),
+          })),
+        };
+
+        const existingReversal = await tx.journalEntry.findFirst({
+          where: {
+            companyId,
+            sourceType: JournalSourceType.REVERSAL,
+            idempotencyKey: dto.idempotencyKey,
+          },
+          include: {
+            lines: { include: { account: true } },
+            journal: true,
+            accountingPeriod: true,
+          },
+        });
+        if (existingReversal) {
+          if (
+            existingReversal.requestHash !== this.hashCommand(reversalCommand)
+          ) {
+            throw new ConflictException(
+              'Idempotency key is already used with another reversal',
+            );
+          }
+          return this.serializeEntry(existingReversal);
+        }
+
+        if (original.status !== JournalEntryStatus.POSTED) {
+          throw new ConflictException(
+            'Only a posted journal entry can be reversed',
+          );
+        }
+        const previousReversal = await tx.journalEntry.findFirst({
+          where: { companyId, reversalOfEntryId: original.id },
+          select: { id: true },
+        });
+        if (previousReversal)
+          throw new ConflictException('Journal entry is already reversed');
+
+        const reversal = await this.postInTransaction(tx, reversalCommand);
+        await tx.journalEntry.update({
+          where: { id: original.id },
+          data: { status: JournalEntryStatus.REVERSED },
+        });
+        await tx.auditLog.create({
+          data: {
+            companyId,
+            actorUserId,
+            action: 'accounting.journal.reversed',
+            entityType: 'journal_entry',
+            entityId: original.id,
+            metadata: { reversalEntryId: reversal.id, reason: dto.reason },
+          },
+        });
+        return reversal;
       });
-      return reversal;
-    });
+    } catch (error) {
+      if (this.isUniqueViolation(error)) {
+        throw new ConflictException(
+          'Journal entry is already being reversed or has already been reversed',
+        );
+      }
+      throw error;
+    }
   }
 
   private async postInTransaction(
@@ -623,6 +994,19 @@ export class AccountingService {
     );
     if (!exchangeRate.isPositive())
       throw new BadRequestException('Exchange rate must be positive');
+    const currencyContext = await this.resolveCurrencyContext(
+      tx,
+      command.companyId,
+      currencyCode,
+    );
+    if (
+      currencyCode === currencyContext.base.code &&
+      !exchangeRate.toDecimal().eq(1)
+    ) {
+      throw new BadRequestException(
+        'A base-currency transaction must use an exchange rate of exactly 1',
+      );
+    }
 
     const period = await tx.accountingPeriod.findFirst({
       where: { id: command.accountingPeriodId, companyId: command.companyId },
@@ -640,15 +1024,21 @@ export class AccountingService {
     if (period.fiscalYear.status === FiscalYearStatus.CLOSED) {
       throw new ConflictException('The fiscal year is closed');
     }
-    if (
-      period.status !== AccountingPeriodStatus.OPEN &&
-      !(
-        period.status === AccountingPeriodStatus.SOFT_CLOSED &&
-        command.allowSoftClosedOverride
-      )
-    ) {
+    if (period.status === AccountingPeriodStatus.CLOSED) {
       throw new ConflictException(
-        'The accounting period does not accept this posting',
+        'Closed accounting periods cannot receive postings',
+      );
+    }
+    if (period.status === AccountingPeriodStatus.SOFT_CLOSED) {
+      if (!command.periodOverrideReason?.trim()) {
+        throw new ConflictException(
+          'A soft-closed period requires a controlled override reason',
+        );
+      }
+      await this.assertPeriodOverrideActor(
+        tx,
+        command.companyId,
+        command.actorUserId,
       );
     }
 
@@ -710,43 +1100,16 @@ export class AccountingService {
           'partyType and partyId must be provided together',
         );
       }
-      const debit = AccountingMoney.fromString(line.debit, 'debit');
-      const credit = AccountingMoney.fromString(line.credit, 'credit');
-      if (debit.isNegative() || credit.isNegative()) {
-        throw new BadRequestException(
-          'Debit and credit amounts cannot be negative',
-        );
-      }
-      if (!debit.isZero() && !credit.isZero()) {
-        throw new BadRequestException(
-          'A journal line cannot contain both debit and credit',
-        );
-      }
-      if (debit.isZero() && credit.isZero()) {
-        throw new BadRequestException(
-          'A journal line must contain a debit or credit amount',
-        );
-      }
-      if (line.partyType && line.partyId) {
-        const partyExists = await awaitablePartyCheck(
-          line.partyType,
-          line.partyId,
-        );
-        if (!partyExists) {
-          throw new BadRequestException(
-            'Journal line party does not belong to this company',
-          );
-        }
-      }
-      const transactionDebit = line.transactionDebit
-        ? AccountingMoney.fromString(line.transactionDebit, 'transactionDebit')
-        : debit;
-      const transactionCredit = line.transactionCredit
-        ? AccountingMoney.fromString(
-            line.transactionCredit,
-            'transactionCredit',
-          )
-        : credit;
+      const transactionDebit = AccountingMoney.fromString(
+        line.transactionDebit,
+        'transactionDebit',
+        currencyContext.transaction.minorUnitPrecision,
+      );
+      const transactionCredit = AccountingMoney.fromString(
+        line.transactionCredit,
+        'transactionCredit',
+        currencyContext.transaction.minorUnitPrecision,
+      );
       if (transactionDebit.isNegative() || transactionCredit.isNegative()) {
         throw new BadRequestException(
           'Transaction debit and credit amounts cannot be negative',
@@ -762,6 +1125,19 @@ export class AccountingService {
           'A transaction line must contain a debit or credit amount',
         );
       }
+      if (line.partyType && line.partyId) {
+        const partyExists = await awaitablePartyCheck(
+          line.partyType,
+          line.partyId,
+        );
+        if (!partyExists) {
+          throw new BadRequestException(
+            'Journal line party does not belong to this company',
+          );
+        }
+      }
+      const debit = transactionDebit.multiply(exchangeRate).round(4);
+      const credit = transactionCredit.multiply(exchangeRate).round(4);
       debitTotal = debitTotal.add(debit);
       creditTotal = creditTotal.add(credit);
       transactionDebitTotal = transactionDebitTotal.add(transactionDebit);
@@ -878,6 +1254,22 @@ export class AccountingService {
         },
       },
     });
+    if (command.periodOverrideReason?.trim()) {
+      await tx.auditLog.create({
+        data: {
+          companyId: command.companyId,
+          actorUserId: command.actorUserId,
+          action: 'accounting.period.soft_close_override',
+          entityType: 'accounting_period',
+          entityId: command.accountingPeriodId,
+          metadata: {
+            reason: command.periodOverrideReason.trim(),
+            entryId: posted.id,
+            entryNumber,
+          },
+        },
+      });
+    }
     return this.serializeEntry(posted);
 
     async function awaitablePartyCheck(
@@ -935,6 +1327,191 @@ export class AccountingService {
     });
   }
 
+  private async ensureConfiguration(companyId: string, actorUserId: string) {
+    const configuration = await this.prisma.accountingConfiguration.findUnique({
+      where: { companyId },
+    });
+    if (configuration) return configuration;
+    await this.getConfiguration(companyId, actorUserId);
+    return this.prisma.accountingConfiguration.findUniqueOrThrow({
+      where: { companyId },
+    });
+  }
+
+  private async assertActiveCurrency(db: any, code: string) {
+    const normalized = code.trim().toUpperCase();
+    if (!/^[A-Z]{3}$/.test(normalized)) {
+      throw new BadRequestException('Invalid ISO currency code');
+    }
+    const currency = await db.currency.findUnique({
+      where: { code: normalized },
+    });
+    if (!currency || !currency.isActive) {
+      throw new BadRequestException(
+        `Currency ${normalized} is not active in the currency master`,
+      );
+    }
+    return currency;
+  }
+
+  private async resolveCurrencyContext(
+    tx: TransactionDb,
+    companyId: string,
+    transactionCurrencyCode: string,
+  ) {
+    const configuration = await tx.accountingConfiguration.findUnique({
+      where: { companyId },
+    });
+    if (!configuration) {
+      throw new ConflictException(
+        'Accounting configuration must be initialized before posting',
+      );
+    }
+    const [base, transaction] = await Promise.all([
+      tx.currency.findUnique({
+        where: { code: configuration.baseCurrencyCode },
+      }),
+      tx.currency.findUnique({ where: { code: transactionCurrencyCode } }),
+    ]);
+    if (!base || !base.isActive || !transaction || !transaction.isActive) {
+      throw new BadRequestException(
+        'Posting currency is not active in the currency master',
+      );
+    }
+    return { configuration, base, transaction };
+  }
+
+  private async assertPeriodOverrideActor(
+    tx: TransactionDb,
+    companyId: string,
+    actorUserId: string,
+  ) {
+    const actor = await tx.user.findFirst({
+      where: {
+        id: actorUserId,
+        status: 'ACTIVE',
+        OR: [{ companyId }, { role: UserRole.SUPER_ADMIN }],
+      },
+      include: { permissions: true },
+    });
+    if (!actor)
+      throw new ConflictException(
+        'The override actor is not active in this company',
+      );
+    if (actor.role === UserRole.OWNER || actor.role === UserRole.SUPER_ADMIN)
+      return;
+    const permissions = actor.permissions?.permissions;
+    if (
+      !permissions ||
+      typeof permissions !== 'object' ||
+      Array.isArray(permissions) ||
+      (permissions as Record<string, unknown>).manageLedger !== true
+    ) {
+      throw new ConflictException(
+        'The actor is not authorized to override a soft-closed period',
+      );
+    }
+  }
+
+  private assertAccountMappingCompatibility(
+    key: AccountingConfigAccountKey,
+    type: AccountingAccountType,
+  ) {
+    const allowed: Record<AccountingConfigAccountKey, AccountingAccountType[]> =
+      {
+        [AccountingConfigAccountKey.RECEIVABLE]: [
+          AccountingAccountType.ASSET_RECEIVABLE,
+        ],
+        [AccountingConfigAccountKey.PAYABLE]: [
+          AccountingAccountType.LIABILITY_PAYABLE,
+        ],
+        [AccountingConfigAccountKey.INCOME]: [
+          AccountingAccountType.INCOME_OPERATING_REVENUE,
+          AccountingAccountType.INCOME_OTHER,
+        ],
+        [AccountingConfigAccountKey.EXPENSE]: [
+          AccountingAccountType.EXPENSE_OPERATING,
+          AccountingAccountType.EXPENSE_OTHER,
+        ],
+        [AccountingConfigAccountKey.RETAINED_EARNINGS]: [
+          AccountingAccountType.EQUITY,
+        ],
+        [AccountingConfigAccountKey.EXCHANGE_GAIN]: [
+          AccountingAccountType.INCOME_OTHER,
+        ],
+        [AccountingConfigAccountKey.EXCHANGE_LOSS]: [
+          AccountingAccountType.EXPENSE_OTHER,
+        ],
+        [AccountingConfigAccountKey.ROUNDING]: [
+          AccountingAccountType.INCOME_OTHER,
+          AccountingAccountType.EXPENSE_OTHER,
+        ],
+        [AccountingConfigAccountKey.TAX_PAYABLE]: [
+          AccountingAccountType.LIABILITY_TAX,
+        ],
+        [AccountingConfigAccountKey.TAX_RECOVERABLE]: [
+          AccountingAccountType.ASSET_OTHER,
+          AccountingAccountType.ASSET_RECEIVABLE,
+        ],
+        [AccountingConfigAccountKey.INVENTORY]: [
+          AccountingAccountType.ASSET_INVENTORY,
+        ],
+        [AccountingConfigAccountKey.COGS]: [AccountingAccountType.EXPENSE_COGS],
+      };
+    if (!allowed[key].includes(type)) {
+      throw new BadRequestException(
+        `Account type ${type} is not compatible with ${key}`,
+      );
+    }
+  }
+
+  private assertJournalMappingCompatibility(
+    key: AccountingConfigJournalKey,
+    type: AccountingJournalType,
+  ) {
+    const expected: Record<
+      AccountingConfigJournalKey,
+      AccountingJournalType[]
+    > = {
+      [AccountingConfigJournalKey.GENERAL]: [AccountingJournalType.GENERAL],
+      [AccountingConfigJournalKey.SALES]: [AccountingJournalType.SALES],
+      [AccountingConfigJournalKey.PURCHASE]: [AccountingJournalType.PURCHASE],
+      [AccountingConfigJournalKey.CASH]: [AccountingJournalType.CASH],
+      [AccountingConfigJournalKey.BANK]: [AccountingJournalType.BANK],
+      [AccountingConfigJournalKey.EXCHANGE_DIFFERENCE]: [
+        AccountingJournalType.GENERAL,
+        AccountingJournalType.BANK,
+      ],
+    };
+    if (!expected[key].includes(type)) {
+      throw new BadRequestException(
+        `Journal type ${type} is not compatible with ${key}`,
+      );
+    }
+  }
+
+  private async auditMasterMutation(
+    tx: TransactionDb,
+    companyId: string,
+    actorUserId: string,
+    event: { action: string; entityId: string; metadata?: unknown },
+  ) {
+    await tx.auditLog.create({
+      data: {
+        companyId,
+        actorUserId,
+        action: event.action,
+        entityType: 'accounting_master_data',
+        entityId: event.entityId,
+        metadata: this.jsonSnapshot(event.metadata ?? {}),
+      },
+    });
+  }
+
+  private jsonSnapshot(value: unknown): Prisma.InputJsonValue {
+    return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
+  }
+
   private serializeEntry(row: any) {
     return {
       ...row,
@@ -961,6 +1538,7 @@ export class AccountingService {
       exchangeRate: command.exchangeRate,
       documentReference: command.documentReference ?? null,
       description: command.description,
+      periodOverrideReason: command.periodOverrideReason ?? null,
       sourceType: command.sourceType,
       sourceId: command.sourceId ?? null,
       reversalOfEntryId: command.reversalOfEntryId ?? null,

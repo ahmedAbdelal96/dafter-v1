@@ -181,6 +181,7 @@ import { AccountingModule } from './modules/accounting/accounting.module';
 
     // Cash Reconciliation
     CashReconciliationModule,
+    TaxSetupModule,
     AccountingModule,
   ],
   controllers: [AppController],

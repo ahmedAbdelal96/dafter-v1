@@ -1,9 +1,5 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import {
-  AccountingPeriodStatus,
-  FiscalYearStatus,
-  JournalSourceType,
-} from '@prisma/client';
+import { AccountingPeriodStatus, FiscalYearStatus } from '@prisma/client';
 import { AccountingService } from './accounting.service';
 
 function makePosting(overrides: Record<string, unknown> = {}) {
@@ -14,11 +10,18 @@ function makePosting(overrides: Record<string, unknown> = {}) {
     transactionCurrencyCode: 'EGP',
     exchangeRate: '1',
     description: 'Opening test posting',
-    sourceType: JournalSourceType.MANUAL_JOURNAL,
     idempotencyKey: 'test-key-1',
     lines: [
-      { accountId: 'account-1', debit: '100.10', credit: '0' },
-      { accountId: 'account-2', debit: '0', credit: '100.10' },
+      {
+        accountId: 'account-1',
+        transactionDebit: '100.10',
+        transactionCredit: '0',
+      },
+      {
+        accountId: 'account-2',
+        transactionDebit: '0',
+        transactionCredit: '100.10',
+      },
     ],
     ...overrides,
   };
@@ -32,6 +35,8 @@ function makeService() {
       update: jest.fn(),
     },
     accountingPeriod: { findFirst: jest.fn() },
+    accountingConfiguration: { findUnique: jest.fn() },
+    currency: { findUnique: jest.fn() },
     accountingJournal: { findFirst: jest.fn() },
     accountingAccount: { findMany: jest.fn() },
     journalLine: { createMany: jest.fn() },
@@ -39,8 +44,8 @@ function makeService() {
     $queryRaw: jest.fn(),
   };
   const prisma = {
-    $transaction: jest.fn(async (callback: (client: typeof tx) => unknown) =>
-      callback(tx),
+    $transaction: jest.fn((callback: (client: typeof tx) => unknown) =>
+      Promise.resolve(callback(tx)),
     ),
     journalEntry: { findFirst: jest.fn() },
   };
@@ -50,6 +55,17 @@ function makeService() {
   const service = new AccountingService(prisma as never, idempotency as never);
 
   tx.journalEntry.findFirst.mockResolvedValue(null);
+  tx.accountingConfiguration.findUnique.mockResolvedValue({
+    baseCurrencyCode: 'EGP',
+  });
+  tx.currency.findUnique.mockImplementation(
+    ({ where }: { where: { code: string } }) =>
+      Promise.resolve({
+        code: where.code,
+        isActive: true,
+        minorUnitPrecision: where.code === 'JPY' ? 0 : 2,
+      }),
+  );
   tx.accountingPeriod.findFirst.mockResolvedValue({
     startDate: new Date('2026-01-01T00:00:00.000Z'),
     endDate: new Date('2026-01-31T00:00:00.000Z'),
@@ -89,13 +105,21 @@ describe('AccountingService posting invariants', () => {
     const { service, tx } = makeService();
 
     await expect(
-      service.post(
+      service.postManualJournal(
         'company-1',
         'user-1',
         makePosting({
           lines: [
-            { accountId: 'account-1', debit: '100.10', credit: '0' },
-            { accountId: 'account-2', debit: '0', credit: '99.10' },
+            {
+              accountId: 'account-1',
+              transactionDebit: '100.10',
+              transactionCredit: '0',
+            },
+            {
+              accountId: 'account-2',
+              transactionDebit: '0',
+              transactionCredit: '99.10',
+            },
           ],
         }) as never,
       ),
@@ -117,39 +141,74 @@ describe('AccountingService posting invariants', () => {
     ]);
 
     await expect(
-      service.post('company-1', 'user-1', makePosting() as never),
+      service.postManualJournal('company-1', 'user-1', makePosting() as never),
     ).rejects.toBeInstanceOf(NotFoundException);
     expect(tx.$queryRaw).not.toHaveBeenCalled();
   });
 
-  it('requires transaction-currency lines to balance independently', async () => {
+  it('derives company-currency amounts from transaction amounts and the exchange rate', async () => {
     const { service, tx } = makeService();
+    tx.accountingConfiguration.findUnique.mockResolvedValue({
+      baseCurrencyCode: 'EGP',
+    });
 
-    await expect(
-      service.post(
-        'company-1',
-        'user-1',
-        makePosting({
-          lines: [
-            {
-              accountId: 'account-1',
-              debit: '120.00',
-              credit: '0',
-              transactionDebit: '100.00',
-              transactionCredit: '0',
-            },
-            {
-              accountId: 'account-2',
-              debit: '0',
-              credit: '120.00',
-              transactionDebit: '0',
-              transactionCredit: '99.00',
-            },
-          ],
-        }) as never,
-      ),
-    ).rejects.toBeInstanceOf(BadRequestException);
-    expect(tx.$queryRaw).not.toHaveBeenCalled();
+    tx.currency.findUnique.mockImplementation(
+      ({ where }: { where: { code: string } }) =>
+        Promise.resolve({
+          code: where.code,
+          isActive: true,
+          minorUnitPrecision: 2,
+        }),
+    );
+    tx.journalEntry.create.mockResolvedValue({ id: 'entry-1' });
+    tx.journalEntry.update.mockResolvedValue({
+      id: 'entry-1',
+      status: 'POSTED',
+      lines: [],
+      journal: {},
+      accountingPeriod: {},
+    });
+    tx.$queryRaw.mockResolvedValue([{ allocated: 1 }]);
+
+    await service.postManualJournal(
+      'company-1',
+      'user-1',
+      makePosting({
+        transactionCurrencyCode: 'USD',
+        exchangeRate: '50',
+        lines: [
+          {
+            accountId: 'account-1',
+            transactionDebit: '100.00',
+            transactionCredit: '0',
+          },
+          {
+            accountId: 'account-2',
+            transactionDebit: '0',
+            transactionCredit: '100.00',
+          },
+        ],
+      }) as never,
+    );
+
+    expect(tx.journalEntry.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          transactionCurrencyCode: 'USD',
+          exchangeRate: expect.anything(),
+        }),
+      }),
+    );
+    expect(tx.journalLine.createMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            debit: expect.anything(),
+            transactionDebit: expect.anything(),
+          }),
+        ]),
+      }),
+    );
   });
 
   it('replays the same idempotent request without creating another entry', async () => {
@@ -165,7 +224,8 @@ describe('AccountingService posting invariants', () => {
       exchangeRate: command.exchangeRate,
       documentReference: null,
       description: command.description,
-      sourceType: command.sourceType,
+      periodOverrideReason: null,
+      sourceType: 'MANUAL_JOURNAL',
       sourceId: null,
       reversalOfEntryId: null,
       reversalReason: null,
@@ -179,7 +239,11 @@ describe('AccountingService posting invariants', () => {
       accountingPeriod: {},
     });
 
-    const result = await service.post('company-1', 'user-1', command as never);
+    const result = await service.postManualJournal(
+      'company-1',
+      'user-1',
+      command as never,
+    );
     expect(result).toMatchObject({ id: 'entry-1' });
     expect(tx.journalEntry.create).not.toHaveBeenCalled();
     expect(tx.$queryRaw).not.toHaveBeenCalled();

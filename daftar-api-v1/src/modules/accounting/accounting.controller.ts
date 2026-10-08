@@ -31,8 +31,10 @@ import {
   CreateAccountingJournalDto,
   CreateAccountingPeriodDto,
   CreateFiscalYearDto,
-  PostJournalEntryDto,
+  ManualJournalEntryDto,
   ReverseJournalEntryDto,
+  SetAccountingAccountDefaultDto,
+  SetAccountingJournalDefaultDto,
   UpdateAccountingAccountDto,
   UpdateAccountingJournalDto,
   UpdateAccountingPeriodStatusDto,
@@ -57,10 +59,11 @@ export class AccountingController {
   @OwnerOnly()
   async createAccount(
     @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateAccountingAccountDto,
   ) {
     return new ApiResponseDto(
-      await this.accountingService.createAccount(companyId, dto),
+      await this.accountingService.createAccount(companyId, user.id, dto),
     );
   }
 
@@ -68,11 +71,12 @@ export class AccountingController {
   @OwnerOnly()
   async updateAccount(
     @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateAccountingAccountDto,
   ) {
     return new ApiResponseDto(
-      await this.accountingService.updateAccount(companyId, id, dto),
+      await this.accountingService.updateAccount(companyId, user.id, id, dto),
     );
   }
 
@@ -90,10 +94,11 @@ export class AccountingController {
   @OwnerOnly()
   async createJournal(
     @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateAccountingJournalDto,
   ) {
     return new ApiResponseDto(
-      await this.accountingService.createJournal(companyId, dto),
+      await this.accountingService.createJournal(companyId, user.id, dto),
     );
   }
 
@@ -101,11 +106,12 @@ export class AccountingController {
   @OwnerOnly()
   async updateJournal(
     @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateAccountingJournalDto,
   ) {
     return new ApiResponseDto(
-      await this.accountingService.updateJournal(companyId, id, dto),
+      await this.accountingService.updateJournal(companyId, user.id, id, dto),
     );
   }
 
@@ -123,10 +129,11 @@ export class AccountingController {
   @OwnerOnly()
   async createFiscalYear(
     @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateFiscalYearDto,
   ) {
     return new ApiResponseDto(
-      await this.accountingService.createFiscalYear(companyId, dto),
+      await this.accountingService.createFiscalYear(companyId, user.id, dto),
     );
   }
 
@@ -134,11 +141,17 @@ export class AccountingController {
   @OwnerOnly()
   async changeFiscalYearStatus(
     @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateFiscalYearStatusDto,
   ) {
     return new ApiResponseDto(
-      await this.accountingService.changeFiscalYearStatus(companyId, id, dto),
+      await this.accountingService.changeFiscalYearStatus(
+        companyId,
+        user.id,
+        id,
+        dto,
+      ),
     );
   }
 
@@ -160,10 +173,11 @@ export class AccountingController {
   @OwnerOnly()
   async createPeriod(
     @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateAccountingPeriodDto,
   ) {
     return new ApiResponseDto(
-      await this.accountingService.createPeriod(companyId, dto),
+      await this.accountingService.createPeriod(companyId, user.id, dto),
     );
   }
 
@@ -171,11 +185,17 @@ export class AccountingController {
   @OwnerOnly()
   async changePeriodStatus(
     @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateAccountingPeriodStatusDto,
   ) {
     return new ApiResponseDto(
-      await this.accountingService.changePeriodStatus(companyId, id, dto),
+      await this.accountingService.changePeriodStatus(
+        companyId,
+        user.id,
+        id,
+        dto,
+      ),
     );
   }
 
@@ -183,9 +203,12 @@ export class AccountingController {
   @UseGuards(PermissionsGuard)
   @ProtectedRead(UserRole.OWNER, UserRole.STAFF, UserRole.SUPER_ADMIN)
   @RequirePermissions('viewLedger')
-  async getConfiguration(@CurrentTenant() companyId: string) {
+  async getConfiguration(
+    @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
     return new ApiResponseDto(
-      await this.accountingService.getConfiguration(companyId),
+      await this.accountingService.getConfiguration(companyId, user.id),
     );
   }
 
@@ -193,10 +216,35 @@ export class AccountingController {
   @OwnerOnly()
   async updateConfiguration(
     @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateAccountingConfigurationDto,
   ) {
     return new ApiResponseDto(
-      await this.accountingService.updateConfiguration(companyId, dto),
+      await this.accountingService.updateConfiguration(companyId, user.id, dto),
+    );
+  }
+
+  @Put('configuration/default-accounts')
+  @OwnerOnly()
+  async setDefaultAccount(
+    @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: SetAccountingAccountDefaultDto,
+  ) {
+    return new ApiResponseDto(
+      await this.accountingService.setDefaultAccount(companyId, user.id, dto),
+    );
+  }
+
+  @Put('configuration/default-journals')
+  @OwnerOnly()
+  async setDefaultJournal(
+    @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: SetAccountingJournalDefaultDto,
+  ) {
+    return new ApiResponseDto(
+      await this.accountingService.setDefaultJournal(companyId, user.id, dto),
     );
   }
 
@@ -206,10 +254,10 @@ export class AccountingController {
   async postJournalEntry(
     @CurrentTenant() companyId: string,
     @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: PostJournalEntryDto,
+    @Body() dto: ManualJournalEntryDto,
   ) {
     return new ApiResponseDto(
-      await this.accountingService.post(companyId, user.id, dto),
+      await this.accountingService.postManualJournal(companyId, user.id, dto),
     );
   }
 

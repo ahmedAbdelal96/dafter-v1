@@ -17,6 +17,8 @@ import {
   FiscalYearStatus,
   JournalEntryStatus,
   JournalSourceType,
+  AccountingConfigAccountKey,
+  AccountingConfigJournalKey,
   PartyType,
 } from '@prisma/client';
 
@@ -54,6 +56,11 @@ export class CreateAccountingAccountDto {
   @IsOptional()
   @IsBoolean()
   reconciliationEligible?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  reason?: string;
 }
 
 export class UpdateAccountingAccountDto {
@@ -86,6 +93,11 @@ export class UpdateAccountingAccountDto {
   @IsOptional()
   @IsBoolean()
   reconciliationEligible?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  reason?: string;
 }
 
 export class CreateAccountingJournalDto {
@@ -104,6 +116,11 @@ export class CreateAccountingJournalDto {
   @IsString()
   @Matches(/^[A-Z]{3}$/)
   currencyCode?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  reason?: string;
 }
 
 export class UpdateAccountingJournalDto {
@@ -120,6 +137,11 @@ export class UpdateAccountingJournalDto {
   @IsString()
   @Matches(/^[A-Z]{3}$/)
   currencyCode?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  reason?: string;
 }
 
 export class CreateFiscalYearDto {
@@ -184,26 +206,11 @@ export class JournalLineDto {
 
   @IsString()
   @Matches(MONEY)
-  debit!: string;
+  transactionDebit!: string;
 
   @IsString()
   @Matches(MONEY)
-  credit!: string;
-
-  /**
-   * Optional transaction-currency amounts. `debit`/`credit` remain the
-   * company-currency amounts so source-document adapters can supply both
-   * ledgers explicitly without any JavaScript number conversion.
-   */
-  @IsOptional()
-  @IsString()
-  @Matches(MONEY)
-  transactionDebit?: string;
-
-  @IsOptional()
-  @IsString()
-  @Matches(MONEY)
-  transactionCredit?: string;
+  transactionCredit!: string;
 
   @IsOptional()
   @IsString()
@@ -248,7 +255,7 @@ export class JournalLineDto {
   taxRate?: string;
 }
 
-export class PostJournalEntryDto {
+export class ManualJournalEntryDto {
   @IsUUID()
   journalId!: string;
 
@@ -283,24 +290,46 @@ export class PostJournalEntryDto {
   @MaxLength(500)
   description!: string;
 
-  @IsEnum(JournalSourceType)
-  sourceType!: JournalSourceType;
-
+  /** Required by the service when posting into a SOFT_CLOSED period. */
   @IsOptional()
-  @IsUUID()
-  sourceId?: string;
+  @IsString()
+  @MaxLength(500)
+  periodOverrideReason?: string;
 
   @IsString()
   @MaxLength(128)
   idempotencyKey!: string;
 
-  @IsOptional()
-  @IsBoolean()
-  allowSoftClosedOverride?: boolean;
-
   @ValidateNested({ each: true })
   @Type(() => JournalLineDto)
   lines!: JournalLineDto[];
+}
+
+/** @deprecated Use ManualJournalEntryDto for the public manual-journal API. */
+export class PostJournalEntryDto extends ManualJournalEntryDto {}
+
+export class SetAccountingAccountDefaultDto {
+  @IsEnum(AccountingConfigAccountKey)
+  settingKey!: AccountingConfigAccountKey;
+
+  @IsUUID()
+  accountId!: string;
+
+  @IsString()
+  @MaxLength(500)
+  reason!: string;
+}
+
+export class SetAccountingJournalDefaultDto {
+  @IsEnum(AccountingConfigJournalKey)
+  settingKey!: AccountingConfigJournalKey;
+
+  @IsUUID()
+  journalId!: string;
+
+  @IsString()
+  @MaxLength(500)
+  reason!: string;
 }
 
 export class ReverseJournalEntryDto {

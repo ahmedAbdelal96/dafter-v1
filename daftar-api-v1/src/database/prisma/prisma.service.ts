@@ -18,6 +18,7 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   private readonly logger = new Logger(PrismaService.name);
+  private readonly pool: Pool;
 
   constructor() {
     const logLevels: Array<'query' | 'info' | 'warn' | 'error'> =
@@ -64,11 +65,11 @@ export class PrismaService
     const adapter = new PrismaPg(pool);
 
     // Optimized for 100+ concurrent users with proper connection pooling
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     super({
       log: logLevels,
       adapter,
     } as Prisma.PrismaClientOptions);
+    this.pool = pool;
   }
 
   /**
@@ -76,7 +77,6 @@ export class PrismaService
    */
   async onModuleInit(): Promise<void> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       await (this as PrismaClient).$connect();
       this.logger.log('✅ Connected to database');
 
@@ -152,8 +152,8 @@ export class PrismaService
    * Disconnect when the application shuts down
    */
   async onModuleDestroy(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     await (this as PrismaClient).$disconnect();
+    await this.pool.end();
     this.logger.log('🔌 Disconnected from database');
   }
 

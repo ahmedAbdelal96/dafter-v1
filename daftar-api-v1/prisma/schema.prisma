@@ -435,6 +435,7 @@ model Company {
   phone                   String?
   address                 String?
   currencyCode            String                 @default("EGP")
+  currency                Currency               @relation("CompanyCurrency", fields: [currencyCode], references: [code], onDelete: Restrict)
   cashReconciliationMode  CashReconciliationMode @default(DISABLED)
   cashModeUpdatedByUserId String?                @db.Uuid
   cashModeUpdatedAt       DateTime?
@@ -1576,6 +1577,7 @@ model AccountingAccount {
   name                   String                @db.VarChar(200)
   accountType            AccountingAccountType
   currencyCode           String?               @db.Char(3)
+  currency               Currency?             @relation("AccountingAccountCurrency", fields: [currencyCode], references: [code], onDelete: Restrict)
   parentId               String?               @db.Uuid
   parent                 AccountingAccount?    @relation("AccountingAccountHierarchy", fields: [parentId, companyId], references: [id, companyId], onDelete: Restrict)
   children               AccountingAccount[]   @relation("AccountingAccountHierarchy")
@@ -1604,6 +1606,7 @@ model AccountingJournal {
   name         String                @db.VarChar(200)
   type         AccountingJournalType
   currencyCode String?               @db.Char(3)
+  currency     Currency?             @relation("AccountingJournalCurrency", fields: [currencyCode], references: [code], onDelete: Restrict)
   isActive     Boolean               @default(true)
   createdAt    DateTime              @default(now())
   updatedAt    DateTime              @updatedAt
@@ -1681,6 +1684,7 @@ model JournalEntry {
   documentDate            DateTime?          @db.Date
   dueDate                 DateTime?          @db.Date
   transactionCurrencyCode String             @db.Char(3)
+  transactionCurrency     Currency           @relation("JournalEntryTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
   exchangeRate            Decimal            @db.Decimal(19, 8)
   documentReference       String?            @db.VarChar(120)
   description             String             @db.VarChar(500)
@@ -1740,20 +1744,45 @@ model JournalLine {
 }
 
 model AccountingConfiguration {
-  id                    String   @id @default(uuid()) @db.Uuid
-  companyId             String   @unique @db.Uuid
-  company               Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  baseCurrencyCode      String   @db.Char(3)
-  reportingCurrencyCode String?  @db.Char(3)
-  countryCode           String   @db.Char(2)
-  localeCode            String   @db.VarChar(20)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                    String    @id @default(uuid()) @db.Uuid
+  companyId             String    @unique @db.Uuid
+  company               Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  baseCurrencyCode      String    @db.Char(3)
+  baseCurrency          Currency  @relation("AccountingBaseCurrency", fields: [baseCurrencyCode], references: [code], onDelete: Restrict)
+  reportingCurrencyCode String?   @db.Char(3)
+  reportingCurrency     Currency? @relation("AccountingReportingCurrency", fields: [reportingCurrencyCode], references: [code], onDelete: Restrict)
+  countryCode           String    @db.Char(2)
+  localeCode            String    @db.VarChar(20)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   accountDefaults AccountingConfigurationAccount[]
   journalDefaults AccountingConfigurationJournal[]
 
   @@unique([id, companyId])
+}
+
+// B01.1: canonical currency reference data. The accounting engine validates
+// transaction precision from minorUnitPrecision while keeping GL storage at
+// four decimal places for deterministic conversion and reporting.
+model Currency {
+  code               String   @id @db.Char(3)
+  name               String   @db.VarChar(100)
+  nativeName         String?  @db.VarChar(100)
+  symbol             String?  @db.VarChar(12)
+  minorUnitPrecision Int
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  accountingAccounts      AccountingAccount[]       @relation("AccountingAccountCurrency")
+  accountingJournals      AccountingJournal[]       @relation("AccountingJournalCurrency")
+  journalEntries          JournalEntry[]            @relation("JournalEntryTransactionCurrency")
+  baseConfigurations      AccountingConfiguration[] @relation("AccountingBaseCurrency")
+  reportingConfigurations AccountingConfiguration[] @relation("AccountingReportingCurrency")
+  companies               Company[]                 @relation("CompanyCurrency")
+
+  @@index([isActive])
 }
 
 model AccountingConfigurationAccount {

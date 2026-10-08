@@ -21,7 +21,7 @@
     "predebug": "node scripts/kill-port.js 7000",
     "debug": "node --max-old-space-size=4096 ./node_modules/@nestjs/cli/bin/nest.js start --debug --watch",
     "prod": "node dist/main.js",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -78,6 +78,7 @@
     "@types/nodemailer": "^7.0.11",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.3",
+    "ajv": "^6.12.6",
     "@typescript-eslint/eslint-plugin": "^8.56.0",
     "@typescript-eslint/parser": "^8.56.0",
     "eslint": "^10.0.0",
@@ -100,8 +101,7 @@
     "minimatch": "^10.2.1",
     "glob": "^11.0.0",
     "rimraf": "^6.0.0",
-    "hono": "^4.12.0",
-    "ajv": "^8.18.0"
+    "hono": "^4.12.0"
   },
   "prisma": {
     "seed": "ts-node --project tsconfig.seed.json --transpile-only prisma/seed.ts"

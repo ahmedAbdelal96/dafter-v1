@@ -53,6 +53,16 @@ export class AccountingMoney {
     return new AccountingMoney(this.value.neg());
   }
 
+  multiply(other: AccountingMoney): AccountingMoney {
+    return new AccountingMoney(this.value.mul(other.value));
+  }
+
+  round(scale: number): AccountingMoney {
+    return new AccountingMoney(
+      this.value.toDecimalPlaces(scale, Prisma.Decimal.ROUND_HALF_UP),
+    );
+  }
+
   isZero(): boolean {
     return this.value.isZero();
   }
