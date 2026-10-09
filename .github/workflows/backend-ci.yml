@@ -2,14 +2,16 @@ name: Backend CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, "codex/**"]
     paths:
       - "daftar-api-v1/**"
+      - "docs/**"
       - ".github/workflows/backend-ci.yml"
   pull_request:
     branches: [main, master]
     paths:
       - "daftar-api-v1/**"
+      - "docs/**"
 
 defaults:
   run:
@@ -60,6 +62,12 @@ jobs:
         run: >-
           npx eslint
           "src/modules/accounting/**/*.ts"
+          "src/modules/business-partners/**/*.ts"
+          "src/modules/payment-terms/**/*.ts"
+          "src/modules/accounting-bootstrap/**/*.ts"
+          "src/modules/opening-balances/**/*.ts"
+          "src/common/types/auth.types.ts"
+          "src/common/entitlements/feature-policy.manifest.ts"
           "src/app.module.ts"
           --max-warnings=0
 
@@ -73,6 +81,11 @@ jobs:
 
       - name: Apply Prisma migrations
         run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daftar_test"
+
+      - name: Seed deterministic test reference data
+        run: npm run db:seed
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daftar_test"
 
@@ -92,7 +105,7 @@ jobs:
           SHADOW_DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daftar_shadow"
 
       - name: Run tests
-        run: npm test -- --passWithNoTests
+        run: npm test -- --runInBand --passWithNoTests --forceExit
         env:
           NODE_ENV: test
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daftar_test"

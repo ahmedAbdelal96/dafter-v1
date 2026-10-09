@@ -104,7 +104,33 @@ Document date, posting/accounting date, and due/maturity date are distinct. Peri
 
 Tax is expected to be line-aware in later phases. B01 lines support tax/source references and generic tax account mappings without performing tax calculation. Inventory is also later: the generic journal can express inventory/GRNI, COGS/inventory, returns, and valuation adjustments without a stock ledger in B01. Cost center, branch, department, and project dimensions will be added through a future line-dimension bridge; no fixed organization dimension is baked into the journal key or balance logic.
 
-## 13. Senior architecture review gate
+## 13. B02 permanent rules
+
+B02 makes the greenfield boundary executable. The following rules are permanent accounting architecture, not implementation preferences:
+
+- `BusinessPartner` is the authoritative counterparty identity. `CustomerProfile` and `SupplierProfile` are independent role capabilities on that identity; a `BOTH` counterparty has one identity with both profiles, never two parallel parties.
+- New accounting references carry `JournalLine.businessPartnerId` only. The legacy signed `partyType`/`partyId` path is not a new posting contract and must not be used by B02 modules.
+- A receivable control account requires an active customer role; a payable control account requires an active supplier role. The role check is company-scoped, transactionally enforced, and applies equally to normal source postings and opening balances.
+- Opening balances are explicit, auditable GL events. Mutable balances on party records, summary tables, or legacy ledger rows are never an accounting source of truth.
+- Payment terms are decimal-safe schedule definitions. A document integration must snapshot the calculated schedule at source-document creation; later payment-term changes must not rewrite historical due dates or installment amounts.
+- Accounting templates are versioned reference data. Company account/journal configuration stores immutable provenance, is created through an idempotent bootstrap operation, and is considered usable only when the readiness checks pass.
+- Posted entries, posted opening-balance batches, and their lines remain immutable. Corrections are reversals or new explicit entries, never edits or deletes.
+
+### Legacy isolation and removal matrix
+
+Legacy structures may remain only for the coexistence period. They are isolated from the authoritative B02 boundary as follows:
+
+| Legacy area | B02 status | Removal/integration gate |
+| --- | --- | --- |
+| `Customer` / `Supplier` models and repositories | Legacy-only compatibility data; no B02 imports or queries | B03 migration adapter maps records to `BusinessPartner` and records unresolved duplicates before document posting moves |
+| Legacy `partyType` / `partyId` journal references | Legacy-only historical representation | B03 source-flow adapter emits `businessPartnerId`; B04 removes the compatibility columns after all historical readers are migrated |
+| `LedgerEntry` / `Balance` managerial path | Not an accounting statement authority | B04 reporting cutover proves all financial reports derive from B01 journal lines, then removes the path |
+| Legacy invoice/payment/installment/expense posting flows | Operational coexistence only; no B02 GL ownership | Each B03/B04 source adapter must post through the typed accounting contract with idempotency and audit evidence before its legacy writer is retired |
+| Mutable party balances and denormalized totals | Never authoritative | No migration phase may copy them into GL truth; derive balances from posted journal lines and reconciliation allocations |
+
+B02 modules (`business-partners`, `payment-terms`, `accounting-bootstrap`, and `opening-balances`) must not import legacy customer/supplier modules or query legacy customer/supplier repositories. Any exception requires a new architecture review decision and an explicit boundary-test update.
+
+## 14. Senior architecture review gate
 
 The B01.1 answers are yes: the GL would still be chosen greenfield; Sales, Purchasing, Expenses, Cash/Bank, Tax, AR/AP, and Inventory can post through the internal source-typed contract without changing `JournalEntry`/`JournalLine`; multiple currencies are representable with one documented rate orientation and deterministic rounding; document-level reconciliation is representable; periods can be locked with controlled soft-close overrides; posted history is immutable; corrections are reversals; financial statements can derive from the GL; future dimensions can be added without rebuilding the ledger; and no second financial truth is intended to survive backend freeze.
 
