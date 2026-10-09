@@ -23,6 +23,12 @@ export interface StaffPermissionsMap {
   manageUsers?: boolean;
   viewParties?: boolean;
   manageParties?: boolean;
+  viewPartners?: boolean;
+  managePartners?: boolean;
+  viewAccountingSetup?: boolean;
+  manageAccountingSetup?: boolean;
+  viewOpeningBalances?: boolean;
+  manageOpeningBalances?: boolean;
   viewLedger?: boolean;
   manageLedger?: boolean;
   viewReports?: boolean;
