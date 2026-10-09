@@ -1,6 +1,7 @@
 ﻿import { SeedContext } from './types';
 import { resetDatabase } from './modules/00-reset';
 import { seedPlatformAndTenants } from './modules/10-platform-tenants';
+import { seedAccountingTemplates } from './modules/15-accounting-templates';
 import { seedPartiesAndBalances } from './modules/20-parties-balances';
 import { seedProducts } from './modules/30-products';
 import { seedLedger } from './modules/40-ledger';
@@ -16,6 +17,9 @@ const logStep = (text: string): void => {
 export const runAllSeeds = async (ctx: SeedContext): Promise<void> => {
   logStep('Reset database');
   await resetDatabase(ctx);
+
+  logStep('Seed accounting templates');
+  await seedAccountingTemplates(ctx);
 
   logStep('Seed platform + tenants + users');
   await seedPlatformAndTenants(ctx);

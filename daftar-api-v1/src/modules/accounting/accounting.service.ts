@@ -13,7 +13,6 @@ import {
   FiscalYearStatus,
   JournalEntryStatus,
   JournalSourceType,
-  PartyType,
   Prisma,
   UserRole,
 } from '@prisma/client';
@@ -42,8 +41,7 @@ interface AccountingLineCommand {
   transactionDebit: string;
   transactionCredit: string;
   description?: string;
-  partyType?: PartyType;
-  partyId?: string;
+  businessPartnerId?: string;
   dueDate?: string;
   documentReference?: string;
   reconciliationReference?: string;
@@ -867,8 +865,7 @@ export class AccountingService {
             transactionDebit: line.transactionCredit.toFixed(4),
             transactionCredit: line.transactionDebit.toFixed(4),
             description: line.description ?? undefined,
-            partyType: line.partyType ?? undefined,
-            partyId: line.partyId ?? undefined,
+            businessPartnerId: line.businessPartnerId ?? undefined,
             dueDate: line.dueDate?.toISOString(),
             documentReference: line.documentReference ?? undefined,
             reconciliationReference: line.reconciliationReference ?? undefined,
@@ -1096,13 +1093,20 @@ export class AccountingService {
           `Account ${account.code} only accepts ${account.currencyCode}`,
         );
       }
-      if (
-        (line.partyType && !line.partyId) ||
-        (!line.partyType && line.partyId)
-      ) {
-        throw new BadRequestException(
-          'partyType and partyId must be provided together',
-        );
+      if (line.businessPartnerId) {
+        const businessPartnerExists =
+          (await tx.businessPartner.count({
+            where: {
+              id: line.businessPartnerId,
+              companyId: command.companyId,
+              isActive: true,
+            },
+          })) > 0;
+        if (!businessPartnerExists) {
+          throw new BadRequestException(
+            'Journal line business partner does not belong to this company or is inactive',
+          );
+        }
       }
       const transactionDebit = AccountingMoney.fromString(
         line.transactionDebit,
@@ -1129,17 +1133,6 @@ export class AccountingService {
           'A transaction line must contain a debit or credit amount',
         );
       }
-      if (line.partyType && line.partyId) {
-        const partyExists = await awaitablePartyCheck(
-          line.partyType,
-          line.partyId,
-        );
-        if (!partyExists) {
-          throw new BadRequestException(
-            'Journal line party does not belong to this company',
-          );
-        }
-      }
       const debit = transactionDebit.multiply(exchangeRate).round(4);
       const credit = transactionCredit.multiply(exchangeRate).round(4);
       debitTotal = debitTotal.add(debit);
@@ -1154,8 +1147,7 @@ export class AccountingService {
         transactionDebit: transactionDebit.toDecimal(),
         transactionCredit: transactionCredit.toDecimal(),
         description: line.description ?? null,
-        partyType: line.partyType ?? null,
-        partyId: line.partyId ?? null,
+        businessPartnerId: line.businessPartnerId ?? null,
         dueDate: line.dueDate
           ? this.parseDate(line.dueDate, 'line.dueDate')
           : dueDate,
@@ -1275,34 +1267,6 @@ export class AccountingService {
       });
     }
     return this.serializeEntry(posted);
-
-    async function awaitablePartyCheck(
-      type: PartyType,
-      id: string,
-    ): Promise<boolean> {
-      switch (type) {
-        case PartyType.CUSTOMER:
-          return (
-            (await tx.customer.count({
-              where: { id, companyId: command.companyId, isDeleted: false },
-            })) > 0
-          );
-        case PartyType.SUPPLIER:
-          return (
-            (await tx.supplier.count({
-              where: { id, companyId: command.companyId, isDeleted: false },
-            })) > 0
-          );
-        case PartyType.EMPLOYEE:
-          return (
-            (await tx.employee.count({
-              where: { id, companyId: command.companyId, isDeleted: false },
-            })) > 0
-          );
-        default:
-          return false;
-      }
-    }
   }
 
   private findByIdempotencyKey(

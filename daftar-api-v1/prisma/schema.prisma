@@ -56,6 +56,18 @@ enum PartyType {
   EMPLOYEE
 }
 
+enum BusinessPartnerType {
+  ORGANIZATION
+  PERSON
+}
+
+enum BusinessPartnerAddressType {
+  BILLING
+  SHIPPING
+  REGISTERED
+  OTHER
+}
+
 enum LedgerEntryType {
   // Generic
   INVOICE
@@ -285,6 +297,25 @@ enum AccountingConfigJournalKey {
   EXCHANGE_DIFFERENCE
 }
 
+enum PaymentTermLineType {
+  PERCENT
+  BALANCE
+}
+
+enum AccountingSetupStatus {
+  NOT_CONFIGURED
+  IN_PROGRESS
+  READY
+  BLOCKED
+}
+
+enum OpeningBalanceBatchStatus {
+  DRAFT
+  VALIDATED
+  POSTED
+  REVERSED
+}
+
 // -------------------------
 // COMMON FIELD PATTERN NOTES
 // -------------------------
@@ -349,7 +380,9 @@ model User {
   createdInvoices Invoice[] @relation("InvoiceCreatedBy")
 
   // B01: authoritative accounting postings
-  postedAccountingEntries JournalEntry[] @relation("AccountingEntryPostedBy")
+  postedAccountingEntries      JournalEntry[]        @relation("AccountingEntryPostedBy")
+  createdOpeningBalanceBatches OpeningBalanceBatch[] @relation("OpeningBalanceBatchCreatedBy")
+  postedOpeningBalanceBatches  OpeningBalanceBatch[] @relation("OpeningBalanceBatchPostedBy")
 
   // P2-BE-1: back-reference for customer product prices
   updatedCustomerProductPrices CustomerProductPrice[] @relation("CustomerProductPriceUpdatedBy")
@@ -449,6 +482,12 @@ model Company {
   users               User[]
   customers           Customer[]
   suppliers           Supplier[]
+  businessPartners    BusinessPartner[]
+  customerProfiles    CustomerProfile[]
+  supplierProfiles    SupplierProfile[]
+  partnerAddresses    BusinessPartnerAddress[]
+  partnerContacts     BusinessPartnerContact[]
+  paymentTerms        PaymentTerm[]
   employees           Employee[]
   ledgerEntries       LedgerEntry[]
   balances            Balance[]
@@ -485,6 +524,7 @@ model Company {
 
   // B01: authoritative accounting core
   accountingConfiguration  AccountingConfiguration?
+  accountingSetup          AccountingSetup?
   accountingAccounts       AccountingAccount[]
   accountingJournals       AccountingJournal[]
   fiscalYears              FiscalYear[]
@@ -492,6 +532,7 @@ model Company {
   accountingEntrySequences AccountingEntrySequence[]
   accountingJournalEntries JournalEntry[]
   accountingJournalLines   JournalLine[]
+  openingBalanceBatches    OpeningBalanceBatch[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -782,12 +823,11 @@ model StaffPermission {
 }
 
 // ============================================================
-// PARTIES (CUSTOMERS / SUPPLIERS / EMPLOYEES)
+// LEGACY PARTIES (CUSTOMERS / SUPPLIERS / EMPLOYEES)
 // ============================================================
-// Opening balances:
-// - Stored here.
-// - Balance model stores CURRENT balance.
-// - Services MUST initialize Balance row upon party creation to openingBalance.
+// These models remain only for unreplaced legacy modules. They are not the
+// authoritative B02 external-party identity and their openingBalance fields
+// are not read by BusinessPartner, the B01 GL, or any new B02 feature.
 // ============================================================
 
 model Customer {
@@ -843,6 +883,164 @@ model Supplier {
   @@index([companyId, name])
 }
 
+// ============================================================
+// B02: AUTHORITATIVE BUSINESS PARTNER DOMAIN
+// ============================================================
+
+model BusinessPartner {
+  id                           String              @id @default(uuid()) @db.Uuid
+  companyId                    String              @db.Uuid
+  company                      Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  partnerCode                  String              @db.VarChar(40)
+  partnerType                  BusinessPartnerType
+  displayName                  String              @db.VarChar(200)
+  legalName                    String?             @db.VarChar(200)
+  taxRegistrationNumber        String?             @db.VarChar(80)
+  commercialRegistrationNumber String?             @db.VarChar(80)
+  email                        String?             @db.VarChar(320)
+  phone                        String?             @db.VarChar(40)
+  website                      String?             @db.VarChar(255)
+  notes                        String?             @db.VarChar(2000)
+  isActive                     Boolean             @default(true)
+  version                      Int                 @default(0)
+  createdAt                    DateTime            @default(now())
+  updatedAt                    DateTime            @updatedAt
+
+  customerProfile CustomerProfile?
+  supplierProfile SupplierProfile?
+  addresses       BusinessPartnerAddress[]
+  contacts        BusinessPartnerContact[]
+  journalLines    JournalLine[]
+  openingLines    OpeningBalanceLine[]
+
+  @@unique([id, companyId])
+  @@unique([companyId, partnerCode])
+  @@index([companyId, isActive, displayName])
+  @@index([companyId, legalName])
+  @@index([companyId, phone])
+  @@index([companyId, taxRegistrationNumber])
+}
+
+model CustomerProfile {
+  businessPartnerId     String             @id @db.Uuid
+  companyId             String             @db.Uuid
+  businessPartner       BusinessPartner    @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Cascade)
+  company               Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  paymentTermId         String?            @db.Uuid
+  paymentTerm           PaymentTerm?       @relation(fields: [paymentTermId, companyId], references: [id, companyId], onDelete: Restrict)
+  creditLimit           Decimal?           @db.Decimal(19, 4)
+  receivableAccountId   String?            @db.Uuid
+  receivableAccount     AccountingAccount? @relation("CustomerReceivableOverride", fields: [receivableAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  preferredCurrencyCode String?            @db.Char(3)
+  preferredCurrency     Currency?          @relation("CustomerPreferredCurrency", fields: [preferredCurrencyCode], references: [code], onDelete: Restrict)
+  isActive              Boolean            @default(true)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  @@unique([businessPartnerId, companyId])
+  @@index([companyId, paymentTermId])
+  @@index([companyId, receivableAccountId])
+}
+
+model SupplierProfile {
+  businessPartnerId     String             @id @db.Uuid
+  companyId             String             @db.Uuid
+  businessPartner       BusinessPartner    @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Cascade)
+  company               Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  paymentTermId         String?            @db.Uuid
+  paymentTerm           PaymentTerm?       @relation(fields: [paymentTermId, companyId], references: [id, companyId], onDelete: Restrict)
+  payableAccountId      String?            @db.Uuid
+  payableAccount        AccountingAccount? @relation("SupplierPayableOverride", fields: [payableAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  preferredCurrencyCode String?            @db.Char(3)
+  preferredCurrency     Currency?          @relation("SupplierPreferredCurrency", fields: [preferredCurrencyCode], references: [code], onDelete: Restrict)
+  isActive              Boolean            @default(true)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  @@unique([businessPartnerId, companyId])
+  @@index([companyId, paymentTermId])
+  @@index([companyId, payableAccountId])
+}
+
+model BusinessPartnerAddress {
+  id                String                     @id @default(uuid()) @db.Uuid
+  companyId         String                     @db.Uuid
+  businessPartnerId String                     @db.Uuid
+  company           Company                    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  businessPartner   BusinessPartner            @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Cascade)
+  addressType       BusinessPartnerAddressType
+  line1             String                     @db.VarChar(200)
+  line2             String?                    @db.VarChar(200)
+  city              String?                    @db.VarChar(100)
+  region            String?                    @db.VarChar(100)
+  postalCode        String?                    @db.VarChar(30)
+  countryCode       String                     @db.Char(2)
+  isDefault         Boolean                    @default(false)
+  isActive          Boolean                    @default(true)
+  createdAt         DateTime                   @default(now())
+  updatedAt         DateTime                   @updatedAt
+
+  @@unique([id, companyId])
+  @@index([companyId, businessPartnerId, addressType])
+  @@index([companyId, businessPartnerId, isDefault])
+}
+
+model BusinessPartnerContact {
+  id                String          @id @default(uuid()) @db.Uuid
+  companyId         String          @db.Uuid
+  businessPartnerId String          @db.Uuid
+  company           Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  businessPartner   BusinessPartner @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Cascade)
+  name              String          @db.VarChar(160)
+  jobTitle          String?         @db.VarChar(120)
+  email             String?         @db.VarChar(320)
+  phone             String?         @db.VarChar(40)
+  isPrimary         Boolean         @default(false)
+  isActive          Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([id, companyId])
+  @@index([companyId, businessPartnerId, isPrimary])
+}
+
+model PaymentTerm {
+  id          String   @id @default(uuid()) @db.Uuid
+  companyId   String   @db.Uuid
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  code        String   @db.VarChar(40)
+  name        String   @db.VarChar(160)
+  description String?  @db.VarChar(500)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lines            PaymentTermLine[]
+  customerProfiles CustomerProfile[]
+  supplierProfiles SupplierProfile[]
+
+  @@unique([id, companyId])
+  @@unique([companyId, code])
+  @@index([companyId, isActive, name])
+}
+
+model PaymentTermLine {
+  id              String              @id @default(uuid()) @db.Uuid
+  companyId       String              @db.Uuid
+  paymentTermId   String              @db.Uuid
+  paymentTerm     PaymentTerm         @relation(fields: [paymentTermId, companyId], references: [id, companyId], onDelete: Cascade)
+  sequence        Int
+  calculationType PaymentTermLineType
+  percentage      Decimal?            @db.Decimal(9, 4)
+  dueDays         Int                 @default(0)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@unique([id, companyId])
+  @@unique([companyId, paymentTermId, sequence])
+  @@index([companyId, paymentTermId, sequence])
+}
+
 model Employee {
   id        String  @id @default(uuid()) @db.Uuid
   companyId String  @db.Uuid
@@ -867,9 +1065,10 @@ model Employee {
 }
 
 // ============================================================
-// LEDGER ENGINE (CORE)
+// LEGACY PARTY LEDGER ENGINE
 // ============================================================
-// Polymorphic party relation:
+// Legacy party workflows retain this polymorphic relation temporarily. The
+// authoritative B01/B02 JournalLine uses BusinessPartner.businessPartnerId.
 // - partyType + partyId (UUID) identifies the party.
 // - No FK constraint possible here; enforce existence in service layer.
 // - Keep strong index for statements and lookups.
@@ -910,7 +1109,8 @@ model LedgerEntry {
   @@index([createdById])
 }
 
-// Current balance per party for fast queries
+// Legacy current balance per party. B02 balances are derived from GL/open
+// items and never stored on BusinessPartner.
 model Balance {
   companyId String    @db.Uuid
   partyType PartyType
@@ -1568,6 +1768,51 @@ model InvoiceItem {
 // B01: AUTHORITATIVE GENERAL LEDGER FOUNDATION
 // ============================================================
 
+model AccountingTemplate {
+  id                  String    @id @default(uuid()) @db.Uuid
+  code                String    @db.VarChar(40)
+  version             Int
+  countryCode         String    @db.Char(2)
+  name                String    @db.VarChar(160)
+  description         String?   @db.VarChar(1000)
+  defaultCurrencyCode String?   @db.Char(3)
+  defaultCurrency     Currency? @relation("AccountingTemplateDefaultCurrency", fields: [defaultCurrencyCode], references: [code], onDelete: Restrict)
+  isActive            Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  accounts AccountingTemplateAccount[]
+  setups   AccountingSetup[]
+
+  @@unique([code, version])
+  @@index([countryCode, isActive])
+}
+
+model AccountingTemplateAccount {
+  id                     String                      @id @default(uuid()) @db.Uuid
+  templateId             String                      @db.Uuid
+  template               AccountingTemplate          @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  stableKey              String                      @db.VarChar(80)
+  code                   String                      @db.VarChar(40)
+  arabicName             String                      @db.VarChar(200)
+  englishName            String                      @db.VarChar(200)
+  accountType            AccountingAccountType
+  parentId               String?                     @db.Uuid
+  parent                 AccountingTemplateAccount?  @relation("AccountingTemplateHierarchy", fields: [parentId, templateId], references: [id, templateId], onDelete: Restrict)
+  children               AccountingTemplateAccount[] @relation("AccountingTemplateHierarchy")
+  allowDirectPosting     Boolean                     @default(true)
+  isControlAccount       Boolean                     @default(false)
+  reconciliationEligible Boolean                     @default(false)
+  systemKey              String?                     @db.VarChar(80)
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
+
+  @@unique([id, templateId])
+  @@unique([templateId, stableKey])
+  @@index([templateId, parentId])
+  @@index([templateId, systemKey])
+}
+
 model AccountingAccount {
   id        String  @id @default(uuid()) @db.Uuid
   companyId String  @db.Uuid
@@ -1585,15 +1830,22 @@ model AccountingAccount {
   allowDirectPosting     Boolean               @default(true)
   isControlAccount       Boolean               @default(false)
   reconciliationEligible Boolean               @default(false)
+  templateCode           String?               @db.VarChar(40)
+  templateVersion        Int?
+  templateKey            String?               @db.VarChar(80)
   archivedAt             DateTime?
   createdAt              DateTime              @default(now())
   updatedAt              DateTime              @updatedAt
 
-  journalLines          JournalLine[]
-  configurationDefaults AccountingConfigurationAccount[]
+  journalLines                JournalLine[]
+  openingBalanceLines         OpeningBalanceLine[]
+  configurationDefaults       AccountingConfigurationAccount[]
+  customerReceivableOverrides CustomerProfile[]                @relation("CustomerReceivableOverride")
+  supplierPayableOverrides    SupplierProfile[]                @relation("SupplierPayableOverride")
 
   @@unique([id, companyId])
   @@unique([companyId, code])
+  @@unique([companyId, templateKey])
   @@index([companyId, parentId])
   @@index([companyId, accountType, isActive])
 }
@@ -1651,7 +1903,8 @@ model AccountingPeriod {
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
 
-  journalEntries JournalEntry[]
+  journalEntries        JournalEntry[]
+  openingBalanceBatches OpeningBalanceBatch[]
 
   @@unique([id, companyId])
   @@unique([companyId, fiscalYearId, name])
@@ -1678,29 +1931,30 @@ model JournalEntry {
   accountingPeriodId String            @db.Uuid
   accountingPeriod   AccountingPeriod  @relation(fields: [accountingPeriodId, companyId], references: [id, companyId], onDelete: Restrict)
 
-  entryNumber             String             @db.VarChar(40)
-  status                  JournalEntryStatus @default(DRAFT)
-  postingDate             DateTime           @db.Date
-  documentDate            DateTime?          @db.Date
-  dueDate                 DateTime?          @db.Date
-  transactionCurrencyCode String             @db.Char(3)
-  transactionCurrency     Currency           @relation("JournalEntryTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
-  exchangeRate            Decimal            @db.Decimal(19, 8)
-  documentReference       String?            @db.VarChar(120)
-  description             String             @db.VarChar(500)
+  entryNumber             String               @db.VarChar(40)
+  status                  JournalEntryStatus   @default(DRAFT)
+  postingDate             DateTime             @db.Date
+  documentDate            DateTime?            @db.Date
+  dueDate                 DateTime?            @db.Date
+  transactionCurrencyCode String               @db.Char(3)
+  transactionCurrency     Currency             @relation("JournalEntryTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
+  exchangeRate            Decimal              @db.Decimal(19, 8)
+  documentReference       String?              @db.VarChar(120)
+  description             String               @db.VarChar(500)
   sourceType              JournalSourceType
-  sourceId                String?            @db.Uuid
-  idempotencyKey          String             @db.VarChar(128)
-  requestHash             String             @db.Char(64)
-  postedById              String?            @db.Uuid
-  postedBy                User?              @relation("AccountingEntryPostedBy", fields: [postedById], references: [id], onDelete: Restrict)
+  sourceId                String?              @db.Uuid
+  idempotencyKey          String               @db.VarChar(128)
+  requestHash             String               @db.Char(64)
+  postedById              String?              @db.Uuid
+  postedBy                User?                @relation("AccountingEntryPostedBy", fields: [postedById], references: [id], onDelete: Restrict)
   postedAt                DateTime?
-  reversalOfEntryId       String?            @db.Uuid
-  reversalOf              JournalEntry?      @relation("JournalEntryReversal", fields: [reversalOfEntryId, companyId], references: [id, companyId], onDelete: Restrict)
-  reversals               JournalEntry[]     @relation("JournalEntryReversal")
-  reversalReason          String?            @db.VarChar(500)
-  createdAt               DateTime           @default(now())
-  updatedAt               DateTime           @updatedAt
+  reversalOfEntryId       String?              @db.Uuid
+  reversalOf              JournalEntry?        @relation("JournalEntryReversal", fields: [reversalOfEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  reversals               JournalEntry[]       @relation("JournalEntryReversal")
+  openingBalanceBatch     OpeningBalanceBatch? @relation("OpeningBalanceBatchJournalEntry")
+  reversalReason          String?              @db.VarChar(500)
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
 
   lines JournalLine[]
 
@@ -1713,6 +1967,59 @@ model JournalEntry {
   @@index([companyId, sourceType, sourceId])
   @@index([companyId, status])
   @@index([companyId, accountingPeriodId])
+}
+
+model OpeningBalanceBatch {
+  id                 String                    @id @default(uuid()) @db.Uuid
+  companyId          String                    @db.Uuid
+  company            Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  effectiveDate      DateTime                  @db.Date
+  accountingPeriodId String                    @db.Uuid
+  accountingPeriod   AccountingPeriod          @relation(fields: [accountingPeriodId, companyId], references: [id, companyId], onDelete: Restrict)
+  status             OpeningBalanceBatchStatus @default(DRAFT)
+  description        String                    @db.VarChar(500)
+  createdById        String                    @db.Uuid
+  createdBy          User                      @relation("OpeningBalanceBatchCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  postedById         String?                   @db.Uuid
+  postedBy           User?                     @relation("OpeningBalanceBatchPostedBy", fields: [postedById], references: [id], onDelete: Restrict)
+  journalEntryId     String?                   @db.Uuid
+  journalEntry       JournalEntry?             @relation("OpeningBalanceBatchJournalEntry", fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  idempotencyKey     String                    @db.VarChar(128)
+  requestHash        String                    @db.Char(64)
+  validatedAt        DateTime?
+  postedAt           DateTime?
+  reversedAt         DateTime?
+  reversalReason     String?                   @db.VarChar(500)
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+
+  lines OpeningBalanceLine[]
+
+  @@unique([id, companyId])
+  @@unique([companyId, idempotencyKey])
+  @@unique([companyId, journalEntryId])
+  @@unique([journalEntryId, companyId])
+  @@index([companyId, status, effectiveDate])
+}
+
+model OpeningBalanceLine {
+  id                String              @id @default(uuid()) @db.Uuid
+  companyId         String              @db.Uuid
+  batchId           String              @db.Uuid
+  batch             OpeningBalanceBatch @relation(fields: [batchId, companyId], references: [id, companyId], onDelete: Cascade)
+  accountId         String              @db.Uuid
+  account           AccountingAccount   @relation(fields: [accountId, companyId], references: [id, companyId], onDelete: Restrict)
+  businessPartnerId String?             @db.Uuid
+  businessPartner   BusinessPartner?    @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
+  debit             Decimal             @db.Decimal(19, 4)
+  credit            Decimal             @db.Decimal(19, 4)
+  description       String?             @db.VarChar(500)
+  createdAt         DateTime            @default(now())
+
+  @@unique([id, companyId])
+  @@index([companyId, batchId])
+  @@index([companyId, accountId])
+  @@index([companyId, businessPartnerId])
 }
 
 model JournalLine {
@@ -1728,8 +2035,8 @@ model JournalLine {
   transactionDebit        Decimal           @db.Decimal(19, 4)
   transactionCredit       Decimal           @db.Decimal(19, 4)
   description             String?           @db.VarChar(500)
-  partyType               PartyType?
-  partyId                 String?           @db.Uuid
+  businessPartnerId       String?           @db.Uuid
+  businessPartner         BusinessPartner?  @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
   dueDate                 DateTime?         @db.Date
   documentReference       String?           @db.VarChar(120)
   reconciliationReference String?           @db.VarChar(160)
@@ -1740,6 +2047,7 @@ model JournalLine {
 
   @@index([companyId, accountId])
   @@index([companyId, journalEntryId])
+  @@index([companyId, businessPartnerId])
   @@index([accountId, createdAt])
 }
 
@@ -1762,6 +2070,23 @@ model AccountingConfiguration {
   @@unique([id, companyId])
 }
 
+model AccountingSetup {
+  id              String                @id @default(uuid()) @db.Uuid
+  companyId       String                @unique @db.Uuid
+  company         Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  status          AccountingSetupStatus @default(NOT_CONFIGURED)
+  templateCode    String                @db.VarChar(40)
+  templateVersion Int
+  template        AccountingTemplate    @relation(fields: [templateCode, templateVersion], references: [code, version], onDelete: Restrict)
+  lastError       String?               @db.VarChar(2000)
+  completedAt     DateTime?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@unique([id, companyId])
+  @@index([status])
+}
+
 // B01.1: canonical currency reference data. The accounting engine validates
 // transaction precision from minorUnitPrecision while keeping GL storage at
 // four decimal places for deterministic conversion and reporting.
@@ -1780,6 +2105,9 @@ model Currency {
   journalEntries          JournalEntry[]            @relation("JournalEntryTransactionCurrency")
   baseConfigurations      AccountingConfiguration[] @relation("AccountingBaseCurrency")
   reportingConfigurations AccountingConfiguration[] @relation("AccountingReportingCurrency")
+  templateDefaults        AccountingTemplate[]      @relation("AccountingTemplateDefaultCurrency")
+  customerPreferences     CustomerProfile[]         @relation("CustomerPreferredCurrency")
+  supplierPreferences     SupplierProfile[]         @relation("SupplierPreferredCurrency")
   companies               Company[]                 @relation("CompanyCurrency")
 
   @@index([isActive])

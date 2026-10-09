@@ -19,7 +19,6 @@ import {
   JournalSourceType,
   AccountingConfigAccountKey,
   AccountingConfigJournalKey,
-  PartyType,
 } from '@prisma/client';
 
 const MONEY = /^-?(?:\d+)(?:\.\d+)?$/;
@@ -218,12 +217,8 @@ export class JournalLineDto {
   description?: string;
 
   @IsOptional()
-  @IsEnum(PartyType as Record<string, string>)
-  partyType?: PartyType;
-
-  @IsOptional()
   @IsUUID()
-  partyId?: string;
+  businessPartnerId?: string;
 
   @IsOptional()
   @IsDateString()
