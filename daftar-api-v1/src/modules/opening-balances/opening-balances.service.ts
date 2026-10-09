@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import {
+  AccountingAccountType,
   AccountingPeriodStatus,
   FiscalYearStatus,
   JournalSourceType,
@@ -14,6 +15,8 @@ import {
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { PlatformIdempotencyService } from '../platform/idempotency/platform-idempotency.service';
 import { AccountingService } from '../accounting/accounting.service';
+import { AccountingMoney } from '../accounting/accounting.money';
+import { validateAccountingCounterparty } from '../accounting/accounting-policies';
 
 export interface OpeningBalanceLineInput {
   accountId: string;
@@ -83,14 +86,14 @@ export class OpeningBalancesService {
 
   async validate(companyId: string, actorUserId: string, batchId: string) {
     return this.prisma.$transaction(async (db) => {
-      const batch = await this.getBatch(db, companyId, batchId);
+      const batch = await this.lockBatch(db, companyId, batchId);
       if (batch.status !== OpeningBalanceBatchStatus.DRAFT)
         throw new ConflictException(
           'Only draft opening balances can be validated',
         );
       this.assertOpenPeriod(batch);
       this.assertBalanced(batch.lines);
-      this.assertRoleCorrect(batch.lines);
+      await this.validateCounterparties(db, companyId, batch.lines);
       const updated = await db.openingBalanceBatch.update({
         where: { id: batch.id },
         data: {
@@ -117,46 +120,70 @@ export class OpeningBalancesService {
     batchId: string,
     idempotencyKey: string,
   ) {
-    const batch = await this.getBatch(this.prisma, companyId, batchId);
-    if (batch.status !== OpeningBalanceBatchStatus.VALIDATED)
-      throw new ConflictException(
-        'Opening balance batch must be validated before posting',
-      );
-    this.assertOpenPeriod(batch);
-    const general = await this.prisma.accountingConfigurationJournal.findFirst({
-      where: { companyId, settingKey: 'GENERAL' },
-      include: { journal: true },
+    if (!idempotencyKey.trim())
+      throw new BadRequestException('Opening balance posting key is required');
+    const requestHash = this.idempotency.buildRequestHash({
+      batchId,
     });
-    if (!general)
-      throw new BadRequestException(
-        'General accounting journal is not configured',
+    return this.prisma.$transaction(async (db) => {
+      const batch = await this.lockBatch(db, companyId, batchId);
+      if (batch.status === OpeningBalanceBatchStatus.POSTED) {
+        if (
+          batch.postingIdempotencyKey === idempotencyKey &&
+          batch.postingRequestHash === requestHash
+        )
+          return batch;
+        throw new ConflictException(
+          'Opening balance batch has already been posted',
+        );
+      }
+      if (batch.status === OpeningBalanceBatchStatus.REVERSED)
+        throw new ConflictException(
+          'A reversed opening balance cannot be posted again',
+        );
+      if (batch.status !== OpeningBalanceBatchStatus.VALIDATED)
+        throw new ConflictException(
+          'Opening balance batch must be validated before posting',
+        );
+      this.assertOpenPeriod(batch);
+      this.assertBalanced(batch.lines);
+      await this.validateCounterparties(db, companyId, batch.lines);
+      const general = await db.accountingConfigurationJournal.findFirst({
+        where: { companyId, settingKey: 'GENERAL' },
+        include: { journal: true },
+      });
+      const configuration = await db.accountingConfiguration.findUnique({
+        where: { companyId },
+      });
+      if (!general || !general.journal.isActive || !configuration)
+        throw new BadRequestException(
+          'General accounting journal and accounting configuration are required',
+        );
+      const entry = await this.accounting.postInternalInTransaction(
+        db,
+        companyId,
+        actorUserId,
+        {
+          journalId: general.journalId,
+          accountingPeriodId: batch.accountingPeriodId,
+          postingDate: batch.effectiveDate.toISOString(),
+          documentDate: batch.effectiveDate.toISOString(),
+          transactionCurrencyCode: configuration.baseCurrencyCode,
+          exchangeRate: '1',
+          description: batch.description,
+          documentReference: `OPENING-${batch.id}`,
+          sourceType: JournalSourceType.OPENING_BALANCE,
+          sourceId: batch.id,
+          idempotencyKey: `opening-batch:${batch.id}:post`,
+          lines: batch.lines.map((line) => ({
+            accountId: line.accountId,
+            businessPartnerId: line.businessPartnerId ?? undefined,
+            transactionDebit: line.debit.toString(),
+            transactionCredit: line.credit.toString(),
+            description: line.description ?? undefined,
+          })),
+        },
       );
-    const entry = await this.accounting.postInternal(companyId, actorUserId, {
-      journalId: general.journalId,
-      accountingPeriodId: batch.accountingPeriodId,
-      postingDate: batch.effectiveDate.toISOString(),
-      documentDate: batch.effectiveDate.toISOString(),
-      transactionCurrencyCode: (
-        await this.prisma.company.findFirstOrThrow({
-          where: { id: companyId },
-          select: { currencyCode: true },
-        })
-      ).currencyCode,
-      exchangeRate: '1',
-      description: batch.description,
-      documentReference: `OPENING-${batch.id}`,
-      sourceType: JournalSourceType.OPENING_BALANCE,
-      sourceId: batch.id,
-      idempotencyKey,
-      lines: batch.lines.map((line) => ({
-        accountId: line.accountId,
-        businessPartnerId: line.businessPartnerId ?? undefined,
-        transactionDebit: line.debit.toString(),
-        transactionCredit: line.credit.toString(),
-        description: line.description ?? undefined,
-      })),
-    });
-    const updated = await this.prisma.$transaction(async (db) => {
       const result = await db.openingBalanceBatch.update({
         where: { id: batch.id },
         data: {
@@ -164,6 +191,8 @@ export class OpeningBalancesService {
           postedById: actorUserId,
           postedAt: new Date(),
           journalEntryId: entry.id,
+          postingIdempotencyKey: idempotencyKey,
+          postingRequestHash: requestHash,
         },
         include: BATCH_INCLUDE,
       });
@@ -177,7 +206,6 @@ export class OpeningBalancesService {
       );
       return result;
     });
-    return updated;
   }
 
   async reverse(
@@ -186,32 +214,55 @@ export class OpeningBalancesService {
     batchId: string,
     dto: ReverseOpeningBalanceInput,
   ) {
-    const batch = await this.getBatch(this.prisma, companyId, batchId);
-    if (
-      batch.status !== OpeningBalanceBatchStatus.POSTED ||
-      !batch.journalEntryId
-    )
-      throw new ConflictException(
-        'Only a posted opening balance can be reversed',
-      );
-    const reversal = await this.accounting.reverse(
-      companyId,
-      actorUserId,
-      batch.journalEntryId,
-      {
-        accountingPeriodId: dto.accountingPeriodId,
-        postingDate: dto.postingDate,
-        reason: dto.reason,
-        idempotencyKey: dto.idempotencyKey,
-      },
-    );
+    if (!dto.idempotencyKey.trim())
+      throw new BadRequestException('Opening balance reversal key is required');
+    const requestHash = this.idempotency.buildRequestHash({
+      batchId,
+      accountingPeriodId: dto.accountingPeriodId,
+      postingDate: dto.postingDate,
+      reason: dto.reason,
+    });
     return this.prisma.$transaction(async (db) => {
+      const batch = await this.lockBatch(db, companyId, batchId);
+      if (batch.status === OpeningBalanceBatchStatus.REVERSED) {
+        if (
+          batch.reversalIdempotencyKey === dto.idempotencyKey &&
+          batch.reversalRequestHash === requestHash
+        )
+          return batch;
+        throw new ConflictException(
+          'Opening balance reversal key or payload does not match the existing reversal',
+        );
+      }
+      if (
+        batch.status !== OpeningBalanceBatchStatus.POSTED ||
+        !batch.journalEntryId
+      )
+        throw new ConflictException(
+          'Only a posted opening balance can be reversed',
+        );
+      this.assertOpenPeriod(batch);
+      const reversal = await this.accounting.reverseInTransaction(
+        db,
+        companyId,
+        actorUserId,
+        batch.journalEntryId,
+        {
+          accountingPeriodId: dto.accountingPeriodId,
+          postingDate: dto.postingDate,
+          reason: dto.reason,
+          idempotencyKey: `opening-batch:${batch.id}:reverse`,
+        },
+      );
       const updated = await db.openingBalanceBatch.update({
         where: { id: batch.id },
         data: {
           status: OpeningBalanceBatchStatus.REVERSED,
           reversedAt: new Date(),
           reversalReason: dto.reason,
+          reversalJournalEntryId: reversal.id,
+          reversalIdempotencyKey: dto.idempotencyKey,
+          reversalRequestHash: requestHash,
         },
         include: BATCH_INCLUDE,
       });
@@ -248,9 +299,18 @@ export class OpeningBalancesService {
         throw new BadRequestException(
           'Opening balance date is outside the accounting period',
         );
+      const configuration = await db.accountingConfiguration.findUnique({
+        where: { companyId: input.companyId },
+        include: { baseCurrency: true },
+      });
+      if (!configuration || !configuration.baseCurrency.isActive)
+        throw new BadRequestException(
+          'Active accounting base currency is required for opening balances',
+        );
+      const precision = Number(configuration.baseCurrency.minorUnitPrecision);
       for (const line of input.lines) {
-        const debit = this.money(line.debit);
-        const credit = this.money(line.credit);
+        const debit = this.money(line.debit, precision);
+        const credit = this.money(line.credit, precision);
         if (
           debit.isNegative() ||
           credit.isNegative() ||
@@ -271,15 +331,11 @@ export class OpeningBalancesService {
           throw new NotFoundException(
             'Opening balance account does not belong to this company',
           );
-        if (line.businessPartnerId) {
-          const partner = await db.businessPartner.findFirst({
-            where: { id: line.businessPartnerId, companyId: input.companyId },
-          });
-          if (!partner)
-            throw new NotFoundException(
-              'Opening balance business partner does not belong to this company',
-            );
-        }
+        await validateAccountingCounterparty(db, {
+          companyId: input.companyId,
+          accountType: account.accountType,
+          businessPartnerId: line.businessPartnerId,
+        });
       }
       const batch = await db.openingBalanceBatch.create({
         data: {
@@ -302,8 +358,8 @@ export class OpeningBalancesService {
             batchId: batch.id,
             accountId: line.accountId,
             businessPartnerId: line.businessPartnerId,
-            debit: this.money(line.debit),
-            credit: this.money(line.credit),
+            debit: this.money(line.debit, precision),
+            credit: this.money(line.credit, precision),
             description: line.description,
           },
         });
@@ -325,6 +381,39 @@ export class OpeningBalancesService {
     return batch;
   }
 
+  private async lockBatch(
+    db: Prisma.TransactionClient,
+    companyId: string,
+    id: string,
+  ) {
+    const rows = await db.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+      SELECT "id"
+      FROM "OpeningBalanceBatch"
+      WHERE "id" = ${id}::uuid AND "companyId" = ${companyId}::uuid
+      FOR UPDATE
+    `);
+    if (!rows.length)
+      throw new NotFoundException('Opening balance batch not found');
+    return this.getBatch(db, companyId, id);
+  }
+
+  private async validateCounterparties(
+    db: Prisma.TransactionClient,
+    companyId: string,
+    lines: Array<{
+      account: { accountType: AccountingAccountType };
+      businessPartnerId: string | null;
+    }>,
+  ) {
+    for (const line of lines) {
+      await validateAccountingCounterparty(db, {
+        companyId,
+        accountType: line.account.accountType,
+        businessPartnerId: line.businessPartnerId,
+      });
+    }
+  }
+
   private assertOpenPeriod(batch: {
     accountingPeriod: {
       status: AccountingPeriodStatus;
@@ -335,10 +424,12 @@ export class OpeningBalancesService {
     effectiveDate: Date;
   }) {
     if (
-      batch.accountingPeriod.status === AccountingPeriodStatus.CLOSED ||
-      batch.accountingPeriod.fiscalYear.status === FiscalYearStatus.CLOSED
+      batch.accountingPeriod.status !== AccountingPeriodStatus.OPEN ||
+      batch.accountingPeriod.fiscalYear.status !== FiscalYearStatus.OPEN
     )
-      throw new ConflictException('Opening balance period is closed');
+      throw new ConflictException(
+        'Opening balance validation and posting require an OPEN period and fiscal year',
+      );
   }
 
   private assertBalanced(
@@ -356,44 +447,12 @@ export class OpeningBalancesService {
       throw new BadRequestException('Opening balance batch is not balanced');
   }
 
-  private assertRoleCorrect(
-    lines: Array<{
-      account: { accountType: string };
-      businessPartner: {
-        isActive: boolean;
-        customerProfile: { isActive: boolean } | null;
-        supplierProfile: { isActive: boolean } | null;
-      } | null;
-    }>,
-  ) {
-    for (const line of lines) {
-      if (
-        line.account.accountType === 'ASSET_RECEIVABLE' &&
-        line.businessPartner &&
-        (!line.businessPartner.isActive ||
-          !line.businessPartner.customerProfile?.isActive)
-      )
-        throw new BadRequestException(
-          'Receivable opening lines require an active customer role',
-        );
-      if (
-        line.account.accountType === 'LIABILITY_PAYABLE' &&
-        line.businessPartner &&
-        (!line.businessPartner.isActive ||
-          !line.businessPartner.supplierProfile?.isActive)
-      )
-        throw new BadRequestException(
-          'Payable opening lines require an active supplier role',
-        );
-    }
-  }
-
-  private money(value: string) {
-    try {
-      return new Prisma.Decimal(value);
-    } catch {
-      throw new BadRequestException('Invalid opening balance amount');
-    }
+  private money(value: string, precision: number) {
+    return AccountingMoney.fromString(
+      value,
+      'opening balance amount',
+      precision,
+    ).toDecimal();
   }
 
   private async audit(

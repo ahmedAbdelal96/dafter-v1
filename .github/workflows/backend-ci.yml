@@ -84,8 +84,18 @@ jobs:
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daftar_test"
 
+      - name: Install production-safe reference data
+        run: npm run db:reference-data
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daftar_test"
+
       - name: Seed deterministic test reference data
         run: npm run db:seed
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daftar_test"
+
+      - name: Verify production-safe reference data is replay-safe
+        run: npm run db:reference-data
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daftar_test"
 
@@ -95,11 +105,37 @@ jobs:
           PGPASSWORD: postgres
 
       - name: Verify Prisma migration diff
-        run: >-
-          npx prisma migrate diff
-          --from-migrations prisma/migrations
-          --to-schema prisma/schema.prisma
-          --exit-code
+        run: |
+          set +e
+          npx prisma migrate diff \
+            --from-migrations prisma/migrations \
+            --to-schema prisma/schema.prisma \
+            --exit-code > /tmp/prisma-migration-diff.txt
+          diff_status=$?
+          set -e
+          cat /tmp/prisma-migration-diff.txt
+          if [ "$diff_status" -eq 0 ]; then
+            exit 0
+          fi
+          if grep -E '  \[-\] ' /tmp/prisma-migration-diff.txt | grep -Ev \
+            'Removed unique index on columns \(companyId, businessPartnerId, addressType\)|Removed unique index on columns \(companyId, businessPartnerId\)' \
+            > /tmp/prisma-unexpected-diff.txt; then
+            echo 'Unexpected Prisma migration/schema drift:'
+            cat /tmp/prisma-unexpected-diff.txt
+            exit 1
+          fi
+          if grep -q '  \[+\] \|  \[~\] ' /tmp/prisma-migration-diff.txt; then
+            echo 'Unexpected Prisma migration/schema additions or changes:'
+            exit 1
+          fi
+          expected_partial_indexes=$(grep -Ec \
+            '  \[-\] Removed unique index on columns \(companyId, businessPartnerId, addressType\)|  \[-\] Removed unique index on columns \(companyId, businessPartnerId\)' \
+            /tmp/prisma-migration-diff.txt || true)
+          if [ "$expected_partial_indexes" -ne 2 ]; then
+            echo 'Expected exactly two partial-index representation differences.'
+            exit 1
+          fi
+          echo 'Only the two expected partial unique-index differences remain; Prisma cannot represent their WHERE predicates in schema.prisma.'
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daftar_test"
           SHADOW_DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daftar_shadow"

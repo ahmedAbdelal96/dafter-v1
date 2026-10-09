@@ -14,6 +14,10 @@ import {
 } from '@prisma/client';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { PlatformIdempotencyService } from '../platform/idempotency/platform-idempotency.service';
+import {
+  assertAccountMappingCompatibility,
+  assertJournalMappingCompatibility,
+} from '../accounting/accounting-policies';
 import { TemplateService } from './template.service';
 
 export interface InitializeCompanyAccountingInput {
@@ -128,14 +132,35 @@ export class InitializeCompanyAccounting {
         );
       const company = await db.company.findFirst({
         where: { id: input.companyId },
-        select: { id: true },
+        select: { id: true, currencyCode: true, isDeleted: true },
       });
-      if (!company) throw new BadRequestException('Company not found');
+      if (!company || company.isDeleted)
+        throw new BadRequestException('Company not found');
+      const baseCurrencyCode = input.baseCurrencyCode.trim().toUpperCase();
       const currency = await db.currency.findFirst({
-        where: { code: input.baseCurrencyCode, isActive: true },
+        where: { code: baseCurrencyCode, isActive: true },
       });
       if (!currency)
         throw new BadRequestException('Base currency is not active');
+      if (company.currencyCode !== baseCurrencyCode) {
+        await db.company.update({
+          where: { id: input.companyId },
+          data: { currencyCode: baseCurrencyCode },
+        });
+        await db.auditLog.create({
+          data: {
+            companyId: input.companyId,
+            actorUserId: input.actorUserId,
+            action: 'accounting-bootstrap.company-currency-aligned',
+            entityType: 'Company',
+            entityId: input.companyId,
+            metadata: {
+              before: company.currencyCode,
+              after: baseCurrencyCode,
+            } as Prisma.InputJsonValue,
+          },
+        });
+      }
       const template = await this.templates.loadActive(
         input.templateCode,
         input.templateVersion,
@@ -149,7 +174,7 @@ export class InitializeCompanyAccounting {
       const configuration = await db.accountingConfiguration.create({
         data: {
           companyId: input.companyId,
-          baseCurrencyCode: input.baseCurrencyCode,
+          baseCurrencyCode,
           countryCode: input.countryCode,
           localeCode: input.localeCode,
         },
@@ -158,7 +183,6 @@ export class InitializeCompanyAccounting {
         db,
         input.companyId,
         template,
-        input.baseCurrencyCode,
       );
       const journals = await Promise.all([
         this.createJournal(
@@ -166,28 +190,28 @@ export class InitializeCompanyAccounting {
           input.companyId,
           'GENERAL',
           AccountingJournalType.GENERAL,
-          input.baseCurrencyCode,
+          null,
         ),
         this.createJournal(
           db,
           input.companyId,
           'SALES',
           AccountingJournalType.SALES,
-          input.baseCurrencyCode,
+          null,
         ),
         this.createJournal(
           db,
           input.companyId,
           'PURCHASE',
           AccountingJournalType.PURCHASE,
-          input.baseCurrencyCode,
+          null,
         ),
         this.createJournal(
           db,
           input.companyId,
           'CASH',
           AccountingJournalType.CASH,
-          input.baseCurrencyCode,
+          baseCurrencyCode,
         ),
       ]);
       const fiscalYear = await db.fiscalYear.create({
@@ -244,6 +268,7 @@ export class InitializeCompanyAccounting {
           throw new BadRequestException(
             `Required account mapping is missing: ${templateKey}`,
           );
+        assertAccountMappingCompatibility(settingKey, account.accountType);
         await db.accountingConfigurationAccount.create({
           data: {
             companyId: input.companyId,
@@ -265,6 +290,7 @@ export class InitializeCompanyAccounting {
           throw new BadRequestException(
             `Required journal mapping is missing: ${code}`,
           );
+        assertJournalMappingCompatibility(settingKey, journal.type);
         await db.accountingConfigurationJournal.create({
           data: {
             companyId: input.companyId,
@@ -317,7 +343,7 @@ export class InitializeCompanyAccounting {
     companyId: string,
     code: string,
     type: AccountingJournalType,
-    currencyCode: string,
+    currencyCode: string | null,
   ) {
     return db.accountingJournal.create({
       data: { companyId, code, name: code, type, currencyCode },

@@ -153,10 +153,23 @@ describe('B02 company accounting bootstrap', () => {
   });
 
   it('keeps failure atomic when the template is missing', async () => {
+    const stamp = Date.now();
+    const rollbackCompany = await prisma.company.create({
+      data: { name: `B02 Rollback ${stamp}`, currencyCode: 'EGP' },
+    });
+    const rollbackOwner = await prisma.user.create({
+      data: {
+        email: `b02-rollback-${stamp}@example.test`,
+        passwordHash: 'test-hash',
+        fullName: 'Rollback Owner',
+        companyId: rollbackCompany.id,
+        role: 'OWNER',
+      },
+    });
     await expect(
       initializer.execute({
-        companyId: company.id,
-        actorUserId: owner.id,
+        companyId: rollbackCompany.id,
+        actorUserId: rollbackOwner.id,
         idempotencyKey: 'b02-bootstrap-missing-template',
         countryCode: 'EG',
         localeCode: 'ar-EG',
@@ -168,7 +181,191 @@ describe('B02 company accounting bootstrap', () => {
       }),
     ).rejects.toThrow();
     expect(
-      await prisma.accountingSetup.count({ where: { companyId: company.id } }),
-    ).toBe(1);
+      await prisma.accountingConfiguration.count({
+        where: { companyId: rollbackCompany.id },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.accountingAccount.count({
+        where: { companyId: rollbackCompany.id },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.accountingJournal.count({
+        where: { companyId: rollbackCompany.id },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.fiscalYear.count({
+        where: { companyId: rollbackCompany.id },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.accountingPeriod.count({
+        where: { companyId: rollbackCompany.id },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.accountingSetup.count({
+        where: { companyId: rollbackCompany.id },
+      }),
+    ).toBe(0);
+    await prisma.company.delete({ where: { id: rollbackCompany.id } });
+  });
+
+  it('rolls back objects created before an injected bootstrap failure', async () => {
+    const stamp = Date.now();
+    const rollbackCompany = await prisma.company.create({
+      data: { name: `B02 Injected Rollback ${stamp}`, currencyCode: 'EGP' },
+    });
+    const rollbackOwner = await prisma.user.create({
+      data: {
+        email: `b02-injected-rollback-${stamp}@example.test`,
+        passwordHash: 'test-hash',
+        fullName: 'Injected Rollback Owner',
+        companyId: rollbackCompany.id,
+        role: 'OWNER',
+      },
+    });
+    const instantiateSpy = jest
+      .spyOn(TemplateService.prototype, 'instantiate')
+      .mockRejectedValueOnce(new Error('injected bootstrap failure'));
+    try {
+      await expect(
+        initializer.execute({
+          companyId: rollbackCompany.id,
+          actorUserId: rollbackOwner.id,
+          idempotencyKey: 'b02-bootstrap-injected-failure',
+          countryCode: 'EG',
+          localeCode: 'ar-EG',
+          baseCurrencyCode: 'EGP',
+          templateCode: 'EG_STANDARD_V1',
+          templateVersion: 1,
+          fiscalYearStart: new Date('2028-07-01T00:00:00.000Z'),
+          fiscalYearEnd: new Date('2029-06-30T00:00:00.000Z'),
+        }),
+      ).rejects.toThrow('injected bootstrap failure');
+    } finally {
+      instantiateSpy.mockRestore();
+    }
+    expect(
+      await prisma.accountingConfiguration.count({
+        where: { companyId: rollbackCompany.id },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.accountingAccount.count({
+        where: { companyId: rollbackCompany.id },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.accountingJournal.count({
+        where: { companyId: rollbackCompany.id },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.fiscalYear.count({
+        where: { companyId: rollbackCompany.id },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.accountingSetup.count({
+        where: { companyId: rollbackCompany.id },
+      }),
+    ).toBe(0);
+    await prisma.company.delete({ where: { id: rollbackCompany.id } });
+  });
+
+  it('reports blocked readiness reasons for inactive mappings and currencies', async () => {
+    const mapping =
+      await prisma.accountingConfigurationAccount.findFirstOrThrow({
+        where: { companyId: company.id, settingKey: 'RECEIVABLE' },
+      });
+    const account = await prisma.accountingAccount.findUniqueOrThrow({
+      where: { id: mapping.accountId },
+    });
+    await prisma.accountingAccount.update({
+      where: { id: account.id },
+      data: { isActive: false },
+    });
+    const inactiveAccount = await readiness.evaluate(
+      company.id,
+      new Date('2026-07-01T00:00:00.000Z'),
+    );
+    expect(inactiveAccount.ready).toBe(false);
+    expect(inactiveAccount.reasons).toContain(
+      'ACCOUNT_MAPPING_INACTIVE:RECEIVABLE',
+    );
+    await prisma.accountingAccount.update({
+      where: { id: account.id },
+      data: { isActive: true },
+    });
+
+    const missingMapping =
+      await prisma.accountingConfigurationAccount.findFirstOrThrow({
+        where: { companyId: company.id, settingKey: 'EXPENSE' },
+      });
+    await prisma.accountingConfigurationAccount.delete({
+      where: { id: missingMapping.id },
+    });
+    const incomplete = await readiness.evaluate(
+      company.id,
+      new Date('2026-07-01T00:00:00.000Z'),
+    );
+    expect(incomplete.ready).toBe(false);
+    expect(incomplete.reasons).toContain('ACCOUNT_MAPPING_MISSING:EXPENSE');
+    await prisma.accountingConfigurationAccount.create({
+      data: {
+        companyId: company.id,
+        configurationId: missingMapping.configurationId,
+        settingKey: missingMapping.settingKey,
+        accountId: missingMapping.accountId,
+      },
+    });
+
+    await prisma.currency.update({
+      where: { code: 'EGP' },
+      data: { isActive: false },
+    });
+    const inactiveCurrency = await readiness.evaluate(
+      company.id,
+      new Date('2026-07-01T00:00:00.000Z'),
+    );
+    expect(inactiveCurrency.ready).toBe(false);
+    expect(inactiveCurrency.reasons).toEqual(
+      expect.arrayContaining([
+        'COMPANY_CURRENCY_INACTIVE',
+        'BASE_CURRENCY_INACTIVE',
+      ]),
+    );
+    await prisma.currency.update({
+      where: { code: 'EGP' },
+      data: { isActive: true },
+    });
+  });
+
+  it('blocks readiness when a required journal mapping has the wrong type', async () => {
+    const salesMapping =
+      await prisma.accountingConfigurationJournal.findFirstOrThrow({
+        where: { companyId: company.id, settingKey: 'SALES' },
+      });
+    const cashJournal = await prisma.accountingJournal.findFirstOrThrow({
+      where: { companyId: company.id, type: 'CASH' },
+    });
+    const originalJournalId = salesMapping.journalId;
+    await prisma.accountingConfigurationJournal.update({
+      where: { id: salesMapping.id },
+      data: { journalId: cashJournal.id },
+    });
+    const blocked = await readiness.evaluate(
+      company.id,
+      new Date('2026-07-01T00:00:00.000Z'),
+    );
+    expect(blocked.ready).toBe(false);
+    expect(blocked.reasons).toContain('JOURNAL_MAPPING_INCOMPATIBLE:SALES');
+    await prisma.accountingConfigurationJournal.update({
+      where: { id: salesMapping.id },
+      data: { journalId: originalJournalId },
+    });
   });
 });

@@ -27,7 +27,10 @@ describe('B02 GL BusinessPartner validation', () => {
   let customerId: string;
   let supplierId: string;
   let bothId: string;
+  let inactiveId: string;
   let otherCompanyPartnerId: string;
+  let templateCashAccountId: string;
+  let revenueAccountId: string;
 
   beforeAll(async () => {
     if (!process.env.DATABASE_URL)
@@ -94,6 +97,16 @@ describe('B02 GL BusinessPartner validation', () => {
     });
     journalId = journal.id;
     periodId = period.id;
+    templateCashAccountId = (
+      await prisma.accountingAccount.findFirstOrThrow({
+        where: { companyId: companyA.id, templateKey: 'CASH' },
+      })
+    ).id;
+    revenueAccountId = (
+      await prisma.accountingAccount.findFirstOrThrow({
+        where: { companyId: companyA.id, templateKey: 'SALES_REVENUE' },
+      })
+    ).id;
     const [receivable, payable, cash] = await Promise.all([
       prisma.accountingAccount.create({
         data: {
@@ -153,6 +166,18 @@ describe('B02 GL BusinessPartner validation', () => {
         roles: ['CUSTOMER', 'SUPPLIER'],
       })
     ).id;
+    inactiveId = (
+      await partners.create(companyA.id, ownerA.id, {
+        partnerCode: `GL-INACTIVE-${stamp}`,
+        partnerType: BusinessPartnerType.ORGANIZATION,
+        displayName: 'GL Inactive',
+        roles: ['CUSTOMER'],
+      })
+    ).id;
+    await prisma.businessPartner.update({
+      where: { id: inactiveId },
+      data: { isActive: false },
+    });
     otherCompanyPartnerId = (
       await partners.create(companyB.id, ownerB.id, {
         partnerCode: `GL-OTHER-${stamp}`,
@@ -215,17 +240,19 @@ describe('B02 GL BusinessPartner validation', () => {
 
   it('rejects wrong roles, inactive partners, and cross-company partners', async () => {
     await expect(
+      post(undefined, receivableAccountId, '10', '0', 'gl-missing-ar'),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    await expect(
+      post(undefined, payableAccountId, '0', '10', 'gl-missing-ap'),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    await expect(
       post(supplierId, receivableAccountId, '10', '0', 'gl-wrong-ar'),
     ).rejects.toBeInstanceOf(BadRequestException);
     await expect(
       post(customerId, payableAccountId, '0', '10', 'gl-wrong-ap'),
     ).rejects.toBeInstanceOf(BadRequestException);
-    await prisma.businessPartner.update({
-      where: { id: customerId },
-      data: { isActive: false },
-    });
     await expect(
-      post(customerId, receivableAccountId, '10', '0', 'gl-inactive'),
+      post(inactiveId, receivableAccountId, '10', '0', 'gl-inactive'),
     ).rejects.toBeInstanceOf(BadRequestException);
     await expect(
       post(
@@ -236,9 +263,119 @@ describe('B02 GL BusinessPartner validation', () => {
         'gl-cross-company',
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
-    await prisma.businessPartner.update({
-      where: { id: customerId },
-      data: { isActive: true },
+  });
+
+  it('accepts USD through the bootstrapped unconstrained general journal', async () => {
+    const entry = await accounting.postManualJournal(companyA.id, ownerA.id, {
+      journalId,
+      accountingPeriodId: periodId,
+      postingDate: '2026-07-01',
+      transactionCurrencyCode: 'USD',
+      exchangeRate: '50',
+      description: 'USD regression gate',
+      idempotencyKey: 'gl-usd-regression',
+      lines: [
+        {
+          accountId: templateCashAccountId,
+          transactionDebit: '100',
+          transactionCredit: '0',
+        },
+        {
+          accountId: revenueAccountId,
+          transactionDebit: '0',
+          transactionCredit: '100',
+        },
+      ],
     });
+    expect(entry.transactionCurrencyCode).toBe('USD');
+    const lines = await prisma.journalLine.findMany({
+      where: { journalEntryId: entry.id },
+      orderBy: { debit: 'desc' },
+    });
+    expect(lines[0].transactionDebit.toString()).toBe('100');
+    expect(lines[0].debit.toString()).toBe('5000');
+    expect(lines[1].transactionCredit.toString()).toBe('100');
+    expect(lines[1].credit.toString()).toBe('5000');
+  });
+
+  it('keeps role removal and posting race-safe', async () => {
+    const stamp = Date.now();
+    const partner = await partners.create(companyA.id, ownerA.id, {
+      partnerCode: `GL-RACE-${stamp}`,
+      partnerType: BusinessPartnerType.ORGANIZATION,
+      displayName: 'GL Race Customer',
+      roles: ['CUSTOMER'],
+    });
+    const results = await Promise.allSettled([
+      post(partner.id, receivableAccountId, '11', '0', `gl-race-post-${stamp}`),
+      partners.removeCustomerProfile(companyA.id, ownerA.id, partner.id),
+    ]);
+    const posted = await prisma.journalEntry.findFirst({
+      where: {
+        companyId: companyA.id,
+        idempotencyKey: `gl-race-post-${stamp}`,
+        status: 'POSTED',
+      },
+    });
+    if (posted) {
+      await expect(
+        partners.removeCustomerProfile(companyA.id, ownerA.id, partner.id),
+      ).rejects.toThrow();
+      await expect(
+        prisma.customerProfile.findUniqueOrThrow({
+          where: { businessPartnerId: partner.id },
+        }),
+      ).resolves.toEqual(expect.objectContaining({ isActive: true }));
+    } else {
+      expect(results.some((result) => result.status === 'rejected')).toBe(true);
+    }
+  });
+
+  it('rejects a direct database transition to POSTED without an AR partner', async () => {
+    const entry = await prisma.journalEntry.create({
+      data: {
+        companyId: companyA.id,
+        journalId,
+        accountingPeriodId: periodId,
+        entryNumber: `B02-DB-AR-${Date.now()}`,
+        postingDate: new Date('2026-07-01T00:00:00.000Z'),
+        transactionCurrencyCode: 'EGP',
+        exchangeRate: '1',
+        description: 'Database trigger counterparty guard',
+        sourceType: 'MANUAL_JOURNAL',
+        idempotencyKey: `b02-db-ar-${Date.now()}`,
+        requestHash: 'b'.repeat(64),
+        postedAt: new Date('2026-07-01T00:00:00.000Z'),
+        postedById: ownerA.id,
+        lines: {
+          create: [
+            {
+              accountId: receivableAccountId,
+              debit: '10',
+              credit: '0',
+              transactionDebit: '10',
+              transactionCredit: '0',
+            },
+            {
+              accountId: cashAccountId,
+              debit: '0',
+              credit: '10',
+              transactionDebit: '0',
+              transactionCredit: '10',
+            },
+          ],
+        },
+      },
+    });
+    await expect(
+      prisma.journalEntry.update({
+        where: { id: entry.id },
+        data: { status: 'POSTED' },
+      }),
+    ).rejects.toThrow('BusinessPartner');
+    await prisma.journalLine.deleteMany({
+      where: { journalEntryId: entry.id },
+    });
+    await prisma.journalEntry.delete({ where: { id: entry.id } });
   });
 });

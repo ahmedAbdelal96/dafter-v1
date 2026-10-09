@@ -1952,6 +1952,7 @@ model JournalEntry {
   reversalOf              JournalEntry?        @relation("JournalEntryReversal", fields: [reversalOfEntryId, companyId], references: [id, companyId], onDelete: Restrict)
   reversals               JournalEntry[]       @relation("JournalEntryReversal")
   openingBalanceBatch     OpeningBalanceBatch? @relation("OpeningBalanceBatchJournalEntry")
+  openingBalanceReversalBatch OpeningBalanceBatch? @relation("OpeningBalanceBatchReversalJournalEntry")
   reversalReason          String?              @db.VarChar(500)
   createdAt               DateTime             @default(now())
   updatedAt               DateTime             @updatedAt
@@ -1984,8 +1985,14 @@ model OpeningBalanceBatch {
   postedBy           User?                     @relation("OpeningBalanceBatchPostedBy", fields: [postedById], references: [id], onDelete: Restrict)
   journalEntryId     String?                   @db.Uuid
   journalEntry       JournalEntry?             @relation("OpeningBalanceBatchJournalEntry", fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  reversalJournalEntryId String?               @db.Uuid
+  reversalJournalEntry   JournalEntry?         @relation("OpeningBalanceBatchReversalJournalEntry", fields: [reversalJournalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
   idempotencyKey     String                    @db.VarChar(128)
   requestHash        String                    @db.Char(64)
+  postingIdempotencyKey String?                @db.VarChar(128)
+  postingRequestHash    String?                @db.Char(64)
+  reversalIdempotencyKey String?               @db.VarChar(128)
+  reversalRequestHash    String?               @db.Char(64)
   validatedAt        DateTime?
   postedAt           DateTime?
   reversedAt         DateTime?
@@ -1999,6 +2006,10 @@ model OpeningBalanceBatch {
   @@unique([companyId, idempotencyKey])
   @@unique([companyId, journalEntryId])
   @@unique([journalEntryId, companyId])
+  @@unique([companyId, postingIdempotencyKey])
+  @@unique([companyId, reversalIdempotencyKey])
+  @@unique([companyId, reversalJournalEntryId])
+  @@unique([reversalJournalEntryId, companyId])
   @@index([companyId, status, effectiveDate])
 }
 

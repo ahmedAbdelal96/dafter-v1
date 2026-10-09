@@ -134,6 +134,48 @@ describe('B02 controlled opening balances', () => {
   ];
 
   it('validates and posts customer AR and supplier AP openings with the partner FK', async () => {
+    await expect(
+      opening.createDraft({
+        companyId: company.id,
+        actorUserId: owner.id,
+        idempotencyKey: 'opening-missing-ar',
+        effectiveDate: new Date('2026-07-01T00:00:00.000Z'),
+        accountingPeriodId: periodId,
+        description: 'Missing AR partner',
+        lines: [
+          { accountId: arAccountId, debit: '10', credit: '0' },
+          { accountId: openingEquityId, debit: '0', credit: '10' },
+        ],
+      }),
+    ).rejects.toThrow('require a business partner');
+    await expect(
+      opening.createDraft({
+        companyId: company.id,
+        actorUserId: owner.id,
+        idempotencyKey: 'opening-missing-ap',
+        effectiveDate: new Date('2026-07-01T00:00:00.000Z'),
+        accountingPeriodId: periodId,
+        description: 'Missing AP partner',
+        lines: [
+          { accountId: apAccountId, debit: '0', credit: '10' },
+          { accountId: openingEquityId, debit: '10', credit: '0' },
+        ],
+      }),
+    ).rejects.toThrow('require a business partner');
+    await expect(
+      opening.createDraft({
+        companyId: company.id,
+        actorUserId: owner.id,
+        idempotencyKey: 'opening-excess-precision',
+        effectiveDate: new Date('2026-07-01T00:00:00.000Z'),
+        accountingPeriodId: periodId,
+        description: 'Excess precision',
+        lines: [
+          { accountId: cashAccountId, debit: '10.001', credit: '0' },
+          { accountId: openingEquityId, debit: '0', credit: '10.001' },
+        ],
+      }),
+    ).rejects.toThrow('at most 2 decimal places');
     const customerBatch = await opening.createDraft({
       companyId: company.id,
       actorUserId: owner.id,
@@ -211,32 +253,83 @@ describe('B02 controlled opening balances', () => {
     const replay = await opening.createDraft(payload);
     expect(replay.id).toBe(first.id);
     await opening.validate(company.id, owner.id, first.id);
-    await opening.post(company.id, owner.id, first.id, 'opening-post-replay');
+    const firstPost = await opening.post(
+      company.id,
+      owner.id,
+      first.id,
+      'opening-post-replay',
+    );
+    const replayPost = await opening.post(
+      company.id,
+      owner.id,
+      first.id,
+      'opening-post-replay',
+    );
+    expect(replayPost.journalEntryId).toBe(firstPost.journalEntryId);
+    expect(
+      await prisma.journalEntry.count({
+        where: { sourceId: first.id, sourceType: 'OPENING_BALANCE' },
+      }),
+    ).toBe(1);
     await expect(
       opening.post(company.id, owner.id, first.id, 'opening-post-replay-again'),
     ).rejects.toBeInstanceOf(ConflictException);
   });
 
-  it('rejects wrong-role openings and reverses a posted batch', async () => {
-    const wrongRole = await opening.createDraft({
+  it('rolls back the journal when the opening-balance state audit fails', async () => {
+    const batch = await opening.createDraft({
       companyId: company.id,
       actorUserId: owner.id,
-      idempotencyKey: 'opening-wrong-role',
+      idempotencyKey: 'opening-atomic-post',
       effectiveDate: new Date('2026-07-01T00:00:00.000Z'),
       accountingPeriodId: periodId,
-      description: 'Wrong role',
+      description: 'Atomic post failure',
       lines: [
-        {
-          accountId: arAccountId,
-          businessPartnerId: supplierId,
-          debit: '10',
-          credit: '0',
-        },
-        { accountId: openingEquityId, debit: '0', credit: '10' },
+        { accountId: cashAccountId, debit: '7', credit: '0' },
+        { accountId: openingEquityId, debit: '0', credit: '7' },
       ],
     });
+    await opening.validate(company.id, owner.id, batch.id);
+    const auditSpy = jest
+      .spyOn(opening as never, 'audit' as never)
+      .mockRejectedValueOnce(new Error('injected opening audit failure'));
     await expect(
-      opening.validate(company.id, owner.id, wrongRole.id),
+      opening.post(company.id, owner.id, batch.id, 'opening-atomic-post-key'),
+    ).rejects.toThrow('injected opening audit failure');
+    auditSpy.mockRestore();
+    expect(
+      await prisma.openingBalanceBatch.findUniqueOrThrow({
+        where: { id: batch.id },
+      }),
+    ).toEqual(
+      expect.objectContaining({ status: OpeningBalanceBatchStatus.VALIDATED }),
+    );
+    expect(
+      await prisma.journalEntry.count({
+        where: { sourceId: batch.id, sourceType: 'OPENING_BALANCE' },
+      }),
+    ).toBe(0);
+  });
+
+  it('rejects wrong-role openings and reverses a posted batch', async () => {
+    await expect(
+      opening.createDraft({
+        companyId: company.id,
+        actorUserId: owner.id,
+        idempotencyKey: 'opening-wrong-role',
+        effectiveDate: new Date('2026-07-01T00:00:00.000Z'),
+        accountingPeriodId: periodId,
+        description: 'Wrong role',
+        lines: [
+          {
+            accountId: arAccountId,
+            businessPartnerId: supplierId,
+            debit: '10',
+            credit: '0',
+          },
+          { accountId: openingEquityId, debit: '0', credit: '10' },
+        ],
+      }),
     ).rejects.toThrow();
     const batch = await opening.createDraft({
       companyId: company.id,
@@ -265,5 +358,115 @@ describe('B02 controlled opening balances', () => {
     });
     expect(reversed.status).toBe(OpeningBalanceBatchStatus.REVERSED);
     expect(reversed.journalEntryId).toBe(posted.journalEntryId);
+    const reversalReplay = await opening.reverse(
+      company.id,
+      owner.id,
+      batch.id,
+      {
+        accountingPeriodId: periodId,
+        postingDate: '2026-07-02',
+        reason: 'Correction',
+        idempotencyKey: 'opening-reverse-command',
+      },
+    );
+    expect(reversalReplay.reversalJournalEntryId).toBe(
+      reversed.reversalJournalEntryId,
+    );
+    expect(
+      await prisma.journalEntry.count({
+        where: { reversalOfEntryId: posted.journalEntryId! },
+      }),
+    ).toBe(1);
+    await expect(
+      prisma.openingBalanceBatch.update({
+        where: { id: batch.id },
+        data: { description: 'tampered' },
+      }),
+    ).rejects.toThrow('immutable');
+    const line = await prisma.openingBalanceLine.findFirstOrThrow({
+      where: { batchId: batch.id },
+    });
+    await expect(
+      prisma.openingBalanceLine.update({
+        where: { id: line.id },
+        data: { description: 'tampered' },
+      }),
+    ).rejects.toThrow('immutable');
+    await expect(
+      prisma.openingBalanceBatch.delete({ where: { id: batch.id } }),
+    ).rejects.toThrow('cannot be deleted');
+  });
+
+  it('rolls back a reversal and batch state together on failure', async () => {
+    const batch = await opening.createDraft({
+      companyId: company.id,
+      actorUserId: owner.id,
+      idempotencyKey: 'opening-atomic-reverse',
+      effectiveDate: new Date('2026-07-01T00:00:00.000Z'),
+      accountingPeriodId: periodId,
+      description: 'Atomic reverse failure',
+      lines: [
+        { accountId: cashAccountId, debit: '8', credit: '0' },
+        { accountId: openingEquityId, debit: '0', credit: '8' },
+      ],
+    });
+    await opening.validate(company.id, owner.id, batch.id);
+    const posted = await opening.post(
+      company.id,
+      owner.id,
+      batch.id,
+      'opening-atomic-reverse-post',
+    );
+    const auditSpy = jest
+      .spyOn(opening as never, 'audit' as never)
+      .mockRejectedValueOnce(new Error('injected reversal audit failure'));
+    await expect(
+      opening.reverse(company.id, owner.id, batch.id, {
+        accountingPeriodId: periodId,
+        postingDate: '2026-07-02',
+        reason: 'Atomic reversal failure',
+        idempotencyKey: 'opening-atomic-reverse-key',
+      }),
+    ).rejects.toThrow('injected reversal audit failure');
+    auditSpy.mockRestore();
+    expect(
+      await prisma.openingBalanceBatch.findUniqueOrThrow({
+        where: { id: batch.id },
+      }),
+    ).toEqual(
+      expect.objectContaining({ status: OpeningBalanceBatchStatus.POSTED }),
+    );
+    expect(
+      await prisma.journalEntry.findUniqueOrThrow({
+        where: { id: posted.journalEntryId! },
+      }),
+    ).toEqual(expect.objectContaining({ status: 'POSTED' }));
+    expect(
+      await prisma.journalEntry.count({
+        where: { reversalOfEntryId: posted.journalEntryId! },
+      }),
+    ).toBe(0);
+  });
+
+  it('requires OPEN periods for opening-balance validation', async () => {
+    await prisma.accountingPeriod.update({
+      where: { id: periodId },
+      data: { status: 'SOFT_CLOSED' },
+    });
+    const batch = await opening.createDraft({
+      companyId: company.id,
+      actorUserId: owner.id,
+      idempotencyKey: 'opening-soft-close',
+      effectiveDate: new Date('2026-07-01T00:00:00.000Z'),
+      accountingPeriodId: periodId,
+      description: 'Soft close opening',
+      lines: [
+        { accountId: cashAccountId, debit: '5', credit: '0' },
+        { accountId: openingEquityId, debit: '0', credit: '5' },
+      ],
+    });
+    await expect(
+      opening.validate(company.id, owner.id, batch.id),
+    ).rejects.toThrow('require an OPEN period');
   });
 });

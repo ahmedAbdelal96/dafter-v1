@@ -5,7 +5,7 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
-import { BusinessPartnerType } from '@prisma/client';
+import { AccountingAccountType, BusinessPartnerType } from '@prisma/client';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { BusinessPartnersService } from './business-partners.service';
 
@@ -17,6 +17,9 @@ describe('B02 BusinessPartner schema foundation', () => {
   let companyA: { id: string };
   let companyB: { id: string };
   let ownerA: { id: string };
+  let expenseAccountId: string;
+  let receivableAccountId: string;
+  let payableAccountId: string;
 
   beforeAll(async () => {
     if (!process.env.DATABASE_URL) {
@@ -46,6 +49,35 @@ describe('B02 BusinessPartner schema foundation', () => {
         role: 'OWNER',
       },
     });
+    const [expense, receivable, payable] = await Promise.all([
+      prisma.accountingAccount.create({
+        data: {
+          companyId: companyA.id,
+          code: `B02-EXP-${stamp}`,
+          name: 'B02 expense account',
+          accountType: AccountingAccountType.EXPENSE_OPERATING,
+        },
+      }),
+      prisma.accountingAccount.create({
+        data: {
+          companyId: companyA.id,
+          code: `B02-AR-${stamp}`,
+          name: 'B02 receivable account',
+          accountType: AccountingAccountType.ASSET_RECEIVABLE,
+        },
+      }),
+      prisma.accountingAccount.create({
+        data: {
+          companyId: companyA.id,
+          code: `B02-AP-${stamp}`,
+          name: 'B02 payable account',
+          accountType: AccountingAccountType.LIABILITY_PAYABLE,
+        },
+      }),
+    ]);
+    expenseAccountId = expense.id;
+    receivableAccountId = receivable.id;
+    payableAccountId = payable.id;
     await prisma.currency.upsert({
       where: { code: 'ZZZ' },
       update: {
@@ -172,5 +204,90 @@ describe('B02 BusinessPartner schema foundation', () => {
         countryCode: 'EG',
       }),
     ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('requires semantic account types for customer and supplier overrides', async () => {
+    const customer = await service.create(companyA.id, ownerA.id, {
+      partnerCode: 'B02-OVERRIDE-CUSTOMER',
+      partnerType: BusinessPartnerType.ORGANIZATION,
+      displayName: 'B02 Override Customer',
+      roles: ['CUSTOMER'],
+    });
+    const supplier = await service.create(companyA.id, ownerA.id, {
+      partnerCode: 'B02-OVERRIDE-SUPPLIER',
+      partnerType: BusinessPartnerType.ORGANIZATION,
+      displayName: 'B02 Override Supplier',
+      roles: ['SUPPLIER'],
+    });
+
+    await expect(
+      service.updateCustomerProfile(companyA.id, ownerA.id, customer.id, {
+        receivableAccountId: expenseAccountId,
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    await expect(
+      service.updateSupplierProfile(companyA.id, ownerA.id, supplier.id, {
+        payableAccountId: expenseAccountId,
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+
+    await expect(
+      service.updateCustomerProfile(companyA.id, ownerA.id, customer.id, {
+        receivableAccountId,
+      }),
+    ).resolves.toEqual(expect.objectContaining({ receivableAccountId }));
+    await expect(
+      service.updateSupplierProfile(companyA.id, ownerA.id, supplier.id, {
+        payableAccountId,
+      }),
+    ).resolves.toEqual(expect.objectContaining({ payableAccountId }));
+  });
+
+  it('keeps one default address and one primary contact under concurrent writes', async () => {
+    const partner = await service.create(companyA.id, ownerA.id, {
+      partnerCode: 'B02-CONCURRENT-CHILDREN',
+      partnerType: BusinessPartnerType.ORGANIZATION,
+      displayName: 'B02 Concurrent Children',
+      roles: [],
+    });
+    await Promise.allSettled([
+      service.addAddress(companyA.id, ownerA.id, partner.id, {
+        addressType: 'BILLING',
+        line1: 'Concurrent address A',
+        countryCode: 'EG',
+        isDefault: true,
+      }),
+      service.addAddress(companyA.id, ownerA.id, partner.id, {
+        addressType: 'BILLING',
+        line1: 'Concurrent address B',
+        countryCode: 'EG',
+        isDefault: true,
+      }),
+    ]);
+    expect(
+      await prisma.businessPartnerAddress.count({
+        where: {
+          businessPartnerId: partner.id,
+          addressType: 'BILLING',
+          isDefault: true,
+        },
+      }),
+    ).toBeLessThanOrEqual(1);
+
+    await Promise.allSettled([
+      service.addContact(companyA.id, ownerA.id, partner.id, {
+        name: 'Concurrent contact A',
+        isPrimary: true,
+      }),
+      service.addContact(companyA.id, ownerA.id, partner.id, {
+        name: 'Concurrent contact B',
+        isPrimary: true,
+      }),
+    ]);
+    expect(
+      await prisma.businessPartnerContact.count({
+        where: { businessPartnerId: partner.id, isPrimary: true },
+      }),
+    ).toBeLessThanOrEqual(1);
   });
 });

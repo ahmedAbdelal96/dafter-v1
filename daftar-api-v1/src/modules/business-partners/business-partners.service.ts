@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { AccountingAccountType, Prisma } from '@prisma/client';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import {
   BusinessPartnerAddressDto,
@@ -660,7 +660,12 @@ export class BusinessPartnersService {
     role: 'CUSTOMER' | 'SUPPLIER',
   ) {
     return this.prisma.$transaction(async (db) => {
-      await this.requirePartner(db, companyId, partnerId);
+      await this.lockPartner(db, companyId, partnerId);
+      if (role === 'CUSTOMER') {
+        await this.lockCustomerProfile(db, companyId, partnerId);
+      } else {
+        await this.lockSupplierProfile(db, companyId, partnerId);
+      }
       const journalLineCount = await db.journalLine.count({
         where: { companyId, businessPartnerId: partnerId },
       });
@@ -714,6 +719,54 @@ export class BusinessPartnersService {
     return partner;
   }
 
+  private async lockPartner(
+    db: TransactionDb,
+    companyId: string,
+    partnerId: string,
+  ) {
+    const rows = await db.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+      SELECT "id"
+      FROM "BusinessPartner"
+      WHERE "id" = ${partnerId}::uuid AND "companyId" = ${companyId}::uuid
+      FOR UPDATE
+    `);
+    if (!rows.length) throw new NotFoundException('Business partner not found');
+  }
+
+  private async lockCustomerProfile(
+    db: TransactionDb,
+    companyId: string,
+    partnerId: string,
+  ) {
+    const rows = await db.$queryRaw<Array<{ businessPartnerId: string }>>(
+      Prisma.sql`
+        SELECT "businessPartnerId"
+        FROM "CustomerProfile"
+        WHERE "businessPartnerId" = ${partnerId}::uuid
+          AND "companyId" = ${companyId}::uuid
+        FOR UPDATE
+      `,
+    );
+    if (!rows.length) throw new NotFoundException('Customer role not found');
+  }
+
+  private async lockSupplierProfile(
+    db: TransactionDb,
+    companyId: string,
+    partnerId: string,
+  ) {
+    const rows = await db.$queryRaw<Array<{ businessPartnerId: string }>>(
+      Prisma.sql`
+        SELECT "businessPartnerId"
+        FROM "SupplierProfile"
+        WHERE "businessPartnerId" = ${partnerId}::uuid
+          AND "companyId" = ${companyId}::uuid
+        FOR UPDATE
+      `,
+    );
+    if (!rows.length) throw new NotFoundException('Supplier role not found');
+  }
+
   private async buildCustomerProfileData(
     db: TransactionDb,
     companyId: string,
@@ -725,7 +778,12 @@ export class BusinessPartnersService {
     if (input.paymentTermId)
       await this.requirePaymentTerm(db, companyId, input.paymentTermId);
     if (input.receivableAccountId)
-      await this.requireAccount(db, companyId, input.receivableAccountId);
+      await this.requireAccount(
+        db,
+        companyId,
+        input.receivableAccountId,
+        AccountingAccountType.ASSET_RECEIVABLE,
+      );
     return {
       companyId,
       ...(input.paymentTermId !== undefined
@@ -760,7 +818,12 @@ export class BusinessPartnersService {
     if (input.paymentTermId)
       await this.requirePaymentTerm(db, companyId, input.paymentTermId);
     if (input.payableAccountId)
-      await this.requireAccount(db, companyId, input.payableAccountId);
+      await this.requireAccount(
+        db,
+        companyId,
+        input.payableAccountId,
+        AccountingAccountType.LIABILITY_PAYABLE,
+      );
     return {
       companyId,
       ...(input.paymentTermId !== undefined
@@ -804,6 +867,7 @@ export class BusinessPartnersService {
     db: TransactionDb,
     companyId: string,
     id: string,
+    expectedType: AccountingAccountType,
   ) {
     const account = await db.accountingAccount.findFirst({
       where: { id, companyId, isActive: true },
@@ -811,6 +875,10 @@ export class BusinessPartnersService {
     if (!account)
       throw new BadRequestException(
         'Accounting account is not active for this company',
+      );
+    if (account.accountType !== expectedType)
+      throw new BadRequestException(
+        `Accounting account must be ${expectedType} for this profile override`,
       );
     return account;
   }

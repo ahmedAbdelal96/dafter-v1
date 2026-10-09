@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { AccountingAccountType, Prisma } from '@prisma/client';
 import { PrismaService } from '../../database/prisma/prisma.service';
 
 export const REQUIRED_TEMPLATE_SYSTEM_KEYS = [
@@ -60,11 +60,14 @@ export class TemplateService {
     db: Prisma.TransactionClient,
     companyId: string,
     template: Awaited<ReturnType<TemplateService['loadActive']>>,
-    currencyCode: string,
   ) {
     const accountsByTemplateId = new Map<string, string>();
     const pending = [...template.accounts];
-    const created: Array<{ id: string; templateKey: string | null }> = [];
+    const created: Array<{
+      id: string;
+      templateKey: string | null;
+      accountType: AccountingAccountType;
+    }> = [];
     while (pending.length) {
       const index = pending.findIndex(
         (account) =>
@@ -81,7 +84,10 @@ export class TemplateService {
           code: account.code,
           name: account.englishName,
           accountType: account.accountType,
-          currencyCode,
+          // Normal ledger accounts accept transaction currencies. A currency
+          // constraint is reserved for explicitly currency-specific cash/bank
+          // accounts configured after bootstrap.
+          currencyCode: null,
           parentId: account.parentId
             ? accountsByTemplateId.get(account.parentId)
             : undefined,

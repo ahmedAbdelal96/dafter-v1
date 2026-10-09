@@ -5,10 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import {
-  AccountingAccountType,
-  AccountingConfigAccountKey,
-  AccountingConfigJournalKey,
-  AccountingJournalType,
   AccountingPeriodStatus,
   FiscalYearStatus,
   JournalEntryStatus,
@@ -19,6 +15,11 @@ import {
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { PlatformIdempotencyService } from '../platform/idempotency/platform-idempotency.service';
 import { AccountingMoney } from './accounting.money';
+import {
+  assertAccountMappingCompatibility,
+  assertJournalMappingCompatibility,
+  validateAccountingCounterparty,
+} from './accounting-policies';
 import {
   AccountingEntryQueryDto,
   CreateAccountingAccountDto,
@@ -569,6 +570,11 @@ export class AccountingService {
     const existing = await this.prisma.accountingConfiguration.findUnique({
       where: { companyId },
     });
+    const company = await this.prisma.company.findFirst({
+      where: { id: companyId, isDeleted: false },
+      select: { id: true, currencyCode: true },
+    });
+    if (!company) throw new NotFoundException('Company not found');
     if (existing && existing.baseCurrencyCode !== baseCurrencyCode) {
       const postedCount = await this.prisma.journalEntry.count({
         where: {
@@ -603,6 +609,12 @@ export class AccountingService {
         },
         include: { accountDefaults: true, journalDefaults: true },
       });
+      if (company.currencyCode !== baseCurrencyCode) {
+        await tx.company.update({
+          where: { id: companyId },
+          data: { currencyCode: baseCurrencyCode },
+        });
+      }
       await this.auditMasterMutation(tx, companyId, actorUserId, {
         action: 'accounting.configuration.changed',
         entityId: configuration.id,
@@ -610,6 +622,7 @@ export class AccountingService {
           before: existing,
           after: configuration,
           currencySensitive: existing?.baseCurrencyCode !== baseCurrencyCode,
+          companyCurrencyAligned: company.currencyCode !== baseCurrencyCode,
         },
       });
       return configuration;
@@ -632,7 +645,7 @@ export class AccountingService {
       throw new NotFoundException(
         'Accounting account not found for this company',
       );
-    this.assertAccountMappingCompatibility(dto.settingKey, account.accountType);
+    assertAccountMappingCompatibility(dto.settingKey, account.accountType);
 
     return this.prisma.$transaction(async (tx) => {
       const existing = await tx.accountingConfigurationAccount.findUnique({
@@ -685,7 +698,7 @@ export class AccountingService {
       throw new NotFoundException(
         'Accounting journal not found for this company',
       );
-    this.assertJournalMappingCompatibility(dto.settingKey, journal.type);
+    assertJournalMappingCompatibility(dto.settingKey, journal.type);
 
     return this.prisma.$transaction(async (tx) => {
       const existing = await tx.accountingConfigurationJournal.findUnique({
@@ -758,6 +771,19 @@ export class AccountingService {
     command: Omit<PostJournalCommand, 'companyId' | 'actorUserId'>,
   ) {
     return this.executePosting({ companyId, actorUserId, ...command });
+  }
+
+  /**
+   * Trusted transaction-composition boundary for source modules. The caller
+   * owns the transaction and must not expose this method through a controller.
+   */
+  postInternalInTransaction(
+    tx: TransactionDb,
+    companyId: string,
+    actorUserId: string,
+    command: Omit<PostJournalCommand, 'companyId' | 'actorUserId'>,
+  ) {
+    return this.postInTransaction(tx, { companyId, actorUserId, ...command });
   }
 
   private async executePosting(command: PostJournalCommand) {
@@ -836,97 +862,9 @@ export class AccountingService {
     dto: ReverseJournalEntryDto,
   ) {
     try {
-      return await this.prisma.$transaction(async (tx) => {
-        const original = await tx.journalEntry.findFirst({
-          where: { id, companyId },
-          include: { lines: { include: { account: true } }, journal: true },
-        });
-        if (!original) throw new NotFoundException('Journal entry not found');
-
-        const reversalCommand: PostJournalCommand = {
-          companyId,
-          actorUserId,
-          journalId: original.journalId,
-          accountingPeriodId: dto.accountingPeriodId,
-          postingDate: dto.postingDate,
-          documentDate: dto.postingDate,
-          dueDate: original.dueDate?.toISOString(),
-          transactionCurrencyCode: original.transactionCurrencyCode,
-          exchangeRate: original.exchangeRate.toFixed(8),
-          documentReference: original.documentReference ?? undefined,
-          description: `Reversal of ${original.entryNumber}: ${this.requireText(dto.reason, 'Reversal reason')}`,
-          sourceType: JournalSourceType.REVERSAL,
-          sourceId: original.id,
-          idempotencyKey: dto.idempotencyKey,
-          reversalOfEntryId: original.id,
-          reversalReason: dto.reason,
-          lines: original.lines.map((line) => ({
-            accountId: line.accountId,
-            transactionDebit: line.transactionCredit.toFixed(4),
-            transactionCredit: line.transactionDebit.toFixed(4),
-            description: line.description ?? undefined,
-            businessPartnerId: line.businessPartnerId ?? undefined,
-            dueDate: line.dueDate?.toISOString(),
-            documentReference: line.documentReference ?? undefined,
-            reconciliationReference: line.reconciliationReference ?? undefined,
-            taxCode: line.taxCode ?? undefined,
-            taxTreatmentCode: line.taxTreatmentCode ?? undefined,
-            taxRate: line.taxRate?.toFixed(4),
-          })),
-        };
-
-        const existingReversal = await tx.journalEntry.findFirst({
-          where: {
-            companyId,
-            sourceType: JournalSourceType.REVERSAL,
-            idempotencyKey: dto.idempotencyKey,
-          },
-          include: {
-            lines: { include: { account: true } },
-            journal: true,
-            accountingPeriod: true,
-          },
-        });
-        if (existingReversal) {
-          if (
-            existingReversal.requestHash !== this.hashCommand(reversalCommand)
-          ) {
-            throw new ConflictException(
-              'Idempotency key is already used with another reversal',
-            );
-          }
-          return this.serializeEntry(existingReversal);
-        }
-
-        if (original.status !== JournalEntryStatus.POSTED) {
-          throw new ConflictException(
-            'Only a posted journal entry can be reversed',
-          );
-        }
-        const previousReversal = await tx.journalEntry.findFirst({
-          where: { companyId, reversalOfEntryId: original.id },
-          select: { id: true },
-        });
-        if (previousReversal)
-          throw new ConflictException('Journal entry is already reversed');
-
-        const reversal = await this.postInTransaction(tx, reversalCommand);
-        await tx.journalEntry.update({
-          where: { id: original.id },
-          data: { status: JournalEntryStatus.REVERSED },
-        });
-        await tx.auditLog.create({
-          data: {
-            companyId,
-            actorUserId,
-            action: 'accounting.journal.reversed',
-            entityType: 'journal_entry',
-            entityId: original.id,
-            metadata: { reversalEntryId: reversal.id, reason: dto.reason },
-          },
-        });
-        return reversal;
-      });
+      return await this.prisma.$transaction((tx) =>
+        this.reverseInTransaction(tx, companyId, actorUserId, id, dto),
+      );
     } catch (error) {
       if (this.isUniqueViolation(error)) {
         throw new ConflictException(
@@ -935,6 +873,102 @@ export class AccountingService {
       }
       throw error;
     }
+  }
+
+  async reverseInTransaction(
+    tx: TransactionDb,
+    companyId: string,
+    actorUserId: string,
+    id: string,
+    dto: ReverseJournalEntryDto,
+  ) {
+    const original = await tx.journalEntry.findFirst({
+      where: { id, companyId },
+      include: { lines: { include: { account: true } }, journal: true },
+    });
+    if (!original) throw new NotFoundException('Journal entry not found');
+
+    const reversalCommand: PostJournalCommand = {
+      companyId,
+      actorUserId,
+      journalId: original.journalId,
+      accountingPeriodId: dto.accountingPeriodId,
+      postingDate: dto.postingDate,
+      documentDate: dto.postingDate,
+      dueDate: original.dueDate?.toISOString(),
+      transactionCurrencyCode: original.transactionCurrencyCode,
+      exchangeRate: original.exchangeRate.toFixed(8),
+      documentReference: original.documentReference ?? undefined,
+      description: `Reversal of ${original.entryNumber}: ${this.requireText(dto.reason, 'Reversal reason')}`,
+      sourceType: JournalSourceType.REVERSAL,
+      sourceId: original.id,
+      idempotencyKey: dto.idempotencyKey,
+      reversalOfEntryId: original.id,
+      reversalReason: dto.reason,
+      lines: original.lines.map((line) => ({
+        accountId: line.accountId,
+        transactionDebit: line.transactionCredit.toFixed(4),
+        transactionCredit: line.transactionDebit.toFixed(4),
+        description: line.description ?? undefined,
+        businessPartnerId: line.businessPartnerId ?? undefined,
+        dueDate: line.dueDate?.toISOString(),
+        documentReference: line.documentReference ?? undefined,
+        reconciliationReference: line.reconciliationReference ?? undefined,
+        taxCode: line.taxCode ?? undefined,
+        taxTreatmentCode: line.taxTreatmentCode ?? undefined,
+        taxRate: line.taxRate?.toFixed(4),
+      })),
+    };
+
+    const existingReversal = await tx.journalEntry.findFirst({
+      where: {
+        companyId,
+        sourceType: JournalSourceType.REVERSAL,
+        idempotencyKey: dto.idempotencyKey,
+      },
+      include: {
+        lines: { include: { account: true } },
+        journal: true,
+        accountingPeriod: true,
+      },
+    });
+    if (existingReversal) {
+      if (existingReversal.requestHash !== this.hashCommand(reversalCommand)) {
+        throw new ConflictException(
+          'Idempotency key is already used with another reversal',
+        );
+      }
+      return this.serializeEntry(existingReversal);
+    }
+
+    if (original.status !== JournalEntryStatus.POSTED) {
+      throw new ConflictException(
+        'Only a posted journal entry can be reversed',
+      );
+    }
+    const previousReversal = await tx.journalEntry.findFirst({
+      where: { companyId, reversalOfEntryId: original.id },
+      select: { id: true },
+    });
+    if (previousReversal)
+      throw new ConflictException('Journal entry is already reversed');
+
+    const reversal = await this.postInTransaction(tx, reversalCommand);
+    await tx.journalEntry.update({
+      where: { id: original.id },
+      data: { status: JournalEntryStatus.REVERSED },
+    });
+    await tx.auditLog.create({
+      data: {
+        companyId,
+        actorUserId,
+        action: 'accounting.journal.reversed',
+        entityType: 'journal_entry',
+        entityId: original.id,
+        metadata: { reversalEntryId: reversal.id, reason: dto.reason },
+      },
+    });
+    return reversal;
   }
 
   private async postInTransaction(
@@ -1096,40 +1130,11 @@ export class AccountingService {
           `Account ${account.code} only accepts ${account.currencyCode}`,
         );
       }
-      if (line.businessPartnerId) {
-        const businessPartner = await tx.businessPartner.findFirst({
-          where: {
-            id: line.businessPartnerId,
-            companyId: command.companyId,
-            isActive: true,
-          },
-          include: {
-            customerProfile: { select: { isActive: true } },
-            supplierProfile: { select: { isActive: true } },
-          },
-        });
-        if (!businessPartner) {
-          throw new BadRequestException(
-            'Journal line business partner does not belong to this company or is inactive',
-          );
-        }
-        if (
-          account.accountType === AccountingAccountType.ASSET_RECEIVABLE &&
-          !businessPartner.customerProfile?.isActive
-        ) {
-          throw new BadRequestException(
-            'Receivable journal lines require an active customer role',
-          );
-        }
-        if (
-          account.accountType === AccountingAccountType.LIABILITY_PAYABLE &&
-          !businessPartner.supplierProfile?.isActive
-        ) {
-          throw new BadRequestException(
-            'Payable journal lines require an active supplier role',
-          );
-        }
-      }
+      await validateAccountingCounterparty(tx, {
+        companyId: command.companyId,
+        accountType: account.accountType,
+        businessPartnerId: line.businessPartnerId,
+      });
       const transactionDebit = AccountingMoney.fromString(
         line.transactionDebit,
         'transactionDebit',
@@ -1399,83 +1404,6 @@ export class AccountingService {
     ) {
       throw new ConflictException(
         'The actor is not authorized to override a soft-closed period',
-      );
-    }
-  }
-
-  private assertAccountMappingCompatibility(
-    key: AccountingConfigAccountKey,
-    type: AccountingAccountType,
-  ) {
-    const allowed: Record<AccountingConfigAccountKey, AccountingAccountType[]> =
-      {
-        [AccountingConfigAccountKey.RECEIVABLE]: [
-          AccountingAccountType.ASSET_RECEIVABLE,
-        ],
-        [AccountingConfigAccountKey.PAYABLE]: [
-          AccountingAccountType.LIABILITY_PAYABLE,
-        ],
-        [AccountingConfigAccountKey.INCOME]: [
-          AccountingAccountType.INCOME_OPERATING_REVENUE,
-          AccountingAccountType.INCOME_OTHER,
-        ],
-        [AccountingConfigAccountKey.EXPENSE]: [
-          AccountingAccountType.EXPENSE_OPERATING,
-          AccountingAccountType.EXPENSE_OTHER,
-        ],
-        [AccountingConfigAccountKey.RETAINED_EARNINGS]: [
-          AccountingAccountType.EQUITY,
-        ],
-        [AccountingConfigAccountKey.EXCHANGE_GAIN]: [
-          AccountingAccountType.INCOME_OTHER,
-        ],
-        [AccountingConfigAccountKey.EXCHANGE_LOSS]: [
-          AccountingAccountType.EXPENSE_OTHER,
-        ],
-        [AccountingConfigAccountKey.ROUNDING]: [
-          AccountingAccountType.INCOME_OTHER,
-          AccountingAccountType.EXPENSE_OTHER,
-        ],
-        [AccountingConfigAccountKey.TAX_PAYABLE]: [
-          AccountingAccountType.LIABILITY_TAX,
-        ],
-        [AccountingConfigAccountKey.TAX_RECOVERABLE]: [
-          AccountingAccountType.ASSET_OTHER,
-          AccountingAccountType.ASSET_RECEIVABLE,
-        ],
-        [AccountingConfigAccountKey.INVENTORY]: [
-          AccountingAccountType.ASSET_INVENTORY,
-        ],
-        [AccountingConfigAccountKey.COGS]: [AccountingAccountType.EXPENSE_COGS],
-      };
-    if (!allowed[key].includes(type)) {
-      throw new BadRequestException(
-        `Account type ${type} is not compatible with ${key}`,
-      );
-    }
-  }
-
-  private assertJournalMappingCompatibility(
-    key: AccountingConfigJournalKey,
-    type: AccountingJournalType,
-  ) {
-    const expected: Record<
-      AccountingConfigJournalKey,
-      AccountingJournalType[]
-    > = {
-      [AccountingConfigJournalKey.GENERAL]: [AccountingJournalType.GENERAL],
-      [AccountingConfigJournalKey.SALES]: [AccountingJournalType.SALES],
-      [AccountingConfigJournalKey.PURCHASE]: [AccountingJournalType.PURCHASE],
-      [AccountingConfigJournalKey.CASH]: [AccountingJournalType.CASH],
-      [AccountingConfigJournalKey.BANK]: [AccountingJournalType.BANK],
-      [AccountingConfigJournalKey.EXCHANGE_DIFFERENCE]: [
-        AccountingJournalType.GENERAL,
-        AccountingJournalType.BANK,
-      ],
-    };
-    if (!expected[key].includes(type)) {
-      throw new BadRequestException(
-        `Journal type ${type} is not compatible with ${key}`,
       );
     }
   }
