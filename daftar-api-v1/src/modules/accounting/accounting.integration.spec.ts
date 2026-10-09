@@ -80,11 +80,11 @@ describe('Accounting B01.1 PostgreSQL integration', () => {
       new PlatformIdempotencyService(prisma),
     );
 
-    const company = await prisma.company.create({
+    const company = (await prisma.company.create({
       data: { name: unique('B011 integration company'), currencyCode: 'EGP' },
-    });
+    })) as { id: string };
     companyIds.push(company.id);
-    const actor = await prisma.user.create({
+    const actor = (await prisma.user.create({
       data: {
         email: `${unique('b011-owner')}@example.local`,
         passwordHash: 'integration-only',
@@ -92,7 +92,7 @@ describe('Accounting B01.1 PostgreSQL integration', () => {
         role: UserRole.OWNER,
         companyId: company.id,
       },
-    });
+    })) as { id: string };
     userIds.push(actor.id);
 
     await service.updateConfiguration(company.id, actor.id, {
@@ -101,43 +101,43 @@ describe('Accounting B01.1 PostgreSQL integration', () => {
       countryCode: 'EG',
       localeCode: 'en-EG',
     });
-    const cash = await service.createAccount(company.id, actor.id, {
+    const cash = (await service.createAccount(company.id, actor.id, {
       code: '1000',
       name: 'Cash',
       accountType: AccountingAccountType.ASSET_CASH,
-    });
-    const income = await service.createAccount(company.id, actor.id, {
+    })) as { id: string };
+    const income = (await service.createAccount(company.id, actor.id, {
       code: '4000',
       name: 'Income',
       accountType: AccountingAccountType.INCOME_OPERATING_REVENUE,
-    });
-    const receivable = await service.createAccount(company.id, actor.id, {
+    })) as { id: string };
+    const receivable = (await service.createAccount(company.id, actor.id, {
       code: '1100',
       name: 'Receivables',
       accountType: AccountingAccountType.ASSET_RECEIVABLE,
-    });
-    const journal = await service.createJournal(company.id, actor.id, {
+    })) as { id: string };
+    const journal = (await service.createJournal(company.id, actor.id, {
       code: 'GEN',
       name: 'General',
       type: AccountingJournalType.GENERAL,
-    });
-    const fiscalYear = await service.createFiscalYear(company.id, actor.id, {
+    })) as { id: string };
+    const fiscalYear = (await service.createFiscalYear(company.id, actor.id, {
       name: 'FY 2026',
       startDate: '2026-01-01',
       endDate: '2026-12-31',
-    });
-    const period = await service.createPeriod(company.id, actor.id, {
+    })) as { id: string };
+    const period = (await service.createPeriod(company.id, actor.id, {
       fiscalYearId: fiscalYear.id,
       name: 'January 2026',
       startDate: '2026-01-01',
       endDate: '2026-01-31',
-    });
-    const controlPeriod = await service.createPeriod(company.id, actor.id, {
+    })) as { id: string };
+    const controlPeriod = (await service.createPeriod(company.id, actor.id, {
       fiscalYearId: fiscalYear.id,
       name: 'February 2026',
       startDate: '2026-02-01',
       endDate: '2026-02-28',
-    });
+    })) as { id: string };
 
     fixture = {
       companyId: company.id,
@@ -318,18 +318,18 @@ describe('Accounting B01.1 PostgreSQL integration', () => {
   });
 
   it('enforces tenant isolation, periods, and controlled soft-close overrides', async () => {
-    const otherCompany = await prisma.company.create({
+    const otherCompany = (await prisma.company.create({
       data: { name: unique('B011 tenant'), currencyCode: 'EGP' },
-    });
+    })) as { id: string };
     companyIds.push(otherCompany.id);
-    const otherAccount = await prisma.accountingAccount.create({
+    const otherAccount = (await prisma.accountingAccount.create({
       data: {
         companyId: otherCompany.id,
         code: '1000',
         name: 'Other Cash',
         accountType: AccountingAccountType.ASSET_CASH,
       },
-    });
+    })) as { id: string };
     await expect(
       service.postManualJournal(
         fixture.companyId,
@@ -450,7 +450,7 @@ describe('Accounting B01.1 PostgreSQL integration', () => {
   });
 
   it('allocates unique journal numbers under concurrent posting', async () => {
-    const results = await Promise.all(
+    const results = (await Promise.all(
       Array.from({ length: 4 }, () =>
         service.postManualJournal(
           fixture.companyId,
@@ -458,7 +458,7 @@ describe('Accounting B01.1 PostgreSQL integration', () => {
           manualPosting(),
         ),
       ),
-    );
+    )) as Array<{ entryNumber: string }>;
     expect(new Set(results.map((entry) => entry.entryNumber)).size).toBe(4);
   });
 

@@ -218,7 +218,7 @@ export class AccountingService {
     });
   }
 
-  async listJournals(companyId: string) {
+  listJournals(companyId: string) {
     return this.prisma.accountingJournal.findMany({
       where: { companyId },
       orderBy: [{ code: 'asc' }, { name: 'asc' }],
@@ -328,7 +328,7 @@ export class AccountingService {
     });
   }
 
-  async listFiscalYears(companyId: string) {
+  listFiscalYears(companyId: string) {
     return this.prisma.fiscalYear.findMany({
       where: { companyId },
       orderBy: { startDate: 'desc' },
@@ -407,7 +407,7 @@ export class AccountingService {
     });
   }
 
-  async listPeriods(companyId: string, fiscalYearId?: string) {
+  listPeriods(companyId: string, fiscalYearId?: string) {
     return this.prisma.accountingPeriod.findMany({
       where: { companyId, ...(fiscalYearId ? { fiscalYearId } : {}) },
       orderBy: { startDate: 'asc' },
@@ -1063,9 +1063,10 @@ export class AccountingService {
     const accounts = await tx.accountingAccount.findMany({
       where: { companyId: command.companyId, id: { in: accountIds } },
     });
-    const accountById = new Map(
-      accounts.map((account) => [account.id, account]),
-    );
+    const accountById = new Map<string, (typeof accounts)[number]>();
+    for (const account of accounts) {
+      accountById.set(account.id as string, account);
+    }
     if (accounts.length !== accountIds.length) {
       throw new NotFoundException(
         'One or more accounts do not belong to this company',
@@ -1079,6 +1080,9 @@ export class AccountingService {
     const lineData: Array<
       Omit<Prisma.JournalLineCreateManyInput, 'journalEntryId'>
     > = [];
+    const transactionMinorUnitPrecision = Number(
+      currencyContext.transaction.minorUnitPrecision,
+    );
     for (const line of command.lines) {
       const account = accountById.get(line.accountId)!;
       if (!account.isActive)
@@ -1103,12 +1107,12 @@ export class AccountingService {
       const transactionDebit = AccountingMoney.fromString(
         line.transactionDebit,
         'transactionDebit',
-        currencyContext.transaction.minorUnitPrecision,
+        transactionMinorUnitPrecision,
       );
       const transactionCredit = AccountingMoney.fromString(
         line.transactionCredit,
         'transactionCredit',
-        currencyContext.transaction.minorUnitPrecision,
+        transactionMinorUnitPrecision,
       );
       if (transactionDebit.isNegative() || transactionCredit.isNegative()) {
         throw new BadRequestException(
@@ -1301,7 +1305,7 @@ export class AccountingService {
     }
   }
 
-  private async findByIdempotencyKey(
+  private findByIdempotencyKey(
     companyId: string,
     sourceType: JournalSourceType,
     idempotencyKey: string,
@@ -1316,7 +1320,7 @@ export class AccountingService {
     });
   }
 
-  private async findEntry(companyId: string, id: string) {
+  private findEntry(companyId: string, id: string) {
     return this.prisma.journalEntry.findFirst({
       where: { id, companyId },
       include: {

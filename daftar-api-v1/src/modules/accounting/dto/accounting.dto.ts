@@ -33,7 +33,7 @@ export class CreateAccountingAccountDto {
   @MaxLength(200)
   name!: string;
 
-  @IsEnum(AccountingAccountType)
+  @IsEnum(AccountingAccountType as Record<string, string>)
   accountType!: AccountingAccountType;
 
   @IsOptional()
@@ -109,7 +109,7 @@ export class CreateAccountingJournalDto {
   @MaxLength(200)
   name!: string;
 
-  @IsEnum(AccountingJournalType)
+  @IsEnum(AccountingJournalType as Record<string, string>)
   type!: AccountingJournalType;
 
   @IsOptional()
@@ -157,7 +157,7 @@ export class CreateFiscalYearDto {
 }
 
 export class UpdateFiscalYearStatusDto {
-  @IsEnum(FiscalYearStatus)
+  @IsEnum(FiscalYearStatus as Record<string, string>)
   status!: FiscalYearStatus;
 }
 
@@ -177,7 +177,7 @@ export class CreateAccountingPeriodDto {
 }
 
 export class UpdateAccountingPeriodStatusDto {
-  @IsEnum(AccountingPeriodStatus)
+  @IsEnum(AccountingPeriodStatus as Record<string, string>)
   status!: AccountingPeriodStatus;
 }
 
@@ -218,7 +218,7 @@ export class JournalLineDto {
   description?: string;
 
   @IsOptional()
-  @IsEnum(PartyType)
+  @IsEnum(PartyType as Record<string, string>)
   partyType?: PartyType;
 
   @IsOptional()
@@ -309,7 +309,7 @@ export class ManualJournalEntryDto {
 export class PostJournalEntryDto extends ManualJournalEntryDto {}
 
 export class SetAccountingAccountDefaultDto {
-  @IsEnum(AccountingConfigAccountKey)
+  @IsEnum(AccountingConfigAccountKey as Record<string, string>)
   settingKey!: AccountingConfigAccountKey;
 
   @IsUUID()
@@ -321,7 +321,7 @@ export class SetAccountingAccountDefaultDto {
 }
 
 export class SetAccountingJournalDefaultDto {
-  @IsEnum(AccountingConfigJournalKey)
+  @IsEnum(AccountingConfigJournalKey as Record<string, string>)
   settingKey!: AccountingConfigJournalKey;
 
   @IsUUID()
@@ -370,11 +370,11 @@ export class AccountingEntryQueryDto {
   accountingPeriodId?: string;
 
   @IsOptional()
-  @IsEnum(JournalSourceType)
+  @IsEnum(JournalSourceType as Record<string, string>)
   sourceType?: JournalSourceType;
 
   @IsOptional()
   @IsString()
-  @IsEnum(JournalEntryStatus)
+  @IsEnum(JournalEntryStatus as Record<string, string>)
   status?: JournalEntryStatus;
 }
