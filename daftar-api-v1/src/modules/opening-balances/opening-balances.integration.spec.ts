@@ -1,0 +1,269 @@
+import 'dotenv/config';
+
+import { ConflictException } from '@nestjs/common';
+import { BusinessPartnerType, OpeningBalanceBatchStatus } from '@prisma/client';
+import { PrismaService } from '../../database/prisma/prisma.service';
+import { PlatformIdempotencyService } from '../platform/idempotency/platform-idempotency.service';
+import { BusinessPartnersService } from '../business-partners/business-partners.service';
+import { InitializeCompanyAccounting } from '../accounting-bootstrap/accounting-bootstrap.service';
+import { TemplateService } from '../accounting-bootstrap/template.service';
+import { AccountingService } from '../accounting/accounting.service';
+import { OpeningBalancesService } from './opening-balances.service';
+
+jest.setTimeout(30_000);
+
+describe('B02 controlled opening balances', () => {
+  let prisma: PrismaService;
+  let opening: OpeningBalancesService;
+  let partners: BusinessPartnersService;
+  let company: { id: string };
+  let owner: { id: string };
+  let periodId: string;
+  let arAccountId: string;
+  let apAccountId: string;
+  let cashAccountId: string;
+  let openingEquityId: string;
+  let customerId: string;
+  let supplierId: string;
+
+  beforeAll(async () => {
+    if (!process.env.DATABASE_URL)
+      throw new Error('DATABASE_URL is required for B02 integration tests');
+    prisma = new PrismaService();
+    await prisma.$connect();
+    const idempotency = new PlatformIdempotencyService(prisma);
+    const accounting = new AccountingService(prisma, idempotency);
+    opening = new OpeningBalancesService(prisma, accounting, idempotency);
+    partners = new BusinessPartnersService(prisma);
+    await prisma.currency.upsert({
+      where: { code: 'EGP' },
+      update: { isActive: true },
+      create: { code: 'EGP', name: 'Egyptian Pound', minorUnitPrecision: 2 },
+    });
+    const stamp = Date.now();
+    company = await prisma.company.create({
+      data: { name: `B02 Opening ${stamp}`, currencyCode: 'EGP' },
+    });
+    owner = await prisma.user.create({
+      data: {
+        email: `b02-opening-${stamp}@example.test`,
+        passwordHash: 'test-hash',
+        fullName: 'Opening Owner',
+        companyId: company.id,
+        role: 'OWNER',
+      },
+    });
+    await new InitializeCompanyAccounting(
+      prisma,
+      idempotency,
+      new TemplateService(prisma),
+    ).execute({
+      companyId: company.id,
+      actorUserId: owner.id,
+      idempotencyKey: `opening-bootstrap-${stamp}`,
+      countryCode: 'EG',
+      localeCode: 'ar-EG',
+      baseCurrencyCode: 'EGP',
+      templateCode: 'EG_STANDARD_V1',
+      templateVersion: 1,
+      fiscalYearStart: new Date('2026-07-01T00:00:00.000Z'),
+      fiscalYearEnd: new Date('2027-06-30T00:00:00.000Z'),
+    });
+    periodId = (
+      await prisma.accountingPeriod.findFirstOrThrow({
+        where: { companyId: company.id, name: '2026-07' },
+      })
+    ).id;
+    arAccountId = (
+      await prisma.accountingAccount.findFirstOrThrow({
+        where: { companyId: company.id, templateKey: 'AR_CONTROL' },
+      })
+    ).id;
+    apAccountId = (
+      await prisma.accountingAccount.findFirstOrThrow({
+        where: { companyId: company.id, templateKey: 'AP_CONTROL' },
+      })
+    ).id;
+    openingEquityId = (
+      await prisma.accountingAccount.findFirstOrThrow({
+        where: { companyId: company.id, templateKey: 'OPENING_BALANCE_EQUITY' },
+      })
+    ).id;
+    cashAccountId = (
+      await prisma.accountingAccount.findFirstOrThrow({
+        where: { companyId: company.id, templateKey: 'CASH' },
+      })
+    ).id;
+    customerId = (
+      await partners.create(company.id, owner.id, {
+        partnerCode: `OPEN-CUST-${stamp}`,
+        partnerType: BusinessPartnerType.ORGANIZATION,
+        displayName: 'Opening Customer',
+        roles: ['CUSTOMER'],
+      })
+    ).id;
+    supplierId = (
+      await partners.create(company.id, owner.id, {
+        partnerCode: `OPEN-SUP-${stamp}`,
+        partnerType: BusinessPartnerType.ORGANIZATION,
+        displayName: 'Opening Supplier',
+        roles: ['SUPPLIER'],
+      })
+    ).id;
+  });
+
+  afterAll(async () => {
+    // Posted journal lines are intentionally immutable; the disposable test database is dropped by the test harness.
+    await prisma?.$disconnect();
+  });
+
+  const customerLines = () => [
+    {
+      accountId: arAccountId,
+      businessPartnerId: customerId,
+      debit: '100',
+      credit: '0',
+      description: 'Customer opening balance',
+    },
+    {
+      accountId: openingEquityId,
+      debit: '0',
+      credit: '100',
+      description: 'Opening balance equity',
+    },
+  ];
+
+  it('validates and posts customer AR and supplier AP openings with the partner FK', async () => {
+    const customerBatch = await opening.createDraft({
+      companyId: company.id,
+      actorUserId: owner.id,
+      idempotencyKey: 'opening-customer-1',
+      effectiveDate: new Date('2026-07-01T00:00:00.000Z'),
+      accountingPeriodId: periodId,
+      description: 'Customer opening',
+      lines: customerLines(),
+    });
+    await expect(
+      opening.validate(company.id, owner.id, customerBatch.id),
+    ).resolves.toEqual(
+      expect.objectContaining({ status: OpeningBalanceBatchStatus.VALIDATED }),
+    );
+    const posted = await opening.post(
+      company.id,
+      owner.id,
+      customerBatch.id,
+      'opening-post-customer',
+    );
+    expect(posted.status).toBe(OpeningBalanceBatchStatus.POSTED);
+    expect(
+      await prisma.journalLine.findFirst({
+        where: {
+          journalEntryId: posted.journalEntryId!,
+          businessPartnerId: customerId,
+        },
+      }),
+    ).toBeTruthy();
+
+    const supplierBatch = await opening.createDraft({
+      companyId: company.id,
+      actorUserId: owner.id,
+      idempotencyKey: 'opening-supplier-1',
+      effectiveDate: new Date('2026-07-01T00:00:00.000Z'),
+      accountingPeriodId: periodId,
+      description: 'Supplier opening',
+      lines: [
+        {
+          accountId: apAccountId,
+          businessPartnerId: supplierId,
+          debit: '0',
+          credit: '50',
+        },
+        { accountId: openingEquityId, debit: '50', credit: '0' },
+      ],
+    });
+    await opening.validate(company.id, owner.id, supplierBatch.id);
+    expect(
+      (
+        await opening.post(
+          company.id,
+          owner.id,
+          supplierBatch.id,
+          'opening-post-supplier',
+        )
+      ).status,
+    ).toBe(OpeningBalanceBatchStatus.POSTED);
+  });
+
+  it('replays idempotent draft creation and keeps posted batches immutable', async () => {
+    const payload = {
+      companyId: company.id,
+      actorUserId: owner.id,
+      idempotencyKey: 'opening-replay-1',
+      effectiveDate: new Date('2026-07-01T00:00:00.000Z'),
+      accountingPeriodId: periodId,
+      description: 'Replay opening',
+      lines: [
+        { accountId: cashAccountId, debit: '20', credit: '0' },
+        { accountId: openingEquityId, debit: '0', credit: '20' },
+      ],
+    };
+    const first = await opening.createDraft(payload);
+    const replay = await opening.createDraft(payload);
+    expect(replay.id).toBe(first.id);
+    await opening.validate(company.id, owner.id, first.id);
+    await opening.post(company.id, owner.id, first.id, 'opening-post-replay');
+    await expect(
+      opening.post(company.id, owner.id, first.id, 'opening-post-replay-again'),
+    ).rejects.toBeInstanceOf(ConflictException);
+  });
+
+  it('rejects wrong-role openings and reverses a posted batch', async () => {
+    const wrongRole = await opening.createDraft({
+      companyId: company.id,
+      actorUserId: owner.id,
+      idempotencyKey: 'opening-wrong-role',
+      effectiveDate: new Date('2026-07-01T00:00:00.000Z'),
+      accountingPeriodId: periodId,
+      description: 'Wrong role',
+      lines: [
+        {
+          accountId: arAccountId,
+          businessPartnerId: supplierId,
+          debit: '10',
+          credit: '0',
+        },
+        { accountId: openingEquityId, debit: '0', credit: '10' },
+      ],
+    });
+    await expect(
+      opening.validate(company.id, owner.id, wrongRole.id),
+    ).rejects.toThrow();
+    const batch = await opening.createDraft({
+      companyId: company.id,
+      actorUserId: owner.id,
+      idempotencyKey: 'opening-reverse',
+      effectiveDate: new Date('2026-07-01T00:00:00.000Z'),
+      accountingPeriodId: periodId,
+      description: 'Reverse opening',
+      lines: [
+        { accountId: cashAccountId, debit: '30', credit: '0' },
+        { accountId: openingEquityId, debit: '0', credit: '30' },
+      ],
+    });
+    await opening.validate(company.id, owner.id, batch.id);
+    const posted = await opening.post(
+      company.id,
+      owner.id,
+      batch.id,
+      'opening-post-reverse',
+    );
+    const reversed = await opening.reverse(company.id, owner.id, batch.id, {
+      accountingPeriodId: periodId,
+      postingDate: '2026-07-02',
+      reason: 'Correction',
+      idempotencyKey: 'opening-reverse-command',
+    });
+    expect(reversed.status).toBe(OpeningBalanceBatchStatus.REVERSED);
+    expect(reversed.journalEntryId).toBe(posted.journalEntryId);
+  });
+});

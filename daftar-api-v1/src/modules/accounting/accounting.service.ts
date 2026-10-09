@@ -1084,7 +1084,10 @@ export class AccountingService {
       const account = accountById.get(line.accountId)!;
       if (!account.isActive)
         throw new ConflictException(`Account ${account.code} is inactive`);
-      if (!account.allowDirectPosting)
+      if (
+        !account.allowDirectPosting &&
+        command.sourceType !== JournalSourceType.OPENING_BALANCE
+      )
         throw new ConflictException(
           `Account ${account.code} does not allow direct posting`,
         );
@@ -1094,17 +1097,36 @@ export class AccountingService {
         );
       }
       if (line.businessPartnerId) {
-        const businessPartnerExists =
-          (await tx.businessPartner.count({
-            where: {
-              id: line.businessPartnerId,
-              companyId: command.companyId,
-              isActive: true,
-            },
-          })) > 0;
-        if (!businessPartnerExists) {
+        const businessPartner = await tx.businessPartner.findFirst({
+          where: {
+            id: line.businessPartnerId,
+            companyId: command.companyId,
+            isActive: true,
+          },
+          include: {
+            customerProfile: { select: { isActive: true } },
+            supplierProfile: { select: { isActive: true } },
+          },
+        });
+        if (!businessPartner) {
           throw new BadRequestException(
             'Journal line business partner does not belong to this company or is inactive',
+          );
+        }
+        if (
+          account.accountType === AccountingAccountType.ASSET_RECEIVABLE &&
+          !businessPartner.customerProfile?.isActive
+        ) {
+          throw new BadRequestException(
+            'Receivable journal lines require an active customer role',
+          );
+        }
+        if (
+          account.accountType === AccountingAccountType.LIABILITY_PAYABLE &&
+          !businessPartner.supplierProfile?.isActive
+        ) {
+          throw new BadRequestException(
+            'Payable journal lines require an active supplier role',
           );
         }
       }

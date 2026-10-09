@@ -82,6 +82,7 @@ import { AccountingModule } from './modules/accounting/accounting.module';
 import { BusinessPartnersModule } from './modules/business-partners/business-partners.module';
 import { PaymentTermsModule } from './modules/payment-terms/payment-terms.module';
 import { AccountingBootstrapModule } from './modules/accounting-bootstrap/accounting-bootstrap.module';
+import { OpeningBalancesModule } from './modules/opening-balances/opening-balances.module';
 
 @Module({
   imports: [
@@ -189,6 +190,7 @@ import { AccountingBootstrapModule } from './modules/accounting-bootstrap/accoun
     BusinessPartnersModule,
     PaymentTermsModule,
     AccountingBootstrapModule,
+    OpeningBalancesModule,
   ],
   controllers: [AppController],
   providers: [
