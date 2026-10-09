@@ -25,6 +25,7 @@ const EG_STANDARD_V1_ACCOUNTS: TemplateAccountSeed[] = [
   { stableKey: 'LIABILITIES', code: '2000', arabicName: 'الالتزامات', englishName: 'Liabilities', accountType: AccountingAccountType.LIABILITY_CURRENT, allowDirectPosting: false },
   { stableKey: 'AP_CONTROL', code: '2100', arabicName: 'الموردون', englishName: 'Accounts Payable', accountType: AccountingAccountType.LIABILITY_PAYABLE, parentKey: 'LIABILITIES', allowDirectPosting: false, isControlAccount: true, reconciliationEligible: true, systemKey: 'AP_CONTROL' },
   { stableKey: 'TAX_PAYABLE', code: '2200', arabicName: 'ضرائب مستحقة', englishName: 'Tax Payable', accountType: AccountingAccountType.LIABILITY_TAX, parentKey: 'LIABILITIES', systemKey: 'TAX_PAYABLE' },
+  { stableKey: 'TAX_RECOVERABLE', code: '2210', arabicName: 'ضرائب قابلة للاسترداد', englishName: 'Tax Recoverable', accountType: AccountingAccountType.ASSET_CURRENT, parentKey: 'ASSETS', systemKey: 'TAX_RECOVERABLE' },
   { stableKey: 'OTHER_CURRENT_LIABILITIES', code: '2300', arabicName: 'التزامات متداولة أخرى', englishName: 'Other Current Liabilities', accountType: AccountingAccountType.LIABILITY_CURRENT, parentKey: 'LIABILITIES' },
   { stableKey: 'EQUITY', code: '3000', arabicName: 'حقوق الملكية', englishName: 'Equity', accountType: AccountingAccountType.EQUITY, allowDirectPosting: false },
   { stableKey: 'CAPITAL', code: '3100', arabicName: 'رأس المال', englishName: 'Capital', accountType: AccountingAccountType.EQUITY, parentKey: 'EQUITY' },

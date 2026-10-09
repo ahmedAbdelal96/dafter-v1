@@ -81,6 +81,7 @@ import { TaxSetupModule } from './modules/tax-setup/tax-setup.module';
 import { AccountingModule } from './modules/accounting/accounting.module';
 import { BusinessPartnersModule } from './modules/business-partners/business-partners.module';
 import { PaymentTermsModule } from './modules/payment-terms/payment-terms.module';
+import { AccountingBootstrapModule } from './modules/accounting-bootstrap/accounting-bootstrap.module';
 
 @Module({
   imports: [
@@ -187,6 +188,7 @@ import { PaymentTermsModule } from './modules/payment-terms/payment-terms.module
     AccountingModule,
     BusinessPartnersModule,
     PaymentTermsModule,
+    AccountingBootstrapModule,
   ],
   controllers: [AppController],
   providers: [

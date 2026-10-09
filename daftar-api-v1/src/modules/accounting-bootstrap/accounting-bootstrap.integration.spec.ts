@@ -1,0 +1,174 @@
+import 'dotenv/config';
+
+import { AccountingSetupStatus } from '@prisma/client';
+import { PrismaService } from '../../database/prisma/prisma.service';
+import { PlatformIdempotencyService } from '../platform/idempotency/platform-idempotency.service';
+import { AccountingReadinessService } from './accounting-readiness.service';
+import { InitializeCompanyAccounting } from './accounting-bootstrap.service';
+import { TemplateService } from './template.service';
+
+jest.setTimeout(30_000);
+
+describe('B02 company accounting bootstrap', () => {
+  let prisma: PrismaService;
+  let initializer: InitializeCompanyAccounting;
+  let readiness: AccountingReadinessService;
+  let company: { id: string };
+  let owner: { id: string };
+
+  beforeAll(async () => {
+    if (!process.env.DATABASE_URL)
+      throw new Error('DATABASE_URL is required for B02 integration tests');
+    prisma = new PrismaService();
+    await prisma.$connect();
+    initializer = new InitializeCompanyAccounting(
+      prisma,
+      new PlatformIdempotencyService(prisma),
+      new TemplateService(prisma),
+    );
+    readiness = new AccountingReadinessService(prisma);
+    await prisma.currency.upsert({
+      where: { code: 'EGP' },
+      update: { isActive: true },
+      create: { code: 'EGP', name: 'Egyptian Pound', minorUnitPrecision: 2 },
+    });
+    const stamp = Date.now();
+    company = await prisma.company.create({
+      data: { name: `B02 Bootstrap ${stamp}`, currencyCode: 'EGP' },
+    });
+    owner = await prisma.user.create({
+      data: {
+        email: `b02-bootstrap-${stamp}@example.test`,
+        passwordHash: 'test-hash',
+        fullName: 'Bootstrap Owner',
+        companyId: company.id,
+        role: 'OWNER',
+      },
+    });
+  });
+
+  afterAll(async () => {
+    if (company?.id) {
+      await prisma.accountingConfigurationAccount.deleteMany({
+        where: { companyId: company.id },
+      });
+      await prisma.accountingConfigurationJournal.deleteMany({
+        where: { companyId: company.id },
+      });
+      await prisma.accountingSetup.deleteMany({
+        where: { companyId: company.id },
+      });
+      await prisma.accountingPeriod.deleteMany({
+        where: { companyId: company.id },
+      });
+      await prisma.accountingEntrySequence.deleteMany({
+        where: { companyId: company.id },
+      });
+      await prisma.fiscalYear.deleteMany({ where: { companyId: company.id } });
+      await prisma.accountingConfiguration.deleteMany({
+        where: { companyId: company.id },
+      });
+      await prisma.accountingJournal.deleteMany({
+        where: { companyId: company.id },
+      });
+      await prisma.accountingAccount.deleteMany({
+        where: { companyId: company.id },
+      });
+      await prisma.company.delete({ where: { id: company.id } });
+    }
+    await prisma?.$disconnect();
+  });
+
+  it('bootstraps EG_STANDARD_V1 with July-June periods and READY status', async () => {
+    const result = await initializer.execute({
+      companyId: company.id,
+      actorUserId: owner.id,
+      idempotencyKey: 'b02-bootstrap-1',
+      countryCode: 'EG',
+      localeCode: 'ar-EG',
+      baseCurrencyCode: 'EGP',
+      templateCode: 'EG_STANDARD_V1',
+      templateVersion: 1,
+      fiscalYearStart: new Date('2026-07-01T00:00:00.000Z'),
+      fiscalYearEnd: new Date('2027-06-30T00:00:00.000Z'),
+    });
+
+    expect(result.status).toBe(AccountingSetupStatus.READY);
+    expect(
+      await prisma.accountingAccount.count({
+        where: { companyId: company.id },
+      }),
+    ).toBeGreaterThan(10);
+    expect(
+      await prisma.accountingJournal.count({
+        where: { companyId: company.id },
+      }),
+    ).toBe(4);
+    expect(
+      await prisma.accountingPeriod.count({ where: { companyId: company.id } }),
+    ).toBe(12);
+    expect(
+      await prisma.accountingAccount.findFirst({
+        where: { companyId: company.id, templateKey: 'AR_CONTROL' },
+      }),
+    ).toEqual(
+      expect.objectContaining({
+        templateCode: 'EG_STANDARD_V1',
+        templateVersion: 1,
+      }),
+    );
+    expect(
+      (
+        await readiness.evaluate(
+          company.id,
+          new Date('2026-07-01T00:00:00.000Z'),
+        )
+      ).status,
+    ).toBe(AccountingSetupStatus.READY);
+  });
+
+  it('replays the same idempotency key and rejects a different payload after setup', async () => {
+    const payload = {
+      companyId: company.id,
+      actorUserId: owner.id,
+      idempotencyKey: 'b02-bootstrap-1',
+      countryCode: 'EG',
+      localeCode: 'ar-EG',
+      baseCurrencyCode: 'EGP',
+      templateCode: 'EG_STANDARD_V1',
+      templateVersion: 1,
+      fiscalYearStart: new Date('2026-07-01T00:00:00.000Z'),
+      fiscalYearEnd: new Date('2027-06-30T00:00:00.000Z'),
+    };
+    const first = await initializer.execute(payload);
+    const replay = await initializer.execute(payload);
+    expect(replay.id).toBe(first.id);
+    await expect(
+      initializer.execute({
+        ...payload,
+        idempotencyKey: 'b02-bootstrap-different',
+        localeCode: 'en-EG',
+      }),
+    ).rejects.toThrow();
+  });
+
+  it('keeps failure atomic when the template is missing', async () => {
+    await expect(
+      initializer.execute({
+        companyId: company.id,
+        actorUserId: owner.id,
+        idempotencyKey: 'b02-bootstrap-missing-template',
+        countryCode: 'EG',
+        localeCode: 'ar-EG',
+        baseCurrencyCode: 'EGP',
+        templateCode: 'MISSING',
+        templateVersion: 1,
+        fiscalYearStart: new Date('2028-07-01T00:00:00.000Z'),
+        fiscalYearEnd: new Date('2029-06-30T00:00:00.000Z'),
+      }),
+    ).rejects.toThrow();
+    expect(
+      await prisma.accountingSetup.count({ where: { companyId: company.id } }),
+    ).toBe(1);
+  });
+});

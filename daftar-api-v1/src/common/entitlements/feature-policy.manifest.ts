@@ -14,6 +14,7 @@ export const CONTROLLER_FEATURE_POLICY: Record<
 > = {
   'audit/audit.controller.ts': 'platform-admin',
   'accounting/accounting.controller.ts': 'role-guarded',
+  'accounting-bootstrap/accounting-bootstrap.controller.ts': 'role-guarded',
   'business-partners/business-partners.controller.ts': 'role-guarded',
   'payment-terms/payment-terms.controller.ts': 'role-guarded',
   'auth/auth.controller.ts': 'auth-public',
