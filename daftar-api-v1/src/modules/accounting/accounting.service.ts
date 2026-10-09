@@ -1065,7 +1065,7 @@ export class AccountingService {
     });
     const accountById = new Map<string, (typeof accounts)[number]>();
     for (const account of accounts) {
-      accountById.set(account.id as string, account);
+      accountById.set(account.id, account);
     }
     if (accounts.length !== accountIds.length) {
       throw new NotFoundException(
