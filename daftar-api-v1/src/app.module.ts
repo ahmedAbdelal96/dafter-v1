@@ -80,6 +80,7 @@ import { CashReconciliationModule } from './modules/cash-reconciliation/cash-rec
 import { TaxSetupModule } from './modules/tax-setup/tax-setup.module';
 import { AccountingModule } from './modules/accounting/accounting.module';
 import { BusinessPartnersModule } from './modules/business-partners/business-partners.module';
+import { PaymentTermsModule } from './modules/payment-terms/payment-terms.module';
 
 @Module({
   imports: [
@@ -185,6 +186,7 @@ import { BusinessPartnersModule } from './modules/business-partners/business-par
     TaxSetupModule,
     AccountingModule,
     BusinessPartnersModule,
+    PaymentTermsModule,
   ],
   controllers: [AppController],
   providers: [
