@@ -224,4 +224,3 @@
 - [ ] **Step 5: Push the implementation branch/approved integration target** according to repository workflow and inspect the resulting GitHub Actions run and every job step.
   Expected: run conclusion `success`, lint/typecheck/Prisma/migrations/diff/tests/build all green.
 - [ ] **Step 6: Commit any final CI-only repair if required, rerun the full gate, and stop after B02 without beginning B03.**
-
