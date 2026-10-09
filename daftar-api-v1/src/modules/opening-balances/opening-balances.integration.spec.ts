@@ -19,6 +19,7 @@ describe('B02 controlled opening balances', () => {
   let company: { id: string };
   let owner: { id: string };
   let periodId: string;
+  let augustPeriodId: string;
   let arAccountId: string;
   let apAccountId: string;
   let cashAccountId: string;
@@ -72,6 +73,11 @@ describe('B02 controlled opening balances', () => {
     periodId = (
       await prisma.accountingPeriod.findFirstOrThrow({
         where: { companyId: company.id, name: '2026-07' },
+      })
+    ).id;
+    augustPeriodId = (
+      await prisma.accountingPeriod.findFirstOrThrow({
+        where: { companyId: company.id, name: '2026-08' },
       })
     ).id;
     arAccountId = (
@@ -468,5 +474,86 @@ describe('B02 controlled opening balances', () => {
     await expect(
       opening.validate(company.id, owner.id, batch.id),
     ).rejects.toThrow('require an OPEN period');
+    await prisma.accountingPeriod.update({
+      where: { id: periodId },
+      data: { status: 'OPEN' },
+    });
+  });
+
+  it('reverses a July opening balance into August after July is closed', async () => {
+    const makePostedBatch = async (key: string) => {
+      const batch = await opening.createDraft({
+        companyId: company.id,
+        actorUserId: owner.id,
+        idempotencyKey: key,
+        effectiveDate: new Date('2026-07-03T00:00:00.000Z'),
+        accountingPeriodId: periodId,
+        description: `Closed-period reversal ${key}`,
+        lines: [
+          { accountId: cashAccountId, debit: '12', credit: '0' },
+          { accountId: openingEquityId, debit: '0', credit: '12' },
+        ],
+      });
+      await opening.validate(company.id, owner.id, batch.id);
+      return opening.post(company.id, owner.id, batch.id, `${key}-post`);
+    };
+    const reversible = await makePostedBatch('opening-closed-reversal');
+    const closedTarget = await makePostedBatch('opening-closed-target');
+    await prisma.accountingPeriod.update({
+      where: { id: periodId },
+      data: { status: 'CLOSED' },
+    });
+
+    const reversed = await opening.reverse(
+      company.id,
+      owner.id,
+      reversible.id,
+      {
+        accountingPeriodId: augustPeriodId,
+        postingDate: '2026-08-03',
+        reason: 'Reverse after July close',
+        idempotencyKey: 'opening-closed-reversal-command',
+      },
+    );
+    expect(reversed.status).toBe(OpeningBalanceBatchStatus.REVERSED);
+    expect(reversed.reversalJournalEntryId).toBeTruthy();
+    expect(
+      await prisma.journalEntry.findUniqueOrThrow({
+        where: { id: reversible.journalEntryId! },
+      }),
+    ).toEqual(expect.objectContaining({ accountingPeriodId: periodId }));
+    expect(
+      await prisma.journalEntry.findUniqueOrThrow({
+        where: { id: reversed.reversalJournalEntryId! },
+      }),
+    ).toEqual(expect.objectContaining({ accountingPeriodId: augustPeriodId }));
+    expect(
+      await prisma.accountingPeriod.findUniqueOrThrow({
+        where: { id: periodId },
+      }),
+    ).toEqual(expect.objectContaining({ status: 'CLOSED' }));
+    expect(
+      await prisma.journalEntry.findUniqueOrThrow({
+        where: { id: reversible.journalEntryId! },
+      }),
+    ).toEqual(expect.objectContaining({ status: 'REVERSED' }));
+    expect(
+      await prisma.journalEntry.findUniqueOrThrow({
+        where: { id: reversed.reversalJournalEntryId! },
+      }),
+    ).toEqual(
+      expect.objectContaining({
+        status: 'POSTED',
+        reversalOfEntryId: reversible.journalEntryId,
+      }),
+    );
+    await expect(
+      opening.reverse(company.id, owner.id, closedTarget.id, {
+        accountingPeriodId: periodId,
+        postingDate: '2026-07-04',
+        reason: 'Closed target must reject',
+        idempotencyKey: 'opening-closed-target-command',
+      }),
+    ).rejects.toThrow('Closed accounting periods cannot receive postings');
   });
 });

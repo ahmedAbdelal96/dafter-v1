@@ -49,7 +49,7 @@ export const EG_STANDARD_V1_ACCOUNTS: TemplateAccountSeed[] = [
     englishName: 'Accounts Receivable',
     accountType: AccountingAccountType.ASSET_RECEIVABLE,
     parentKey: 'ASSETS',
-    allowDirectPosting: false,
+    allowDirectPosting: true,
     isControlAccount: true,
     reconciliationEligible: true,
     systemKey: 'AR_CONTROL',
@@ -94,7 +94,7 @@ export const EG_STANDARD_V1_ACCOUNTS: TemplateAccountSeed[] = [
     englishName: 'Accounts Payable',
     accountType: AccountingAccountType.LIABILITY_PAYABLE,
     parentKey: 'LIABILITIES',
-    allowDirectPosting: false,
+    allowDirectPosting: true,
     isControlAccount: true,
     reconciliationEligible: true,
     systemKey: 'AP_CONTROL',
@@ -339,6 +339,8 @@ export const installEgStandardV1 = async (
       if (
         !account ||
         account.code !== expected.code ||
+        account.arabicName !== expected.arabicName ||
+        account.englishName !== expected.englishName ||
         account.accountType !== expected.accountType ||
         account.parent?.stableKey !== expected.parentKey ||
         account.allowDirectPosting !== (expected.allowDirectPosting ?? true) ||

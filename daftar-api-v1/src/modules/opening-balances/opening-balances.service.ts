@@ -241,7 +241,6 @@ export class OpeningBalancesService {
         throw new ConflictException(
           'Only a posted opening balance can be reversed',
         );
-      this.assertOpenPeriod(batch);
       const reversal = await this.accounting.reverseInTransaction(
         db,
         companyId,

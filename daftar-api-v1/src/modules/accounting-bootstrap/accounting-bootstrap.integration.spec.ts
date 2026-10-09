@@ -6,6 +6,7 @@ import { PlatformIdempotencyService } from '../platform/idempotency/platform-ide
 import { AccountingReadinessService } from './accounting-readiness.service';
 import { InitializeCompanyAccounting } from './accounting-bootstrap.service';
 import { TemplateService } from './template.service';
+import { installEgStandardV1 } from '../../../prisma/seeds/modules/15-accounting-templates';
 
 jest.setTimeout(30_000);
 
@@ -367,5 +368,43 @@ describe('B02 company accounting bootstrap', () => {
       where: { id: salesMapping.id },
       data: { journalId: originalJournalId },
     });
+  });
+
+  it('rejects immutable reference-data name drift instead of silently verifying it', async () => {
+    const account = await prisma.accountingTemplateAccount.findFirstOrThrow({
+      where: {
+        template: { code: 'EG_STANDARD_V1', version: 1 },
+        stableKey: 'CASH',
+      },
+    });
+    await prisma.$executeRawUnsafe(
+      'ALTER TABLE "AccountingTemplateAccount" DISABLE TRIGGER "dafter_protect_used_accounting_template_account"',
+    );
+    try {
+      await prisma.accountingTemplateAccount.update({
+        where: { id: account.id },
+        data: { englishName: 'Tampered cash name' },
+      });
+    } finally {
+      await prisma.$executeRawUnsafe(
+        'ALTER TABLE "AccountingTemplateAccount" ENABLE TRIGGER "dafter_protect_used_accounting_template_account"',
+      );
+    }
+    await expect(installEgStandardV1(prisma)).rejects.toThrow(
+      'differs from immutable reference data',
+    );
+    await prisma.$executeRawUnsafe(
+      'ALTER TABLE "AccountingTemplateAccount" DISABLE TRIGGER "dafter_protect_used_accounting_template_account"',
+    );
+    try {
+      await prisma.accountingTemplateAccount.update({
+        where: { id: account.id },
+        data: { englishName: 'Cash' },
+      });
+    } finally {
+      await prisma.$executeRawUnsafe(
+        'ALTER TABLE "AccountingTemplateAccount" ENABLE TRIGGER "dafter_protect_used_accounting_template_account"',
+      );
+    }
   });
 });

@@ -84,15 +84,17 @@ Journal lines already carry party, document reference, due date, transaction amo
 
 ### Accounts and hierarchy
 
-B01 deliberately chooses a parent/child account tree. Group accounts are represented by `allowDirectPosting=false`; posting eligibility is behavior driven by account type and flags, never by code prefixes. Account code remains a tenant-local identifier. Deactivation replaces hard deletion after posted history exists.
+B01 deliberately chooses a parent/child account tree. Group accounts are represented by `allowDirectPosting=false`; posting eligibility is behavior driven by account type and flags, never by code prefixes. `isControlAccount` is separate: AR/AP control accounts are real postable accounts (`allowDirectPosting=true`) owned by trusted source-document/subledger contracts, while generic `MANUAL_JOURNAL` posting rejects them. Account code remains a tenant-local identifier. Deactivation replaces hard deletion after posted history exists.
 
 ### Company accounting configuration
 
 `AccountingConfiguration` is the explicit company-owned boundary for base/reporting currency, country/locale, and future default account/journal mappings. Mapping rows are keyed by typed configuration keys so tax, retained earnings, FX, inventory, AR/AP, and default journals can be extended without scattering settings across unrelated modules.
 
-Default mappings are written through application services, are same-company only, and are semantically validated (for example, a receivable key cannot point to an expense account and a general-journal key cannot point to a sales journal). Mapping changes, currency-sensitive changes, accounts, journals, fiscal years, periods, and configuration changes create actor/reason snapshots in the company audit log. Opening-balance posting and reversal are one database transaction, require an OPEN period, and use durable idempotency keys with replay/conflict semantics.
+Default mappings are written through application services, are same-company only, and are semantically validated (for example, a receivable key cannot point to an expense account and a general-journal key cannot point to a sales journal). Mapping changes, currency-sensitive changes, accounts, journals, fiscal years, periods, and configuration changes create actor/reason snapshots in the company audit log. Opening-balance posting requires an OPEN original period; its later reversal is atomic and idempotent but validates only the target period/fiscal-year posting policy.
 
 The immutable EG_STANDARD_V1 reference template is installed by `npm run db:reference-data` in production-safe environments. That command is additive, verifies existing versions instead of mutating them, and is safe to replay; disposable development `db:seed` may reset its own database before invoking the same installer.
+
+The CI Prisma migration diff deliberately whitelists only the two expected differences caused by PostgreSQL partial unique indexes (one default address per type and one primary contact). Prisma schema syntax cannot express their `WHERE` predicates; any additional migration/schema difference fails CI.
 
 Soft-close overrides are not a casual DTO boolean. They require an explicit non-empty reason, an active actor in the company, the required owner/super-admin or ledger permission, and a same-transaction audit event. `CLOSED` periods and closed fiscal years never accept an override.
 
@@ -117,6 +119,7 @@ B02 makes the greenfield boundary executable. The following rules are permanent 
 - Payment terms are decimal-safe schedule definitions. A document integration must snapshot the calculated schedule at source-document creation; later payment-term changes must not rewrite historical due dates or installment amounts.
 - Accounting templates are versioned reference data. Company account/journal configuration stores immutable provenance, is created through an idempotent bootstrap operation, and is considered usable only when the readiness checks pass.
 - Posted entries, posted opening-balance batches, and their lines remain immutable. Corrections are reversals or new explicit entries, never edits or deletes.
+- A reversal is posted into its target accounting period. An original opening-balance period may later be `SOFT_CLOSED` or `CLOSED`; only the target period/fiscal-year posting policy governs the correction.
 
 ### Legacy isolation and removal matrix
 

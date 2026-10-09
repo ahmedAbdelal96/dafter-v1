@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import { AccountingJournalType, BusinessPartnerType } from '@prisma/client';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { PlatformIdempotencyService } from '../platform/idempotency/platform-idempotency.service';
@@ -31,6 +31,12 @@ describe('B02 GL BusinessPartner validation', () => {
   let otherCompanyPartnerId: string;
   let templateCashAccountId: string;
   let revenueAccountId: string;
+  let templateArAccountId: string;
+  let templateApAccountId: string;
+  let defaultExpenseAccountId: string;
+  let assetsAccountId: string;
+  let salesJournalId: string;
+  let purchaseJournalId: string;
 
   beforeAll(async () => {
     if (!process.env.DATABASE_URL)
@@ -105,6 +111,36 @@ describe('B02 GL BusinessPartner validation', () => {
     revenueAccountId = (
       await prisma.accountingAccount.findFirstOrThrow({
         where: { companyId: companyA.id, templateKey: 'SALES_REVENUE' },
+      })
+    ).id;
+    templateArAccountId = (
+      await prisma.accountingAccount.findFirstOrThrow({
+        where: { companyId: companyA.id, templateKey: 'AR_CONTROL' },
+      })
+    ).id;
+    templateApAccountId = (
+      await prisma.accountingAccount.findFirstOrThrow({
+        where: { companyId: companyA.id, templateKey: 'AP_CONTROL' },
+      })
+    ).id;
+    defaultExpenseAccountId = (
+      await prisma.accountingAccount.findFirstOrThrow({
+        where: { companyId: companyA.id, templateKey: 'DEFAULT_EXPENSE' },
+      })
+    ).id;
+    assetsAccountId = (
+      await prisma.accountingAccount.findFirstOrThrow({
+        where: { companyId: companyA.id, templateKey: 'ASSETS' },
+      })
+    ).id;
+    salesJournalId = (
+      await prisma.accountingJournal.findFirstOrThrow({
+        where: { companyId: companyA.id, type: AccountingJournalType.SALES },
+      })
+    ).id;
+    purchaseJournalId = (
+      await prisma.accountingJournal.findFirstOrThrow({
+        where: { companyId: companyA.id, type: AccountingJournalType.PURCHASE },
       })
     ).id;
     const [receivable, payable, cash] = await Promise.all([
@@ -296,6 +332,224 @@ describe('B02 GL BusinessPartner validation', () => {
     expect(lines[0].debit.toString()).toBe('5000');
     expect(lines[1].transactionCredit.toString()).toBe('100');
     expect(lines[1].credit.toString()).toBe('5000');
+  });
+
+  it('supports trusted USD sales and purchase control-account contracts', async () => {
+    const sales = await accounting.postInternal(companyA.id, ownerA.id, {
+      journalId: salesJournalId,
+      accountingPeriodId: periodId,
+      postingDate: '2026-07-03',
+      transactionCurrencyCode: 'USD',
+      exchangeRate: '50',
+      description: 'Trusted sales contract',
+      sourceType: 'SALES_INVOICE',
+      sourceId: customerId,
+      idempotencyKey: `trusted-sales-${Date.now()}`,
+      lines: [
+        {
+          accountId: templateArAccountId,
+          businessPartnerId: customerId,
+          transactionDebit: '100',
+          transactionCredit: '0',
+        },
+        {
+          accountId: revenueAccountId,
+          transactionDebit: '0',
+          transactionCredit: '100',
+        },
+      ],
+    });
+    const salesLines = await prisma.journalLine.findMany({
+      where: { journalEntryId: sales.id },
+      orderBy: { debit: 'desc' },
+    });
+    expect(salesLines[0]).toEqual(
+      expect.objectContaining({
+        accountId: templateArAccountId,
+        businessPartnerId: customerId,
+        transactionDebit: expect.anything(),
+        debit: expect.anything(),
+      }),
+    );
+    expect(salesLines[0].transactionDebit.toString()).toBe('100');
+    expect(salesLines[0].debit.toString()).toBe('5000');
+    expect(salesLines[1].transactionCredit.toString()).toBe('100');
+    expect(salesLines[1].credit.toString()).toBe('5000');
+    expect(
+      salesLines.reduce(
+        (sum, line) => sum + Number(line.debit) - Number(line.credit),
+        0,
+      ),
+    ).toBe(0);
+
+    const purchase = await accounting.postInternal(companyA.id, ownerA.id, {
+      journalId: purchaseJournalId,
+      accountingPeriodId: periodId,
+      postingDate: '2026-07-03',
+      transactionCurrencyCode: 'USD',
+      exchangeRate: '50',
+      description: 'Trusted purchase contract',
+      sourceType: 'PURCHASE_INVOICE',
+      sourceId: supplierId,
+      idempotencyKey: `trusted-purchase-${Date.now()}`,
+      lines: [
+        {
+          accountId: defaultExpenseAccountId,
+          transactionDebit: '100',
+          transactionCredit: '0',
+        },
+        {
+          accountId: templateApAccountId,
+          businessPartnerId: supplierId,
+          transactionDebit: '0',
+          transactionCredit: '100',
+        },
+      ],
+    });
+    const purchaseLines = await prisma.journalLine.findMany({
+      where: { journalEntryId: purchase.id },
+    });
+    expect(purchaseLines).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          accountId: templateApAccountId,
+          businessPartnerId: supplierId,
+          transactionCredit: expect.anything(),
+          credit: expect.anything(),
+        }),
+      ]),
+    );
+    const payableLine = purchaseLines.find(
+      (line) => line.accountId === templateApAccountId,
+    )!;
+    expect(payableLine.transactionCredit.toString()).toBe('100');
+    expect(payableLine.credit.toString()).toBe('5000');
+  });
+
+  it('rejects generic manual journals on real AR and AP control accounts', async () => {
+    await expect(
+      post(customerId, templateArAccountId, '10', '0', 'manual-real-ar'),
+    ).rejects.toBeInstanceOf(ConflictException);
+    await expect(
+      post(supplierId, templateApAccountId, '0', '10', 'manual-real-ap'),
+    ).rejects.toBeInstanceOf(ConflictException);
+  });
+
+  it('rejects group accounts for every application source type', async () => {
+    await expect(
+      post(undefined, assetsAccountId, '10', '0', 'group-manual'),
+    ).rejects.toThrow('does not allow direct posting');
+    await expect(
+      accounting.postInternal(companyA.id, ownerA.id, {
+        journalId,
+        accountingPeriodId: periodId,
+        postingDate: '2026-07-04',
+        transactionCurrencyCode: 'EGP',
+        exchangeRate: '1',
+        description: 'Group opening rejection',
+        sourceType: 'OPENING_BALANCE',
+        sourceId: customerId,
+        idempotencyKey: 'group-opening',
+        lines: [
+          {
+            accountId: assetsAccountId,
+            transactionDebit: '10',
+            transactionCredit: '0',
+          },
+          {
+            accountId: templateCashAccountId,
+            transactionDebit: '0',
+            transactionCredit: '10',
+          },
+        ],
+      }),
+    ).rejects.toThrow('does not allow direct posting');
+    await expect(
+      accounting.postInternal(companyA.id, ownerA.id, {
+        journalId: salesJournalId,
+        accountingPeriodId: periodId,
+        postingDate: '2026-07-04',
+        transactionCurrencyCode: 'USD',
+        exchangeRate: '50',
+        description: 'Group trusted rejection',
+        sourceType: 'SALES_INVOICE',
+        sourceId: customerId,
+        idempotencyKey: 'group-trusted',
+        lines: [
+          {
+            accountId: assetsAccountId,
+            transactionDebit: '10',
+            transactionCredit: '0',
+          },
+          {
+            accountId: revenueAccountId,
+            transactionDebit: '0',
+            transactionCredit: '10',
+          },
+        ],
+      }),
+    ).rejects.toThrow('does not allow direct posting');
+  });
+
+  it('blocks inactive and non-postable accounts at the database POSTED boundary', async () => {
+    const inactive = await prisma.accountingAccount.create({
+      data: {
+        companyId: companyA.id,
+        code: `INACTIVE-${Date.now()}`,
+        name: 'Inactive posting test',
+        accountType: 'EXPENSE_OPERATING',
+        isActive: false,
+      },
+    });
+    const createDraftEntry = async (accountId: string, suffix: string) => {
+      const entry = await prisma.journalEntry.create({
+        data: {
+          companyId: companyA.id,
+          journalId,
+          accountingPeriodId: periodId,
+          entryNumber: `B02-POST-${Date.now()}-${suffix}`,
+          postingDate: new Date('2026-07-05T00:00:00.000Z'),
+          transactionCurrencyCode: 'EGP',
+          exchangeRate: '1',
+          description: 'Database postability guard',
+          sourceType: 'MANUAL_JOURNAL',
+          idempotencyKey: `b02-db-postability-${Date.now()}-${suffix}`,
+          requestHash: 'c'.repeat(64),
+          postedAt: new Date('2026-07-05T00:00:00.000Z'),
+          postedById: ownerA.id,
+          lines: {
+            create: [
+              {
+                accountId,
+                debit: '10',
+                credit: '0',
+                transactionDebit: '10',
+                transactionCredit: '0',
+              },
+              {
+                accountId: cashAccountId,
+                debit: '0',
+                credit: '10',
+                transactionDebit: '0',
+                transactionCredit: '10',
+              },
+            ],
+          },
+        },
+      });
+      await expect(
+        prisma.journalEntry.update({
+          where: { id: entry.id },
+          data: { status: 'POSTED' },
+        }),
+      ).rejects.toThrow();
+      await prisma.journalLine.deleteMany({
+        where: { journalEntryId: entry.id },
+      });
+      await prisma.journalEntry.delete({ where: { id: entry.id } });
+    };
+    await createDraftEntry(assetsAccountId, 'group');
+    await createDraftEntry(inactive.id, 'inactive');
   });
 
   it('keeps role removal and posting race-safe', async () => {

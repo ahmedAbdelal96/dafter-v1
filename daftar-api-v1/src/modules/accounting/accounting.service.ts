@@ -1119,9 +1119,13 @@ export class AccountingService {
       if (!account.isActive)
         throw new ConflictException(`Account ${account.code} is inactive`);
       if (
-        !account.allowDirectPosting &&
-        command.sourceType !== JournalSourceType.OPENING_BALANCE
+        account.isControlAccount &&
+        command.sourceType === JournalSourceType.MANUAL_JOURNAL
       )
+        throw new ConflictException(
+          `Control account ${account.code} requires a source-document posting`,
+        );
+      if (!account.allowDirectPosting)
         throw new ConflictException(
           `Account ${account.code} does not allow direct posting`,
         );
