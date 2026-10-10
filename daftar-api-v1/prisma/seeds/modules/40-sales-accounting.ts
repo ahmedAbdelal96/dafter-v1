@@ -82,7 +82,7 @@ export const seedSalesAndAccounting = async (ctx: SeedContext): Promise<void> =>
         journalId: journal.id,
         accountingPeriodId: period.id,
         entryNumber: `SEED-${tenant.key.toUpperCase()}-0001`,
-        status: JournalEntryStatus.POSTED,
+        status: JournalEntryStatus.DRAFT,
         postingDate: new Date('2026-01-15T00:00:00.000Z'),
         documentDate: new Date('2026-01-15T00:00:00.000Z'),
         transactionCurrencyCode: 'EGP',
@@ -94,32 +94,40 @@ export const seedSalesAndAccounting = async (ctx: SeedContext): Promise<void> =>
         requestHash: '0'.repeat(64),
         postedById: tenant.owner.id,
         postedAt: new Date('2026-01-15T00:00:00.000Z'),
-        lines: {
-          create: [
-            {
-              companyId,
-              accountId: receivable.id,
-              debit: grandTotal,
-              credit: 0,
-              transactionDebit: grandTotal,
-              transactionCredit: 0,
-              businessPartnerId: partner.id,
-              description: 'Seeded receivable',
-              documentReference: 'SEED-INV-0001',
-            },
-            {
-              companyId,
-              accountId: revenue.id,
-              debit: 0,
-              credit: grandTotal,
-              transactionDebit: 0,
-              transactionCredit: grandTotal,
-              description: 'Seeded revenue',
-              documentReference: 'SEED-INV-0001',
-            },
-          ],
-        },
       },
+    });
+
+    await ctx.prisma.journalLine.createMany({
+      data: [
+        {
+          companyId,
+          journalEntryId,
+          accountId: receivable.id,
+          debit: grandTotal,
+          credit: 0,
+          transactionDebit: grandTotal,
+          transactionCredit: 0,
+          businessPartnerId: partner.id,
+          description: 'Seeded receivable',
+          documentReference: 'SEED-INV-0001',
+        },
+        {
+          companyId,
+          journalEntryId,
+          accountId: revenue.id,
+          debit: 0,
+          credit: grandTotal,
+          transactionDebit: 0,
+          transactionCredit: grandTotal,
+          description: 'Seeded revenue',
+          documentReference: 'SEED-INV-0001',
+        },
+      ],
+    });
+
+    await ctx.prisma.journalEntry.update({
+      where: { id: journalEntryId },
+      data: { status: JournalEntryStatus.POSTED },
     });
 
     await ctx.prisma.salesInvoice.create({
@@ -127,7 +135,7 @@ export const seedSalesAndAccounting = async (ctx: SeedContext): Promise<void> =>
         id: documentId,
         companyId,
         businessPartnerId: partner.id,
-        status: SalesInvoiceStatus.POSTED,
+        status: SalesInvoiceStatus.DRAFT,
         invoiceNumber: 'SEED-INV-0001',
         documentDate: new Date('2026-01-15T00:00:00.000Z'),
         postingDate: new Date('2026-01-15T00:00:00.000Z'),
@@ -144,27 +152,38 @@ export const seedSalesAndAccounting = async (ctx: SeedContext): Promise<void> =>
         journalEntryId,
         receivableAccountId: receivable.id,
         createdById: tenant.owner.id,
+        postedById: null,
+        postedAt: null,
+      },
+    });
+
+    await ctx.prisma.salesInvoiceLine.create({
+      data: {
+        companyId,
+        salesInvoiceId: documentId,
+        sequence: 1,
+        productId: product.id,
+        descriptionSnapshot: product.name,
+        quantity: 1,
+        unitPrice: subtotal,
+        discountType: SalesDiscountType.NONE,
+        discountValue: 0,
+        grossBeforeDiscount: subtotal,
+        discountAmount: 0,
+        taxableBase: subtotal,
+        taxAmount: taxTotal,
+        lineTotal: grandTotal,
+        revenueAccountId: revenue.id,
+        revenueAccountCodeSnapshot: revenue.code,
+      },
+    });
+
+    await ctx.prisma.salesInvoice.update({
+      where: { id: documentId },
+      data: {
+        status: SalesInvoiceStatus.POSTED,
         postedById: tenant.owner.id,
         postedAt: new Date('2026-01-15T00:00:00.000Z'),
-        lines: {
-          create: {
-            companyId,
-            sequence: 1,
-            productId: product.id,
-            descriptionSnapshot: product.name,
-            quantity: 1,
-            unitPrice: subtotal,
-            discountType: SalesDiscountType.NONE,
-            discountValue: 0,
-            grossBeforeDiscount: subtotal,
-            discountAmount: 0,
-            taxableBase: subtotal,
-            taxAmount: taxTotal,
-            lineTotal: grandTotal,
-            revenueAccountId: revenue.id,
-            revenueAccountCodeSnapshot: revenue.code,
-          },
-        },
       },
     });
   }

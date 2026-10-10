@@ -19,6 +19,24 @@ export const seedBusinessPartners = async (ctx: SeedContext): Promise<void> => {
           isActive: true,
         },
       });
+
+      if (i < 5) {
+        await ctx.prisma.customerProfile.create({
+          data: {
+            businessPartnerId: partner.id,
+            companyId: tenant.company.id,
+            isActive: true,
+          },
+        });
+      } else {
+        await ctx.prisma.supplierProfile.create({
+          data: {
+            businessPartnerId: partner.id,
+            companyId: tenant.company.id,
+            isActive: true,
+          },
+        });
+      }
       partners.push(partner);
     }
 
