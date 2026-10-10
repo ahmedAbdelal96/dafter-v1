@@ -308,8 +308,8 @@ async function resolveTaxSelection(
       throw new ForbiddenException('Purchase tax override is forbidden');
     return undefined;
   }
-  let treatment: TaxTreatmentRecord | null = null;
-  let rate: TaxRateRecord | null = null;
+  let treatment: TaxTreatmentRecord | null;
+  let rate: TaxRateRecord | null;
   let provenance: PurchaseTaxSelection['selectionProvenance'];
   let reason: string | null = null;
   if (explicit) {
