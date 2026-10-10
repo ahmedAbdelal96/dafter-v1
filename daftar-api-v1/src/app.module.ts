@@ -74,6 +74,7 @@ import { PaymentTermsModule } from './modules/payment-terms/payment-terms.module
 import { AccountingBootstrapModule } from './modules/accounting-bootstrap/accounting-bootstrap.module';
 import { OpeningBalancesModule } from './modules/opening-balances/opening-balances.module';
 import { CustomerPaymentModule } from './modules/customer-payments/customer-payment.module';
+import { SupplierPaymentModule } from './modules/supplier-payments/supplier-payment.module';
 import { PurchasesModule } from './modules/purchases/purchases.module';
 
 @Module({
@@ -174,6 +175,7 @@ import { PurchasesModule } from './modules/purchases/purchases.module';
     AccountingBootstrapModule,
     OpeningBalancesModule,
     CustomerPaymentModule,
+    SupplierPaymentModule,
     PurchasesModule,
   ],
   controllers: [AppController],

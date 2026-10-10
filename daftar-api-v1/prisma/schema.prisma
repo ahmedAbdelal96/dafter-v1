@@ -212,6 +212,7 @@ enum JournalSourceType {
   CASH_TRANSFER
   REVERSAL
   AR_RECONCILIATION
+  AP_RECONCILIATION
   MIGRATION
 }
 
@@ -230,6 +231,25 @@ enum CustomerPaymentMethod {
 }
 
 enum ARReconciliationStatus {
+  ACTIVE
+  REVERSED
+}
+
+enum SupplierPaymentStatus {
+  DRAFT
+  POSTED
+  REVERSED
+}
+
+enum SupplierPaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CHEQUE
+  CARD
+  OTHER
+}
+
+enum APReconciliationStatus {
   ACTIVE
   REVERSED
 }
@@ -386,6 +406,11 @@ model User {
   reversedCustomerPayments  CustomerPayment[]  @relation("CustomerPaymentReversedBy")
   createdARReconciliations  ARReconciliation[] @relation("ARReconciliationCreatedBy")
   reversedARReconciliations ARReconciliation[] @relation("ARReconciliationReversedBy")
+  createdSupplierPayments   SupplierPayment[]  @relation("SupplierPaymentCreatedBy")
+  postedSupplierPayments    SupplierPayment[]  @relation("SupplierPaymentPostedBy")
+  reversedSupplierPayments  SupplierPayment[]  @relation("SupplierPaymentReversedBy")
+  createdAPReconciliations  APReconciliation[] @relation("APReconciliationCreatedBy")
+  reversedAPReconciliations APReconciliation[] @relation("APReconciliationReversedBy")
 
   // B05: authoritative purchases/AP documents
   createdPurchaseOrders      PurchaseOrder[]      @relation("PurchaseOrderCreatedBy")
@@ -514,6 +539,10 @@ model Company {
   customerPaymentSequences   CustomerPaymentSequence[]
   customerPaymentAllocations CustomerPaymentAllocation[]
   arReconciliations          ARReconciliation[]
+  supplierPayments            SupplierPayment[]
+  supplierPaymentSequences    SupplierPaymentSequence[]
+  supplierPaymentAllocations  SupplierPaymentAllocation[]
+  apReconciliations            APReconciliation[]
 
   // B05
   purchaseOrders            PurchaseOrder[]
@@ -865,6 +894,7 @@ model BusinessPartner {
   salesCreditNotes    SalesCreditNote[]
   supplierCreditNotes SupplierCreditNote[]
   customerPayments    CustomerPayment[]
+  supplierPayments    SupplierPayment[]
 
   @@unique([id, companyId])
   @@unique([companyId, partnerCode])
@@ -1799,6 +1829,7 @@ model SupplierInvoicePaymentSchedule {
   amount                  Decimal         @db.Decimal(19, 4)
   journalLineId           String?         @db.Uuid
   journalLine             JournalLine?    @relation("SupplierInvoicePaymentScheduleJournalLine", fields: [journalLineId, companyId], references: [id, companyId], onDelete: Restrict)
+  supplierPaymentAllocations SupplierPaymentAllocation[]
   paymentTermCodeSnapshot String?
   paymentTermNameSnapshot String?
   createdAt               DateTime        @default(now())
@@ -2042,6 +2073,142 @@ model ARReconciliation {
 }
 
 // ============================================================
+// B06: AUTHORITATIVE SUPPLIER PAYMENTS + AP RECONCILIATION
+// ============================================================
+
+model SupplierPaymentSequence {
+  companyId    String     @db.Uuid
+  company      Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  fiscalYearId String     @db.Uuid
+  fiscalYear   FiscalYear @relation(fields: [fiscalYearId, companyId], references: [id, companyId], onDelete: Restrict)
+  nextValue    Int        @default(1)
+  updatedAt    DateTime   @updatedAt
+
+  @@id([companyId, fiscalYearId])
+}
+
+model SupplierPayment {
+  id                      String                @id @default(uuid()) @db.Uuid
+  companyId               String                @db.Uuid
+  company                 Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  businessPartnerId       String                @db.Uuid
+  businessPartner         BusinessPartner       @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
+  status                  SupplierPaymentStatus @default(DRAFT)
+  paymentNumber           String?               @db.VarChar(40)
+  paymentDate             DateTime              @db.Date
+  postingDate             DateTime?             @db.Date
+  method                  SupplierPaymentMethod
+  sourceAccountId         String                @db.Uuid
+  sourceAccount           AccountingAccount     @relation("SupplierPaymentSourceAccount", fields: [sourceAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  payableAccountId        String                @db.Uuid
+  payableAccount          AccountingAccount     @relation("SupplierPaymentPayableAccount", fields: [payableAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  transactionCurrencyCode String                @db.Char(3)
+  transactionCurrency     Currency              @relation("SupplierPaymentTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
+  exchangeRate            Decimal               @db.Decimal(19, 8)
+  amount                  Decimal               @db.Decimal(19, 4)
+  unappliedAmount         Decimal               @db.Decimal(19, 4)
+  notes                   String?               @db.VarChar(2000)
+  reference               String?               @db.VarChar(200)
+  journalEntryId          String?               @db.Uuid
+  journalEntry            JournalEntry?         @relation("SupplierPaymentJournalEntry", fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  apJournalLineId         String?               @db.Uuid
+  apJournalLine           JournalLine?          @relation("SupplierPaymentAPSourceLine", fields: [apJournalLineId, companyId], references: [id, companyId], onDelete: Restrict)
+  reversalJournalEntryId  String?               @db.Uuid
+  reversalJournalEntry    JournalEntry?         @relation("SupplierPaymentReversalJournalEntry", fields: [reversalJournalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  idempotencyKey          String?               @db.VarChar(128)
+  requestHash             String?               @db.Char(64)
+  createdById             String                @db.Uuid
+  createdBy               User                  @relation("SupplierPaymentCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  postedById              String?               @db.Uuid
+  postedBy                User?                 @relation("SupplierPaymentPostedBy", fields: [postedById], references: [id], onDelete: Restrict)
+  reversedById            String?               @db.Uuid
+  reversedBy              User?                 @relation("SupplierPaymentReversedBy", fields: [reversedById], references: [id], onDelete: Restrict)
+  postedAt                DateTime?
+  reversedAt              DateTime?
+  reversalReason          String?               @db.VarChar(500)
+  reversalIdempotencyKey  String?               @db.VarChar(128)
+  reversalRequestHash     String?               @db.Char(64)
+
+  allocations     SupplierPaymentAllocation[]
+  reconciliations APReconciliation[]
+  createdAt       DateTime                    @default(now())
+  updatedAt       DateTime                    @updatedAt
+
+  @@unique([id, companyId])
+  @@unique([companyId, paymentNumber])
+  @@unique([companyId, idempotencyKey])
+  @@unique([journalEntryId, companyId])
+  @@unique([apJournalLineId, companyId])
+  @@unique([reversalJournalEntryId, companyId])
+  @@unique([companyId, reversalIdempotencyKey])
+  @@index([companyId, status, paymentDate])
+  @@index([companyId, businessPartnerId, paymentDate])
+  @@index([companyId, payableAccountId])
+}
+
+model SupplierPaymentAllocation {
+  id                            String                          @id @default(uuid()) @db.Uuid
+  companyId                     String                          @db.Uuid
+  company                       Company                         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  supplierPaymentId             String                          @db.Uuid
+  supplierPayment               SupplierPayment                 @relation(fields: [supplierPaymentId, companyId], references: [id, companyId], onDelete: Restrict)
+  journalLineId                 String                          @db.Uuid
+  journalLine                   JournalLine                     @relation(fields: [journalLineId, companyId], references: [id, companyId], onDelete: Restrict)
+  supplierInvoicePaymentScheduleId String?                      @db.Uuid
+  supplierInvoicePaymentSchedule   SupplierInvoicePaymentSchedule? @relation(fields: [supplierInvoicePaymentScheduleId, companyId], references: [id, companyId], onDelete: Restrict)
+  amount                        Decimal                         @db.Decimal(19, 4)
+  apReconciliationId            String?                         @db.Uuid
+  apReconciliation              APReconciliation?               @relation(fields: [apReconciliationId, companyId], references: [id, companyId], onDelete: Restrict)
+  createdAt                     DateTime                        @default(now())
+
+  @@unique([id, companyId])
+  @@unique([apReconciliationId, companyId])
+  @@unique([companyId, supplierPaymentId, journalLineId])
+  @@index([companyId, journalLineId])
+  @@index([companyId, supplierPaymentId])
+}
+
+model APReconciliation {
+  id                       String                     @id @default(uuid()) @db.Uuid
+  companyId                String                     @db.Uuid
+  company                  Company                    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  debitJournalLineId       String                     @db.Uuid
+  debitJournalLine         JournalLine                @relation("APReconciliationDebit", fields: [debitJournalLineId, companyId], references: [id, companyId], onDelete: Restrict)
+  creditJournalLineId      String                     @db.Uuid
+  creditJournalLine        JournalLine                @relation("APReconciliationCredit", fields: [creditJournalLineId, companyId], references: [id, companyId], onDelete: Restrict)
+  supplierPaymentId        String?                    @db.Uuid
+  supplierPayment          SupplierPayment?           @relation(fields: [supplierPaymentId, companyId], references: [id, companyId], onDelete: Restrict)
+  transactionAmount        Decimal                    @db.Decimal(19, 4)
+  debitBaseAmountApplied   Decimal                    @db.Decimal(19, 4)
+  creditBaseAmountApplied  Decimal                    @db.Decimal(19, 4)
+  realizedFxAmount         Decimal                    @db.Decimal(19, 4)
+  status                   APReconciliationStatus     @default(ACTIVE)
+  adjustmentJournalEntryId String?                    @db.Uuid
+  adjustmentJournalEntry   JournalEntry?              @relation("APReconciliationAdjustmentJournalEntry", fields: [adjustmentJournalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  reversalJournalEntryId   String?                    @db.Uuid
+  reversalJournalEntry     JournalEntry?              @relation("APReconciliationReversalJournalEntry", fields: [reversalJournalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  idempotencyKey           String                     @db.VarChar(128)
+  requestHash              String                     @db.Char(64)
+  createdById              String                     @db.Uuid
+  createdBy                User                       @relation("APReconciliationCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  reversedById             String?                    @db.Uuid
+  reversedBy               User?                      @relation("APReconciliationReversedBy", fields: [reversedById], references: [id], onDelete: Restrict)
+  reversedAt               DateTime?
+  reversalReason           String?                    @db.VarChar(500)
+  reversalIdempotencyKey   String?                    @db.VarChar(128)
+  reversalRequestHash      String?                    @db.Char(64)
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  allocation               SupplierPaymentAllocation?
+
+  @@unique([id, companyId])
+  @@unique([companyId, idempotencyKey])
+  @@unique([companyId, reversalIdempotencyKey])
+  @@index([companyId, debitJournalLineId, status])
+  @@index([companyId, creditJournalLineId, status])
+}
+
+// ============================================================
 // B01: AUTHORITATIVE GENERAL LEDGER FOUNDATION
 // ============================================================
 
@@ -2097,6 +2264,8 @@ model AccountingAccount {
 
   customerPaymentDestinations CustomerPayment[] @relation("CustomerPaymentDestinationAccount")
   customerPaymentReceivables  CustomerPayment[] @relation("CustomerPaymentReceivableAccount")
+  supplierPaymentSources      SupplierPayment[] @relation("SupplierPaymentSourceAccount")
+  supplierPaymentPayables     SupplierPayment[] @relation("SupplierPaymentPayableAccount")
 
   code                   String                @db.VarChar(40)
   name                   String                @db.VarChar(200)
@@ -2183,6 +2352,7 @@ model FiscalYear {
   sequences                 AccountingEntrySequence[]
   salesDocumentSequences    SalesDocumentSequence[]
   customerPaymentSequences  CustomerPaymentSequence[]
+  supplierPaymentSequences  SupplierPaymentSequence[]
   supplierDocumentSequences SupplierDocumentSequence[]
 
   @@unique([id, companyId])
@@ -2264,6 +2434,10 @@ model JournalEntry {
   customerPaymentReversal     CustomerPayment?    @relation("CustomerPaymentReversalJournalEntry")
   arReconciliationAdjustments ARReconciliation[]  @relation("ARReconciliationAdjustmentJournalEntry")
   arReconciliationReversals   ARReconciliation[]  @relation("ARReconciliationReversalJournalEntry")
+  supplierPayment             SupplierPayment?   @relation("SupplierPaymentJournalEntry")
+  supplierPaymentReversal     SupplierPayment?   @relation("SupplierPaymentReversalJournalEntry")
+  apReconciliationAdjustments APReconciliation[] @relation("APReconciliationAdjustmentJournalEntry")
+  apReconciliationReversals   APReconciliation[] @relation("APReconciliationReversalJournalEntry")
   supplierInvoice             SupplierInvoice?    @relation("SupplierInvoiceJournalEntry")
   supplierCreditNote          SupplierCreditNote? @relation("SupplierCreditNoteJournalEntry")
 
@@ -2365,6 +2539,10 @@ model JournalLine {
   customerPaymentARSources       CustomerPayment[]               @relation("CustomerPaymentARSourceLine")
   arReconciliationDebits         ARReconciliation[]              @relation("ARReconciliationDebit")
   arReconciliationCredits        ARReconciliation[]              @relation("ARReconciliationCredit")
+  supplierPaymentAllocations     SupplierPaymentAllocation[]
+  supplierPaymentAPSources       SupplierPayment[]               @relation("SupplierPaymentAPSourceLine")
+  apReconciliationDebits         APReconciliation[]              @relation("APReconciliationDebit")
+  apReconciliationCredits        APReconciliation[]              @relation("APReconciliationCredit")
   supplierInvoicePaymentSchedule SupplierInvoicePaymentSchedule? @relation("SupplierInvoicePaymentScheduleJournalLine")
   taxCode                        String?                         @db.VarChar(40)
   taxTreatmentCode               String?                         @db.VarChar(40)
@@ -2434,6 +2612,7 @@ model Currency {
   salesInvoices           SalesInvoice[]            @relation("SalesInvoiceTransactionCurrency")
   salesCreditNotes        SalesCreditNote[]         @relation("SalesCreditNoteTransactionCurrency")
   customerPayments        CustomerPayment[]         @relation("CustomerPaymentTransactionCurrency")
+  supplierPayments        SupplierPayment[]         @relation("SupplierPaymentTransactionCurrency")
   purchaseOrders          PurchaseOrder[]           @relation("PurchaseOrderTransactionCurrency")
   supplierInvoices        SupplierInvoice[]         @relation("SupplierInvoiceTransactionCurrency")
   supplierCreditNotes     SupplierCreditNote[]      @relation("SupplierCreditNoteTransactionCurrency")
