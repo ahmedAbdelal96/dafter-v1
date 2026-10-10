@@ -1,16 +1,24 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import {
+  AccountingConfigAccountKey,
+  AccountingConfigJournalKey,
+  JournalSourceType,
   Prisma,
   SalesDiscountType,
+  SalesDocumentType,
   SalesInvoiceStatus,
   TaxCalculationMode,
   TaxTreatmentCategory,
 } from '@prisma/client';
+import { createHash, randomUUID } from 'crypto';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { AccountingService } from '../accounting/accounting.service';
 import {
   PaymentTermsCalculator,
   PaymentTermWithLines,
@@ -35,7 +43,8 @@ export class SalesInvoiceService {
     private readonly prisma: PrismaService,
     private readonly pricing: SalesPricingService,
     private readonly tax: SalesTaxCalculatorService,
-    private readonly repository?: SalesInvoiceRepository,
+    @Optional() private readonly accounting?: AccountingService,
+    @Optional() private readonly repository?: SalesInvoiceRepository,
   ) {}
 
   async createDraft(
@@ -131,6 +140,188 @@ export class SalesInvoiceService {
         },
       });
       return { id };
+    });
+  }
+
+  async postDraft(companyId: string, actorUserId: string, id: string) {
+    if (!this.accounting) {
+      throw new ConflictException('Accounting service is not available');
+    }
+    const accounting = this.accounting;
+
+    return this.prisma.$transaction(async (db) => {
+      const invoice = await db.salesInvoice.findFirst({
+        where: { id, companyId },
+        include: {
+          businessPartner: { include: { customerProfile: true } },
+          lines: { include: { taxes: true }, orderBy: { sequence: 'asc' } },
+          paymentSchedule: { orderBy: { sequence: 'asc' } },
+        },
+      });
+      if (!invoice) throw new NotFoundException('Sales invoice not found');
+      if (invoice.status === SalesInvoiceStatus.POSTED) {
+        return db.salesInvoice.findFirstOrThrow({
+          where: { id, companyId },
+          include: SALES_INVOICE_INCLUDE,
+        });
+      }
+
+      await this.assertCreditLimit(db, invoice);
+      const postingDate = this.dateOnly(invoice.documentDate);
+      const period = await db.accountingPeriod.findFirst({
+        where: {
+          companyId,
+          startDate: { lte: invoice.documentDate },
+          endDate: { gte: invoice.documentDate },
+        },
+        include: { fiscalYear: true },
+      });
+      if (!period) {
+        throw new ConflictException(
+          'No accounting period covers the invoice date',
+        );
+      }
+
+      const configuration = await db.accountingConfiguration.findUnique({
+        where: { companyId },
+        include: { accountDefaults: true, journalDefaults: true },
+      });
+      if (!configuration) {
+        throw new ConflictException(
+          'Accounting configuration must be initialized before posting',
+        );
+      }
+      const journalMapping = configuration.journalDefaults.find(
+        (mapping) => mapping.settingKey === AccountingConfigJournalKey.SALES,
+      );
+      const journal = journalMapping
+        ? await db.accountingJournal.findFirst({
+            where: { id: journalMapping.journalId, companyId, isActive: true },
+          })
+        : null;
+      if (!journal)
+        throw new ConflictException('Active sales journal mapping is required');
+
+      const mappedAccounts = new Map(
+        configuration.accountDefaults.map((mapping) => [
+          mapping.settingKey,
+          mapping.accountId,
+        ]),
+      );
+      const incomeAccountId = mappedAccounts.get(
+        AccountingConfigAccountKey.INCOME,
+      );
+      const taxAccountId = mappedAccounts.get(
+        AccountingConfigAccountKey.TAX_PAYABLE,
+      );
+      const receivableAccountId =
+        invoice.businessPartner.customerProfile?.receivableAccountId ??
+        mappedAccounts.get(AccountingConfigAccountKey.RECEIVABLE);
+      if (!incomeAccountId || !receivableAccountId) {
+        throw new ConflictException(
+          'Receivable and income account mappings are required',
+        );
+      }
+      if (invoice.lines.some((line) => line.taxAmount.gt(0)) && !taxAccountId) {
+        throw new ConflictException(
+          'Tax payable account mapping is required for taxable sales',
+        );
+      }
+
+      const allocatedNumber = await this.allocateDocumentNumber(
+        db,
+        companyId,
+        period.fiscalYearId,
+        SalesDocumentType.SALES_INVOICE,
+      );
+      const lastSchedule = invoice.paymentSchedule.at(-1);
+      const lines = [
+        {
+          accountId: receivableAccountId,
+          transactionDebit: invoice.grandTotal.toString(),
+          transactionCredit: '0',
+          description: invoice.partnerNameSnapshot,
+          businessPartnerId: invoice.businessPartnerId,
+          dueDate: lastSchedule
+            ? this.dateOnly(lastSchedule.dueDate)
+            : postingDate,
+          documentReference: allocatedNumber,
+          reconciliationReference: invoice.id,
+        },
+        ...invoice.lines.map((line) => ({
+          accountId: line.revenueAccountId ?? incomeAccountId,
+          transactionDebit: '0',
+          transactionCredit: line.taxableBase.toString(),
+          description: line.descriptionSnapshot,
+          documentReference: allocatedNumber,
+          taxTreatmentCode: line.taxes[0]?.treatmentCodeSnapshot,
+          taxRate: line.taxes[0]?.percentageSnapshot.toString(),
+        })),
+        ...invoice.lines
+          .filter((line) => line.taxAmount.gt(0))
+          .map((line) => ({
+            accountId: taxAccountId!,
+            transactionDebit: '0',
+            transactionCredit: line.taxAmount.toString(),
+            description: `Tax - ${line.descriptionSnapshot}`,
+            documentReference: allocatedNumber,
+            taxTreatmentCode: line.taxes[0]?.treatmentCodeSnapshot,
+            taxRate: line.taxes[0]?.percentageSnapshot.toString(),
+          })),
+      ];
+      const journalEntry = await accounting.postInternalInTransaction(
+        db,
+        companyId,
+        actorUserId,
+        {
+          journalId: journal.id,
+          accountingPeriodId: period.id,
+          postingDate,
+          documentDate: postingDate,
+          dueDate: lastSchedule
+            ? this.dateOnly(lastSchedule.dueDate)
+            : undefined,
+          transactionCurrencyCode: invoice.transactionCurrencyCode,
+          exchangeRate: invoice.exchangeRate.toString(),
+          documentReference: allocatedNumber,
+          description: `Sales invoice ${allocatedNumber}`,
+          sourceType: JournalSourceType.SALES_INVOICE,
+          sourceId: invoice.id,
+          idempotencyKey: `sales-invoice:${invoice.id}:post`,
+          lines,
+        },
+      );
+
+      await db.salesInvoice.update({
+        where: { id },
+        data: {
+          status: SalesInvoiceStatus.POSTED,
+          invoiceNumber: allocatedNumber,
+          postingDate: invoice.documentDate,
+          postedById: actorUserId,
+          postedAt: new Date(),
+          journalEntryId: journalEntry.id,
+          idempotencyKey: `sales-invoice:${invoice.id}:post`,
+          requestHash: this.postingRequestHash(invoice.id, allocatedNumber),
+        },
+      });
+      await db.auditLog.create({
+        data: {
+          companyId,
+          actorUserId,
+          action: 'sales-invoice.posted',
+          entityType: 'SalesInvoice',
+          entityId: invoice.id,
+          metadata: {
+            invoiceNumber: allocatedNumber,
+            journalEntryId: journalEntry.id,
+          },
+        },
+      });
+      return db.salesInvoice.findFirstOrThrow({
+        where: { id, companyId },
+        include: SALES_INVOICE_INCLUDE,
+      });
     });
   }
 
@@ -458,5 +649,74 @@ export class SalesInvoiceService {
       (total, value) => total.add(value),
       new Prisma.Decimal(0),
     );
+  }
+
+  private async assertCreditLimit(
+    db: Prisma.TransactionClient,
+    invoice: {
+      companyId: string;
+      businessPartnerId: string;
+      grandTotal: Prisma.Decimal;
+      businessPartner: {
+        customerProfile: { creditLimit: Prisma.Decimal | null } | null;
+      };
+    },
+  ) {
+    const limit = invoice.businessPartner.customerProfile?.creditLimit;
+    if (limit === null || limit === undefined) return;
+    const [postedSales, postedCreditNotes] = await Promise.all([
+      db.salesInvoice.aggregate({
+        where: {
+          companyId: invoice.companyId,
+          businessPartnerId: invoice.businessPartnerId,
+          status: SalesInvoiceStatus.POSTED,
+        },
+        _sum: { grandTotal: true },
+      }),
+      db.salesCreditNote.aggregate({
+        where: {
+          companyId: invoice.companyId,
+          businessPartnerId: invoice.businessPartnerId,
+          status: 'POSTED',
+        },
+        _sum: { grandTotal: true },
+      }),
+    ]);
+    const outstanding = (
+      postedSales._sum.grandTotal ?? new Prisma.Decimal(0)
+    ).sub(postedCreditNotes._sum.grandTotal ?? new Prisma.Decimal(0));
+    if (outstanding.add(invoice.grandTotal).gt(limit)) {
+      throw new ConflictException('sales.customer_credit_limit_exceeded');
+    }
+  }
+
+  private async allocateDocumentNumber(
+    db: Prisma.TransactionClient,
+    companyId: string,
+    fiscalYearId: string,
+    documentType: SalesDocumentType,
+  ) {
+    const rows = await db.$queryRaw<{ allocated: number }[]>(Prisma.sql`
+      INSERT INTO "SalesDocumentSequence" ("id", "companyId", "fiscalYearId", "documentType", "nextValue", "createdAt", "updatedAt")
+      VALUES (${randomUUID()}, ${companyId}, ${fiscalYearId}, ${documentType}::"SalesDocumentType", 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      ON CONFLICT ("companyId", "fiscalYearId", "documentType")
+      DO UPDATE SET "nextValue" = "SalesDocumentSequence"."nextValue" + 1,
+                    "updatedAt" = CURRENT_TIMESTAMP
+      RETURNING ("nextValue" - 1) AS "allocated"
+    `);
+    const allocated = rows[0]?.allocated;
+    if (!allocated)
+      throw new ConflictException('Unable to allocate sales document number');
+    return `SI-${new Date().getUTCFullYear()}-${String(allocated).padStart(6, '0')}`;
+  }
+
+  private dateOnly(value: Date) {
+    return value.toISOString().slice(0, 10);
+  }
+
+  private postingRequestHash(invoiceId: string, invoiceNumber: string) {
+    return createHash('sha256')
+      .update(`${invoiceId}:${invoiceNumber}`)
+      .digest('hex');
   }
 }

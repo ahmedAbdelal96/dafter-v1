@@ -113,6 +113,22 @@ export class SalesInvoiceController {
     );
   }
 
+  @Post(':id/post')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(PermissionsGuard)
+  @ProtectedWrite()
+  @RequirePermissions('postSalesInvoice')
+  async post(
+    @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return new ApiResponseDto(
+      await this.salesInvoiceService.postDraft(companyId, user.id, id),
+      'Sales invoice posted successfully',
+    );
+  }
+
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @UseGuards(PermissionsGuard)
