@@ -10,6 +10,7 @@ import {
   ValidateNested,
   IsArray,
   ArrayMinSize,
+  IsNotEmpty,
 } from 'class-validator';
 import { SalesDiscountType, SalesInvoiceStatus } from '@prisma/client';
 
@@ -41,6 +42,11 @@ export class SalesInvoiceLineDto {
   @IsOptional()
   @IsUUID()
   taxTreatmentId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  taxOverrideReason?: string;
 }
 
 export class CreateSalesInvoiceDto {
@@ -80,6 +86,16 @@ export class CreateSalesInvoiceDto {
 }
 
 export class UpdateSalesInvoiceDto extends CreateSalesInvoiceDto {}
+
+export class PostSalesInvoiceDto {
+  @IsDateString()
+  postingDate!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(128)
+  idempotencyKey!: string;
+}
 
 export class SalesInvoiceQueryDto {
   @IsOptional()
@@ -125,6 +141,7 @@ export type SalesInvoiceLineInput = {
   discountValue?: string;
   taxRateId?: string;
   taxTreatmentId?: string;
+  taxOverrideReason?: string;
 };
 
 export type CreateSalesInvoiceInput = {
@@ -137,6 +154,11 @@ export type CreateSalesInvoiceInput = {
   notes?: string;
   lines: SalesInvoiceLineInput[];
   claimedGrandTotal?: string;
+};
+
+export type PostSalesInvoiceInput = {
+  postingDate: Date;
+  idempotencyKey: string;
 };
 
 export type SalesInvoiceQuery = {

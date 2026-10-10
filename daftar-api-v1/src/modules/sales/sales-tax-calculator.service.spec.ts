@@ -1,4 +1,9 @@
-import { Prisma, TaxCalculationMode, TaxLifecycleStatus, TaxTreatmentCategory } from '@prisma/client';
+import {
+  Prisma,
+  TaxCalculationMode,
+  TaxLifecycleStatus,
+  TaxTreatmentCategory,
+} from '@prisma/client';
 import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { SalesTaxCalculatorService } from './sales-tax-calculator.service';
 
@@ -11,6 +16,12 @@ describe('SalesTaxCalculatorService', () => {
     status: TaxLifecycleStatus.ACTIVE,
     effectiveFrom: new Date('2026-01-01T00:00:00.000Z'),
     effectiveTo: null,
+  };
+  const validTreatment = {
+    treatmentId: 'treatment-id',
+    treatmentStatus: TaxLifecycleStatus.ACTIVE,
+    treatmentEffectiveFrom: new Date('2026-01-01T00:00:00.000Z'),
+    treatmentEffectiveTo: null,
   };
 
   it('calculates tax-exclusive STANDARD tax', () => {
@@ -66,28 +77,82 @@ describe('SalesTaxCalculatorService', () => {
   });
 
   it('rejects inactive, future, and expired rates', () => {
-    expect(() => service.calculateTax({
-      enteredAmount: '100', rate: { ...validRate, status: TaxLifecycleStatus.INACTIVE }, treatmentCode: 'STANDARD', treatmentCategory: TaxTreatmentCategory.STANDARD,
-      calculationMode: TaxCalculationMode.TAX_EXCLUSIVE, asOf: new Date('2026-10-10'), currencyPrecision: 2,
-    })).toThrow(BadRequestException);
-    expect(() => service.calculateTax({
-      enteredAmount: '100', rate: { ...validRate, effectiveFrom: new Date('2027-01-01') }, treatmentCode: 'STANDARD', treatmentCategory: TaxTreatmentCategory.STANDARD,
-      calculationMode: TaxCalculationMode.TAX_EXCLUSIVE, asOf: new Date('2026-10-10'), currencyPrecision: 2,
-    })).toThrow(BadRequestException);
-    expect(() => service.calculateTax({
-      enteredAmount: '100', rate: { ...validRate, effectiveTo: new Date('2026-09-01') }, treatmentCode: 'STANDARD', treatmentCategory: TaxTreatmentCategory.STANDARD,
-      calculationMode: TaxCalculationMode.TAX_EXCLUSIVE, asOf: new Date('2026-10-10'), currencyPrecision: 2,
-    })).toThrow(BadRequestException);
+    expect(() =>
+      service.calculateTax({
+        enteredAmount: '100',
+        rate: { ...validRate, status: TaxLifecycleStatus.INACTIVE },
+        treatmentCode: 'STANDARD',
+        treatmentCategory: TaxTreatmentCategory.STANDARD,
+        calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
+        asOf: new Date('2026-10-10'),
+        currencyPrecision: 2,
+      }),
+    ).toThrow(BadRequestException);
+    expect(() =>
+      service.calculateTax({
+        enteredAmount: '100',
+        rate: { ...validRate, effectiveFrom: new Date('2027-01-01') },
+        treatmentCode: 'STANDARD',
+        treatmentCategory: TaxTreatmentCategory.STANDARD,
+        calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
+        asOf: new Date('2026-10-10'),
+        currencyPrecision: 2,
+      }),
+    ).toThrow(BadRequestException);
+    expect(() =>
+      service.calculateTax({
+        enteredAmount: '100',
+        rate: { ...validRate, effectiveTo: new Date('2026-09-01') },
+        treatmentCode: 'STANDARD',
+        treatmentCategory: TaxTreatmentCategory.STANDARD,
+        calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
+        asOf: new Date('2026-10-10'),
+        currencyPrecision: 2,
+      }),
+    ).toThrow(BadRequestException);
+  });
+
+  it('rejects inactive, future, and expired treatments', () => {
+    for (const treatment of [
+      { ...validTreatment, treatmentStatus: TaxLifecycleStatus.INACTIVE },
+      { ...validTreatment, treatmentEffectiveFrom: new Date('2027-01-01') },
+      { ...validTreatment, treatmentEffectiveTo: new Date('2026-09-01') },
+    ]) {
+      expect(() =>
+        service.calculateTax({
+          ...treatment,
+          enteredAmount: '100',
+          rate: null,
+          treatmentCode: 'EXEMPT',
+          treatmentCategory: TaxTreatmentCategory.EXEMPT,
+          calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
+          asOf: new Date('2026-10-10'),
+          currencyPrecision: 2,
+        }),
+      ).toThrow(BadRequestException);
+    }
   });
 
   it('rejects an unauthorized manual override', () => {
-    expect(() => service.resolveTaxSelection({
-      moduleEnabled: true,
-      moduleDefault: { rate: validRate, treatmentCode: 'STANDARD', treatmentCategory: TaxTreatmentCategory.STANDARD, calculationMode: TaxCalculationMode.TAX_EXCLUSIVE },
-      companyDefault: null,
-      explicit: { rate: validRate, treatmentCode: 'STANDARD', treatmentCategory: TaxTreatmentCategory.STANDARD, calculationMode: TaxCalculationMode.TAX_EXCLUSIVE },
-      allowManualOverride: false,
-      overrideAuthorized: false,
-    })).toThrow(ForbiddenException);
+    expect(() =>
+      service.resolveTaxSelection({
+        moduleEnabled: true,
+        moduleDefault: {
+          rate: validRate,
+          treatmentCode: 'STANDARD',
+          treatmentCategory: TaxTreatmentCategory.STANDARD,
+          calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
+        },
+        companyDefault: null,
+        explicit: {
+          rate: validRate,
+          treatmentCode: 'STANDARD',
+          treatmentCategory: TaxTreatmentCategory.STANDARD,
+          calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
+        },
+        allowManualOverride: false,
+        overrideAuthorized: false,
+      }),
+    ).toThrow(ForbiddenException);
   });
 });

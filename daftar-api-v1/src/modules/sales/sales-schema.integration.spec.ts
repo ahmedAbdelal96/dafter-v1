@@ -9,7 +9,9 @@ describe('B03 Sales document schema', () => {
 
   beforeAll(async () => {
     if (!process.env.DATABASE_URL) {
-      throw new Error('DATABASE_URL is required for B03 schema integration tests');
+      throw new Error(
+        'DATABASE_URL is required for B03 schema integration tests',
+      );
     }
     prisma = new PrismaService();
     await prisma.$connect();
@@ -50,7 +52,9 @@ describe('B03 Sales document schema', () => {
   });
 
   it('stores company-safe Sales relationships, Decimal financial fields, and immutable posting metadata', async () => {
-    const rows = await prisma.$queryRaw<Array<{ table_name: string; column_name: string }>>`
+    const rows = await prisma.$queryRaw<
+      Array<{ table_name: string; column_name: string }>
+    >`
       SELECT table_name, column_name
       FROM information_schema.columns
       WHERE table_schema = 'public'
@@ -63,14 +67,16 @@ describe('B03 Sales document schema', () => {
       ORDER BY table_name, column_name
     `;
 
-    expect(rows).toEqual(expect.arrayContaining([
-      { table_name: 'SalesInvoice', column_name: 'businessPartnerId' },
-      { table_name: 'SalesInvoice', column_name: 'grandTotal' },
-      { table_name: 'SalesInvoice', column_name: 'journalEntryId' },
-      { table_name: 'SalesInvoiceLine', column_name: 'taxableBase' },
-      { table_name: 'SalesInvoicePaymentSchedule', column_name: 'dueDate' },
-      { table_name: 'SalesCreditNote', column_name: 'salesInvoiceId' },
-    ]));
+    expect(rows).toEqual(
+      expect.arrayContaining([
+        { table_name: 'SalesInvoice', column_name: 'businessPartnerId' },
+        { table_name: 'SalesInvoice', column_name: 'grandTotal' },
+        { table_name: 'SalesInvoice', column_name: 'journalEntryId' },
+        { table_name: 'SalesInvoiceLine', column_name: 'taxableBase' },
+        { table_name: 'SalesInvoicePaymentSchedule', column_name: 'dueDate' },
+        { table_name: 'SalesCreditNote', column_name: 'salesInvoiceId' },
+      ]),
+    );
   });
 
   it('has database protection for posted document and child immutability', async () => {

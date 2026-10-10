@@ -26,6 +26,7 @@ import {
   CreateSalesInvoiceDto,
   SalesInvoiceQueryDto,
   UpdateSalesInvoiceDto,
+  PostSalesInvoiceDto,
 } from './dto';
 import { SalesInvoiceService } from './sales-invoice.service';
 
@@ -122,9 +123,13 @@ export class SalesInvoiceController {
     @CurrentTenant() companyId: string,
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: PostSalesInvoiceDto,
   ) {
     return new ApiResponseDto(
-      await this.salesInvoiceService.postDraft(companyId, user.id, id),
+      await this.salesInvoiceService.postDraft(companyId, user.id, id, {
+        postingDate: new Date(dto.postingDate),
+        idempotencyKey: dto.idempotencyKey,
+      }),
       'Sales invoice posted successfully',
     );
   }

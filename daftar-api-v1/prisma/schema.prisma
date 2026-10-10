@@ -404,10 +404,10 @@ model User {
   postedOpeningBalanceBatches  OpeningBalanceBatch[] @relation("OpeningBalanceBatchPostedBy")
 
   // B03: authoritative Sales documents
-  createdSalesInvoices      SalesInvoice[]   @relation("SalesInvoiceCreatedBy")
-  postedSalesInvoices       SalesInvoice[]   @relation("SalesInvoicePostedBy")
-  createdSalesCreditNotes   SalesCreditNote[] @relation("SalesCreditNoteCreatedBy")
-  postedSalesCreditNotes    SalesCreditNote[] @relation("SalesCreditNotePostedBy")
+  createdSalesInvoices    SalesInvoice[]    @relation("SalesInvoiceCreatedBy")
+  postedSalesInvoices     SalesInvoice[]    @relation("SalesInvoicePostedBy")
+  createdSalesCreditNotes SalesCreditNote[] @relation("SalesCreditNoteCreatedBy")
+  postedSalesCreditNotes  SalesCreditNote[] @relation("SalesCreditNotePostedBy")
 
   // P2-BE-1: back-reference for customer product prices
   updatedCustomerProductPrices CustomerProductPrice[] @relation("CustomerProductPriceUpdatedBy")
@@ -537,9 +537,9 @@ model Company {
   invoices Invoice[]
 
   // B03: authoritative Sales documents
-  salesInvoices       SalesInvoice[]
-  salesCreditNotes    SalesCreditNote[]
-  salesSequences      SalesDocumentSequence[]
+  salesInvoices    SalesInvoice[]
+  salesCreditNotes SalesCreditNote[]
+  salesSequences   SalesDocumentSequence[]
 
   // P2-BE-1
   customerProductPrices CustomerProductPrice[]
@@ -936,13 +936,13 @@ model BusinessPartner {
   createdAt                    DateTime            @default(now())
   updatedAt                    DateTime            @updatedAt
 
-  customerProfile CustomerProfile?
-  supplierProfile SupplierProfile?
-  addresses       BusinessPartnerAddress[]
-  contacts        BusinessPartnerContact[]
-  journalLines    JournalLine[]
-  openingLines    OpeningBalanceLine[]
-  salesInvoices   SalesInvoice[]
+  customerProfile  CustomerProfile?
+  supplierProfile  SupplierProfile?
+  addresses        BusinessPartnerAddress[]
+  contacts         BusinessPartnerContact[]
+  journalLines     JournalLine[]
+  openingLines     OpeningBalanceLine[]
+  salesInvoices    SalesInvoice[]
   salesCreditNotes SalesCreditNote[]
 
   @@unique([id, companyId])
@@ -1805,66 +1805,68 @@ model InvoiceItem {
 // ============================================================
 
 model SalesDocumentSequence {
-  id            String            @id @default(uuid()) @db.Uuid
-  companyId     String            @db.Uuid
-  company       Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  fiscalYearId  String            @db.Uuid
-  fiscalYear    FiscalYear        @relation(fields: [fiscalYearId, companyId], references: [id, companyId], onDelete: Restrict)
-  documentType  SalesDocumentType
-  nextValue     Int               @default(1)
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  id           String            @id @default(uuid()) @db.Uuid
+  companyId    String            @db.Uuid
+  company      Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  fiscalYearId String            @db.Uuid
+  fiscalYear   FiscalYear        @relation(fields: [fiscalYearId, companyId], references: [id, companyId], onDelete: Restrict)
+  documentType SalesDocumentType
+  nextValue    Int               @default(1)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
   @@unique([companyId, fiscalYearId, documentType])
   @@index([companyId, documentType])
 }
 
 model SalesInvoice {
-  id                    String            @id @default(uuid()) @db.Uuid
-  companyId             String            @db.Uuid
-  company               Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  businessPartnerId     String            @db.Uuid
-  businessPartner       BusinessPartner   @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
-  status                SalesInvoiceStatus @default(DRAFT)
-  invoiceNumber         String?           @db.VarChar(40)
-  documentDate          DateTime          @db.Date
-  postingDate           DateTime?         @db.Date
-  transactionCurrencyCode String          @db.Char(3)
-  transactionCurrency   Currency          @relation("SalesInvoiceTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
-  exchangeRate          Decimal           @db.Decimal(19, 8)
-  paymentTermId         String?           @db.Uuid
-  paymentTerm           PaymentTerm?      @relation(fields: [paymentTermId, companyId], references: [id, companyId], onDelete: Restrict)
-  customerReference     String?           @db.VarChar(120)
-  notes                 String?           @db.VarChar(2000)
+  id                      String             @id @default(uuid()) @db.Uuid
+  companyId               String             @db.Uuid
+  company                 Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  businessPartnerId       String             @db.Uuid
+  businessPartner         BusinessPartner    @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
+  status                  SalesInvoiceStatus @default(DRAFT)
+  invoiceNumber           String?            @db.VarChar(40)
+  documentDate            DateTime           @db.Date
+  postingDate             DateTime?          @db.Date
+  transactionCurrencyCode String             @db.Char(3)
+  transactionCurrency     Currency           @relation("SalesInvoiceTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
+  exchangeRate            Decimal            @db.Decimal(19, 8)
+  paymentTermId           String?            @db.Uuid
+  paymentTerm             PaymentTerm?       @relation(fields: [paymentTermId, companyId], references: [id, companyId], onDelete: Restrict)
+  customerReference       String?            @db.VarChar(120)
+  notes                   String?            @db.VarChar(2000)
 
-  subtotal              Decimal           @db.Decimal(19, 4)
-  discountTotal         Decimal           @db.Decimal(19, 4)
-  taxableBaseTotal      Decimal           @db.Decimal(19, 4)
-  taxTotal              Decimal           @db.Decimal(19, 4)
-  grandTotal            Decimal           @db.Decimal(19, 4)
+  subtotal         Decimal @db.Decimal(19, 4)
+  discountTotal    Decimal @db.Decimal(19, 4)
+  taxableBaseTotal Decimal @db.Decimal(19, 4)
+  taxTotal         Decimal @db.Decimal(19, 4)
+  grandTotal       Decimal @db.Decimal(19, 4)
 
-  partnerCodeSnapshot   String            @db.VarChar(40)
-  partnerNameSnapshot   String            @db.VarChar(200)
-  partnerLegalNameSnapshot String?
+  partnerCodeSnapshot           String  @db.VarChar(40)
+  partnerNameSnapshot           String  @db.VarChar(200)
+  partnerLegalNameSnapshot      String?
   taxRegistrationNumberSnapshot String?
-  billingAddressSnapshot Json?
+  billingAddressSnapshot        Json?
 
-  postedById            String?           @db.Uuid
-  postedBy              User?             @relation("SalesInvoicePostedBy", fields: [postedById], references: [id], onDelete: Restrict)
-  postedAt              DateTime?
-  journalEntryId        String?           @db.Uuid
-  journalEntry          JournalEntry?     @relation("SalesInvoiceJournalEntry", fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
-  idempotencyKey        String?           @db.VarChar(128)
-  requestHash           String?           @db.Char(64)
-  createdById           String            @db.Uuid
-  createdBy             User              @relation("SalesInvoiceCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  postedById          String?            @db.Uuid
+  postedBy            User?              @relation("SalesInvoicePostedBy", fields: [postedById], references: [id], onDelete: Restrict)
+  postedAt            DateTime?
+  journalEntryId      String?            @db.Uuid
+  journalEntry        JournalEntry?      @relation("SalesInvoiceJournalEntry", fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  receivableAccountId String?            @db.Uuid
+  receivableAccount   AccountingAccount? @relation("SalesInvoiceReceivableAccount", fields: [receivableAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  idempotencyKey      String?            @db.VarChar(128)
+  requestHash         String?            @db.Char(64)
+  createdById         String             @db.Uuid
+  createdBy           User               @relation("SalesInvoiceCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
 
-  lines                 SalesInvoiceLine[]
-  paymentSchedule       SalesInvoicePaymentSchedule[]
-  creditNotes           SalesCreditNote[]
+  lines           SalesInvoiceLine[]
+  paymentSchedule SalesInvoicePaymentSchedule[]
+  creditNotes     SalesCreditNote[]
 
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([id, companyId])
   @@unique([companyId, invoiceNumber])
@@ -1874,33 +1876,35 @@ model SalesInvoice {
   @@index([companyId, businessPartnerId, documentDate])
   @@index([companyId, postingDate])
   @@index([companyId, transactionCurrencyCode])
+  @@index([companyId, receivableAccountId])
 }
 
 model SalesInvoiceLine {
-  id                    String            @id @default(uuid()) @db.Uuid
-  companyId             String            @db.Uuid
-  salesInvoiceId        String            @db.Uuid
-  salesInvoice          SalesInvoice      @relation(fields: [salesInvoiceId, companyId], references: [id, companyId], onDelete: Cascade)
-  sequence              Int
-  productId             String?           @db.Uuid
-  product               Product?          @relation(fields: [productId, companyId], references: [id, companyId], onDelete: Restrict)
-  descriptionSnapshot   String            @db.VarChar(500)
-  quantity              Decimal           @db.Decimal(19, 6)
-  unitPrice             Decimal           @db.Decimal(19, 6)
-  discountType          SalesDiscountType @default(NONE)
-  discountValue         Decimal           @db.Decimal(19, 6)
-  grossBeforeDiscount   Decimal           @db.Decimal(19, 4)
-  discountAmount        Decimal           @db.Decimal(19, 4)
-  taxableBase           Decimal           @db.Decimal(19, 4)
-  taxAmount             Decimal           @db.Decimal(19, 4)
-  lineTotal             Decimal           @db.Decimal(19, 4)
-  revenueAccountId      String?           @db.Uuid
+  id                         String             @id @default(uuid()) @db.Uuid
+  companyId                  String             @db.Uuid
+  salesInvoiceId             String             @db.Uuid
+  salesInvoice               SalesInvoice       @relation(fields: [salesInvoiceId, companyId], references: [id, companyId], onDelete: Cascade)
+  sequence                   Int
+  productId                  String?            @db.Uuid
+  product                    Product?           @relation(fields: [productId, companyId], references: [id, companyId], onDelete: Restrict)
+  descriptionSnapshot        String             @db.VarChar(500)
+  quantity                   Decimal            @db.Decimal(19, 6)
+  unitPrice                  Decimal            @db.Decimal(19, 6)
+  discountType               SalesDiscountType  @default(NONE)
+  discountValue              Decimal            @db.Decimal(19, 6)
+  grossBeforeDiscount        Decimal            @db.Decimal(19, 4)
+  discountAmount             Decimal            @db.Decimal(19, 4)
+  taxableBase                Decimal            @db.Decimal(19, 4)
+  taxAmount                  Decimal            @db.Decimal(19, 4)
+  lineTotal                  Decimal            @db.Decimal(19, 4)
+  revenueAccountId           String?            @db.Uuid
+  revenueAccount             AccountingAccount? @relation("SalesInvoiceLineRevenueAccount", fields: [revenueAccountId, companyId], references: [id, companyId], onDelete: Restrict)
   revenueAccountCodeSnapshot String?
 
-  taxes                 SalesInvoiceLineTax[]
-  creditNoteLines       SalesCreditNoteLine[]
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
+  taxes           SalesInvoiceLineTax[]
+  creditNoteLines SalesCreditNoteLine[]
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
 
   @@unique([id, companyId])
   @@unique([companyId, salesInvoiceId, sequence])
@@ -1908,36 +1912,38 @@ model SalesInvoiceLine {
 }
 
 model SalesInvoiceLineTax {
-  id                    String            @id @default(uuid()) @db.Uuid
-  companyId             String            @db.Uuid
-  salesInvoiceLineId    String            @db.Uuid
-  salesInvoiceLine      SalesInvoiceLine @relation(fields: [salesInvoiceLineId, companyId], references: [id, companyId], onDelete: Cascade)
-  taxTreatmentId        String?           @db.Uuid
-  taxRateId             String?           @db.Uuid
-  treatmentCodeSnapshot String            @db.VarChar(40)
+  id                    String               @id @default(uuid()) @db.Uuid
+  companyId             String               @db.Uuid
+  salesInvoiceLineId    String               @db.Uuid
+  salesInvoiceLine      SalesInvoiceLine     @relation(fields: [salesInvoiceLineId, companyId], references: [id, companyId], onDelete: Cascade)
+  taxTreatmentId        String?              @db.Uuid
+  taxRateId             String?              @db.Uuid
+  taxLiabilityAccountId String?              @db.Uuid
+  taxLiabilityAccount   AccountingAccount?   @relation("SalesInvoiceLineTaxLiabilityAccount", fields: [taxLiabilityAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  treatmentCodeSnapshot String               @db.VarChar(40)
   treatmentCategory     TaxTreatmentCategory
   rateCodeSnapshot      String?
-  percentageSnapshot    Decimal           @db.Decimal(9, 4)
+  percentageSnapshot    Decimal              @db.Decimal(9, 4)
   calculationMode       TaxCalculationMode
-  taxableBase           Decimal           @db.Decimal(19, 4)
-  taxAmount             Decimal           @db.Decimal(19, 4)
-  createdAt             DateTime          @default(now())
+  taxableBase           Decimal              @db.Decimal(19, 4)
+  taxAmount             Decimal              @db.Decimal(19, 4)
+  createdAt             DateTime             @default(now())
 
   @@unique([companyId, salesInvoiceLineId])
   @@index([companyId, taxRateId])
 }
 
 model SalesInvoicePaymentSchedule {
-  id                    String            @id @default(uuid()) @db.Uuid
-  companyId             String            @db.Uuid
-  salesInvoiceId        String            @db.Uuid
-  salesInvoice          SalesInvoice      @relation(fields: [salesInvoiceId, companyId], references: [id, companyId], onDelete: Cascade)
-  sequence              Int
-  dueDate               DateTime          @db.Date
-  amount                Decimal           @db.Decimal(19, 4)
+  id                      String       @id @default(uuid()) @db.Uuid
+  companyId               String       @db.Uuid
+  salesInvoiceId          String       @db.Uuid
+  salesInvoice            SalesInvoice @relation(fields: [salesInvoiceId, companyId], references: [id, companyId], onDelete: Cascade)
+  sequence                Int
+  dueDate                 DateTime     @db.Date
+  amount                  Decimal      @db.Decimal(19, 4)
   paymentTermCodeSnapshot String?
   paymentTermNameSnapshot String?
-  createdAt             DateTime          @default(now())
+  createdAt               DateTime     @default(now())
 
   @@unique([id, companyId])
   @@unique([companyId, salesInvoiceId, sequence])
@@ -1945,40 +1951,42 @@ model SalesInvoicePaymentSchedule {
 }
 
 model SalesCreditNote {
-  id                    String              @id @default(uuid()) @db.Uuid
-  companyId             String              @db.Uuid
-  company               Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  salesInvoiceId        String              @db.Uuid
-  salesInvoice          SalesInvoice        @relation(fields: [salesInvoiceId, companyId], references: [id, companyId], onDelete: Restrict)
-  businessPartnerId     String              @db.Uuid
-  businessPartner       BusinessPartner     @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
-  status                SalesCreditNoteStatus @default(DRAFT)
-  creditNoteNumber      String?             @db.VarChar(40)
-  documentDate          DateTime            @db.Date
-  postingDate           DateTime?           @db.Date
-  transactionCurrencyCode String            @db.Char(3)
-  transactionCurrency   Currency            @relation("SalesCreditNoteTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
-  exchangeRate          Decimal             @db.Decimal(19, 8)
-  reason                String              @db.VarChar(1000)
-  subtotal              Decimal             @db.Decimal(19, 4)
-  taxTotal              Decimal             @db.Decimal(19, 4)
-  grandTotal            Decimal             @db.Decimal(19, 4)
-  partnerCodeSnapshot   String              @db.VarChar(40)
-  partnerNameSnapshot   String              @db.VarChar(200)
+  id                            String                @id @default(uuid()) @db.Uuid
+  companyId                     String                @db.Uuid
+  company                       Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  salesInvoiceId                String                @db.Uuid
+  salesInvoice                  SalesInvoice          @relation(fields: [salesInvoiceId, companyId], references: [id, companyId], onDelete: Restrict)
+  businessPartnerId             String                @db.Uuid
+  businessPartner               BusinessPartner       @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
+  status                        SalesCreditNoteStatus @default(DRAFT)
+  creditNoteNumber              String?               @db.VarChar(40)
+  documentDate                  DateTime              @db.Date
+  postingDate                   DateTime?             @db.Date
+  transactionCurrencyCode       String                @db.Char(3)
+  transactionCurrency           Currency              @relation("SalesCreditNoteTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
+  exchangeRate                  Decimal               @db.Decimal(19, 8)
+  reason                        String                @db.VarChar(1000)
+  subtotal                      Decimal               @db.Decimal(19, 4)
+  taxTotal                      Decimal               @db.Decimal(19, 4)
+  grandTotal                    Decimal               @db.Decimal(19, 4)
+  partnerCodeSnapshot           String                @db.VarChar(40)
+  partnerNameSnapshot           String                @db.VarChar(200)
   taxRegistrationNumberSnapshot String?
-  billingAddressSnapshot Json?
-  postedById            String?             @db.Uuid
-  postedBy              User?               @relation("SalesCreditNotePostedBy", fields: [postedById], references: [id], onDelete: Restrict)
-  postedAt              DateTime?
-  journalEntryId        String?             @db.Uuid
-  journalEntry          JournalEntry?       @relation("SalesCreditNoteJournalEntry", fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
-  idempotencyKey        String?             @db.VarChar(128)
-  requestHash           String?             @db.Char(64)
-  createdById           String              @db.Uuid
-  createdBy             User                @relation("SalesCreditNoteCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
-  lines                 SalesCreditNoteLine[]
-  createdAt             DateTime            @default(now())
-  updatedAt             DateTime            @updatedAt
+  billingAddressSnapshot        Json?
+  postedById                    String?               @db.Uuid
+  postedBy                      User?                 @relation("SalesCreditNotePostedBy", fields: [postedById], references: [id], onDelete: Restrict)
+  postedAt                      DateTime?
+  journalEntryId                String?               @db.Uuid
+  journalEntry                  JournalEntry?         @relation("SalesCreditNoteJournalEntry", fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  receivableAccountId           String?               @db.Uuid
+  receivableAccount             AccountingAccount?    @relation("SalesCreditNoteReceivableAccount", fields: [receivableAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  idempotencyKey                String?               @db.VarChar(128)
+  requestHash                   String?               @db.Char(64)
+  createdById                   String                @db.Uuid
+  createdBy                     User                  @relation("SalesCreditNoteCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  lines                         SalesCreditNoteLine[]
+  createdAt                     DateTime              @default(now())
+  updatedAt                     DateTime              @updatedAt
 
   @@unique([id, companyId])
   @@unique([companyId, creditNoteNumber])
@@ -1986,24 +1994,29 @@ model SalesCreditNote {
   @@unique([companyId, idempotencyKey])
   @@index([companyId, salesInvoiceId])
   @@index([companyId, businessPartnerId, documentDate])
+  @@index([companyId, receivableAccountId])
 }
 
 model SalesCreditNoteLine {
-  id                    String            @id @default(uuid()) @db.Uuid
-  companyId             String            @db.Uuid
-  salesCreditNoteId     String            @db.Uuid
-  salesCreditNote       SalesCreditNote   @relation(fields: [salesCreditNoteId, companyId], references: [id, companyId], onDelete: Cascade)
-  originalSalesInvoiceLineId String       @db.Uuid
-  originalSalesInvoiceLine SalesInvoiceLine @relation(fields: [originalSalesInvoiceLineId, companyId], references: [id, companyId], onDelete: Restrict)
-  sequence              Int
-  descriptionSnapshot   String            @db.VarChar(500)
-  quantity              Decimal           @db.Decimal(19, 6)
-  unitPrice             Decimal           @db.Decimal(19, 6)
-  taxableBase           Decimal           @db.Decimal(19, 4)
-  taxAmount             Decimal           @db.Decimal(19, 4)
-  lineTotal             Decimal           @db.Decimal(19, 4)
-  taxes                 SalesCreditNoteLineTax[]
-  createdAt             DateTime          @default(now())
+  id                         String                   @id @default(uuid()) @db.Uuid
+  companyId                  String                   @db.Uuid
+  salesCreditNoteId          String                   @db.Uuid
+  salesCreditNote            SalesCreditNote          @relation(fields: [salesCreditNoteId, companyId], references: [id, companyId], onDelete: Cascade)
+  originalSalesInvoiceLineId String                   @db.Uuid
+  originalSalesInvoiceLine   SalesInvoiceLine         @relation(fields: [originalSalesInvoiceLineId, companyId], references: [id, companyId], onDelete: Restrict)
+  sequence                   Int
+  descriptionSnapshot        String                   @db.VarChar(500)
+  quantity                   Decimal                  @db.Decimal(19, 6)
+  unitPrice                  Decimal                  @db.Decimal(19, 6)
+  taxableBase                Decimal                  @db.Decimal(19, 4)
+  taxAmount                  Decimal                  @db.Decimal(19, 4)
+  lineTotal                  Decimal                  @db.Decimal(19, 4)
+  revenueAccountId           String?                  @db.Uuid
+  revenueAccount             AccountingAccount?       @relation("SalesCreditNoteLineRevenueAccount", fields: [revenueAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  taxLiabilityAccountId      String?                  @db.Uuid
+  taxLiabilityAccount        AccountingAccount?       @relation("SalesCreditNoteLineTaxLiabilityAccount", fields: [taxLiabilityAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  taxes                      SalesCreditNoteLineTax[]
+  createdAt                  DateTime                 @default(now())
 
   @@unique([id, companyId])
   @@unique([companyId, salesCreditNoteId, sequence])
@@ -2011,18 +2024,18 @@ model SalesCreditNoteLine {
 }
 
 model SalesCreditNoteLineTax {
-  id                    String              @id @default(uuid()) @db.Uuid
-  companyId             String              @db.Uuid
-  salesCreditNoteLineId String              @db.Uuid
-  salesCreditNoteLine   SalesCreditNoteLine @relation(fields: [salesCreditNoteLineId, companyId], references: [id, companyId], onDelete: Cascade)
-  treatmentCodeSnapshot String              @db.VarChar(40)
+  id                    String               @id @default(uuid()) @db.Uuid
+  companyId             String               @db.Uuid
+  salesCreditNoteLineId String               @db.Uuid
+  salesCreditNoteLine   SalesCreditNoteLine  @relation(fields: [salesCreditNoteLineId, companyId], references: [id, companyId], onDelete: Cascade)
+  treatmentCodeSnapshot String               @db.VarChar(40)
   treatmentCategory     TaxTreatmentCategory
   rateCodeSnapshot      String?
-  percentageSnapshot    Decimal             @db.Decimal(9, 4)
+  percentageSnapshot    Decimal              @db.Decimal(9, 4)
   calculationMode       TaxCalculationMode
-  taxableBase           Decimal             @db.Decimal(19, 4)
-  taxAmount             Decimal             @db.Decimal(19, 4)
-  createdAt             DateTime            @default(now())
+  taxableBase           Decimal              @db.Decimal(19, 4)
+  taxAmount             Decimal              @db.Decimal(19, 4)
+  createdAt             DateTime             @default(now())
 
   @@unique([companyId, salesCreditNoteLineId])
 }
@@ -2100,11 +2113,17 @@ model AccountingAccount {
   createdAt              DateTime              @default(now())
   updatedAt              DateTime              @updatedAt
 
-  journalLines                JournalLine[]
-  openingBalanceLines         OpeningBalanceLine[]
-  configurationDefaults       AccountingConfigurationAccount[]
-  customerReceivableOverrides CustomerProfile[]                @relation("CustomerReceivableOverride")
-  supplierPayableOverrides    SupplierProfile[]                @relation("SupplierPayableOverride")
+  journalLines                      JournalLine[]
+  openingBalanceLines               OpeningBalanceLine[]
+  configurationDefaults             AccountingConfigurationAccount[]
+  customerReceivableOverrides       CustomerProfile[]                @relation("CustomerReceivableOverride")
+  supplierPayableOverrides          SupplierProfile[]                @relation("SupplierPayableOverride")
+  salesInvoiceReceivables           SalesInvoice[]                   @relation("SalesInvoiceReceivableAccount")
+  salesInvoiceLineRevenues          SalesInvoiceLine[]               @relation("SalesInvoiceLineRevenueAccount")
+  salesInvoiceLineTaxLiabilities    SalesInvoiceLineTax[]            @relation("SalesInvoiceLineTaxLiabilityAccount")
+  salesCreditNoteReceivables        SalesCreditNote[]                @relation("SalesCreditNoteReceivableAccount")
+  salesCreditNoteLineRevenues       SalesCreditNoteLine[]            @relation("SalesCreditNoteLineRevenueAccount")
+  salesCreditNoteLineTaxLiabilities SalesCreditNoteLine[]            @relation("SalesCreditNoteLineTaxLiabilityAccount")
 
   @@unique([id, companyId])
   @@unique([companyId, code])
@@ -2145,8 +2164,8 @@ model FiscalYear {
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 
-  periods   AccountingPeriod[]
-  sequences AccountingEntrySequence[]
+  periods                AccountingPeriod[]
+  sequences              AccountingEntrySequence[]
   salesDocumentSequences SalesDocumentSequence[]
 
   @@unique([id, companyId])
@@ -2195,34 +2214,34 @@ model JournalEntry {
   accountingPeriodId String            @db.Uuid
   accountingPeriod   AccountingPeriod  @relation(fields: [accountingPeriodId, companyId], references: [id, companyId], onDelete: Restrict)
 
-  entryNumber             String               @db.VarChar(40)
-  status                  JournalEntryStatus   @default(DRAFT)
-  postingDate             DateTime             @db.Date
-  documentDate            DateTime?            @db.Date
-  dueDate                 DateTime?            @db.Date
-  transactionCurrencyCode String               @db.Char(3)
-  transactionCurrency     Currency             @relation("JournalEntryTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
-  exchangeRate            Decimal              @db.Decimal(19, 8)
-  documentReference       String?              @db.VarChar(120)
-  description             String               @db.VarChar(500)
-  sourceType              JournalSourceType
-  sourceId                String?              @db.Uuid
-  idempotencyKey          String               @db.VarChar(128)
-  requestHash             String               @db.Char(64)
-  postedById              String?              @db.Uuid
-  postedBy                User?                @relation("AccountingEntryPostedBy", fields: [postedById], references: [id], onDelete: Restrict)
-  postedAt                DateTime?
-  reversalOfEntryId       String?              @db.Uuid
-  reversalOf              JournalEntry?        @relation("JournalEntryReversal", fields: [reversalOfEntryId, companyId], references: [id, companyId], onDelete: Restrict)
-  reversals               JournalEntry[]       @relation("JournalEntryReversal")
-  openingBalanceBatch     OpeningBalanceBatch? @relation("OpeningBalanceBatchJournalEntry")
+  entryNumber                 String               @db.VarChar(40)
+  status                      JournalEntryStatus   @default(DRAFT)
+  postingDate                 DateTime             @db.Date
+  documentDate                DateTime?            @db.Date
+  dueDate                     DateTime?            @db.Date
+  transactionCurrencyCode     String               @db.Char(3)
+  transactionCurrency         Currency             @relation("JournalEntryTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
+  exchangeRate                Decimal              @db.Decimal(19, 8)
+  documentReference           String?              @db.VarChar(120)
+  description                 String               @db.VarChar(500)
+  sourceType                  JournalSourceType
+  sourceId                    String?              @db.Uuid
+  idempotencyKey              String               @db.VarChar(128)
+  requestHash                 String               @db.Char(64)
+  postedById                  String?              @db.Uuid
+  postedBy                    User?                @relation("AccountingEntryPostedBy", fields: [postedById], references: [id], onDelete: Restrict)
+  postedAt                    DateTime?
+  reversalOfEntryId           String?              @db.Uuid
+  reversalOf                  JournalEntry?        @relation("JournalEntryReversal", fields: [reversalOfEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  reversals                   JournalEntry[]       @relation("JournalEntryReversal")
+  openingBalanceBatch         OpeningBalanceBatch? @relation("OpeningBalanceBatchJournalEntry")
   openingBalanceReversalBatch OpeningBalanceBatch? @relation("OpeningBalanceBatchReversalJournalEntry")
-  reversalReason          String?              @db.VarChar(500)
-  createdAt               DateTime             @default(now())
-  updatedAt               DateTime             @updatedAt
+  reversalReason              String?              @db.VarChar(500)
+  createdAt                   DateTime             @default(now())
+  updatedAt                   DateTime             @updatedAt
 
-  lines JournalLine[]
-  salesInvoice   SalesInvoice?   @relation("SalesInvoiceJournalEntry")
+  lines           JournalLine[]
+  salesInvoice    SalesInvoice?    @relation("SalesInvoiceJournalEntry")
   salesCreditNote SalesCreditNote? @relation("SalesCreditNoteJournalEntry")
 
   @@unique([id, companyId])
@@ -2237,34 +2256,34 @@ model JournalEntry {
 }
 
 model OpeningBalanceBatch {
-  id                 String                    @id @default(uuid()) @db.Uuid
-  companyId          String                    @db.Uuid
-  company            Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  effectiveDate      DateTime                  @db.Date
-  accountingPeriodId String                    @db.Uuid
-  accountingPeriod   AccountingPeriod          @relation(fields: [accountingPeriodId, companyId], references: [id, companyId], onDelete: Restrict)
-  status             OpeningBalanceBatchStatus @default(DRAFT)
-  description        String                    @db.VarChar(500)
-  createdById        String                    @db.Uuid
-  createdBy          User                      @relation("OpeningBalanceBatchCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
-  postedById         String?                   @db.Uuid
-  postedBy           User?                     @relation("OpeningBalanceBatchPostedBy", fields: [postedById], references: [id], onDelete: Restrict)
-  journalEntryId     String?                   @db.Uuid
-  journalEntry       JournalEntry?             @relation("OpeningBalanceBatchJournalEntry", fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
-  reversalJournalEntryId String?               @db.Uuid
-  reversalJournalEntry   JournalEntry?         @relation("OpeningBalanceBatchReversalJournalEntry", fields: [reversalJournalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
-  idempotencyKey     String                    @db.VarChar(128)
-  requestHash        String                    @db.Char(64)
-  postingIdempotencyKey String?                @db.VarChar(128)
-  postingRequestHash    String?                @db.Char(64)
-  reversalIdempotencyKey String?               @db.VarChar(128)
-  reversalRequestHash    String?               @db.Char(64)
-  validatedAt        DateTime?
-  postedAt           DateTime?
-  reversedAt         DateTime?
-  reversalReason     String?                   @db.VarChar(500)
-  createdAt          DateTime                  @default(now())
-  updatedAt          DateTime                  @updatedAt
+  id                     String                    @id @default(uuid()) @db.Uuid
+  companyId              String                    @db.Uuid
+  company                Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  effectiveDate          DateTime                  @db.Date
+  accountingPeriodId     String                    @db.Uuid
+  accountingPeriod       AccountingPeriod          @relation(fields: [accountingPeriodId, companyId], references: [id, companyId], onDelete: Restrict)
+  status                 OpeningBalanceBatchStatus @default(DRAFT)
+  description            String                    @db.VarChar(500)
+  createdById            String                    @db.Uuid
+  createdBy              User                      @relation("OpeningBalanceBatchCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  postedById             String?                   @db.Uuid
+  postedBy               User?                     @relation("OpeningBalanceBatchPostedBy", fields: [postedById], references: [id], onDelete: Restrict)
+  journalEntryId         String?                   @db.Uuid
+  journalEntry           JournalEntry?             @relation("OpeningBalanceBatchJournalEntry", fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  reversalJournalEntryId String?                   @db.Uuid
+  reversalJournalEntry   JournalEntry?             @relation("OpeningBalanceBatchReversalJournalEntry", fields: [reversalJournalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  idempotencyKey         String                    @db.VarChar(128)
+  requestHash            String                    @db.Char(64)
+  postingIdempotencyKey  String?                   @db.VarChar(128)
+  postingRequestHash     String?                   @db.Char(64)
+  reversalIdempotencyKey String?                   @db.VarChar(128)
+  reversalRequestHash    String?                   @db.Char(64)
+  validatedAt            DateTime?
+  postedAt               DateTime?
+  reversedAt             DateTime?
+  reversalReason         String?                   @db.VarChar(500)
+  createdAt              DateTime                  @default(now())
+  updatedAt              DateTime                  @updatedAt
 
   lines OpeningBalanceLine[]
 

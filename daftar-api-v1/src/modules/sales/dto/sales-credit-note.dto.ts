@@ -9,6 +9,7 @@ import {
   IsUUID,
   MaxLength,
   ValidateNested,
+  IsNotEmpty,
 } from 'class-validator';
 import { SalesCreditNoteStatus } from '@prisma/client';
 
@@ -38,6 +39,18 @@ export class CreateSalesCreditNoteDto {
   lines!: SalesCreditNoteLineDto[];
 }
 
+export class UpdateSalesCreditNoteDto extends CreateSalesCreditNoteDto {}
+
+export class PostSalesCreditNoteDto {
+  @IsDateString()
+  postingDate!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(128)
+  idempotencyKey!: string;
+}
+
 export class SalesCreditNoteQueryDto {
   @IsOptional()
   @IsUUID()
@@ -62,6 +75,11 @@ export type CreateSalesCreditNoteInput = {
   documentDate: Date;
   reason: string;
   lines: SalesCreditNoteLineInput[];
+};
+
+export type PostSalesCreditNoteInput = {
+  postingDate: Date;
+  idempotencyKey: string;
 };
 
 export type SalesCreditNoteQuery = {

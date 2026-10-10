@@ -6,8 +6,8 @@ import {
   Optional,
 } from '@nestjs/common';
 import {
-  AccountingConfigAccountKey,
   AccountingConfigJournalKey,
+  AccountingJournalType,
   JournalSourceType,
   Prisma,
   SalesCreditNoteStatus,
@@ -23,11 +23,35 @@ import {
   CreateSalesCreditNoteInput,
   SalesCreditNoteLineInput,
   SalesCreditNoteQuery,
+  PostSalesCreditNoteInput,
 } from './dto';
 import {
   SALES_CREDIT_NOTE_INCLUDE,
   SalesCreditNoteRepository,
 } from './sales-credit-note.repository';
+import { AccountingReadinessService } from '../accounting-bootstrap/accounting-readiness.service';
+
+type CreditSourceLine = {
+  id: string;
+  quantity: Prisma.Decimal;
+  taxableBase: Prisma.Decimal;
+  taxAmount: Prisma.Decimal;
+  revenueAccountId: string | null;
+  taxes: Array<{ taxLiabilityAccountId: string | null }>;
+};
+type LockedCreditNote = {
+  id: string;
+  companyId: string;
+  salesInvoice: { lines: CreditSourceLine[] };
+  lines: Array<{
+    id: string;
+    originalSalesInvoiceLineId: string;
+    quantity: Prisma.Decimal;
+    taxableBase: Prisma.Decimal;
+    taxAmount: Prisma.Decimal;
+    lineTotal: Prisma.Decimal;
+  }>;
+};
 
 @Injectable()
 export class SalesCreditNoteService {
@@ -36,6 +60,7 @@ export class SalesCreditNoteService {
     private readonly tax: SalesTaxCalculatorService,
     @Optional() private readonly accounting?: AccountingService,
     @Optional() private readonly repository?: SalesCreditNoteRepository,
+    @Optional() private readonly readiness?: AccountingReadinessService,
   ) {}
 
   async createDraft(
@@ -128,11 +153,107 @@ export class SalesCreditNoteService {
     });
   }
 
-  async postDraft(companyId: string, actorUserId: string, id: string) {
+  async updateDraft(
+    companyId: string,
+    actorUserId: string,
+    id: string,
+    input: CreateSalesCreditNoteInput,
+  ) {
+    return this.prisma.$transaction(async (db) => {
+      const existing = await db.salesCreditNote.findFirst({
+        where: { id, companyId },
+      });
+      if (!existing) throw new NotFoundException('Sales credit note not found');
+      if (existing.status !== SalesCreditNoteStatus.DRAFT) {
+        throw new BadRequestException('sales.posted_credit_note_immutable');
+      }
+      const source = await this.loadPostedInvoice(
+        db,
+        companyId,
+        input.salesInvoiceId,
+      );
+      const currency = await db.currency.findFirst({
+        where: { code: source.transactionCurrencyCode, isActive: true },
+      });
+      if (!currency) throw new BadRequestException('sales.currency_inactive');
+      const reason = input.reason.trim();
+      if (!reason)
+        throw new BadRequestException('sales.credit_note_reason_required');
+      const calculation = await this.calculateLines(
+        db,
+        companyId,
+        source,
+        input.lines,
+        currency.minorUnitPrecision,
+      );
+      await db.salesCreditNoteLine.deleteMany({
+        where: { companyId, salesCreditNoteId: id },
+      });
+      await db.salesCreditNote.update({
+        where: { id },
+        data: {
+          salesInvoiceId: source.id,
+          businessPartnerId: source.businessPartnerId,
+          documentDate: input.documentDate,
+          reason,
+          subtotal: calculation.subtotal,
+          taxTotal: calculation.taxTotal,
+          grandTotal: calculation.grandTotal,
+          partnerCodeSnapshot: source.partnerCodeSnapshot,
+          partnerNameSnapshot: source.partnerNameSnapshot,
+          taxRegistrationNumberSnapshot: source.taxRegistrationNumberSnapshot,
+          billingAddressSnapshot: source.billingAddressSnapshot,
+          lines: { create: calculation.lines },
+        } as any,
+      });
+      await db.auditLog.create({
+        data: {
+          companyId,
+          actorUserId,
+          action: 'sales-credit-note.updated',
+          entityType: 'SalesCreditNote',
+          entityId: id,
+          metadata: { status: SalesCreditNoteStatus.DRAFT },
+        },
+      });
+      return db.salesCreditNote.findFirstOrThrow({
+        where: { id, companyId },
+        include: SALES_CREDIT_NOTE_INCLUDE,
+      });
+    });
+  }
+
+  async postDraft(
+    companyId: string,
+    actorUserId: string,
+    id: string,
+    input?: PostSalesCreditNoteInput,
+  ) {
     if (!this.accounting)
       throw new ConflictException('Accounting service is not available');
     const accounting = this.accounting;
     return this.prisma.$transaction(async (db) => {
+      await db.$queryRaw(Prisma.sql`
+        SELECT "id" FROM "SalesCreditNote"
+        WHERE "id" = ${id} AND "companyId" = ${companyId}
+        FOR UPDATE
+      `);
+      const noteForLock = await db.salesCreditNote.findFirst({
+        where: { id, companyId },
+        select: { salesInvoiceId: true },
+      });
+      if (!noteForLock)
+        throw new NotFoundException('Sales credit note not found');
+      await db.$queryRaw(Prisma.sql`
+        SELECT "id" FROM "SalesInvoice"
+        WHERE "id" = ${noteForLock.salesInvoiceId} AND "companyId" = ${companyId}
+        FOR UPDATE
+      `);
+      await db.$queryRaw(Prisma.sql`
+        SELECT "id" FROM "SalesInvoiceLine"
+        WHERE "salesInvoiceId" = ${noteForLock.salesInvoiceId} AND "companyId" = ${companyId}
+        ORDER BY "id" FOR UPDATE
+      `);
       const note = await db.salesCreditNote.findFirst({
         where: { id, companyId },
         include: {
@@ -143,17 +264,65 @@ export class SalesCreditNoteService {
       });
       if (!note) throw new NotFoundException('Sales credit note not found');
       if (note.status === SalesCreditNoteStatus.POSTED) {
+        if (
+          input?.idempotencyKey &&
+          note.idempotencyKey !== input.idempotencyKey
+        ) {
+          throw new ConflictException(
+            'Sales credit note is already posted with another idempotency key',
+          );
+        }
+        if (
+          input?.idempotencyKey &&
+          note.requestHash !==
+            createHash('sha256')
+              .update(
+                `${note.id}:${input.idempotencyKey}:${this.dateOnly(input.postingDate)}`,
+              )
+              .digest('hex')
+        ) {
+          throw new ConflictException(
+            'Idempotency key payload does not match the original posting',
+          );
+        }
         return db.salesCreditNote.findFirstOrThrow({
           where: { id, companyId },
           include: SALES_CREDIT_NOTE_INCLUDE,
         });
       }
-      await this.assertLinesAvailable(db, note.salesInvoiceId, note.lines);
+      const postingDateValue = input?.postingDate ?? note.documentDate;
+      if (this.readiness) {
+        const readiness = await this.readiness.evaluateInTransaction(
+          db,
+          companyId,
+          postingDateValue,
+        );
+        if (!readiness.ready)
+          throw new ConflictException(
+            `Accounting is not ready: ${readiness.reasons.join(', ')}`,
+          );
+      }
+      const currency = await db.currency.findFirst({
+        where: { code: note.transactionCurrencyCode, isActive: true },
+      });
+      if (!currency) throw new BadRequestException('sales.currency_inactive');
+      const refreshed = await this.rebuildCreditAmountsUnderLock(
+        db,
+        note,
+        currency.minorUnitPrecision,
+      );
+      Object.assign(note, refreshed);
+      await this.assertLinesAvailable(
+        db,
+        companyId,
+        note.salesInvoiceId,
+        note.lines,
+      );
       const period = await db.accountingPeriod.findFirst({
         where: {
           companyId,
-          startDate: { lte: note.documentDate },
-          endDate: { gte: note.documentDate },
+          startDate: { lte: postingDateValue },
+          endDate: { gte: postingDateValue },
         },
         include: { fiscalYear: true },
       });
@@ -179,39 +348,40 @@ export class SalesCreditNoteService {
         : null;
       if (!journal)
         throw new ConflictException('Active sales journal mapping is required');
-      const mappedAccounts = new Map(
-        configuration.accountDefaults.map((mapping) => [
-          mapping.settingKey,
-          mapping.accountId,
-        ]),
-      );
-      const revenueAccountId = mappedAccounts.get(
-        AccountingConfigAccountKey.INCOME,
-      );
-      const taxAccountId = mappedAccounts.get(
-        AccountingConfigAccountKey.TAX_PAYABLE,
-      );
-      const receivableAccountId =
-        note.businessPartner.customerProfile?.receivableAccountId ??
-        mappedAccounts.get(AccountingConfigAccountKey.RECEIVABLE);
-      if (!revenueAccountId || !receivableAccountId) {
+      if (journal.type !== AccountingJournalType.SALES) {
         throw new ConflictException(
-          'Receivable and income account mappings are required',
+          'Configured sales journal must have SALES type',
         );
       }
-      if (note.lines.some((line) => line.taxAmount.gt(0)) && !taxAccountId) {
+      const originalInvoice = note.salesInvoice;
+      if (!originalInvoice.receivableAccountId) {
         throw new ConflictException(
-          'Tax payable account mapping is required for taxable credit notes',
+          'Original invoice accounting basis is missing',
         );
+      }
+      const originalLines = new Map(
+        originalInvoice.lines.map((line) => [line.id, line] as const),
+      );
+      for (const line of note.lines) {
+        const original = originalLines.get(line.originalSalesInvoiceLineId);
+        if (
+          !original?.revenueAccountId ||
+          (line.taxAmount.gt(0) && !original.taxes[0]?.taxLiabilityAccountId)
+        ) {
+          throw new ConflictException(
+            'Original invoice accounting basis is incomplete',
+          );
+        }
       }
       const number = await this.allocateDocumentNumber(
         db,
         companyId,
         period.fiscalYearId,
+        period.fiscalYear.startDate,
       );
       const lines = [
         {
-          accountId: receivableAccountId,
+          accountId: originalInvoice.receivableAccountId,
           transactionDebit: '0',
           transactionCredit: note.grandTotal.toString(),
           description: note.partnerNameSnapshot,
@@ -220,7 +390,8 @@ export class SalesCreditNoteService {
           reconciliationReference: note.id,
         },
         ...note.lines.map((line) => ({
-          accountId: revenueAccountId,
+          accountId: originalLines.get(line.originalSalesInvoiceLineId)!
+            .revenueAccountId!,
           transactionDebit: line.taxableBase.toString(),
           transactionCredit: '0',
           description: line.descriptionSnapshot,
@@ -231,7 +402,8 @@ export class SalesCreditNoteService {
         ...note.lines
           .filter((line) => line.taxAmount.gt(0))
           .map((line) => ({
-            accountId: taxAccountId!,
+            accountId: originalLines.get(line.originalSalesInvoiceLineId)!
+              .taxes[0].taxLiabilityAccountId!,
             transactionDebit: line.taxAmount.toString(),
             transactionCredit: '0',
             description: `Tax reversal - ${line.descriptionSnapshot}`,
@@ -240,6 +412,11 @@ export class SalesCreditNoteService {
             taxRate: line.taxes[0]?.percentageSnapshot.toString(),
           })),
       ];
+      const requestKey =
+        input?.idempotencyKey?.trim() || `sales-credit-note:${note.id}:post`;
+      const requestHash = createHash('sha256')
+        .update(`${note.id}:${requestKey}:${this.dateOnly(postingDateValue)}`)
+        .digest('hex');
       const journalEntry = await accounting.postInternalInTransaction(
         db,
         companyId,
@@ -247,7 +424,7 @@ export class SalesCreditNoteService {
         {
           journalId: journal.id,
           accountingPeriodId: period.id,
-          postingDate: this.dateOnly(note.documentDate),
+          postingDate: this.dateOnly(postingDateValue),
           documentDate: this.dateOnly(note.documentDate),
           transactionCurrencyCode: note.transactionCurrencyCode,
           exchangeRate: note.exchangeRate.toString(),
@@ -255,7 +432,7 @@ export class SalesCreditNoteService {
           description: `Sales credit note ${number}`,
           sourceType: JournalSourceType.SALES_CREDIT_NOTE,
           sourceId: note.id,
-          idempotencyKey: `sales-credit-note:${note.id}:post`,
+          idempotencyKey: requestKey,
           lines,
         },
       );
@@ -264,14 +441,13 @@ export class SalesCreditNoteService {
         data: {
           status: SalesCreditNoteStatus.POSTED,
           creditNoteNumber: number,
-          postingDate: note.documentDate,
+          postingDate: postingDateValue,
           postedById: actorUserId,
           postedAt: new Date(),
           journalEntryId: journalEntry.id,
-          idempotencyKey: `sales-credit-note:${note.id}:post`,
-          requestHash: createHash('sha256')
-            .update(`${note.id}:${number}`)
-            .digest('hex'),
+          idempotencyKey: requestKey,
+          requestHash,
+          receivableAccountId: originalInvoice.receivableAccountId,
         },
       });
       await db.auditLog.create({
@@ -390,6 +566,8 @@ export class SalesCreditNoteService {
         taxableBase,
         taxAmount,
         lineTotal,
+        revenueAccountId: original.revenueAccountId,
+        taxLiabilityAccountId: tax?.taxLiabilityAccountId ?? null,
         taxes: {
           create: {
             treatmentCodeSnapshot:
@@ -413,6 +591,7 @@ export class SalesCreditNoteService {
 
   private async assertLinesAvailable(
     db: Prisma.TransactionClient,
+    companyId: string,
     invoiceId: string,
     lines: Array<{
       originalSalesInvoiceLineId: string;
@@ -424,6 +603,7 @@ export class SalesCreditNoteService {
         where: {
           id: line.originalSalesInvoiceLineId,
           salesInvoiceId: invoiceId,
+          companyId,
         },
       });
       if (!original)
@@ -432,6 +612,7 @@ export class SalesCreditNoteService {
         );
       const credited = await db.salesCreditNoteLine.aggregate({
         where: {
+          companyId,
           originalSalesInvoiceLineId: line.originalSalesInvoiceLineId,
           salesCreditNote: { status: 'POSTED' },
         },
@@ -451,10 +632,92 @@ export class SalesCreditNoteService {
     }
   }
 
+  private async rebuildCreditAmountsUnderLock(
+    db: Prisma.TransactionClient,
+    note: LockedCreditNote,
+    precision: number,
+  ) {
+    const source = note.salesInvoice;
+    let subtotal = new Prisma.Decimal(0);
+    let taxTotal = new Prisma.Decimal(0);
+    const lines = [] as any[];
+    for (const line of note.lines) {
+      const original = source.lines.find(
+        (candidate: any) => candidate.id === line.originalSalesInvoiceLineId,
+      );
+      if (!original)
+        throw new BadRequestException(
+          'sales.credit_note_original_line_invalid',
+        );
+      const prior = await db.salesCreditNoteLine.aggregate({
+        where: {
+          companyId: note.companyId,
+          originalSalesInvoiceLineId: original.id,
+          salesCreditNote: { status: SalesCreditNoteStatus.POSTED },
+        },
+        _sum: { quantity: true, taxableBase: true, taxAmount: true },
+      });
+      const remainingQuantity = original.quantity.sub(
+        prior._sum.quantity ?? new Prisma.Decimal(0),
+      );
+      if (line.quantity.gt(remainingQuantity))
+        throw new BadRequestException(
+          'sales.credit_note_quantity_exceeds_remaining',
+        );
+      const remainingBase = original.taxableBase.sub(
+        prior._sum.taxableBase ?? new Prisma.Decimal(0),
+      );
+      const remainingTax = original.taxAmount.sub(
+        prior._sum.taxAmount ?? new Prisma.Decimal(0),
+      );
+      const isFinal = line.quantity.eq(remainingQuantity);
+      const taxableBase = isFinal
+        ? remainingBase
+        : (() => {
+            const value = original.taxableBase
+              .mul(line.quantity)
+              .div(original.quantity)
+              .toDecimalPlaces(precision, Prisma.Decimal.ROUND_HALF_UP);
+            return value.gt(remainingBase) ? remainingBase : value;
+          })();
+      const taxAmount = isFinal
+        ? remainingTax
+        : (() => {
+            const value = original.taxAmount
+              .mul(line.quantity)
+              .div(original.quantity)
+              .toDecimalPlaces(precision, Prisma.Decimal.ROUND_HALF_UP);
+            return value.gt(remainingTax) ? remainingTax : value;
+          })();
+      const lineTotal = taxableBase
+        .add(taxAmount)
+        .toDecimalPlaces(precision, Prisma.Decimal.ROUND_HALF_UP);
+      await db.salesCreditNoteLine.update({
+        where: { id: line.id },
+        data: { taxableBase, taxAmount, lineTotal },
+      });
+      await db.salesCreditNoteLineTax.updateMany({
+        where: { companyId: note.companyId, salesCreditNoteLineId: line.id },
+        data: { taxableBase, taxAmount },
+      });
+      const updated = { ...line, taxableBase, taxAmount, lineTotal };
+      lines.push(updated);
+      subtotal = subtotal.add(taxableBase);
+      taxTotal = taxTotal.add(taxAmount);
+    }
+    const grandTotal = subtotal.add(taxTotal);
+    await db.salesCreditNote.update({
+      where: { id: note.id },
+      data: { subtotal, taxTotal, grandTotal },
+    });
+    return { lines, subtotal, taxTotal, grandTotal };
+  }
+
   private async allocateDocumentNumber(
     db: Prisma.TransactionClient,
     companyId: string,
     fiscalYearId: string,
+    fiscalYearStartDate: Date,
   ) {
     const rows = await db.$queryRaw<{ allocated: number }[]>(Prisma.sql`
       INSERT INTO "SalesDocumentSequence" ("id", "companyId", "fiscalYearId", "documentType", "nextValue", "createdAt", "updatedAt")
@@ -466,7 +729,7 @@ export class SalesCreditNoteService {
     const allocated = rows[0]?.allocated;
     if (!allocated)
       throw new ConflictException('Unable to allocate credit note number');
-    return `CN-${new Date().getUTCFullYear()}-${String(allocated).padStart(6, '0')}`;
+    return `CN-${fiscalYearStartDate.getUTCFullYear()}-${String(allocated).padStart(6, '0')}`;
   }
 
   private decimal(value: Prisma.Decimal.Value, message: string) {

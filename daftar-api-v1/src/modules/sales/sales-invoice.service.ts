@@ -8,6 +8,8 @@ import {
 import {
   AccountingConfigAccountKey,
   AccountingConfigJournalKey,
+  AccountingAccountType,
+  AccountingJournalType,
   JournalSourceType,
   Prisma,
   SalesDiscountType,
@@ -16,6 +18,7 @@ import {
   TaxModuleKey,
   TaxCalculationMode,
   TaxTreatmentCategory,
+  TaxLifecycleStatus,
 } from '@prisma/client';
 import { createHash, randomUUID } from 'crypto';
 import { PrismaService } from '../../database/prisma/prisma.service';
@@ -28,6 +31,7 @@ import {
   CreateSalesInvoiceInput,
   SalesInvoiceLineInput,
   SalesInvoiceQuery,
+  PostSalesInvoiceInput,
 } from './dto';
 import {
   SalesInvoiceRepository,
@@ -35,6 +39,8 @@ import {
 } from './sales-invoice.repository';
 import { SalesPricingService } from './sales-pricing.service';
 import { SalesTaxCalculatorService } from './sales-tax-calculator.service';
+import { AccountingReadinessService } from '../accounting-bootstrap/accounting-readiness.service';
+import { assertAccountMappingCompatibility } from '../accounting/accounting-policies';
 
 type Db = Prisma.TransactionClient | PrismaService;
 
@@ -46,6 +52,7 @@ export class SalesInvoiceService {
     private readonly tax: SalesTaxCalculatorService,
     @Optional() private readonly accounting?: AccountingService,
     @Optional() private readonly repository?: SalesInvoiceRepository,
+    @Optional() private readonly readiness?: AccountingReadinessService,
   ) {}
 
   async createDraft(
@@ -154,13 +161,23 @@ export class SalesInvoiceService {
     });
   }
 
-  async postDraft(companyId: string, actorUserId: string, id: string) {
+  async postDraft(
+    companyId: string,
+    actorUserId: string,
+    id: string,
+    input?: PostSalesInvoiceInput,
+  ) {
     if (!this.accounting) {
       throw new ConflictException('Accounting service is not available');
     }
     const accounting = this.accounting;
 
     return this.prisma.$transaction(async (db) => {
+      await db.$queryRaw(Prisma.sql`
+        SELECT "id" FROM "SalesInvoice"
+        WHERE "id" = ${id} AND "companyId" = ${companyId}
+        FOR UPDATE
+      `);
       const invoice = await db.salesInvoice.findFirst({
         where: { id, companyId },
         include: {
@@ -171,19 +188,61 @@ export class SalesInvoiceService {
       });
       if (!invoice) throw new NotFoundException('Sales invoice not found');
       if (invoice.status === SalesInvoiceStatus.POSTED) {
+        if (
+          input?.idempotencyKey &&
+          invoice.idempotencyKey !== input.idempotencyKey
+        ) {
+          throw new ConflictException(
+            'Sales invoice is already posted with another idempotency key',
+          );
+        }
+        if (
+          input?.idempotencyKey &&
+          invoice.requestHash !==
+            this.postingRequestHash(
+              invoice.id,
+              input.idempotencyKey,
+              this.dateOnly(input.postingDate),
+            )
+        ) {
+          throw new ConflictException(
+            'Idempotency key payload does not match the original posting',
+          );
+        }
         return db.salesInvoice.findFirstOrThrow({
           where: { id, companyId },
           include: SALES_INVOICE_INCLUDE,
         });
       }
 
+      const postingDateValue = input?.postingDate ?? invoice.documentDate;
+      this.assertDate(postingDateValue, 'sales.posting_date_invalid');
+      const postingDate = this.dateOnly(postingDateValue);
+      if (this.readiness) {
+        const readiness = await this.readiness.evaluateInTransaction(
+          db,
+          companyId,
+          postingDateValue,
+        );
+        if (!readiness.ready) {
+          throw new ConflictException(
+            `Accounting is not ready: ${readiness.reasons.join(', ')}`,
+          );
+        }
+      }
+      await db.$queryRaw(Prisma.sql`
+        SELECT "id" FROM "BusinessPartner"
+        WHERE "id" = ${invoice.businessPartnerId} AND "companyId" = ${companyId}
+        FOR UPDATE
+      `);
+      await this.assertDraftStillCurrent(db, invoice, postingDateValue);
+      this.assertPaymentSchedule(invoice);
       await this.assertCreditLimit(db, invoice);
-      const postingDate = this.dateOnly(invoice.documentDate);
       const period = await db.accountingPeriod.findFirst({
         where: {
           companyId,
-          startDate: { lte: invoice.documentDate },
-          endDate: { gte: invoice.documentDate },
+          startDate: { lte: postingDateValue },
+          endDate: { gte: postingDateValue },
         },
         include: { fiscalYear: true },
       });
@@ -210,8 +269,14 @@ export class SalesInvoiceService {
             where: { id: journalMapping.journalId, companyId, isActive: true },
           })
         : null;
+
       if (!journal)
         throw new ConflictException('Active sales journal mapping is required');
+      if (journal.type !== AccountingJournalType.SALES) {
+        throw new ConflictException(
+          'Configured sales journal must have SALES type',
+        );
+      }
 
       const mappedAccounts = new Map(
         configuration.accountDefaults.map((mapping) => [
@@ -219,48 +284,32 @@ export class SalesInvoiceService {
           mapping.accountId,
         ]),
       );
-      const incomeAccountId = mappedAccounts.get(
-        AccountingConfigAccountKey.INCOME,
+      const accounts = await this.resolvePostingAccounts(
+        db,
+        companyId,
+        invoice,
+        mappedAccounts,
       );
-      const taxAccountId = mappedAccounts.get(
-        AccountingConfigAccountKey.TAX_PAYABLE,
-      );
-      const receivableAccountId =
-        invoice.businessPartner.customerProfile?.receivableAccountId ??
-        mappedAccounts.get(AccountingConfigAccountKey.RECEIVABLE);
-      if (!incomeAccountId || !receivableAccountId) {
-        throw new ConflictException(
-          'Receivable and income account mappings are required',
-        );
-      }
-      if (invoice.lines.some((line) => line.taxAmount.gt(0)) && !taxAccountId) {
-        throw new ConflictException(
-          'Tax payable account mapping is required for taxable sales',
-        );
-      }
-
       const allocatedNumber = await this.allocateDocumentNumber(
         db,
         companyId,
         period.fiscalYearId,
         SalesDocumentType.SALES_INVOICE,
+        period.fiscalYear.startDate,
       );
-      const lastSchedule = invoice.paymentSchedule.at(-1);
       const lines = [
-        {
-          accountId: receivableAccountId,
-          transactionDebit: invoice.grandTotal.toString(),
+        ...invoice.paymentSchedule.map((schedule) => ({
+          accountId: accounts.receivable.id,
+          transactionDebit: schedule.amount.toString(),
           transactionCredit: '0',
           description: invoice.partnerNameSnapshot,
           businessPartnerId: invoice.businessPartnerId,
-          dueDate: lastSchedule
-            ? this.dateOnly(lastSchedule.dueDate)
-            : postingDate,
+          dueDate: this.dateOnly(schedule.dueDate),
           documentReference: allocatedNumber,
           reconciliationReference: invoice.id,
-        },
+        })),
         ...invoice.lines.map((line) => ({
-          accountId: line.revenueAccountId ?? incomeAccountId,
+          accountId: accounts.revenue.id,
           transactionDebit: '0',
           transactionCredit: line.taxableBase.toString(),
           description: line.descriptionSnapshot,
@@ -271,7 +320,7 @@ export class SalesInvoiceService {
         ...invoice.lines
           .filter((line) => line.taxAmount.gt(0))
           .map((line) => ({
-            accountId: taxAccountId!,
+            accountId: accounts.tax!.id,
             transactionDebit: '0',
             transactionCredit: line.taxAmount.toString(),
             description: `Tax - ${line.descriptionSnapshot}`,
@@ -280,6 +329,13 @@ export class SalesInvoiceService {
             taxRate: line.taxes[0]?.percentageSnapshot.toString(),
           })),
       ];
+      const requestKey =
+        input?.idempotencyKey?.trim() || `sales-invoice:${invoice.id}:post`;
+      const requestHash = this.postingRequestHash(
+        invoice.id,
+        requestKey,
+        postingDate,
+      );
       const journalEntry = await accounting.postInternalInTransaction(
         db,
         companyId,
@@ -288,32 +344,49 @@ export class SalesInvoiceService {
           journalId: journal.id,
           accountingPeriodId: period.id,
           postingDate,
-          documentDate: postingDate,
-          dueDate: lastSchedule
-            ? this.dateOnly(lastSchedule.dueDate)
-            : undefined,
+          documentDate: this.dateOnly(invoice.documentDate),
           transactionCurrencyCode: invoice.transactionCurrencyCode,
           exchangeRate: invoice.exchangeRate.toString(),
           documentReference: allocatedNumber,
           description: `Sales invoice ${allocatedNumber}`,
           sourceType: JournalSourceType.SALES_INVOICE,
           sourceId: invoice.id,
-          idempotencyKey: `sales-invoice:${invoice.id}:post`,
+          idempotencyKey: requestKey,
           lines,
         },
       );
 
+      for (const line of invoice.lines) {
+        await db.salesInvoiceLine.update({
+          where: { id: line.id },
+          data: {
+            revenueAccountId: accounts.revenue.id,
+            revenueAccountCodeSnapshot: accounts.revenue.code,
+          },
+        });
+        for (const tax of line.taxes) {
+          await db.salesInvoiceLineTax.update({
+            where: { id: tax.id },
+            data: {
+              taxLiabilityAccountId: tax.taxAmount.gt(0)
+                ? accounts.tax!.id
+                : null,
+            },
+          });
+        }
+      }
       await db.salesInvoice.update({
         where: { id },
         data: {
           status: SalesInvoiceStatus.POSTED,
           invoiceNumber: allocatedNumber,
-          postingDate: invoice.documentDate,
+          postingDate: postingDateValue,
           postedById: actorUserId,
           postedAt: new Date(),
           journalEntryId: journalEntry.id,
-          idempotencyKey: `sales-invoice:${invoice.id}:post`,
-          requestHash: this.postingRequestHash(invoice.id, allocatedNumber),
+          idempotencyKey: requestKey,
+          requestHash,
+          receivableAccountId: accounts.receivable.id,
         },
       });
       await db.auditLog.create({
@@ -424,12 +497,16 @@ export class SalesInvoiceService {
       actor?.role === 'SUPER_ADMIN' ||
       (
         actor?.permissions?.permissions as Record<string, unknown> | undefined
-      )?.['tax_setup.manage_defaults'] === true;
+      )?.['overrideSalesTax'] === true;
     const defaultSelection = moduleRule?.defaultTreatment
       ? {
+          treatmentId: moduleRule.defaultTreatment.id,
           treatmentCode: moduleRule.defaultTreatment.code,
           treatmentCategory: moduleRule.defaultTreatment.category,
           calculationMode: moduleRule.defaultTreatment.calculationMode,
+          treatmentStatus: moduleRule.defaultTreatment.status,
+          treatmentEffectiveFrom: moduleRule.defaultTreatment.effectiveFrom,
+          treatmentEffectiveTo: moduleRule.defaultTreatment.effectiveTo,
           rate: moduleRule.defaultRate
             ? {
                 id: moduleRule.defaultRate.id,
@@ -443,9 +520,14 @@ export class SalesInvoiceService {
         }
       : defaultPolicy?.defaultTreatment
         ? {
+            treatmentId: defaultPolicy.defaultTreatment.id,
             treatmentCode: defaultPolicy.defaultTreatment.code,
             treatmentCategory: defaultPolicy.defaultTreatment.category,
             calculationMode: defaultPolicy.defaultCalculationMode,
+            treatmentStatus: defaultPolicy.defaultTreatment.status,
+            treatmentEffectiveFrom:
+              defaultPolicy.defaultTreatment.effectiveFrom,
+            treatmentEffectiveTo: defaultPolicy.defaultTreatment.effectiveTo,
             rate: defaultPolicy.defaultRate
               ? {
                   id: defaultPolicy.defaultRate.id,
@@ -458,6 +540,22 @@ export class SalesInvoiceService {
               : null,
           }
         : null;
+
+    const configuredTaxPairs = [
+      [moduleRule?.defaultTreatment, moduleRule?.defaultRate],
+      [defaultPolicy?.defaultTreatment, defaultPolicy?.defaultRate],
+    ] as const;
+    for (const [treatment, rate] of configuredTaxPairs) {
+      if (treatment && treatment.companyId !== companyId) {
+        throw new BadRequestException('sales.tax_treatment_company_mismatch');
+      }
+      if (rate && rate.companyId !== companyId) {
+        throw new BadRequestException('sales.tax_rate_company_mismatch');
+      }
+      if (treatment && rate && rate.treatmentId !== treatment.id) {
+        throw new BadRequestException('sales.tax_rate_treatment_mismatch');
+      }
+    }
 
     const lineResults = [] as Array<{
       input: SalesInvoiceLineInput;
@@ -512,6 +610,27 @@ export class SalesInvoiceService {
           (defaultPolicy?.allowManualOverride ?? true),
         overrideAuthorized,
       });
+      if (explicit && !line.taxOverrideReason?.trim()) {
+        throw new BadRequestException('sales.tax_override_reason_required');
+      }
+      if (explicit && actor) {
+        await db.auditLog.create({
+          data: {
+            companyId,
+            actorUserId,
+            action: 'sales.tax.override_selected',
+            entityType: 'SalesInvoiceLine',
+            metadata: {
+              lineDescription: line.description,
+              normalSelection:
+                defaultSelection?.treatmentCode ??
+                TaxTreatmentCategory.OUT_OF_SCOPE,
+              overrideSelection: explicit.treatmentCode,
+              reason: line.taxOverrideReason!.trim(),
+            },
+          },
+        });
+      }
       const tax = this.tax.calculateTax({
         ...selection,
         enteredAmount: priced.taxableBase,
@@ -689,6 +808,7 @@ export class SalesInvoiceService {
       lineTotal: line.lineTotal,
       taxes: {
         create: {
+          taxTreatmentId: line.tax.treatmentId ?? null,
           treatmentCodeSnapshot: line.tax.treatmentCode,
           treatmentCategory: line.tax.treatmentCategory,
           taxRateId: line.tax.rateId,
@@ -760,7 +880,20 @@ export class SalesInvoiceService {
     if ((treatmentId || rateId) && !treatment) {
       throw new BadRequestException('sales.tax_treatment_invalid');
     }
+    if (rate && rate.companyId !== companyId) {
+      throw new BadRequestException('sales.tax_rate_company_mismatch');
+    }
+    if (treatment && treatment.companyId !== companyId) {
+      throw new BadRequestException('sales.tax_treatment_company_mismatch');
+    }
+    if (rate && treatment && rate.treatmentId !== treatment.id) {
+      throw new BadRequestException('sales.tax_rate_treatment_mismatch');
+    }
+    if (rate && !treatment) {
+      throw new BadRequestException('sales.tax_treatment_required');
+    }
     return {
+      treatmentId: treatment?.id ?? null,
       treatmentCode: treatment?.code ?? TaxTreatmentCategory.OUT_OF_SCOPE,
       treatmentCategory:
         treatment?.category ?? TaxTreatmentCategory.OUT_OF_SCOPE,
@@ -776,6 +909,9 @@ export class SalesInvoiceService {
             effectiveTo: rate.effectiveTo,
           }
         : null,
+      treatmentStatus: treatment?.status,
+      treatmentEffectiveFrom: treatment?.effectiveFrom,
+      treatmentEffectiveTo: treatment?.effectiveTo,
     };
   }
 
@@ -785,6 +921,8 @@ export class SalesInvoiceService {
       companyId: string;
       businessPartnerId: string;
       grandTotal: Prisma.Decimal;
+      exchangeRate: Prisma.Decimal;
+      paymentSchedule: Array<{ amount: Prisma.Decimal }>;
       businessPartner: {
         customerProfile: { creditLimit: Prisma.Decimal | null } | null;
       };
@@ -792,29 +930,211 @@ export class SalesInvoiceService {
   ) {
     const limit = invoice.businessPartner.customerProfile?.creditLimit;
     if (limit === null || limit === undefined) return;
-    const [postedSales, postedCreditNotes] = await Promise.all([
-      db.salesInvoice.aggregate({
-        where: {
-          companyId: invoice.companyId,
-          businessPartnerId: invoice.businessPartnerId,
-          status: SalesInvoiceStatus.POSTED,
-        },
-        _sum: { grandTotal: true },
-      }),
-      db.salesCreditNote.aggregate({
-        where: {
-          companyId: invoice.companyId,
-          businessPartnerId: invoice.businessPartnerId,
-          status: 'POSTED',
-        },
-        _sum: { grandTotal: true },
-      }),
-    ]);
-    const outstanding = (
-      postedSales._sum.grandTotal ?? new Prisma.Decimal(0)
-    ).sub(postedCreditNotes._sum.grandTotal ?? new Prisma.Decimal(0));
-    if (outstanding.add(invoice.grandTotal).gt(limit)) {
+    const rows = await db.$queryRaw<{ exposure: Prisma.Decimal }[]>(Prisma.sql`
+      SELECT COALESCE(SUM(jl."debit" - jl."credit"), 0) AS exposure
+      FROM "JournalLine" jl
+      JOIN "JournalEntry" je ON je."id" = jl."journalEntryId" AND je."companyId" = jl."companyId"
+      JOIN "AccountingAccount" aa ON aa."id" = jl."accountId" AND aa."companyId" = jl."companyId"
+      WHERE jl."companyId" = ${invoice.companyId}
+        AND jl."businessPartnerId" = ${invoice.businessPartnerId}
+        AND je."status" = 'POSTED'
+        AND aa."accountType" = 'ASSET_RECEIVABLE'
+    `);
+    const existingExposure = rows[0]?.exposure ?? new Prisma.Decimal(0);
+    const prospective = invoice.paymentSchedule.reduce(
+      (total, schedule) =>
+        total.add(
+          schedule.amount
+            .mul(invoice.exchangeRate)
+            .toDecimalPlaces(4, Prisma.Decimal.ROUND_HALF_UP),
+        ),
+      new Prisma.Decimal(0),
+    );
+    if (existingExposure.add(prospective).gt(limit)) {
       throw new ConflictException('sales.customer_credit_limit_exceeded');
+    }
+  }
+
+  private async resolvePostingAccounts(
+    db: Prisma.TransactionClient,
+    companyId: string,
+    invoice: any,
+    mappedAccounts: Map<AccountingConfigAccountKey, string>,
+  ) {
+    const load = async (
+      id: string | undefined,
+      key: AccountingConfigAccountKey,
+      expected: AccountingAccountType | AccountingAccountType[],
+      control = false,
+    ) => {
+      if (!id) throw new ConflictException(`Missing ${key} account mapping`);
+      const account = await db.accountingAccount.findFirst({
+        where: { id, companyId },
+      });
+      if (!account || !account.isActive || !account.allowDirectPosting) {
+        throw new ConflictException(`Invalid ${key} account mapping`);
+      }
+      try {
+        assertAccountMappingCompatibility(key, account.accountType);
+      } catch {
+        throw new ConflictException(`Invalid ${key} account semantics`);
+      }
+      const expectedTypes = Array.isArray(expected) ? expected : [expected];
+      if (
+        !expectedTypes.includes(account.accountType) ||
+        (control &&
+          (!account.isControlAccount || !account.reconciliationEligible))
+      ) {
+        throw new ConflictException(`Invalid ${key} account semantics`);
+      }
+      return account;
+    };
+    const receivable = await load(
+      (invoice.businessPartner.customerProfile?.receivableAccountId as
+        | string
+        | undefined) ??
+        mappedAccounts.get(AccountingConfigAccountKey.RECEIVABLE),
+      AccountingConfigAccountKey.RECEIVABLE,
+      AccountingAccountType.ASSET_RECEIVABLE,
+      false,
+    );
+    const revenue = await load(
+      mappedAccounts.get(AccountingConfigAccountKey.INCOME),
+      AccountingConfigAccountKey.INCOME,
+      [
+        AccountingAccountType.INCOME_OPERATING_REVENUE,
+        AccountingAccountType.INCOME_OTHER,
+      ],
+    );
+    let tax: Awaited<ReturnType<typeof load>> | null = null;
+    if (invoice.lines.some((line: any) => line.taxAmount.gt(0))) {
+      tax = await load(
+        mappedAccounts.get(AccountingConfigAccountKey.TAX_PAYABLE),
+        AccountingConfigAccountKey.TAX_PAYABLE,
+        AccountingAccountType.LIABILITY_TAX,
+      );
+    }
+    return { receivable, revenue, tax };
+  }
+
+  private async assertDraftStillCurrent(
+    db: Prisma.TransactionClient,
+    invoice: any,
+    postingDate: Date,
+  ) {
+    const partner = await db.businessPartner.findFirst({
+      where: { id: invoice.businessPartnerId, companyId: invoice.companyId },
+      include: {
+        addresses: {
+          where: { isActive: true },
+          orderBy: { isDefault: 'desc' },
+        },
+      },
+    });
+    const currentAddress = partner?.addresses[0] ?? null;
+    if (
+      !partner ||
+      partner.partnerCode !== invoice.partnerCodeSnapshot ||
+      partner.displayName !== invoice.partnerNameSnapshot ||
+      partner.legalName !== invoice.partnerLegalNameSnapshot ||
+      partner.taxRegistrationNumber !== invoice.taxRegistrationNumberSnapshot ||
+      JSON.stringify(currentAddress) !==
+        JSON.stringify(invoice.billingAddressSnapshot)
+    ) {
+      throw new ConflictException('sales.draft_requires_recalculation');
+    }
+    for (const line of invoice.lines) {
+      const tax = line.taxes[0];
+      if (!tax) continue;
+      const treatment = tax.taxTreatmentId
+        ? await db.taxTreatment.findFirst({
+            where: { id: tax.taxTreatmentId, companyId: invoice.companyId },
+          })
+        : null;
+      if (
+        tax.taxTreatmentId &&
+        (!treatment ||
+          treatment.code !== tax.treatmentCodeSnapshot ||
+          treatment.category !== tax.treatmentCategory ||
+          treatment.status !== TaxLifecycleStatus.ACTIVE ||
+          (treatment.effectiveFrom && postingDate < treatment.effectiveFrom) ||
+          (treatment.effectiveTo && postingDate > treatment.effectiveTo))
+      ) {
+        throw new ConflictException('sales.draft_requires_recalculation');
+      }
+      const rate = tax.taxRateId
+        ? await db.taxRate.findFirst({
+            where: { id: tax.taxRateId, companyId: invoice.companyId },
+          })
+        : null;
+      if (
+        tax.taxRateId &&
+        (!rate ||
+          rate.treatmentId !== tax.taxTreatmentId ||
+          rate.code !== tax.rateCodeSnapshot ||
+          !rate.percentage.eq(String(tax.percentageSnapshot)) ||
+          rate.status !== TaxLifecycleStatus.ACTIVE ||
+          (rate.effectiveFrom && postingDate < rate.effectiveFrom) ||
+          (rate.effectiveTo && postingDate > rate.effectiveTo))
+      ) {
+        throw new ConflictException('sales.draft_requires_recalculation');
+      }
+    }
+    if (invoice.paymentTermId) {
+      const term = await db.paymentTerm.findFirst({
+        where: { id: invoice.paymentTermId, companyId: invoice.companyId },
+        include: { lines: { orderBy: { sequence: 'asc' } } },
+      });
+      const first = invoice.paymentSchedule[0];
+      const currency = await db.currency.findFirst({
+        where: { code: invoice.transactionCurrencyCode, isActive: true },
+      });
+      const expectedSchedule =
+        term && currency
+          ? PaymentTermsCalculator.calculate(
+              new Prisma.Decimal(String(invoice.grandTotal)),
+              new Date(String(invoice.documentDate)),
+              term as PaymentTermWithLines,
+              currency.minorUnitPrecision,
+            )
+          : [];
+      if (
+        !term ||
+        !first ||
+        first.paymentTermCodeSnapshot !== term.code ||
+        first.paymentTermNameSnapshot !== term.name ||
+        expectedSchedule.length !== invoice.paymentSchedule.length ||
+        expectedSchedule.some(
+          (expected, index) =>
+            !expected.amount.eq(
+              new Prisma.Decimal(String(invoice.paymentSchedule[index].amount)),
+            ) ||
+            expected.dueDate.toISOString().slice(0, 10) !==
+              new Date(String(invoice.paymentSchedule[index].dueDate))
+                .toISOString()
+                .slice(0, 10),
+        )
+      ) {
+        throw new ConflictException('sales.draft_requires_recalculation');
+      }
+    }
+  }
+
+  private assertPaymentSchedule(invoice: {
+    paymentSchedule: Array<{ amount: Prisma.Decimal }>;
+    grandTotal: Prisma.Decimal;
+  }) {
+    if (!invoice.paymentSchedule.length)
+      throw new ConflictException('sales.payment_schedule_required');
+    const sum = invoice.paymentSchedule.reduce(
+      (total: Prisma.Decimal, row) => total.add(row.amount),
+      new Prisma.Decimal(0),
+    );
+    if (
+      !sum.eq(invoice.grandTotal) ||
+      invoice.paymentSchedule.some((row) => row.amount.lte(0))
+    ) {
+      throw new ConflictException('sales.payment_schedule_invalid');
     }
   }
 
@@ -823,6 +1143,7 @@ export class SalesInvoiceService {
     companyId: string,
     fiscalYearId: string,
     documentType: SalesDocumentType,
+    fiscalYearStartDate: Date,
   ) {
     const rows = await db.$queryRaw<{ allocated: number }[]>(Prisma.sql`
       INSERT INTO "SalesDocumentSequence" ("id", "companyId", "fiscalYearId", "documentType", "nextValue", "createdAt", "updatedAt")
@@ -835,16 +1156,22 @@ export class SalesInvoiceService {
     const allocated = rows[0]?.allocated;
     if (!allocated)
       throw new ConflictException('Unable to allocate sales document number');
-    return `SI-${new Date().getUTCFullYear()}-${String(allocated).padStart(6, '0')}`;
+    const prefix =
+      documentType === SalesDocumentType.SALES_INVOICE ? 'SI' : 'CN';
+    return `${prefix}-${fiscalYearStartDate.getUTCFullYear()}-${String(allocated).padStart(6, '0')}`;
   }
 
   private dateOnly(value: Date) {
     return value.toISOString().slice(0, 10);
   }
 
-  private postingRequestHash(invoiceId: string, invoiceNumber: string) {
+  private postingRequestHash(
+    invoiceId: string,
+    requestKey: string,
+    postingDate: string,
+  ) {
     return createHash('sha256')
-      .update(`${invoiceId}:${invoiceNumber}`)
+      .update(`${invoiceId}:${requestKey}:${postingDate}`)
       .digest('hex');
   }
 }

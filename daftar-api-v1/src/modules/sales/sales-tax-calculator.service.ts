@@ -1,5 +1,14 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
-import { Prisma, TaxCalculationMode, TaxLifecycleStatus, TaxTreatmentCategory } from '@prisma/client';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import {
+  Prisma,
+  TaxCalculationMode,
+  TaxLifecycleStatus,
+  TaxTreatmentCategory,
+} from '@prisma/client';
 
 export interface SalesTaxRateSnapshot {
   id: string;
@@ -12,9 +21,13 @@ export interface SalesTaxRateSnapshot {
 
 export interface SalesTaxSelection {
   rate: SalesTaxRateSnapshot | null;
+  treatmentId?: string | null;
   treatmentCode: string;
   treatmentCategory: TaxTreatmentCategory;
   calculationMode: TaxCalculationMode;
+  treatmentStatus?: TaxLifecycleStatus;
+  treatmentEffectiveFrom?: Date | null;
+  treatmentEffectiveTo?: Date | null;
 }
 
 export interface SalesTaxInput extends SalesTaxSelection {
@@ -24,6 +37,7 @@ export interface SalesTaxInput extends SalesTaxSelection {
 }
 
 export interface SalesTaxResult {
+  treatmentId: string | null;
   treatmentCode: string;
   treatmentCategory: TaxTreatmentCategory;
   rateId: string | null;
@@ -50,6 +64,7 @@ export class SalesTaxCalculatorService {
     if (!input.moduleEnabled) {
       return {
         rate: null,
+        treatmentId: null,
         treatmentCode: TaxTreatmentCategory.OUT_OF_SCOPE,
         treatmentCategory: TaxTreatmentCategory.OUT_OF_SCOPE,
         calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
@@ -63,16 +78,24 @@ export class SalesTaxCalculatorService {
       return input.explicit;
     }
 
-    return input.moduleDefault ?? input.companyDefault ?? {
-      rate: null,
-      treatmentCode: TaxTreatmentCategory.OUT_OF_SCOPE,
-      treatmentCategory: TaxTreatmentCategory.OUT_OF_SCOPE,
-      calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
-    };
+    return (
+      input.moduleDefault ??
+      input.companyDefault ?? {
+        rate: null,
+        treatmentId: null,
+        treatmentCode: TaxTreatmentCategory.OUT_OF_SCOPE,
+        treatmentCategory: TaxTreatmentCategory.OUT_OF_SCOPE,
+        calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
+      }
+    );
   }
 
   calculateTax(input: SalesTaxInput): SalesTaxResult {
-    if (!Number.isInteger(input.currencyPrecision) || input.currencyPrecision < 0 || input.currencyPrecision > 8) {
+    if (
+      !Number.isInteger(input.currencyPrecision) ||
+      input.currencyPrecision < 0 ||
+      input.currencyPrecision > 8
+    ) {
       throw new BadRequestException('sales.currency_precision_invalid');
     }
 
@@ -81,10 +104,12 @@ export class SalesTaxCalculatorService {
       throw new BadRequestException('sales.taxable_amount_invalid');
     }
 
-    const isZeroTaxTreatment = input.treatmentCategory === TaxTreatmentCategory.ZERO_RATED
-      || input.treatmentCategory === TaxTreatmentCategory.EXEMPT
-      || input.treatmentCategory === TaxTreatmentCategory.OUT_OF_SCOPE;
+    const isZeroTaxTreatment =
+      input.treatmentCategory === TaxTreatmentCategory.ZERO_RATED ||
+      input.treatmentCategory === TaxTreatmentCategory.EXEMPT ||
+      input.treatmentCategory === TaxTreatmentCategory.OUT_OF_SCOPE;
 
+    this.assertTreatmentIsUsable(input);
     if (!isZeroTaxTreatment) {
       if (!input.rate) {
         throw new BadRequestException('sales.tax_rate_required');
@@ -92,18 +117,29 @@ export class SalesTaxCalculatorService {
       this.assertRateIsUsable(input.rate, input.asOf);
     }
 
-    const percentage = input.rate ? new Prisma.Decimal(input.rate.percentage) : new Prisma.Decimal(0);
-    const taxableBase = input.calculationMode === TaxCalculationMode.TAX_INCLUSIVE
-      ? this.money(enteredAmount.div(new Prisma.Decimal(1).add(percentage.div(100))), input.currencyPrecision)
-      : this.money(enteredAmount, input.currencyPrecision);
+    const percentage = input.rate
+      ? new Prisma.Decimal(input.rate.percentage)
+      : new Prisma.Decimal(0);
+    const taxableBase =
+      input.calculationMode === TaxCalculationMode.TAX_INCLUSIVE
+        ? this.money(
+            enteredAmount.div(new Prisma.Decimal(1).add(percentage.div(100))),
+            input.currencyPrecision,
+          )
+        : this.money(enteredAmount, input.currencyPrecision);
     const taxAmount = isZeroTaxTreatment
       ? new Prisma.Decimal(0).toDecimalPlaces(input.currencyPrecision)
-      : this.money(taxableBase.mul(percentage).div(100), input.currencyPrecision);
-    const grossAmount = input.calculationMode === TaxCalculationMode.TAX_INCLUSIVE
-      ? this.money(enteredAmount, input.currencyPrecision)
-      : this.money(taxableBase.add(taxAmount), input.currencyPrecision);
+      : this.money(
+          taxableBase.mul(percentage).div(100),
+          input.currencyPrecision,
+        );
+    const grossAmount =
+      input.calculationMode === TaxCalculationMode.TAX_INCLUSIVE
+        ? this.money(enteredAmount, input.currencyPrecision)
+        : this.money(taxableBase.add(taxAmount), input.currencyPrecision);
 
     return {
+      treatmentId: input.treatmentId ?? null,
       treatmentCode: input.treatmentCode,
       treatmentCategory: input.treatmentCategory,
       rateId: input.rate?.id ?? null,
@@ -125,6 +161,22 @@ export class SalesTaxCalculatorService {
     }
     if (rate.effectiveTo && asOf > rate.effectiveTo) {
       throw new BadRequestException('sales.tax_rate_expired');
+    }
+  }
+
+  private assertTreatmentIsUsable(input: SalesTaxInput): void {
+    if (!input.treatmentId) return;
+    if (input.treatmentStatus !== TaxLifecycleStatus.ACTIVE) {
+      throw new BadRequestException('sales.tax_treatment_inactive');
+    }
+    if (
+      input.treatmentEffectiveFrom &&
+      input.asOf < input.treatmentEffectiveFrom
+    ) {
+      throw new BadRequestException('sales.tax_treatment_not_effective');
+    }
+    if (input.treatmentEffectiveTo && input.asOf > input.treatmentEffectiveTo) {
+      throw new BadRequestException('sales.tax_treatment_expired');
     }
   }
 

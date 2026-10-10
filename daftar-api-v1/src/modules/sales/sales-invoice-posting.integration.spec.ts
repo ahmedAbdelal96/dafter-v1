@@ -6,6 +6,7 @@ import {
   AccountingConfigAccountKey,
   AccountingConfigJournalKey,
   AccountingJournalType,
+  BusinessPartnerType,
   JournalSourceType,
   Prisma,
 } from '@prisma/client';
@@ -147,6 +148,12 @@ describe('SalesInvoice posting', () => {
   });
 
   it('posts exactly once through the accounting engine and allocates a fiscal-year number', async () => {
+    const legacyLedgerBefore = await prisma.ledgerEntry.count({
+      where: { companyId },
+    });
+    const legacyBalancesBefore = await prisma.balance.count({
+      where: { companyId },
+    });
     const draft = await sales.createDraft(companyId, ownerId, {
       businessPartnerId: customerId,
       documentDate: new Date('2026-10-10'),
@@ -174,6 +181,12 @@ describe('SalesInvoice posting', () => {
     expect(entry.sourceId).toBe(draft.id);
     expect(entry.status).toBe('POSTED');
     expect(entry.lines).toHaveLength(2);
+    expect(await prisma.ledgerEntry.count({ where: { companyId } })).toBe(
+      legacyLedgerBefore,
+    );
+    expect(await prisma.balance.count({ where: { companyId } })).toBe(
+      legacyBalancesBefore,
+    );
     expect(
       entry.lines
         .reduce((sum, line) => sum.add(line.debit), new Prisma.Decimal(0))
@@ -187,6 +200,127 @@ describe('SalesInvoice posting', () => {
 
     const replay = await sales.postDraft(companyId, ownerId, draft.id);
     expect(replay.id).toBe(posted.id);
+    expect(
+      await prisma.journalEntry.count({
+        where: { companyId, sourceId: draft.id },
+      }),
+    ).toBe(1);
+  });
+
+  it('creates one AR open item per payment maturity and preserves the exact total', async () => {
+    const stamp = Date.now();
+    const partner = await prisma.businessPartner.create({
+      data: {
+        companyId,
+        partnerCode: `SPLIT-${stamp}`,
+        displayName: 'Split Term Customer',
+        legalName: 'Split Term Customer',
+        isActive: true,
+        partnerType: BusinessPartnerType.ORGANIZATION,
+        customerProfile: { create: {} },
+      },
+    });
+    const term = await prisma.paymentTerm.create({
+      data: {
+        companyId,
+        code: `HALF-${stamp}`,
+        name: '50/50 Net 30',
+        lines: {
+          create: [
+            {
+              sequence: 1,
+              calculationType: 'PERCENT',
+              percentage: '50',
+              dueDays: 0,
+            },
+            {
+              sequence: 2,
+              calculationType: 'PERCENT',
+              percentage: '50',
+              dueDays: 30,
+            },
+          ],
+        },
+      },
+    });
+    const draft = await sales.createDraft(companyId, ownerId, {
+      businessPartnerId: partner.id,
+      documentDate: new Date('2026-10-10'),
+      currencyCode: 'EGP',
+      exchangeRate: '1',
+      paymentTermId: term.id,
+      lines: [
+        {
+          description: 'Split maturity service',
+          quantity: '1',
+          unitPrice: '100',
+          discountValue: '0',
+        },
+      ],
+    });
+    const posted = await sales.postDraft(companyId, ownerId, draft.id, {
+      postingDate: new Date('2026-10-11'),
+      idempotencyKey: `split-${stamp}`,
+    });
+    const arLines = await prisma.journalLine.findMany({
+      where: {
+        journalEntryId: posted.journalEntryId!,
+        businessPartnerId: partner.id,
+      },
+      orderBy: { dueDate: 'asc' },
+    });
+    expect(arLines).toHaveLength(2);
+    expect(arLines.map((line) => line.transactionDebit.toFixed(2))).toEqual([
+      '50.00',
+      '50.00',
+    ]);
+    expect(arLines[0].dueDate?.toISOString().slice(0, 10)).toBe('2026-10-10');
+    expect(arLines[1].dueDate?.toISOString().slice(0, 10)).toBe('2026-11-09');
+    expect(
+      arLines
+        .reduce((sum, line) => sum.add(line.debit), new Prisma.Decimal(0))
+        .toFixed(2),
+    ).toBe('100.00');
+  });
+
+  it('serializes concurrent post requests into one number and one journal entry', async () => {
+    const stamp = Date.now();
+    const partner = await prisma.businessPartner.create({
+      data: {
+        companyId,
+        partnerCode: `RACE-${stamp}`,
+        displayName: 'Race Customer',
+        legalName: 'Race Customer',
+        isActive: true,
+        partnerType: BusinessPartnerType.ORGANIZATION,
+        customerProfile: { create: {} },
+      },
+    });
+    const draft = await sales.createDraft(companyId, ownerId, {
+      businessPartnerId: partner.id,
+      documentDate: new Date('2026-10-13'),
+      currencyCode: 'EGP',
+      exchangeRate: '1',
+      lines: [
+        {
+          description: 'Concurrent service',
+          quantity: '1',
+          unitPrice: '25',
+          discountValue: '0',
+        },
+      ],
+    });
+    const results = await Promise.all([
+      sales.postDraft(companyId, ownerId, draft.id, {
+        postingDate: new Date('2026-10-13'),
+        idempotencyKey: `race-${stamp}`,
+      }),
+      sales.postDraft(companyId, ownerId, draft.id, {
+        postingDate: new Date('2026-10-13'),
+        idempotencyKey: `race-${stamp}`,
+      }),
+    ]);
+    expect(results[0].invoiceNumber).toBe(results[1].invoiceNumber);
     expect(
       await prisma.journalEntry.count({
         where: { companyId, sourceId: draft.id },
@@ -215,6 +349,12 @@ describe('SalesInvoice posting', () => {
   });
 
   it('creates and posts a credit note against a posted invoice without mutating the invoice', async () => {
+    const legacyLedgerBefore = await prisma.ledgerEntry.count({
+      where: { companyId },
+    });
+    const legacyBalancesBefore = await prisma.balance.count({
+      where: { companyId },
+    });
     const invoice = await prisma.salesInvoice.findFirstOrThrow({
       where: { companyId, status: 'POSTED' },
       include: { lines: true },
@@ -232,6 +372,12 @@ describe('SalesInvoice posting', () => {
     expect(note.grandTotal.toFixed(2)).toBe('100.00');
     const posted = await creditNotes.postDraft(companyId, ownerId, note.id);
     expect(posted.status).toBe('POSTED');
+    expect(await prisma.ledgerEntry.count({ where: { companyId } })).toBe(
+      legacyLedgerBefore,
+    );
+    expect(await prisma.balance.count({ where: { companyId } })).toBe(
+      legacyBalancesBefore,
+    );
     expect(posted.creditNoteNumber).toBe('CN-2026-000001');
     const entry = await prisma.journalEntry.findFirstOrThrow({
       where: { id: posted.journalEntryId!, companyId },

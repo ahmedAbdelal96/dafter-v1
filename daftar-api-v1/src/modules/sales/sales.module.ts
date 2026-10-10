@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AccountingModule } from '../accounting/accounting.module';
+import { AccountingBootstrapModule } from '../accounting-bootstrap/accounting-bootstrap.module';
 import { SalesCreditNoteController } from './sales-credit-note.controller';
 import { SalesCreditNoteRepository } from './sales-credit-note.repository';
 import { SalesCreditNoteService } from './sales-credit-note.service';
@@ -10,7 +11,7 @@ import { SalesPricingService } from './sales-pricing.service';
 import { SalesTaxCalculatorService } from './sales-tax-calculator.service';
 
 @Module({
-  imports: [AccountingModule],
+  imports: [AccountingModule, AccountingBootstrapModule],
   controllers: [SalesInvoiceController, SalesCreditNoteController],
   providers: [
     SalesInvoiceRepository,

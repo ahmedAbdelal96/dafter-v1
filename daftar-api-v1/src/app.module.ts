@@ -64,11 +64,9 @@ import { ExpensesModule } from './modules/expenses/expenses.module';
 import { ProductsModule } from './modules/products/products.module';
 
 // Phase K â€” Invoices
-import { InvoicesModule } from './modules/invoices/invoices.module';
 import { SalesModule } from './modules/sales/sales.module';
 
 // P2 â€” Pricing
-import { PricingModule } from './modules/pricing/pricing.module';
 
 // P2 â€” Statements
 import { StatementsModule } from './modules/statements/statements.module';
@@ -173,11 +171,9 @@ import { OpeningBalancesModule } from './modules/opening-balances/opening-balanc
     ProductsModule,
 
     // Phase K â€” Invoices
-    InvoicesModule,
     SalesModule,
 
     // P2 â€” Pricing
-    PricingModule,
 
     // P2 â€” Statements
     StatementsModule,

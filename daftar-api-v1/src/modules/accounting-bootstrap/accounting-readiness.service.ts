@@ -6,6 +6,7 @@ import {
   AccountingSetupStatus,
 } from '@prisma/client';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 import {
   assertAccountMappingCompatibility,
   assertJournalMappingCompatibility,
@@ -44,6 +45,22 @@ export class AccountingReadinessService {
     companyId: string,
     postingDate = new Date(),
   ): Promise<AccountingReadiness> {
+    return this.evaluateAgainst(this.prisma, companyId, postingDate);
+  }
+
+  async evaluateInTransaction(
+    db: Prisma.TransactionClient,
+    companyId: string,
+    postingDate = new Date(),
+  ): Promise<AccountingReadiness> {
+    return this.evaluateAgainst(db, companyId, postingDate);
+  }
+
+  private async evaluateAgainst(
+    db: PrismaService | Prisma.TransactionClient,
+    companyId: string,
+    postingDate = new Date(),
+  ): Promise<AccountingReadiness> {
     const date = new Date(
       Date.UTC(
         postingDate.getUTCFullYear(),
@@ -53,7 +70,7 @@ export class AccountingReadinessService {
     );
     const [company, configuration, fiscalYear, period, setup] =
       await Promise.all([
-        this.prisma.company.findFirst({
+        db.company.findFirst({
           where: { id: companyId, isDeleted: false },
           select: {
             id: true,
@@ -61,7 +78,7 @@ export class AccountingReadinessService {
             currency: { select: { code: true, isActive: true } },
           },
         }),
-        this.prisma.accountingConfiguration.findUnique({
+        db.accountingConfiguration.findUnique({
           where: { companyId },
           include: {
             baseCurrency: { select: { code: true, isActive: true } },
@@ -69,7 +86,7 @@ export class AccountingReadinessService {
             journalDefaults: true,
           },
         }),
-        this.prisma.fiscalYear.findFirst({
+        db.fiscalYear.findFirst({
           where: {
             companyId,
             status: 'OPEN',
@@ -77,7 +94,7 @@ export class AccountingReadinessService {
             endDate: { gte: date },
           },
         }),
-        this.prisma.accountingPeriod.findFirst({
+        db.accountingPeriod.findFirst({
           where: {
             companyId,
             status: 'OPEN',
@@ -86,7 +103,7 @@ export class AccountingReadinessService {
           },
           include: { fiscalYear: true },
         }),
-        this.prisma.accountingSetup.findUnique({
+        db.accountingSetup.findUnique({
           where: { companyId },
           include: {
             template: { select: { code: true, version: true, isActive: true } },
@@ -116,7 +133,7 @@ export class AccountingReadinessService {
         reasons.push(`ACCOUNT_MAPPING_MISSING:${key}`);
         continue;
       }
-      const account = await this.prisma.accountingAccount.findFirst({
+      const account = await db.accountingAccount.findFirst({
         where: { id: mapping.accountId, companyId },
       });
       if (!account) {
@@ -141,7 +158,7 @@ export class AccountingReadinessService {
         reasons.push(`JOURNAL_MAPPING_MISSING:${required.key}`);
         continue;
       }
-      const journal = await this.prisma.accountingJournal.findFirst({
+      const journal = await db.accountingJournal.findFirst({
         where: { id: mapping.journalId, companyId },
       });
       if (!journal) {
@@ -176,7 +193,7 @@ export class AccountingReadinessService {
       ) {
         reasons.push('ACCOUNTING_TEMPLATE_PROVENANCE_INVALID');
       }
-      const accountCount = await this.prisma.accountingAccount.count({
+      const accountCount = await db.accountingAccount.count({
         where: {
           companyId,
           templateCode: setup.templateCode,

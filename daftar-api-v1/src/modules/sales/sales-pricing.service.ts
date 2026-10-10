@@ -26,14 +26,21 @@ export class SalesPricingService {
     const unitPrice = new Prisma.Decimal(input.unitPrice);
     const discountValue = new Prisma.Decimal(input.discount.value);
 
-    if (!Number.isInteger(input.currencyPrecision) || input.currencyPrecision < 0 || input.currencyPrecision > 8) {
+    if (
+      !Number.isInteger(input.currencyPrecision) ||
+      input.currencyPrecision < 0 ||
+      input.currencyPrecision > 8
+    ) {
       throw new BadRequestException('sales.currency_precision_invalid');
     }
     if (!quantity.gt(0) || unitPrice.lt(0) || discountValue.lt(0)) {
       throw new BadRequestException('sales.pricing_values_invalid');
     }
 
-    const grossBeforeDiscount = this.money(quantity.mul(unitPrice), input.currencyPrecision);
+    const grossBeforeDiscount = this.money(
+      quantity.mul(unitPrice),
+      input.currencyPrecision,
+    );
     let discountAmount: Prisma.Decimal;
     switch (input.discount.type) {
       case 'NONE':
@@ -43,7 +50,10 @@ export class SalesPricingService {
         if (discountValue.gt(100)) {
           throw new BadRequestException('sales.discount_percent_invalid');
         }
-        discountAmount = this.money(grossBeforeDiscount.mul(discountValue).div(100), input.currencyPrecision);
+        discountAmount = this.money(
+          grossBeforeDiscount.mul(discountValue).div(100),
+          input.currencyPrecision,
+        );
         break;
       case 'FIXED':
         if (discountValue.gt(grossBeforeDiscount)) {
@@ -58,7 +68,10 @@ export class SalesPricingService {
     return {
       grossBeforeDiscount,
       discountAmount,
-      taxableBase: this.money(grossBeforeDiscount.sub(discountAmount), input.currencyPrecision),
+      taxableBase: this.money(
+        grossBeforeDiscount.sub(discountAmount),
+        input.currencyPrecision,
+      ),
     };
   }
 

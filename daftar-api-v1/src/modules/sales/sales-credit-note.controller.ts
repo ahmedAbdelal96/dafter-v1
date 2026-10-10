@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -21,7 +22,12 @@ import {
 } from '../../common/decorators/subscription.decorator';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import type { AuthenticatedUser } from '../../common/types';
-import { CreateSalesCreditNoteDto, SalesCreditNoteQueryDto } from './dto';
+import {
+  CreateSalesCreditNoteDto,
+  PostSalesCreditNoteDto,
+  SalesCreditNoteQueryDto,
+  UpdateSalesCreditNoteDto,
+} from './dto';
 import { SalesCreditNoteService } from './sales-credit-note.service';
 
 @Controller('sales/credit-notes')
@@ -39,6 +45,20 @@ export class SalesCreditNoteController {
     return new ApiResponseDto(
       await this.service.findAll(companyId, query),
       'Sales credit notes retrieved successfully',
+    );
+  }
+
+  @Get('invoice/:salesInvoiceId')
+  @UseGuards(PermissionsGuard)
+  @ProtectedRead()
+  @RequirePermissions('viewSalesCreditNotes')
+  async findForInvoice(
+    @CurrentTenant() companyId: string,
+    @Param('salesInvoiceId', ParseUUIDPipe) salesInvoiceId: string,
+  ) {
+    return new ApiResponseDto(
+      await this.service.findAll(companyId, { salesInvoiceId }),
+      'Sales credit notes for invoice retrieved successfully',
     );
   }
 
@@ -83,10 +103,33 @@ export class SalesCreditNoteController {
     @CurrentTenant() companyId: string,
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: PostSalesCreditNoteDto,
   ) {
     return new ApiResponseDto(
-      await this.service.postDraft(companyId, user.id, id),
+      await this.service.postDraft(companyId, user.id, id, {
+        postingDate: new Date(dto.postingDate),
+        idempotencyKey: dto.idempotencyKey,
+      }),
       'Sales credit note posted successfully',
+    );
+  }
+
+  @Patch(':id')
+  @UseGuards(PermissionsGuard)
+  @ProtectedWrite()
+  @RequirePermissions('editSalesCreditNote')
+  async update(
+    @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateSalesCreditNoteDto,
+  ) {
+    return new ApiResponseDto(
+      await this.service.updateDraft(companyId, user.id, id, {
+        ...dto,
+        documentDate: new Date(dto.documentDate),
+      }),
+      'Sales credit note draft updated successfully',
     );
   }
 

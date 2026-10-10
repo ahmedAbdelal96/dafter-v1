@@ -63,6 +63,7 @@ jobs:
           npx eslint
           "src/modules/accounting/**/*.ts"
           "src/modules/business-partners/**/*.ts"
+          "src/modules/sales/**/*.ts"
           "src/modules/payment-terms/**/*.ts"
           "src/modules/accounting-bootstrap/**/*.ts"
           "src/modules/opening-balances/**/*.ts"
