@@ -277,7 +277,9 @@ export class SupplierCreditNoteService {
         'Credit notes can only reference a posted supplier invoice',
       );
     const already = new Map<string, Prisma.Decimal>();
-    for (const note of invoice.creditNotes)
+    for (const note of invoice.creditNotes.filter(
+      (creditNote) => creditNote.status === SupplierCreditNoteStatus.POSTED,
+    ))
       for (const line of note.lines)
         already.set(
           line.originalSupplierInvoiceLineId,

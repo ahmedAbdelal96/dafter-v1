@@ -58,9 +58,13 @@ export type CalculatedPurchaseLine = {
   };
 };
 
-export function lineCreateData(line: CalculatedPurchaseLine) {
+export function lineCreateData(line: CalculatedPurchaseLine, index: number) {
   const { tax, ...data } = line;
-  return { ...data, taxes: tax ? { create: tax } : undefined };
+  return {
+    ...data,
+    sequence: index + 1,
+    taxes: tax ? { create: tax } : undefined,
+  };
 }
 
 export function decimal(

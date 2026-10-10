@@ -272,10 +272,9 @@ export class SupplierInvoiceService {
         const invoiceNumber =
           existing.invoiceNumber ??
           (await nextValue(db, companyId, 'SI', date));
-        const updated = await db.supplierInvoice.update({
+        await db.supplierInvoice.update({
           where: { id },
           data: {
-            status: SupplierInvoiceStatus.POSTED,
             invoiceNumber,
             postingDate: date,
             postedById: actorUserId,
@@ -284,17 +283,23 @@ export class SupplierInvoiceService {
             payableAccountId: payable.id,
             idempotencyKey,
             requestHash: this.requestHash(id, idempotencyKey, date),
-            paymentSchedule: {
-              create: schedule.map((item, index) => ({
-                sequence: item.sequence,
-                dueDate: item.dueDate,
-                amount: item.amount,
-                journalLineId: payableEntryLines[index]?.id ?? null,
-                paymentTermCodeSnapshot: term.code,
-                paymentTermNameSnapshot: term.name,
-              })),
-            },
           },
+        });
+        await db.supplierInvoicePaymentSchedule.createMany({
+          data: schedule.map((item, index) => ({
+            companyId,
+            supplierInvoiceId: id,
+            sequence: item.sequence,
+            dueDate: item.dueDate,
+            amount: item.amount,
+            journalLineId: payableEntryLines[index]?.id ?? null,
+            paymentTermCodeSnapshot: term.code,
+            paymentTermNameSnapshot: term.name,
+          })),
+        });
+        const updated = await db.supplierInvoice.update({
+          where: { id },
+          data: { status: SupplierInvoiceStatus.POSTED },
         });
         await this.audit(
           db,
@@ -417,7 +422,11 @@ export class SupplierInvoiceService {
           taxTotal: calculation.taxTotal,
           grandTotal: calculation.grandTotal,
           ...context.snapshot,
-          lines: { create: calculation.lines.map(lineCreateData) },
+          lines: {
+            create: calculation.lines.map((line, index) =>
+              lineCreateData(line, index),
+            ),
+          },
         } as any,
       });
       await this.audit(
@@ -450,7 +459,11 @@ export class SupplierInvoiceService {
         grandTotal: calculation.grandTotal,
         ...context.snapshot,
         createdById: actorUserId,
-        lines: { create: calculation.lines.map(lineCreateData) },
+        lines: {
+          create: calculation.lines.map((line, index) =>
+            lineCreateData(line, index),
+          ),
+        },
       } as any,
     });
     await this.audit(

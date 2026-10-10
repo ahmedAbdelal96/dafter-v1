@@ -91,7 +91,11 @@ export class PurchaseOrderService {
             grandTotal: calculation.grandTotal,
             ...context.snapshot,
             createdById: actorUserId,
-            lines: { create: calculation.lines.map(lineCreateData) },
+            lines: {
+              create: calculation.lines.map((line, index) =>
+                lineCreateData(line, index),
+              ),
+            },
           } as any,
         });
         await this.audit(
@@ -184,7 +188,11 @@ export class PurchaseOrderService {
             taxTotal: calculation.taxTotal,
             grandTotal: calculation.grandTotal,
             ...context.snapshot,
-            lines: { create: calculation.lines.map(lineCreateData) },
+            lines: {
+              create: calculation.lines.map((line, index) =>
+                lineCreateData(line, index),
+              ),
+            },
           } as any,
         });
         await this.audit(
@@ -310,7 +318,8 @@ export class PurchaseOrderService {
           billingAddressSnapshot: order.billingAddressSnapshot,
           createdById: actorUserId,
           lines: {
-            create: order.lines.map((line) => ({
+            create: order.lines.map((line, index) => ({
+              sequence: index + 1,
               productId: line.productId,
               descriptionSnapshot: line.descriptionSnapshot,
               quantity: line.quantity,
