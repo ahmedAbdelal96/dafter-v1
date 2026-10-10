@@ -100,7 +100,7 @@ export type PaymentMethod =
   | "CASH"
   | "CARD"
   | "BANK_TRANSFER"
-  | "WALLET"
+  | "CHEQUE"
   | "OTHER";
 
 export type Gender = "MALE" | "FEMALE";

@@ -252,7 +252,7 @@ export interface SupplierCreditNote {
   lines: SalesInvoiceLine[];
 }
 
-export type PaymentMethod = "CASH" | "BANK_TRANSFER" | "CARD" | "OTHER";
+export type PaymentMethod = "CASH" | "BANK_TRANSFER" | "CHEQUE" | "CARD" | "OTHER";
 export type PaymentStatus = "DRAFT" | "POSTED" | "REVERSED";
 
 export interface PaymentAllocationInput {
@@ -295,27 +295,33 @@ export interface PaymentRecord {
 }
 
 export interface OpenItem {
-  journalLineId: string;
+  id: string;
+  type: "DEBIT" | "CREDIT";
+  maturityId?: string | null;
+  invoiceId?: string | null;
+  sourceType?: string | null;
+  sourceId?: string | null;
   businessPartnerId: string;
   businessPartner?: BusinessPartner;
-  debit: string;
-  credit: string;
-  originalAmount: string;
-  reconciledAmount: string;
-  remainingAmount: string;
+  originalTransactionAmount: string;
+  originalBaseAmount: string;
+  activeReconciledTransactionAmount: string;
+  activeReconciledBaseAmount: string;
+  remainingTransactionAmount: string;
+  remainingBaseAmount: string;
+  remainingAmount?: string;
   currencyCode: string;
   dueDate?: string | null;
-  sourceType?: string;
-  sourceId?: string;
   documentReference?: string | null;
-  account?: { id: string; code: string; name: string };
+  arAccount?: { id: string; code: string; name: string };
+  apAccount?: { id: string; code: string; name: string };
 }
 
 export interface AccountingAccount {
   id: string;
   code: string;
   name: string;
-  type?: string;
+  accountType: string;
   isActive?: boolean;
 }
 
