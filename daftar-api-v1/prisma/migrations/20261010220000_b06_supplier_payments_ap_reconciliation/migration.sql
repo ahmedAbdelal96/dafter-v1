@@ -362,7 +362,7 @@ BEGIN
        AND NEW."id" = OLD."id" AND NEW."companyId" = OLD."companyId"
        AND NEW."businessPartnerId" = OLD."businessPartnerId"
        AND NEW."amount" = OLD."amount"
-       AND NEW."unappliedAmount" <= OLD."unappliedAmount"
+       AND NEW."unappliedAmount" = OLD."unappliedAmount"
        AND NEW."paymentNumber" = OLD."paymentNumber"
        AND NEW."sourceAccountId" = OLD."sourceAccountId"
        AND NEW."payableAccountId" = OLD."payableAccountId"

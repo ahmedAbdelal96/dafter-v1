@@ -41,6 +41,8 @@ export interface StaffPermissionsMap {
   createSupplierPayment?: boolean;
   editSupplierPayment?: boolean;
   postSupplierPayment?: boolean;
+  reconcileSupplierAP?: boolean;
+  reverseSupplierPayments?: boolean;
   overrideSalesTax?: boolean;
   overrideCustomerCreditLimit?: boolean;
   viewAccountingSetup?: boolean;

@@ -285,6 +285,7 @@ describe('B06 supplier payments and AP reconciliation', () => {
 
   it('supports on-account payments and later reconciliation with idempotent replay', async () => {
     const schedule = await postInvoice(supplierId, '500');
+    const alternateSchedule = await postInvoice(supplierId, '300');
     const draft = await payments.createDraft(companyId, ownerId, {
       ...paymentInput('500'),
       idempotencyKey: `b06-on-account-${schedule.id}`,
@@ -297,29 +298,80 @@ describe('B06 supplier payments and AP reconciliation', () => {
       `b06-on-account-post-${draft.id}`,
     );
     expect(posted.unappliedAmount.toString()).toBe('500');
+    expect(posted.remainingUnappliedAmount).toBe('500');
     const result = await payments.reconcileOnAccount(
       companyId,
       ownerId,
       posted.id,
       schedule.journalLineId!,
-      '500',
+      '200',
       `b06-on-account-reconcile-${posted.id}`,
       new Date('2026-10-12'),
     );
-    expect(result.transactionAmount.toString()).toBe('500');
+    expect(result.transactionAmount.toString()).toBe('200');
+    expect(
+      (await payments.findOne(companyId, posted.id)).remainingUnappliedAmount,
+    ).toBe('300');
     expect(
       (await payments.findOne(companyId, posted.id)).unappliedAmount.toString(),
-    ).toBe('0');
+    ).toBe('500');
     const replay = await payments.reconcileOnAccount(
       companyId,
       ownerId,
       posted.id,
       schedule.journalLineId!,
-      '500',
+      '200',
       `b06-on-account-reconcile-${posted.id}`,
       new Date('2026-10-12'),
     );
     expect(replay.id).toBe(result.id);
+    await expect(
+      payments.reconcileOnAccount(
+        companyId,
+        ownerId,
+        posted.id,
+        schedule.journalLineId!,
+        '201',
+        `b06-on-account-reconcile-${posted.id}`,
+        new Date('2026-10-12'),
+      ),
+    ).rejects.toBeInstanceOf(ConflictException);
+    await expect(
+      payments.reconcileOnAccount(
+        companyId,
+        ownerId,
+        posted.id,
+        alternateSchedule.journalLineId!,
+        '200',
+        `b06-on-account-reconcile-${posted.id}`,
+        new Date('2026-10-12'),
+      ),
+    ).rejects.toBeInstanceOf(ConflictException);
+    await expect(
+      payments.reconcileOnAccount(
+        companyId,
+        ownerId,
+        posted.id,
+        schedule.journalLineId!,
+        '200',
+        `b06-on-account-reconcile-${posted.id}`,
+        new Date('2026-10-13'),
+      ),
+    ).rejects.toBeInstanceOf(ConflictException);
+    await ap.reverse({
+      companyId,
+      actorUserId: ownerId,
+      reconciliationId: result.id,
+      postingDate: new Date('2026-10-14'),
+      reason: 'B06 focused reversal',
+      idempotencyKey: `b06-on-account-reversal-${posted.id}`,
+    });
+    expect(
+      (await payments.findOne(companyId, posted.id)).remainingUnappliedAmount,
+    ).toBe('500');
+    expect(
+      (await payments.findOne(companyId, posted.id)).unappliedAmount.toString(),
+    ).toBe('500');
   });
 
   it('rejects wrong source account types, cross-supplier targets, and changed idempotent drafts', async () => {

@@ -77,7 +77,7 @@ export class SupplierPaymentController {
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(PermissionsGuard)
   @ProtectedWrite()
-  @RequirePermissions('postSupplierPayment')
+  @RequirePermissions('reconcileSupplierAP')
   reconcileAP(
     @CurrentTenant() companyId: string,
     @CurrentUser() user: AuthenticatedUser,
@@ -102,7 +102,7 @@ export class SupplierPaymentController {
   @Post('ap-reconciliations/:id/reverse')
   @UseGuards(PermissionsGuard)
   @ProtectedWrite()
-  @RequirePermissions('postSupplierPayment')
+  @RequirePermissions('reconcileSupplierAP')
   reverseAP(
     @CurrentTenant() companyId: string,
     @CurrentUser() user: AuthenticatedUser,
@@ -215,7 +215,7 @@ export class SupplierPaymentController {
   @Post(':id/reverse')
   @UseGuards(PermissionsGuard)
   @ProtectedWrite()
-  @RequirePermissions('postSupplierPayment')
+  @RequirePermissions('reverseSupplierPayments')
   reverse(
     @CurrentTenant() companyId: string,
     @CurrentUser() user: AuthenticatedUser,
@@ -240,7 +240,7 @@ export class SupplierPaymentController {
   @Post(':id/reconcile')
   @UseGuards(PermissionsGuard)
   @ProtectedWrite()
-  @RequirePermissions('postSupplierPayment')
+  @RequirePermissions('reconcileSupplierAP')
   reconcile(
     @CurrentTenant() companyId: string,
     @CurrentUser() user: AuthenticatedUser,

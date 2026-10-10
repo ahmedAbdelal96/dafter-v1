@@ -25,6 +25,8 @@ function mapPermissions(dto: UpdatePermissionsDto): StaffPermissionsMap {
     createSupplierPayment: dto.createSupplierPayment ?? false,
     editSupplierPayment: dto.editSupplierPayment ?? false,
     postSupplierPayment: dto.postSupplierPayment ?? false,
+    reconcileSupplierAP: dto.reconcileSupplierAP ?? false,
+    reverseSupplierPayments: dto.reverseSupplierPayments ?? false,
     manageUsers: dto.manageUsers ?? false,
     viewParties: dto.viewParties ?? false,
     manageParties: dto.manageParties ?? false,

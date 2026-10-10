@@ -477,46 +477,36 @@ export class SupplierPaymentService {
           'Only a posted supplier payment can be reconciled',
         );
       }
-      const existing = await db.aPReconciliation.findFirst({
-        where: { companyId, idempotencyKey },
-      });
-      if (existing) return existing;
-      const requestedAmount = this.decimal(
-        amount,
-        'supplier_payment.reconciliation_amount_invalid',
-      );
-      if (requestedAmount.gt(payment.unappliedAmount)) {
-        throw new ConflictException(
-          'On-account reconciliation exceeds the payment unapplied amount',
-        );
-      }
       const journalEntryId = payment.journalEntryId;
+      const sourceLineId = await this.findPaymentSourceLine(db, {
+        ...payment,
+        journalEntryId,
+      });
       const reconciliation = await this.ap.reconcileInTransaction(db, {
         companyId,
         actorUserId,
-        debitJournalLineId: await this.findPaymentSourceLine(db, {
-          ...payment,
-          journalEntryId,
-        }),
+        debitJournalLineId: sourceLineId,
         creditJournalLineId: journalLineId,
         transactionAmount: amount,
         idempotencyKey,
         postingDate,
         supplierPaymentId: paymentId,
       });
-      await db.supplierPayment.update({
-        where: { id: paymentId },
-        data: { unappliedAmount: payment.unappliedAmount.sub(requestedAmount) },
-      });
+      const remaining = await this.deriveRemainingUnappliedAmount(db, payment);
+      if (remaining.lt(0)) {
+        throw new ConflictException(
+          'On-account reconciliation exceeds the payment unapplied amount',
+        );
+      }
       return reconciliation;
     });
   }
 
-  findAll(
+  async findAll(
     companyId: string,
     query: { status?: SupplierPaymentStatus; businessPartnerId?: string },
   ) {
-    return this.prisma.supplierPayment.findMany({
+    const payments = await this.prisma.supplierPayment.findMany({
       where: {
         companyId,
         ...(query.status ? { status: query.status } : {}),
@@ -531,6 +521,14 @@ export class SupplierPaymentService {
       },
       orderBy: [{ paymentDate: 'desc' }, { createdAt: 'desc' }],
     });
+    return Promise.all(
+      payments.map(async (payment) => ({
+        ...this.serialize(payment),
+        remainingUnappliedAmount: (
+          await this.deriveRemainingUnappliedAmount(this.prisma, payment)
+        ).toString(),
+      })),
+    );
   }
 
   async findOne(companyId: string, id: string) {
@@ -884,7 +882,7 @@ export class SupplierPaymentService {
   }
 
   private async findPaymentSourceLine(
-    db: Prisma.TransactionClient,
+    db: Db,
     payment: {
       companyId: string;
       journalEntryId: string;
@@ -908,6 +906,61 @@ export class SupplierPaymentService {
         'Supplier payment AP source line was not found',
       );
     return line.id;
+  }
+
+  private async deriveRemainingUnappliedAmount(
+    db: Db,
+    payment: {
+      companyId: string;
+      status: SupplierPaymentStatus;
+      unappliedAmount: Prisma.Decimal;
+      apJournalLineId: string | null;
+      journalEntryId: string | null;
+      payableAccountId: string;
+      businessPartnerId: string;
+    },
+  ) {
+    if (payment.status === SupplierPaymentStatus.DRAFT) {
+      return payment.unappliedAmount;
+    }
+    if (payment.status === SupplierPaymentStatus.REVERSED) {
+      return new Prisma.Decimal(0);
+    }
+    if (!payment.journalEntryId) {
+      throw new ConflictException(
+        'Posted supplier payment AP source line is required',
+      );
+    }
+    const sourceLineId = await this.findPaymentSourceLine(
+      db,
+      payment as {
+        companyId: string;
+        journalEntryId: string;
+        apJournalLineId: string | null;
+        payableAccountId: string;
+        businessPartnerId: string;
+      },
+    );
+    const sourceLine = await db.journalLine.findFirst({
+      where: { id: sourceLineId, companyId: payment.companyId },
+      select: { id: true, transactionDebit: true, transactionCredit: true },
+    });
+    if (!sourceLine) {
+      throw new ConflictException(
+        'Posted supplier payment AP source line was not found',
+      );
+    }
+    const active = await db.aPReconciliation.aggregate({
+      where: {
+        companyId: payment.companyId,
+        debitJournalLineId: sourceLine.id,
+        status: 'ACTIVE',
+      },
+      _sum: { transactionAmount: true },
+    });
+    return sourceLine.transactionDebit
+      .sub(sourceLine.transactionCredit)
+      .sub(active._sum.transactionAmount ?? new Prisma.Decimal(0));
   }
 
   private async findOpenPeriod(db: Db, companyId: string, date: Date) {
@@ -946,8 +999,8 @@ export class SupplierPaymentService {
     return `SP-${fiscalYearStart.getUTCFullYear()}-${String(allocated).padStart(6, '0')}`;
   }
 
-  private findOneWithAllocations(db: Db, companyId: string, id: string) {
-    return db.supplierPayment.findFirst({
+  private async findOneWithAllocations(db: Db, companyId: string, id: string) {
+    const payment = await db.supplierPayment.findFirst({
       where: { id, companyId },
       include: {
         allocations: { include: { apReconciliation: true } },
@@ -955,6 +1008,13 @@ export class SupplierPaymentService {
         payableAccount: true,
       },
     });
+    if (!payment) return null;
+    return {
+      ...this.serialize(payment),
+      remainingUnappliedAmount: (
+        await this.deriveRemainingUnappliedAmount(db, payment)
+      ).toString(),
+    };
   }
 
   private serialize<
@@ -962,6 +1022,7 @@ export class SupplierPaymentService {
   >(payment: T) {
     return {
       ...payment,
+      remainingUnappliedAmount: payment.unappliedAmount.toString(),
       allocations: payment.allocations?.map((allocation) => ({
         ...allocation,
         amount: allocation.amount.toString(),

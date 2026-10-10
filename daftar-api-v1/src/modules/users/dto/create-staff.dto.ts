@@ -122,25 +122,53 @@ export class StaffPermissionsDto {
   @IsBoolean()
   postCustomerPayment?: boolean;
 
-  @ApiPropertyOptional({ example: true, description: 'View supplier payments and AP open items.' })
+  @ApiPropertyOptional({
+    example: true,
+    description: 'View supplier payments and AP open items.',
+  })
   @IsOptional()
   @IsBoolean()
   viewSupplierPayments?: boolean;
 
-  @ApiPropertyOptional({ example: false, description: 'Create supplier payment drafts.' })
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Create supplier payment drafts.',
+  })
   @IsOptional()
   @IsBoolean()
   createSupplierPayment?: boolean;
 
-  @ApiPropertyOptional({ example: false, description: 'Edit supplier payment drafts.' })
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Edit supplier payment drafts.',
+  })
   @IsOptional()
   @IsBoolean()
   editSupplierPayment?: boolean;
 
-  @ApiPropertyOptional({ example: false, description: 'Post, reconcile, or reverse supplier payments.' })
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Post supplier payments.',
+  })
   @IsOptional()
   @IsBoolean()
   postSupplierPayment?: boolean;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Create, reverse, and later reconcile supplier AP items.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  reconcileSupplierAP?: boolean;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Reverse posted supplier payments.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  reverseSupplierPayments?: boolean;
 
   @ApiPropertyOptional({
     example: false,
