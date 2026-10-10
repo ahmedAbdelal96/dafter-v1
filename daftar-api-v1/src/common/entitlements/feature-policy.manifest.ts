@@ -17,6 +17,7 @@ export const CONTROLLER_FEATURE_POLICY: Record<
   'accounting-bootstrap/accounting-bootstrap.controller.ts': 'role-guarded',
   'opening-balances/opening-balances.controller.ts': 'role-guarded',
   'business-partners/business-partners.controller.ts': 'role-guarded',
+  'customer-payments/customer-payment.controller.ts': 'role-guarded',
   'payment-terms/payment-terms.controller.ts': 'role-guarded',
   'auth/auth.controller.ts': 'auth-public',
   'cash-reconciliation/cash-reconciliation.controller.ts': 'role-guarded',
