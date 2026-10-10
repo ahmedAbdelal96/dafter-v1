@@ -131,7 +131,7 @@ describe('B04 customer payments and AR reconciliation', () => {
     });
   }
 
-  async function paymentInput(
+  function paymentInput(
     amount: string,
     journalLineId: string,
     allocation = amount,
@@ -160,7 +160,7 @@ describe('B04 customer payments and AR reconciliation', () => {
     const first = await payments.createDraft(
       companyId,
       ownerId,
-      await paymentInput('60', maturity.journalLineId!, '60'),
+      paymentInput('60', maturity.journalLineId!, '60'),
     );
     await payments.postDraft(
       companyId,
@@ -176,7 +176,7 @@ describe('B04 customer payments and AR reconciliation', () => {
     const second = await payments.createDraft(
       companyId,
       ownerId,
-      await paymentInput('40', maturity.journalLineId!, '40'),
+      paymentInput('40', maturity.journalLineId!, '40'),
     );
     await payments.postDraft(
       companyId,
@@ -201,7 +201,7 @@ describe('B04 customer payments and AR reconciliation', () => {
     const overpayment = await payments.createDraft(
       companyId,
       ownerId,
-      await paymentInput('80', firstMaturity.journalLineId!, '50'),
+      paymentInput('80', firstMaturity.journalLineId!, '50'),
     );
     const posted = await payments.postDraft(
       companyId,
@@ -239,12 +239,12 @@ describe('B04 customer payments and AR reconciliation', () => {
     const first = await payments.createDraft(
       companyId,
       ownerId,
-      await paymentInput('60', maturity.journalLineId!, '60'),
+      paymentInput('60', maturity.journalLineId!, '60'),
     );
     const second = await payments.createDraft(
       companyId,
       ownerId,
-      await paymentInput('60', maturity.journalLineId!, '60'),
+      paymentInput('60', maturity.journalLineId!, '60'),
     );
     const results = await Promise.allSettled([
       payments.postDraft(
@@ -280,7 +280,7 @@ describe('B04 customer payments and AR reconciliation', () => {
     });
     await expect(
       payments.createDraft(companyId, ownerId, {
-        ...(await paymentInput('1', '00000000-0000-0000-0000-000000000000')),
+        ...paymentInput('1', '00000000-0000-0000-0000-000000000000'),
         destinationAccountId: bank.id,
       }),
     ).rejects.toBeInstanceOf(ConflictException);
@@ -294,7 +294,7 @@ describe('B04 customer payments and AR reconciliation', () => {
     const payment = await payments.createDraft(
       companyId,
       ownerId,
-      await paymentInput('70', maturity.journalLineId!),
+      paymentInput('70', maturity.journalLineId!),
     );
     await payments.postDraft(
       companyId,
@@ -396,7 +396,7 @@ describe('B04 customer payments and AR reconciliation', () => {
     const payment = await payments.createDraft(
       companyId,
       ownerId,
-      await paymentInput('100', maturity.journalLineId!, '100', 'USD', '1.9'),
+      paymentInput('100', maturity.journalLineId!, '100', 'USD', '1.9'),
     );
     await payments.postDraft(
       companyId,
