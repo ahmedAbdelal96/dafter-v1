@@ -222,6 +222,58 @@ describe('SalesInvoice drafts', () => {
     ).toBe(true);
   });
 
+  it('snapshots the active Sales tax policy and calculates tax server-side', async () => {
+    const stamp = Date.now();
+    const treatment = await prisma.taxTreatment.create({
+      data: {
+        companyId,
+        code: `VAT-${stamp}`,
+        normalizedCode: `VAT-${stamp}`,
+        name: 'VAT standard',
+        category: 'STANDARD',
+        calculationMode: 'TAX_EXCLUSIVE',
+      },
+    });
+    const rate = await prisma.taxRate.create({
+      data: {
+        companyId,
+        treatmentId: treatment.id,
+        code: `VAT14-${stamp}`,
+        normalizedCode: `VAT14-${stamp}`,
+        name: 'VAT 14%',
+        percentage: '14',
+        isDefault: true,
+      },
+    });
+    await prisma.taxDefaultPolicy.create({
+      data: {
+        companyId,
+        defaultRateId: rate.id,
+        defaultTreatmentId: treatment.id,
+        defaultCalculationMode: 'TAX_EXCLUSIVE',
+      },
+    });
+    await prisma.taxModuleApplicabilityRule.create({
+      data: {
+        companyId,
+        moduleKey: 'SALES',
+        isEnabled: true,
+        defaultRateId: rate.id,
+        defaultTreatmentId: treatment.id,
+      },
+    });
+    const draft = await service.createDraft(companyId, ownerId, {
+      businessPartnerId: customerId,
+      documentDate: new Date('2026-10-15'),
+      currencyCode: 'EGP',
+      exchangeRate: '1',
+      lines: [line],
+    });
+    expect(draft.taxTotal.toFixed(2)).toBe('28.00');
+    expect(draft.grandTotal.toFixed(2)).toBe('228.00');
+    expect(draft.lines[0].taxes[0].rateCodeSnapshot).toBe(`VAT14-${stamp}`);
+  });
+
   function draftInput(partnerId: string) {
     return {
       businessPartnerId: partnerId,

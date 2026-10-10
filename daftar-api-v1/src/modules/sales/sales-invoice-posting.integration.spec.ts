@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { ConflictException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import {
   AccountingAccountType,
   AccountingConfigAccountKey,
@@ -15,6 +15,7 @@ import { AccountingService } from '../accounting/accounting.service';
 import { SalesPricingService } from './sales-pricing.service';
 import { SalesTaxCalculatorService } from './sales-tax-calculator.service';
 import { SalesInvoiceService } from './sales-invoice.service';
+import { SalesCreditNoteService } from './sales-credit-note.service';
 
 jest.setTimeout(60_000);
 
@@ -22,6 +23,7 @@ describe('SalesInvoice posting', () => {
   let prisma: PrismaService;
   let accounting: AccountingService;
   let sales: SalesInvoiceService;
+  let creditNotes: SalesCreditNoteService;
   let companyId: string;
   let ownerId: string;
   let customerId: string;
@@ -133,6 +135,11 @@ describe('SalesInvoice posting', () => {
       new SalesTaxCalculatorService(),
       accounting,
     );
+    creditNotes = new SalesCreditNoteService(
+      prisma,
+      new SalesTaxCalculatorService(),
+      accounting,
+    );
   });
 
   afterAll(async () => {
@@ -205,5 +212,64 @@ describe('SalesInvoice posting', () => {
     await expect(sales.postDraft(companyId, ownerId, draft.id)).rejects.toThrow(
       ConflictException,
     );
+  });
+
+  it('creates and posts a credit note against a posted invoice without mutating the invoice', async () => {
+    const invoice = await prisma.salesInvoice.findFirstOrThrow({
+      where: { companyId, status: 'POSTED' },
+      include: { lines: true },
+      orderBy: { createdAt: 'asc' },
+    });
+    const note = await creditNotes.createDraft(companyId, ownerId, {
+      salesInvoiceId: invoice.id,
+      documentDate: new Date('2026-10-12'),
+      reason: 'Partial service reversal',
+      lines: [
+        { originalSalesInvoiceLineId: invoice.lines[0].id, quantity: '1' },
+      ],
+    });
+    expect(note.status).toBe('DRAFT');
+    expect(note.grandTotal.toFixed(2)).toBe('100.00');
+    const posted = await creditNotes.postDraft(companyId, ownerId, note.id);
+    expect(posted.status).toBe('POSTED');
+    expect(posted.creditNoteNumber).toBe('CN-2026-000001');
+    const entry = await prisma.journalEntry.findFirstOrThrow({
+      where: { id: posted.journalEntryId!, companyId },
+      include: { lines: true },
+    });
+    expect(entry.sourceType).toBe(JournalSourceType.SALES_CREDIT_NOTE);
+    expect(
+      entry.lines
+        .reduce((sum, line) => sum.add(line.debit), new Prisma.Decimal(0))
+        .toFixed(2),
+    ).toBe('100.00');
+    expect(
+      entry.lines
+        .reduce((sum, line) => sum.add(line.credit), new Prisma.Decimal(0))
+        .toFixed(2),
+    ).toBe('100.00');
+    const unchanged = await prisma.salesInvoice.findUniqueOrThrow({
+      where: { id: invoice.id },
+    });
+    expect(unchanged.status).toBe('POSTED');
+    expect(unchanged.grandTotal.toFixed(2)).toBe('200.00');
+  });
+
+  it('rejects credit quantities above the remaining original quantity', async () => {
+    const invoice = await prisma.salesInvoice.findFirstOrThrow({
+      where: { companyId, status: 'POSTED' },
+      include: { lines: true },
+      orderBy: { createdAt: 'asc' },
+    });
+    await expect(
+      creditNotes.createDraft(companyId, ownerId, {
+        salesInvoiceId: invoice.id,
+        documentDate: new Date('2026-10-13'),
+        reason: 'Too much reversal',
+        lines: [
+          { originalSalesInvoiceLineId: invoice.lines[0].id, quantity: '2' },
+        ],
+      }),
+    ).rejects.toThrow(BadRequestException);
   });
 });

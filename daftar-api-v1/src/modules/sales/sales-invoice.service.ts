@@ -13,6 +13,7 @@ import {
   SalesDiscountType,
   SalesDocumentType,
   SalesInvoiceStatus,
+  TaxModuleKey,
   TaxCalculationMode,
   TaxTreatmentCategory,
 } from '@prisma/client';
@@ -53,7 +54,12 @@ export class SalesInvoiceService {
     input: CreateSalesInvoiceInput,
   ) {
     return this.prisma.$transaction(async (db) => {
-      const calculation = await this.calculateDraft(db, companyId, input);
+      const calculation = await this.calculateDraft(
+        db,
+        companyId,
+        actorUserId,
+        input,
+      );
       const created = await db.salesInvoice.create({
         data: this.buildCreateData(companyId, actorUserId, input, calculation),
       });
@@ -92,7 +98,12 @@ export class SalesInvoiceService {
       });
       this.requireDraft(existing);
 
-      const calculation = await this.calculateDraft(db, companyId, input);
+      const calculation = await this.calculateDraft(
+        db,
+        companyId,
+        actorUserId,
+        input,
+      );
       await db.salesInvoicePaymentSchedule.deleteMany({
         where: { companyId, salesInvoiceId: id },
       });
@@ -342,6 +353,7 @@ export class SalesInvoiceService {
   private async calculateDraft(
     db: Db,
     companyId: string,
+    actorUserId: string,
     input: CreateSalesInvoiceInput,
   ) {
     const documentDate = this.assertDate(
@@ -391,6 +403,62 @@ export class SalesInvoiceService {
       throw new BadRequestException('sales.partner_inactive');
     }
 
+    const [moduleRule, defaultPolicy, actor] = await Promise.all([
+      db.taxModuleApplicabilityRule.findUnique({
+        where: {
+          companyId_moduleKey: { companyId, moduleKey: TaxModuleKey.SALES },
+        },
+        include: { defaultRate: true, defaultTreatment: true },
+      }),
+      db.taxDefaultPolicy.findUnique({
+        where: { companyId },
+        include: { defaultRate: true, defaultTreatment: true },
+      }),
+      db.user.findFirst({
+        where: { id: actorUserId },
+        include: { permissions: true },
+      }),
+    ]);
+    const overrideAuthorized =
+      actor?.role === 'OWNER' ||
+      actor?.role === 'SUPER_ADMIN' ||
+      (
+        actor?.permissions?.permissions as Record<string, unknown> | undefined
+      )?.['tax_setup.manage_defaults'] === true;
+    const defaultSelection = moduleRule?.defaultTreatment
+      ? {
+          treatmentCode: moduleRule.defaultTreatment.code,
+          treatmentCategory: moduleRule.defaultTreatment.category,
+          calculationMode: moduleRule.defaultTreatment.calculationMode,
+          rate: moduleRule.defaultRate
+            ? {
+                id: moduleRule.defaultRate.id,
+                code: moduleRule.defaultRate.code,
+                percentage: moduleRule.defaultRate.percentage,
+                status: moduleRule.defaultRate.status,
+                effectiveFrom: moduleRule.defaultRate.effectiveFrom,
+                effectiveTo: moduleRule.defaultRate.effectiveTo,
+              }
+            : null,
+        }
+      : defaultPolicy?.defaultTreatment
+        ? {
+            treatmentCode: defaultPolicy.defaultTreatment.code,
+            treatmentCategory: defaultPolicy.defaultTreatment.category,
+            calculationMode: defaultPolicy.defaultCalculationMode,
+            rate: defaultPolicy.defaultRate
+              ? {
+                  id: defaultPolicy.defaultRate.id,
+                  code: defaultPolicy.defaultRate.code,
+                  percentage: defaultPolicy.defaultRate.percentage,
+                  status: defaultPolicy.defaultRate.status,
+                  effectiveFrom: defaultPolicy.defaultRate.effectiveFrom,
+                  effectiveTo: defaultPolicy.defaultRate.effectiveTo,
+                }
+              : null,
+          }
+        : null;
+
     const lineResults = [] as Array<{
       input: SalesInvoiceLineInput;
       product: { id: string; name: string; description: string | null } | null;
@@ -399,6 +467,7 @@ export class SalesInvoiceService {
       taxableBase: Prisma.Decimal;
       taxAmount: Prisma.Decimal;
       lineTotal: Prisma.Decimal;
+      tax: any;
     }>;
     for (const line of input.lines) {
       const product = line.productId
@@ -424,11 +493,27 @@ export class SalesInvoiceService {
         },
         currencyPrecision: currency.minorUnitPrecision,
       });
+      const explicit =
+        line.taxTreatmentId || line.taxRateId
+          ? await this.loadExplicitTaxSelection(
+              db,
+              companyId,
+              line.taxTreatmentId,
+              line.taxRateId,
+            )
+          : null;
+      const selection = this.tax.resolveTaxSelection({
+        moduleEnabled: moduleRule?.isEnabled ?? true,
+        moduleDefault: defaultSelection,
+        companyDefault: moduleRule?.defaultTreatment ? null : defaultSelection,
+        explicit,
+        allowManualOverride:
+          (moduleRule?.allowOverride ?? true) &&
+          (defaultPolicy?.allowManualOverride ?? true),
+        overrideAuthorized,
+      });
       const tax = this.tax.calculateTax({
-        rate: null,
-        treatmentCode: TaxTreatmentCategory.OUT_OF_SCOPE,
-        treatmentCategory: TaxTreatmentCategory.OUT_OF_SCOPE,
-        calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
+        ...selection,
         enteredAmount: priced.taxableBase,
         asOf: documentDate,
         currencyPrecision: currency.minorUnitPrecision,
@@ -441,6 +526,7 @@ export class SalesInvoiceService {
         taxableBase: tax.taxableBase,
         taxAmount: tax.taxAmount,
         lineTotal: tax.grossAmount,
+        tax,
       });
     }
 
@@ -603,11 +689,12 @@ export class SalesInvoiceService {
       lineTotal: line.lineTotal,
       taxes: {
         create: {
-          treatmentCodeSnapshot: TaxTreatmentCategory.OUT_OF_SCOPE,
-          treatmentCategory: TaxTreatmentCategory.OUT_OF_SCOPE,
-          rateCodeSnapshot: null,
-          percentageSnapshot: 0,
-          calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
+          treatmentCodeSnapshot: line.tax.treatmentCode,
+          treatmentCategory: line.tax.treatmentCategory,
+          taxRateId: line.tax.rateId,
+          rateCodeSnapshot: line.tax.rateCode,
+          percentageSnapshot: line.tax.percentage,
+          calculationMode: line.tax.calculationMode,
           taxableBase: line.taxableBase,
           taxAmount: line.taxAmount,
         },
@@ -649,6 +736,47 @@ export class SalesInvoiceService {
       (total, value) => total.add(value),
       new Prisma.Decimal(0),
     );
+  }
+
+  private async loadExplicitTaxSelection(
+    db: Db,
+    companyId: string,
+    treatmentId?: string,
+    rateId?: string,
+  ) {
+    const rate = rateId
+      ? await db.taxRate.findFirst({
+          where: { id: rateId, companyId },
+          include: { treatment: true },
+        })
+      : null;
+    if (rateId && !rate)
+      throw new BadRequestException('sales.tax_rate_invalid');
+    const treatment = treatmentId
+      ? await db.taxTreatment.findFirst({
+          where: { id: treatmentId, companyId },
+        })
+      : rate?.treatment;
+    if ((treatmentId || rateId) && !treatment) {
+      throw new BadRequestException('sales.tax_treatment_invalid');
+    }
+    return {
+      treatmentCode: treatment?.code ?? TaxTreatmentCategory.OUT_OF_SCOPE,
+      treatmentCategory:
+        treatment?.category ?? TaxTreatmentCategory.OUT_OF_SCOPE,
+      calculationMode:
+        treatment?.calculationMode ?? TaxCalculationMode.TAX_EXCLUSIVE,
+      rate: rate
+        ? {
+            id: rate.id,
+            code: rate.code,
+            percentage: rate.percentage,
+            status: rate.status,
+            effectiveFrom: rate.effectiveFrom,
+            effectiveTo: rate.effectiveTo,
+          }
+        : null,
+    };
   }
 
   private async assertCreditLimit(

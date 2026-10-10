@@ -33,6 +33,14 @@ export class SalesInvoiceLineDto {
 
   @IsString()
   discountValue = '0';
+
+  @IsOptional()
+  @IsUUID()
+  taxRateId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  taxTreatmentId?: string;
 }
 
 export class CreateSalesInvoiceDto {
@@ -115,6 +123,8 @@ export type SalesInvoiceLineInput = {
   unitPrice: string;
   discountType?: SalesDiscountType;
   discountValue?: string;
+  taxRateId?: string;
+  taxTreatmentId?: string;
 };
 
 export type CreateSalesInvoiceInput = {

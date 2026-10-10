@@ -25,6 +25,14 @@ export interface StaffPermissionsMap {
   manageParties?: boolean;
   viewPartners?: boolean;
   managePartners?: boolean;
+  viewSalesInvoices?: boolean;
+  createSalesInvoice?: boolean;
+  editSalesInvoice?: boolean;
+  postSalesInvoice?: boolean;
+  viewSalesCreditNotes?: boolean;
+  createSalesCreditNote?: boolean;
+  editSalesCreditNote?: boolean;
+  postSalesCreditNote?: boolean;
   viewAccountingSetup?: boolean;
   manageAccountingSetup?: boolean;
   viewOpeningBalances?: boolean;
