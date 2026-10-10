@@ -229,6 +229,20 @@ describe('B04 customer payments and AR reconciliation', () => {
     return open;
   }
 
+  async function arNetForEntries(entryIds: string[]) {
+    const lines = await prisma.journalLine.findMany({
+      where: {
+        journalEntryId: { in: entryIds },
+        businessPartnerId: customerId,
+        account: { accountType: AccountingAccountType.ASSET_RECEIVABLE },
+      },
+    });
+    return lines.reduce(
+      (sum, line) => sum + Number(line.debit) - Number(line.credit),
+      0,
+    );
+  }
+
   beforeEach(async () => {
     await configureCashCurrency('EGP');
   });
@@ -484,6 +498,13 @@ describe('B04 customer payments and AR reconciliation', () => {
     expect(
       open.find((row) => row.id === postedPayment.arJournalLineId),
     ).toBeUndefined();
+    expect(
+      await arNetForEntries([
+        invoice.journalEntryId!,
+        postedPayment.journalEntryId!,
+        adjustment.id,
+      ]),
+    ).toBe(0);
 
     const technicalDebit = adjustment.lines.find(
       (line) =>
@@ -544,7 +565,7 @@ describe('B04 customer payments and AR reconciliation', () => {
       ownerId,
       paymentInput('60', maturity.journalLineId!, '60', 'USD', '2.1'),
     );
-    await payments.postDraft(
+    const postedSecond = await payments.postDraft(
       companyId,
       ownerId,
       second.id,
@@ -556,6 +577,23 @@ describe('B04 customer payments and AR reconciliation', () => {
         (row) => row.id === maturity.journalLineId,
       ),
     ).toBeUndefined();
+    const partialReconciliations = await prisma.aRReconciliation.findMany({
+      where: { customerPaymentId: { in: [first.id, second.id] } },
+      orderBy: { createdAt: 'asc' },
+    });
+    expect(
+      partialReconciliations.map((row) => row.realizedFxAmount.toString()),
+    ).toEqual(['-4', '6']);
+    expect(
+      await arNetForEntries([
+        invoice.journalEntryId!,
+        postedFirst.journalEntryId!,
+        postedSecond.journalEntryId!,
+        ...partialReconciliations
+          .map((row) => row.adjustmentJournalEntryId)
+          .filter((id): id is string => Boolean(id)),
+      ]),
+    ).toBe(0);
     await assertNoTechnicalOpenItems();
     const lines = await prisma.journalLine.findMany({
       where: {
@@ -687,6 +725,43 @@ describe('B04 customer payments and AR reconciliation', () => {
       where: { businessPartnerId: customerId },
       data: { receivableAccountId: null },
     });
+  });
+
+  it('settles a full foreign-currency gain at the authoritative GL rate', async () => {
+    await configureUsdCash();
+    const invoice = await postInvoice('100', 'USD', '2');
+    const maturity = await prisma.salesInvoicePaymentSchedule.findFirstOrThrow({
+      where: { salesInvoiceId: invoice.id },
+    });
+    const payment = await payments.createDraft(
+      companyId,
+      ownerId,
+      paymentInput('100', maturity.journalLineId!, '100', 'USD', '2.1'),
+    );
+    const posted = await payments.postDraft(
+      companyId,
+      ownerId,
+      payment.id,
+      new Date('2026-10-22'),
+      'b042-fx-gain-full',
+    );
+    const reconciliation = await prisma.aRReconciliation.findFirstOrThrow({
+      where: { customerPaymentId: payment.id },
+    });
+    expect(reconciliation.realizedFxAmount.toString()).toBe('10');
+    expect(
+      (await ar.listOpenItems(companyId, customerId)).find(
+        (row) => row.id === maturity.journalLineId,
+      ),
+    ).toBeUndefined();
+    await assertNoTechnicalOpenItems();
+    expect(
+      await arNetForEntries([
+        invoice.journalEntryId!,
+        posted.journalEntryId!,
+        reconciliation.adjustmentJournalEntryId!,
+      ]),
+    ).toBe(0);
   });
 
   it('is idempotent, rejects changed idempotent payloads, and serializes competing reconciliations', async () => {
@@ -950,6 +1025,7 @@ describe('B04 customer payments and AR reconciliation', () => {
       where: { id: payment.id },
     });
     expect(rolledBack.status).toBe(CustomerPaymentStatus.DRAFT);
+    expect(rolledBack.paymentNumber).toBeNull();
     expect(rolledBack.journalEntryId).toBeNull();
     expect(
       await prisma.aRReconciliation.count({
@@ -972,6 +1048,9 @@ describe('B04 customer payments and AR reconciliation', () => {
       ownerId,
       paymentInput('30', maturity.journalLineId!, '30', 'USD', '1.9'),
     );
+    const technicalBefore = await prisma.journalEntry.count({
+      where: { companyId, sourceType: JournalSourceType.AR_RECONCILIATION },
+    });
     await prisma.$executeRaw(
       Prisma.sql`CREATE OR REPLACE FUNCTION b042_fail_payment_post() RETURNS trigger AS $$ BEGIN RAISE EXCEPTION 'b042 injected payment post failure'; END; $$ LANGUAGE plpgsql`,
     );
@@ -996,6 +1075,12 @@ describe('B04 customer payments and AR reconciliation', () => {
         Prisma.sql`DROP FUNCTION IF EXISTS b042_fail_payment_post()`,
       );
     }
+    const rolledBack = await prisma.customerPayment.findUniqueOrThrow({
+      where: { id: payment.id },
+    });
+    expect(rolledBack.status).toBe(CustomerPaymentStatus.DRAFT);
+    expect(rolledBack.paymentNumber).toBeNull();
+    expect(rolledBack.journalEntryId).toBeNull();
     expect(
       await prisma.aRReconciliation.count({
         where: { customerPaymentId: payment.id },
@@ -1004,6 +1089,11 @@ describe('B04 customer payments and AR reconciliation', () => {
     expect(
       await prisma.journalEntry.count({ where: { sourceId: payment.id } }),
     ).toBe(0);
+    expect(
+      await prisma.journalEntry.count({
+        where: { companyId, sourceType: JournalSourceType.AR_RECONCILIATION },
+      }),
+    ).toBe(technicalBefore);
   });
 
   it('uses POSTED plus REVERSED AR exposure for the credit-limit decision', async () => {
