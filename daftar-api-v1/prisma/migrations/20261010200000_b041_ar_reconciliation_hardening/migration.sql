@@ -248,6 +248,7 @@ DECLARE
   existing_credit NUMERIC;
 BEGIN
   SELECT jl.*, je."status" AS entry_status, je."transactionCurrencyCode" AS currency_code,
+         je."sourceType" AS source_type, je."reversalOfEntryId" AS reversal_of_entry_id,
          aa."accountType" AS account_type, aa."isControlAccount" AS is_control,
          aa."reconciliationEligible" AS reconciliation_eligible
   INTO debit_line
@@ -256,6 +257,7 @@ BEGIN
   JOIN "AccountingAccount" aa ON aa."id" = jl."accountId" AND aa."companyId" = jl."companyId"
   WHERE jl."id" = NEW."debitJournalLineId" AND jl."companyId" = NEW."companyId";
   SELECT jl.*, je."status" AS entry_status, je."transactionCurrencyCode" AS currency_code,
+         je."sourceType" AS source_type, je."reversalOfEntryId" AS reversal_of_entry_id,
          aa."accountType" AS account_type, aa."isControlAccount" AS is_control,
          aa."reconciliationEligible" AS reconciliation_eligible
   INTO credit_line
@@ -266,6 +268,10 @@ BEGIN
   IF debit_line IS NULL OR credit_line IS NULL
      OR debit_line.entry_status <> 'POSTED'
      OR credit_line.entry_status <> 'POSTED'
+     OR debit_line.source_type IN ('AR_RECONCILIATION', 'REVERSAL')
+     OR credit_line.source_type IN ('AR_RECONCILIATION', 'REVERSAL')
+     OR debit_line.reversal_of_entry_id IS NOT NULL
+     OR credit_line.reversal_of_entry_id IS NOT NULL
      OR debit_line."businessPartnerId" IS NULL
      OR debit_line."businessPartnerId" <> credit_line."businessPartnerId"
      OR debit_line.currency_code <> credit_line.currency_code

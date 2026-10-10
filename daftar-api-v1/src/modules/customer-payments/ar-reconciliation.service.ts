@@ -285,7 +285,12 @@ export class ARReconciliationService {
           accountingPeriodId: period.id,
           postingDate: this.dateText(input.postingDate),
           reason: input.reason,
-          idempotencyKey: `ar-reconciliation-reversal:${reconciliation.id}:${idempotencyKey}`,
+          idempotencyKey: `ar-reconciliation-reversal:${reconciliation.id}:${createHash(
+            'sha256',
+          )
+            .update(idempotencyKey)
+            .digest('hex')
+            .slice(0, 16)}`,
         },
       );
       reversalJournalEntryId = reversal.id;
@@ -318,6 +323,12 @@ export class ARReconciliationService {
         journalEntry: {
           status: JournalEntryStatus.POSTED,
           reversalOfEntryId: null,
+          sourceType: {
+            notIn: [
+              JournalSourceType.AR_RECONCILIATION,
+              JournalSourceType.REVERSAL,
+            ],
+          },
         },
       },
       include: {
@@ -590,6 +601,10 @@ export class ARReconciliationService {
       credit.journalEntry.status === JournalEntryStatus.POSTED &&
       !debit.journalEntry.reversalOfEntryId &&
       !credit.journalEntry.reversalOfEntryId &&
+      debit.journalEntry.sourceType !== JournalSourceType.AR_RECONCILIATION &&
+      debit.journalEntry.sourceType !== JournalSourceType.REVERSAL &&
+      credit.journalEntry.sourceType !== JournalSourceType.AR_RECONCILIATION &&
+      credit.journalEntry.sourceType !== JournalSourceType.REVERSAL &&
       debit.journalEntry.transactionCurrencyCode ===
         credit.journalEntry.transactionCurrencyCode &&
       debit.account.accountType === AccountingAccountType.ASSET_RECEIVABLE &&
