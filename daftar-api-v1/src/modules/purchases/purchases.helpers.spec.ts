@@ -1,3 +1,4 @@
+import { ForbiddenException } from '@nestjs/common';
 import {
   Prisma,
   PurchaseAccountType,
@@ -14,22 +15,64 @@ describe('purchase helpers', () => {
     },
     taxRate: { findFirst: jest.fn() },
     taxTreatment: { findFirst: jest.fn() },
-    taxAccountBinding: { findUnique: jest.fn().mockResolvedValue(null) },
     accountingConfiguration: {
       findUnique: jest.fn().mockResolvedValue({
-        accountDefaults: [{ settingKey: 'EXPENSE', accountId: 'expense-1' }],
+        accountDefaults: [
+          { settingKey: 'EXPENSE', accountId: 'expense-1' },
+          { settingKey: 'TAX_RECOVERABLE', accountId: 'tax-1' },
+        ],
       }),
     },
     accountingAccount: {
-      findFirst: jest.fn().mockResolvedValue({
-        id: 'expense-1',
-        accountType: 'EXPENSE_OPERATING',
-        isActive: true,
-      }),
+      findFirst: jest.fn().mockImplementation(({ where }: any) =>
+        Promise.resolve(
+          where.id === 'tax-1'
+            ? {
+                id: 'tax-1',
+                companyId: 'company-1',
+                accountType: 'ASSET_CURRENT',
+                isActive: true,
+                allowDirectPosting: true,
+              }
+            : {
+                id: 'expense-1',
+                companyId: 'company-1',
+                accountType: 'EXPENSE_OPERATING',
+                isActive: true,
+                allowDirectPosting: true,
+              },
+        ),
+      ),
     },
   };
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    delete db.taxDefaultPolicy;
+    delete db.user;
+  });
+
+  const activeTreatment = (mode = TaxCalculationMode.TAX_INCLUSIVE) => ({
+    id: 'treatment-1',
+    companyId: 'company-1',
+    code: 'STANDARD',
+    category: TaxTreatmentCategory.STANDARD,
+    calculationMode: mode,
+    status: 'ACTIVE',
+    effectiveFrom: null,
+    effectiveTo: null,
+  });
+
+  const activeRate = () => ({
+    id: 'rate-1',
+    companyId: 'company-1',
+    code: 'VAT14',
+    percentage: new Prisma.Decimal('14'),
+    treatmentId: 'treatment-1',
+    status: 'ACTIVE',
+    effectiveFrom: null,
+    effectiveTo: null,
+  });
 
   it('calculates purchase net, discount and gross totals with Decimal arithmetic', async () => {
     const result = await calculateLines(db, 'company-1', [
@@ -49,44 +92,13 @@ describe('purchase helpers', () => {
     expect(result.lines[0].expenseAccountId).toBe('expense-1');
   });
 
-  it('applies inclusive input tax and preserves the tax snapshot', async () => {
+  it('applies inclusive module-default input tax and preserves the typed snapshot', async () => {
     db.taxModuleApplicabilityRule.findUnique.mockResolvedValue({
       isEnabled: true,
-      defaultRateId: 'rate-1',
-      defaultTreatmentId: 'treatment-1',
-      defaultRate: null,
-      defaultTreatment: null,
+      allowOverride: true,
+      defaultRate: activeRate(),
+      defaultTreatment: activeTreatment(),
     });
-    db.taxRate.findFirst.mockResolvedValue({
-      id: 'rate-1',
-      code: 'VAT14',
-      percentage: new Prisma.Decimal('14'),
-      treatmentId: 'treatment-1',
-    });
-    db.taxTreatment.findFirst.mockResolvedValue({
-      id: 'treatment-1',
-      code: 'STANDARD',
-      category: TaxTreatmentCategory.STANDARD,
-      calculationMode: TaxCalculationMode.TAX_INCLUSIVE,
-    });
-    db.taxAccountBinding = {
-      findUnique: jest.fn().mockResolvedValue({ inputTaxAccountCode: '1410' }),
-    };
-    db.accountingAccount.findFirst.mockImplementation(({ where }: any) =>
-      where.code === '1410'
-        ? {
-            id: 'tax-1',
-            code: '1410',
-            accountType: 'ASSET_CURRENT',
-            isActive: true,
-          }
-        : {
-            id: 'expense-1',
-            code: '6000',
-            accountType: 'EXPENSE_OPERATING',
-            isActive: true,
-          },
-    );
     const result = await calculateLines(db, 'company-1', [
       {
         description: 'Service',
@@ -98,6 +110,85 @@ describe('purchase helpers', () => {
     expect(result.lines[0].taxableBase.toFixed(4)).toBe('100.0000');
     expect(result.lines[0].taxAmount.toFixed(4)).toBe('14.0000');
     expect(result.lines[0].lineTotal.toFixed(4)).toBe('114.0000');
+    expect(result.lines[0].tax?.taxInputAccountId).toBe('tax-1');
+    expect(result.lines[0].tax?.selectionProvenance).toBe('MODULE_DEFAULT');
+  });
+
+  it('denies an explicit purchase tax override without authorization', async () => {
+    db.taxModuleApplicabilityRule.findUnique.mockResolvedValue({
+      isEnabled: true,
+      allowOverride: true,
+      defaultRate: null,
+      defaultTreatment: null,
+    });
+    db.taxDefaultPolicy = {
+      findUnique: jest.fn().mockResolvedValue({ allowManualOverride: true }),
+    };
+    db.user = {
+      findFirst: jest
+        .fn()
+        .mockResolvedValue({ role: 'STAFF', permissions: { permissions: {} } }),
+    };
+    await expect(
+      calculateLines(
+        db,
+        'company-1',
+        [
+          {
+            description: 'Override',
+            quantity: '1',
+            unitPrice: '100',
+            taxTreatmentId: 'treatment-1',
+            taxRateId: 'rate-1',
+            accountType: PurchaseAccountType.EXPENSE,
+          },
+        ],
+        2,
+        { actorUserId: 'staff-1', asOf: new Date('2026-10-10') },
+      ),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+  });
+
+  it('records an authorized override and ignores the legacy tax binding', async () => {
+    db.taxModuleApplicabilityRule.findUnique.mockResolvedValue({
+      isEnabled: true,
+      allowOverride: true,
+      defaultRate: null,
+      defaultTreatment: null,
+    });
+    db.taxDefaultPolicy = {
+      findUnique: jest.fn().mockResolvedValue({ allowManualOverride: true }),
+    };
+    db.user = {
+      findFirst: jest
+        .fn()
+        .mockResolvedValue({ role: 'OWNER', permissions: { permissions: {} } }),
+    };
+    db.taxRate.findFirst.mockResolvedValue(activeRate());
+    db.taxTreatment.findFirst.mockResolvedValue(
+      activeTreatment(TaxCalculationMode.TAX_EXCLUSIVE),
+    );
+    const result = await calculateLines(
+      db,
+      'company-1',
+      [
+        {
+          description: 'Override',
+          quantity: '1',
+          unitPrice: '100',
+          taxTreatmentId: 'treatment-1',
+          taxRateId: 'rate-1',
+          taxOverrideReason: 'Contract requires VAT treatment',
+          accountType: PurchaseAccountType.EXPENSE,
+        },
+      ],
+      2,
+      { actorUserId: 'owner-1', asOf: new Date('2026-10-10') },
+    );
+    expect(result.lines[0].tax?.selectionProvenance).toBe('EXPLICIT_OVERRIDE');
+    expect(result.lines[0].tax?.overrideReasonSnapshot).toBe(
+      'Contract requires VAT treatment',
+    );
     expect(result.lines[0].tax?.taxInputAccountId).toBe('tax-1');
   });
 });

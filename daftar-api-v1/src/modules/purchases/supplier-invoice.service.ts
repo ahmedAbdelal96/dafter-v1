@@ -22,6 +22,7 @@ import {
   assertAccounts,
   calculateLines,
   dateOnly,
+  assertPurchaseTaxSnapshots,
   lineCreateData,
   mapDuplicate,
   nextValue,
@@ -140,6 +141,10 @@ export class SupplierInvoiceService {
           );
         const mapping = await accountingMappings(db, companyId);
         const profile = existing.businessPartner.supplierProfile;
+        if (!existing.businessPartner.isActive || !profile?.isActive)
+          throw new ConflictException(
+            'Supplier or SupplierProfile was deactivated after draft creation',
+          );
         const payable = profile?.payableAccountId
           ? await db.accountingAccount.findFirst({
               where: {
@@ -156,22 +161,23 @@ export class SupplierInvoiceService {
           !payable.reconciliationEligible
         )
           throw new BadRequestException('Supplier payable account is invalid');
-        const term =
-          existing.paymentTerm ??
-          (profile?.paymentTermId
-            ? await db.paymentTerm.findFirst({
-                where: {
-                  id: existing.paymentTermId ?? profile.paymentTermId!,
-                  companyId,
-                  isActive: true,
-                },
-                include: { lines: true },
-              })
-            : null);
+        const term = existing.paymentTermId
+          ? await db.paymentTerm.findFirst({
+              where: { id: existing.paymentTermId, companyId, isActive: true },
+              include: { lines: true },
+            })
+          : null;
         if (!term || !term.lines.length)
           throw new BadRequestException(
             'A payment term is required before posting a supplier invoice',
           );
+        await assertPurchaseTaxSnapshots(
+          db,
+          companyId,
+          existing.lines,
+          actorUserId,
+          date,
+        );
         const currency = await db.currency.findFirstOrThrow({
           where: { code: existing.transactionCurrencyCode, isActive: true },
         });
@@ -181,7 +187,16 @@ export class SupplierInvoiceService {
           term,
           currency.minorUnitPrecision,
         );
-        const lines: Array<any> = [];
+        const lines: Array<any> = schedule.map((item) => ({
+          accountId: payable.id,
+          transactionDebit: '0',
+          transactionCredit: item.amount.toFixed(4),
+          description: `AP maturity ${item.sequence}`,
+          businessPartnerId: existing.businessPartnerId,
+          dueDate: item.dueDate.toISOString(),
+          documentReference: existing.supplierDocumentReference ?? undefined,
+          reconciliationReference: `AP:${existing.id}`,
+        }));
         for (const line of existing.lines) {
           const accountId =
             line.accountType === 'EXPENSE'
@@ -224,17 +239,6 @@ export class SupplierInvoiceService {
             }
           }
         }
-        for (const item of schedule)
-          lines.push({
-            accountId: payable.id,
-            transactionDebit: '0',
-            transactionCredit: item.amount.toFixed(4),
-            description: `AP maturity ${item.sequence}`,
-            businessPartnerId: existing.businessPartnerId,
-            dueDate: item.dueDate.toISOString(),
-            documentReference: existing.supplierDocumentReference ?? undefined,
-            reconciliationReference: `AP:${existing.id}`,
-          });
         const period = await db.accountingPeriod.findFirstOrThrow({
           where: {
             companyId,
@@ -265,10 +269,30 @@ export class SupplierInvoiceService {
             lines,
           },
         );
-        const entryLines = (entry as any).lines ?? [];
-        const payableEntryLines = entryLines.filter(
-          (line: any) => line.accountId === payable.id,
-        );
+        const payableJournalLines = await db.journalLine.findMany({
+          where: {
+            companyId,
+            journalEntryId: (entry as any).id,
+            accountId: payable.id,
+            businessPartnerId: existing.businessPartnerId,
+          },
+          orderBy: { sequence: 'asc' },
+          select: { id: true, sequence: true },
+        });
+        if (payableJournalLines.length !== schedule.length)
+          throw new ConflictException(
+            'Posted supplier invoice maturities do not match AP journal lines',
+          );
+        const scheduleJournalLines = schedule.map((item) => {
+          const journalLine = payableJournalLines.find(
+            (candidate) => candidate.sequence === item.sequence,
+          );
+          if (!journalLine)
+            throw new ConflictException(
+              'Supplier invoice maturity sequence does not match an AP journal line',
+            );
+          return journalLine;
+        });
         const invoiceNumber =
           existing.invoiceNumber ??
           (await nextValue(db, companyId, 'SI', date));
@@ -292,7 +316,7 @@ export class SupplierInvoiceService {
             sequence: item.sequence,
             dueDate: item.dueDate,
             amount: item.amount,
-            journalLineId: payableEntryLines[index]?.id ?? null,
+            journalLineId: scheduleJournalLines[index].id,
             paymentTermCodeSnapshot: term.code,
             paymentTermNameSnapshot: term.name,
           })),
@@ -384,6 +408,7 @@ export class SupplierInvoiceService {
       companyId,
       input.lines as PurchaseLineInput[],
       currency.minorUnitPrecision,
+      { actorUserId, asOf: new Date(input.documentDate) },
     );
     await assertAccounts(db, companyId, calculation.lines);
     const paymentTermId =
@@ -437,7 +462,9 @@ export class SupplierInvoiceService {
         replacingId,
         {},
       );
-      return this.findOneIn(db, companyId, replacingId);
+      const hydrated = await this.findOneIn(db, companyId, replacingId);
+      await this.auditTaxOverrides(db, companyId, actorUserId, hydrated);
+      return hydrated;
     }
     const invoice = await db.supplierInvoice.create({
       data: {
@@ -474,7 +501,9 @@ export class SupplierInvoiceService {
       invoice.id,
       { purchaseOrderId: input.purchaseOrderId ?? null },
     );
-    return this.findOneIn(db, companyId, invoice.id);
+    const hydrated = await this.findOneIn(db, companyId, invoice.id);
+    await this.auditTaxOverrides(db, companyId, actorUserId, hydrated);
+    return hydrated;
   }
 
   private findOneIn(
@@ -497,6 +526,41 @@ export class SupplierInvoiceService {
       .createHash('sha256')
       .update(`${id}:${key}:${postingDate.toISOString().slice(0, 10)}`)
       .digest('hex');
+  }
+
+  private async auditTaxOverrides(
+    db: Prisma.TransactionClient,
+    companyId: string,
+    actorUserId: string,
+    invoice: {
+      id: string;
+      lines: Array<{
+        id: string;
+        taxes: Array<{
+          selectionProvenance: string;
+          overrideReasonSnapshot: string | null;
+          treatmentCodeSnapshot: string;
+        }>;
+      }>;
+    },
+  ) {
+    for (const line of invoice.lines) {
+      for (const tax of line.taxes) {
+        if (tax.selectionProvenance !== 'EXPLICIT_OVERRIDE') continue;
+        await this.audit(
+          db,
+          companyId,
+          actorUserId,
+          'supplier-invoice.tax-override',
+          line.id,
+          {
+            supplierInvoiceId: invoice.id,
+            treatmentCode: tax.treatmentCodeSnapshot,
+            reason: tax.overrideReasonSnapshot,
+          },
+        );
+      }
+    }
   }
 
   private audit(

@@ -2,6 +2,14 @@
 import { IsBoolean, IsOptional } from 'class-validator';
 
 export class UpdatePermissionsDto {
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Override purchase tax defaults with an audited reason.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  overridePurchaseTax?: boolean;
+
   @ApiPropertyOptional({ example: true, description: 'View purchase orders.' })
   @IsOptional()
   @IsBoolean()

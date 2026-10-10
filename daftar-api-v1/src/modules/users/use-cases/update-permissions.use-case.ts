@@ -11,6 +11,7 @@ import { TranslationService } from '../../../common/services/translation.service
 
 function mapPermissions(dto: UpdatePermissionsDto): StaffPermissionsMap {
   return {
+    overridePurchaseTax: dto.overridePurchaseTax ?? false,
     viewPurchaseOrders: dto.viewPurchaseOrders ?? false,
     managePurchaseOrders: dto.managePurchaseOrders ?? false,
     approvePurchaseOrders: dto.approvePurchaseOrders ?? false,

@@ -57,6 +57,7 @@ export class PurchaseOrderService {
           companyId,
           input.lines as PurchaseLineInput[],
           currency.minorUnitPrecision,
+          { actorUserId, asOf: new Date(input.documentDate) },
         );
         await assertAccounts(db, companyId, calculation.lines);
         await this.assertPaymentTerm(db, companyId, input.paymentTermId);
@@ -160,6 +161,7 @@ export class PurchaseOrderService {
           companyId,
           input.lines as PurchaseLineInput[],
           currency.minorUnitPrecision,
+          { actorUserId, asOf: new Date(input.documentDate) },
         );
         await assertAccounts(db, companyId, calculation.lines);
         await this.assertPaymentTerm(db, companyId, input.paymentTermId);
@@ -344,6 +346,8 @@ export class PurchaseOrderService {
                       rateCodeSnapshot: tax.rateCodeSnapshot,
                       percentageSnapshot: tax.percentageSnapshot,
                       calculationMode: tax.calculationMode,
+                      selectionProvenance: tax.selectionProvenance,
+                      overrideReasonSnapshot: tax.overrideReasonSnapshot,
                       taxableBase: tax.taxableBase,
                       taxAmount: tax.taxAmount,
                     })),

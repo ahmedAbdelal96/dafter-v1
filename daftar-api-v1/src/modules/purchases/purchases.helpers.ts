@@ -6,11 +6,17 @@ import {
   PurchaseAccountType,
   SalesDiscountType,
   TaxCalculationMode,
+  TaxLifecycleStatus,
   TaxModuleKey,
   TaxTreatmentCategory,
 } from '@prisma/client';
-import { BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { assertAccountMappingCompatibility } from '../accounting/accounting-policies';
 
 export const ZERO = new Prisma.Decimal(0);
 export const FOUR = 4;
@@ -24,6 +30,7 @@ export type PurchaseLineInput = {
   discountValue?: string;
   taxRateId?: string;
   taxTreatmentId?: string;
+  taxOverrideReason?: string;
   accountType?: PurchaseAccountType;
   expenseAccountId?: string;
   assetAccountId?: string;
@@ -45,17 +52,45 @@ export type CalculatedPurchaseLine = {
   expenseAccountId?: string;
   assetAccountId?: string;
   tax?: {
-    taxTreatmentId?: string;
-    taxRateId?: string;
+    taxTreatmentId?: string | null;
+    taxRateId?: string | null;
     treatmentCodeSnapshot: string;
     treatmentCategory: TaxTreatmentCategory;
-    rateCodeSnapshot?: string;
+    rateCodeSnapshot?: string | null;
     percentageSnapshot: Prisma.Decimal;
     calculationMode: TaxCalculationMode;
+    selectionProvenance:
+      | 'MODULE_DEFAULT'
+      | 'COMPANY_DEFAULT'
+      | 'EXPLICIT_OVERRIDE'
+      | 'MODULE_DISABLED_OUT_OF_SCOPE';
+    overrideReasonSnapshot?: string | null;
     taxableBase: Prisma.Decimal;
     taxAmount: Prisma.Decimal;
-    taxInputAccountId?: string;
+    taxInputAccountId?: string | null;
   };
+};
+
+export type PurchaseTaxContext = {
+  actorUserId?: string;
+  asOf?: Date;
+};
+
+type PurchaseTaxSelection = {
+  taxTreatmentId: string | null;
+  taxRateId: string | null;
+  treatmentCodeSnapshot: string;
+  treatmentCategory: TaxTreatmentCategory;
+  rateCodeSnapshot: string | null;
+  percentageSnapshot: Prisma.Decimal;
+  calculationMode: TaxCalculationMode;
+  selectionProvenance:
+    | 'MODULE_DEFAULT'
+    | 'COMPANY_DEFAULT'
+    | 'EXPLICIT_OVERRIDE'
+    | 'MODULE_DISABLED_OUT_OF_SCOPE';
+  overrideReasonSnapshot: string | null;
+  taxInputAccountId?: string;
 };
 
 export function lineCreateData(line: CalculatedPurchaseLine, index: number) {
@@ -93,7 +128,12 @@ export async function partySnapshot(
   partnerId: string,
 ) {
   const partner = await db.businessPartner.findFirst({
-    where: { id: partnerId, companyId, isActive: true },
+    where: {
+      id: partnerId,
+      companyId,
+      isActive: true,
+      supplierProfile: { isActive: true },
+    },
     include: {
       supplierProfile: true,
       addresses: { where: { isActive: true, isDefault: true }, take: 1 },
@@ -116,51 +156,166 @@ export async function partySnapshot(
   };
 }
 
-async function resolveTax(
+function inEffectiveWindow(
+  asOf: Date,
+  effectiveFrom: Date | null,
+  effectiveTo: Date | null,
+) {
+  return (
+    (!effectiveFrom || asOf >= effectiveFrom) &&
+    (!effectiveTo || asOf <= effectiveTo)
+  );
+}
+
+function assertTaxLifecycle(
+  treatment: any,
+  rate: any,
+  asOf: Date,
+  explicit = false,
+) {
+  if (
+    !treatment ||
+    treatment.status !== TaxLifecycleStatus.ACTIVE ||
+    !inEffectiveWindow(asOf, treatment.effectiveFrom, treatment.effectiveTo)
+  )
+    throw new ConflictException(
+      explicit
+        ? 'Purchase tax override is no longer valid'
+        : 'Purchase tax policy requires recalculation',
+    );
+  if (
+    rate &&
+    (rate.status !== TaxLifecycleStatus.ACTIVE ||
+      !inEffectiveWindow(asOf, rate.effectiveFrom, rate.effectiveTo))
+  )
+    throw new ConflictException(
+      explicit
+        ? 'Purchase tax override is no longer valid'
+        : 'Purchase tax policy requires recalculation',
+    );
+  if (rate && rate.treatmentId !== treatment.id)
+    throw new BadRequestException(
+      'Purchase tax rate and treatment do not match',
+    );
+}
+
+async function loadPurchaseTaxPolicy(
+  db: PrismaService | Prisma.TransactionClient,
+  companyId: string,
+  context: PurchaseTaxContext,
+) {
+  const asOf = context.asOf ?? new Date();
+  const [rule, companyDefault, actor] = await Promise.all([
+    db.taxModuleApplicabilityRule.findUnique({
+      where: {
+        companyId_moduleKey: { companyId, moduleKey: TaxModuleKey.PURCHASES },
+      },
+      include: { defaultRate: true, defaultTreatment: true },
+    }),
+    (db as any).taxDefaultPolicy?.findUnique?.({
+      where: { companyId },
+      include: { defaultRate: true, defaultTreatment: true },
+    }),
+    context.actorUserId
+      ? db.user.findFirst({
+          where: { id: context.actorUserId, companyId },
+          include: { permissions: true },
+        })
+      : null,
+  ]);
+  const moduleEnabled = rule?.isEnabled ?? true;
+  const allowManualOverride =
+    (rule?.allowOverride ?? true) &&
+    (companyDefault?.allowManualOverride ?? true);
+  const overrideAuthorized =
+    actor?.role === 'OWNER' ||
+    actor?.role === 'SUPER_ADMIN' ||
+    (actor?.permissions?.permissions as Record<string, unknown> | undefined)
+      ?.overridePurchaseTax === true;
+  const moduleDefault = rule?.defaultTreatment
+    ? { treatment: rule.defaultTreatment, rate: rule.defaultRate }
+    : null;
+  const companySelection = companyDefault?.defaultTreatment
+    ? {
+        treatment: companyDefault.defaultTreatment,
+        rate: companyDefault.defaultRate,
+      }
+    : null;
+  for (const selection of [moduleDefault, companySelection]) {
+    if (selection?.treatment && selection.treatment.companyId !== companyId)
+      throw new BadRequestException('Purchase tax treatment company mismatch');
+    if (selection?.rate && selection.rate.companyId !== companyId)
+      throw new BadRequestException('Purchase tax rate company mismatch');
+    if (
+      selection?.rate &&
+      selection.rate.treatmentId !== selection.treatment.id
+    )
+      throw new BadRequestException(
+        'Purchase tax rate and treatment do not match',
+      );
+    if (selection?.treatment)
+      assertTaxLifecycle(selection.treatment, selection.rate, asOf);
+  }
+  return {
+    moduleEnabled,
+    allowManualOverride,
+    overrideAuthorized,
+    moduleDefault,
+    companySelection,
+    asOf,
+  };
+}
+
+async function resolveTaxSelection(
   db: PrismaService | Prisma.TransactionClient,
   companyId: string,
   line: PurchaseLineInput,
-) {
-  let rule = await db.taxModuleApplicabilityRule.findUnique({
-    where: {
-      companyId_moduleKey: { companyId, moduleKey: TaxModuleKey.PURCHASES },
-    },
-    include: { defaultRate: true, defaultTreatment: true },
-  });
-  if (rule && !rule.isEnabled && (line.taxRateId || line.taxTreatmentId)) {
-    throw new BadRequestException(
-      'Purchase tax module is disabled for this company',
-    );
+  context: PurchaseTaxContext,
+): Promise<PurchaseTaxSelection | undefined> {
+  const policy = await loadPurchaseTaxPolicy(db, companyId, context);
+  const explicit = Boolean(line.taxRateId || line.taxTreatmentId);
+  if (!policy.moduleEnabled) {
+    if (explicit)
+      throw new ForbiddenException('Purchase tax override is forbidden');
+    return undefined;
   }
-  const rateId = line.taxRateId ?? rule?.defaultRateId ?? undefined;
-  const treatmentId =
-    line.taxTreatmentId ?? rule?.defaultTreatmentId ?? undefined;
-  if (!rateId && !treatmentId) return undefined;
-  const rate = rateId
-    ? await db.taxRate.findFirst({
-        where: { id: rateId, companyId, status: 'ACTIVE' },
-      })
-    : null;
-  const treatment = treatmentId
-    ? await db.taxTreatment.findFirst({
-        where: { id: treatmentId, companyId, status: 'ACTIVE' },
-      })
-    : rate?.treatmentId
-      ? await db.taxTreatment.findFirst({
-          where: { id: rate.treatmentId, companyId, status: 'ACTIVE' },
+  let treatment: any;
+  let rate: any;
+  let provenance: PurchaseTaxSelection['selectionProvenance'];
+  let reason: string | null = null;
+  if (explicit) {
+    if (!policy.allowManualOverride || !policy.overrideAuthorized)
+      throw new ForbiddenException('Purchase tax override is forbidden');
+    reason = line.taxOverrideReason?.trim() || null;
+    if (!reason)
+      throw new BadRequestException('Purchase tax override reason is required');
+    rate = line.taxRateId
+      ? await db.taxRate.findFirst({
+          where: { id: line.taxRateId, companyId },
+          include: { treatment: true },
         })
       : null;
-  if (!rate && rateId)
-    throw new BadRequestException(
-      'Purchase tax rate was not found or is inactive',
-    );
-  if (!treatment)
-    throw new BadRequestException(
-      'Purchase tax treatment was not found or is inactive',
-    );
-  const binding = await db.taxAccountBinding.findUnique({
-    where: { companyId },
-  });
+    treatment = line.taxTreatmentId
+      ? await db.taxTreatment.findFirst({
+          where: { id: line.taxTreatmentId, companyId },
+        })
+      : rate?.treatment;
+    if (line.taxRateId && !rate)
+      throw new BadRequestException('Purchase tax rate is invalid');
+    if (!treatment)
+      throw new BadRequestException('Purchase tax treatment is invalid');
+    provenance = 'EXPLICIT_OVERRIDE';
+  } else {
+    const selected = policy.moduleDefault ?? policy.companySelection;
+    if (!selected) return undefined;
+    treatment = selected.treatment;
+    rate = selected.rate;
+    provenance = policy.moduleDefault ? 'MODULE_DEFAULT' : 'COMPANY_DEFAULT';
+  }
+  assertTaxLifecycle(treatment, rate, policy.asOf, explicit);
+  if (treatment.category === TaxTreatmentCategory.STANDARD && !rate)
+    throw new BadRequestException('Purchase tax rate is required');
+
   const configured = await db.accountingConfiguration.findUnique({
     where: { companyId },
     include: { accountDefaults: true },
@@ -168,15 +323,19 @@ async function resolveTax(
   const mapping = configured?.accountDefaults.find(
     (x) => x.settingKey === AccountingConfigAccountKey.TAX_RECOVERABLE,
   );
-  const account = binding?.inputTaxAccountCode
+  const account = mapping
     ? await db.accountingAccount.findFirst({
-        where: { companyId, code: binding.inputTaxAccountCode, isActive: true },
+        where: { id: mapping.accountId, companyId, isActive: true },
       })
-    : mapping
-      ? await db.accountingAccount.findFirst({
-          where: { id: mapping.accountId, companyId, isActive: true },
-        })
-      : null;
+    : null;
+  if (!mapping || !account || !account.allowDirectPosting)
+    throw new BadRequestException(
+      'TAX_RECOVERABLE mapping is missing or not postable',
+    );
+  assertAccountMappingCompatibility(
+    AccountingConfigAccountKey.TAX_RECOVERABLE,
+    account.accountType,
+  );
   return {
     taxTreatmentId: treatment.id,
     taxRateId: rate?.id,
@@ -185,8 +344,142 @@ async function resolveTax(
     rateCodeSnapshot: rate?.code,
     percentageSnapshot: rate?.percentage ?? ZERO,
     calculationMode: treatment.calculationMode,
+    selectionProvenance: provenance,
+    overrideReasonSnapshot: reason,
     taxInputAccountId: account?.id,
   };
+}
+
+async function loadTaxRecoverableAccount(
+  db: PrismaService | Prisma.TransactionClient,
+  companyId: string,
+) {
+  const configured = await db.accountingConfiguration.findUnique({
+    where: { companyId },
+    include: { accountDefaults: true },
+  });
+  const mapping = configured?.accountDefaults.find(
+    (x) => x.settingKey === AccountingConfigAccountKey.TAX_RECOVERABLE,
+  );
+  const account = mapping
+    ? await db.accountingAccount.findFirst({
+        where: { id: mapping.accountId, companyId, isActive: true },
+      })
+    : null;
+  if (!mapping || !account || !account.allowDirectPosting)
+    throw new ConflictException(
+      'Purchase draft requires TAX_RECOVERABLE recalculation',
+    );
+  assertAccountMappingCompatibility(
+    AccountingConfigAccountKey.TAX_RECOVERABLE,
+    account.accountType,
+  );
+  return account;
+}
+
+export async function assertPurchaseTaxSnapshots(
+  db: PrismaService | Prisma.TransactionClient,
+  companyId: string,
+  lines: Array<{
+    taxes: Array<{
+      taxTreatmentId: string | null;
+      taxRateId: string | null;
+      treatmentCodeSnapshot: string;
+      treatmentCategory: TaxTreatmentCategory;
+      rateCodeSnapshot: string | null;
+      percentageSnapshot: Prisma.Decimal;
+      calculationMode: TaxCalculationMode;
+      selectionProvenance: string;
+      overrideReasonSnapshot: string | null;
+      taxInputAccountId: string | null;
+    }>;
+  }>,
+  actorUserId: string,
+  postingDate: Date,
+) {
+  const policy = await loadPurchaseTaxPolicy(db, companyId, {
+    actorUserId,
+    asOf: postingDate,
+  });
+  for (const line of lines) {
+    for (const tax of line.taxes) {
+      const treatment = tax.taxTreatmentId
+        ? await db.taxTreatment.findFirst({
+            where: { id: tax.taxTreatmentId, companyId },
+          })
+        : null;
+      const rate = tax.taxRateId
+        ? await db.taxRate.findFirst({
+            where: { id: tax.taxRateId, companyId },
+          })
+        : null;
+      try {
+        assertTaxLifecycle(treatment, rate, postingDate);
+      } catch {
+        throw new ConflictException(
+          'Purchase draft requires tax recalculation',
+        );
+      }
+      if (tax.selectionProvenance === 'EXPLICIT_OVERRIDE') {
+        if (!tax.overrideReasonSnapshot?.trim())
+          throw new ConflictException(
+            'Purchase tax override reason is required',
+          );
+        if (!policy.moduleEnabled || !policy.allowManualOverride)
+          throw new ConflictException(
+            'Purchase draft requires tax recalculation',
+          );
+        if (!policy.overrideAuthorized)
+          throw new ForbiddenException('Purchase tax override is forbidden');
+      } else if (tax.overrideReasonSnapshot?.trim()) {
+        throw new ConflictException(
+          'Purchase draft requires tax recalculation',
+        );
+      }
+      const current =
+        tax.selectionProvenance === 'EXPLICIT_OVERRIDE'
+          ? { treatment, rate, provenance: 'EXPLICIT_OVERRIDE' }
+          : policy.moduleEnabled
+            ? {
+                treatment:
+                  (policy.moduleDefault ?? policy.companySelection)
+                    ?.treatment ?? null,
+                rate:
+                  (policy.moduleDefault ?? policy.companySelection)?.rate ??
+                  null,
+                provenance: policy.moduleDefault
+                  ? 'MODULE_DEFAULT'
+                  : 'COMPANY_DEFAULT',
+              }
+            : {
+                treatment: null,
+                rate: null,
+                provenance: 'MODULE_DISABLED_OUT_OF_SCOPE',
+              };
+      if (
+        current.provenance !== tax.selectionProvenance ||
+        (current.treatment?.id ?? null) !== tax.taxTreatmentId ||
+        (current.treatment?.code ?? TaxTreatmentCategory.OUT_OF_SCOPE) !==
+          tax.treatmentCodeSnapshot ||
+        (current.treatment?.category ?? TaxTreatmentCategory.OUT_OF_SCOPE) !==
+          tax.treatmentCategory ||
+        (current.treatment?.calculationMode ??
+          TaxCalculationMode.TAX_EXCLUSIVE) !== tax.calculationMode ||
+        (current.rate?.id ?? null) !== tax.taxRateId ||
+        (current.rate?.code ?? null) !== tax.rateCodeSnapshot ||
+        !(current.rate?.percentage ?? ZERO).eq(tax.percentageSnapshot)
+      ) {
+        throw new ConflictException(
+          'Purchase draft requires tax recalculation',
+        );
+      }
+      const taxAccount = await loadTaxRecoverableAccount(db, companyId);
+      if (tax.taxInputAccountId !== taxAccount.id)
+        throw new ConflictException(
+          'Purchase draft requires tax recalculation',
+        );
+    }
+  }
 }
 
 export async function calculateLines(
@@ -194,6 +487,7 @@ export async function calculateLines(
   companyId: string,
   inputs: PurchaseLineInput[],
   minorUnitPrecision = 2,
+  context: PurchaseTaxContext = {},
 ) {
   if (!inputs.length)
     throw new BadRequestException('At least one purchase line is required');
@@ -222,7 +516,7 @@ export async function calculateLines(
     const taxableBase = gross
       .minus(discount)
       .toDecimalPlaces(FOUR, Prisma.Decimal.ROUND_HALF_UP);
-    const tax = await resolveTax(db, companyId, input);
+    const tax = await resolveTaxSelection(db, companyId, input, context);
     let taxAmount = ZERO;
     let taxBase = taxableBase;
     if (tax && tax.percentageSnapshot.gt(ZERO)) {

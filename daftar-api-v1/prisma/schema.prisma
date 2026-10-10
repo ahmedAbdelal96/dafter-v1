@@ -1666,6 +1666,8 @@ model PurchaseOrderLineTax {
   rateCodeSnapshot      String?
   percentageSnapshot    Decimal              @db.Decimal(9, 4)
   calculationMode       TaxCalculationMode
+  selectionProvenance   SalesTaxSelectionProvenance @default(COMPANY_DEFAULT)
+  overrideReasonSnapshot String?                    @db.VarChar(1000)
   taxableBase           Decimal              @db.Decimal(19, 4)
   taxAmount             Decimal              @db.Decimal(19, 4)
   createdAt             DateTime             @default(now())
@@ -1778,6 +1780,8 @@ model SupplierInvoiceLineTax {
   rateCodeSnapshot      String?
   percentageSnapshot    Decimal              @db.Decimal(9, 4)
   calculationMode       TaxCalculationMode
+  selectionProvenance   SalesTaxSelectionProvenance @default(COMPANY_DEFAULT)
+  overrideReasonSnapshot String?                    @db.VarChar(1000)
   taxableBase           Decimal              @db.Decimal(19, 4)
   taxAmount             Decimal              @db.Decimal(19, 4)
   createdAt             DateTime             @default(now())
@@ -1893,6 +1897,8 @@ model SupplierCreditNoteLineTax {
   rateCodeSnapshot         String?
   percentageSnapshot       Decimal                @db.Decimal(9, 4)
   calculationMode          TaxCalculationMode
+  selectionProvenance      SalesTaxSelectionProvenance @default(COMPANY_DEFAULT)
+  overrideReasonSnapshot   String?                    @db.VarChar(1000)
   taxableBase              Decimal                @db.Decimal(19, 4)
   taxAmount                Decimal                @db.Decimal(19, 4)
   createdAt                DateTime               @default(now())

@@ -13,6 +13,14 @@ import {
 } from 'class-validator';
 
 export class StaffPermissionsDto {
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Override purchase tax defaults with an audited reason.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  overridePurchaseTax?: boolean;
+
   @ApiPropertyOptional({ example: true, description: 'View purchase orders.' })
   @IsOptional()
   @IsBoolean()

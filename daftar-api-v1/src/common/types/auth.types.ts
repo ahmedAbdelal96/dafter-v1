@@ -63,6 +63,7 @@ export interface StaffPermissionsMap {
   viewSupplierCreditNotes?: boolean;
   manageSupplierCreditNotes?: boolean;
   postSupplierCreditNotes?: boolean;
+  overridePurchaseTax?: boolean;
   'tax_setup.view'?: boolean;
   'tax_setup.manage_registration_profile'?: boolean;
   'tax_setup.create_rate'?: boolean;

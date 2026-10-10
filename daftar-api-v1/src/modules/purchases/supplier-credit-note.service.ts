@@ -348,6 +348,8 @@ export class SupplierCreditNoteService {
                 rateCodeSnapshot: item.rateCodeSnapshot,
                 percentageSnapshot: item.percentageSnapshot,
                 calculationMode: item.calculationMode,
+                selectionProvenance: item.selectionProvenance,
+                overrideReasonSnapshot: item.overrideReasonSnapshot,
                 taxableBase: item.taxableBase
                   .mul(ratio)
                   .toDecimalPlaces(4, Prisma.Decimal.ROUND_HALF_UP),

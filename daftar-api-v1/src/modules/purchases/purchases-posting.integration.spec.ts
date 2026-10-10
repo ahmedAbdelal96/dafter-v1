@@ -211,6 +211,199 @@ describe('B05 purchase/AP posting', () => {
     ).rejects.toBeInstanceOf(ConflictException);
   });
 
+  it('maps three AP maturities to persisted journal sequences with multiple tax lines', async () => {
+    const stamp = Date.now();
+    const stagedTerm = await prisma.paymentTerm.create({
+      data: {
+        companyId,
+        code: `STAGED-${stamp}`,
+        name: 'Three stage supplier term',
+        lines: {
+          create: [
+            {
+              sequence: 1,
+              calculationType: 'PERCENT',
+              percentage: 25,
+              dueDays: 0,
+            },
+            {
+              sequence: 2,
+              calculationType: 'PERCENT',
+              percentage: 35,
+              dueDays: 30,
+            },
+            {
+              sequence: 3,
+              calculationType: 'PERCENT',
+              percentage: 40,
+              dueDays: 60,
+            },
+          ],
+        },
+      },
+    });
+    const treatment = await prisma.taxTreatment.create({
+      data: {
+        companyId,
+        code: `PURCHASE-STANDARD-${stamp}`,
+        normalizedCode: `purchase-standard-${stamp}`,
+        name: 'Purchase standard',
+        category: 'STANDARD',
+        calculationMode: 'TAX_EXCLUSIVE',
+      },
+    });
+    const rate = await prisma.taxRate.create({
+      data: {
+        companyId,
+        treatmentId: treatment.id,
+        code: `PURCHASE-VAT-${stamp}`,
+        normalizedCode: `purchase-vat-${stamp}`,
+        name: 'Purchase VAT',
+        percentage: 14,
+      },
+    });
+    await prisma.taxModuleApplicabilityRule.create({
+      data: {
+        companyId,
+        moduleKey: 'PURCHASES',
+        isEnabled: true,
+        defaultTreatmentId: treatment.id,
+        defaultRateId: rate.id,
+      },
+    });
+    const draft = await supplierInvoices.createDraft(companyId, ownerId, {
+      businessPartnerId: supplierId,
+      documentDate: new Date('2026-10-20'),
+      currencyCode: 'EGP',
+      exchangeRate: '1',
+      paymentTermId: stagedTerm.id,
+      supplierReference: `SUP-STAGED-${stamp}`,
+      lines: [line('Staged service one'), line('Staged service two')],
+    });
+    await prisma.taxRate.update({
+      where: { id: rate.id },
+      data: { status: 'INACTIVE' },
+    });
+    await expect(
+      supplierInvoices.postDraft(
+        companyId,
+        ownerId,
+        draft.id,
+        new Date('2026-10-20'),
+        `stale-tax-${draft.id}`,
+      ),
+    ).rejects.toThrow('recalculation');
+    await prisma.taxRate.update({
+      where: { id: rate.id },
+      data: { status: 'ACTIVE' },
+    });
+    const posted = await supplierInvoices.postDraft(
+      companyId,
+      ownerId,
+      draft.id,
+      new Date('2026-10-20'),
+      `invoice-${draft.id}`,
+    );
+    const entry = await prisma.journalEntry.findFirstOrThrow({
+      where: { id: posted.journalEntryId!, companyId },
+      include: { lines: true },
+    });
+    const payableLines = entry.lines
+      .filter((item) => item.accountId === posted.payableAccountId)
+      .sort((a, b) => a.sequence - b.sequence);
+    const schedules = await prisma.supplierInvoicePaymentSchedule.findMany({
+      where: { supplierInvoiceId: posted.id },
+      orderBy: { sequence: 'asc' },
+    });
+    expect(schedules).toHaveLength(3);
+    expect(payableLines.map((item) => item.sequence)).toEqual([1, 2, 3]);
+    expect(schedules.map((item) => item.journalLineId)).toEqual(
+      payableLines.map((item) => item.id),
+    );
+    expect(schedules.map((item) => item.amount.toFixed(2))).toEqual([
+      '570.00',
+      '798.00',
+      '912.00',
+    ]);
+    expect(entry.lines.filter((item) => item.taxTreatmentCode)).toHaveLength(2);
+    expect(
+      entry.lines.filter(
+        (item) =>
+          item.accountId !== posted.payableAccountId && !item.taxTreatmentCode,
+      ),
+    ).toHaveLength(2);
+    await prisma.taxModuleApplicabilityRule.update({
+      where: { companyId_moduleKey: { companyId, moduleKey: 'PURCHASES' } },
+      data: { isEnabled: false },
+    });
+  });
+
+  it('rejects posting when the supplier or selected payment term becomes inactive', async () => {
+    const staleSupplier = await prisma.businessPartner.create({
+      data: {
+        companyId,
+        partnerCode: `STALE-SUP-${Date.now()}`,
+        displayName: 'Stale supplier',
+        partnerType: BusinessPartnerType.ORGANIZATION,
+      },
+    });
+    await prisma.supplierProfile.create({
+      data: { businessPartnerId: staleSupplier.id, companyId, paymentTermId },
+    });
+    const supplierDraft = await supplierInvoices.createDraft(
+      companyId,
+      ownerId,
+      {
+        businessPartnerId: staleSupplier.id,
+        documentDate: new Date('2026-10-21'),
+        currencyCode: 'EGP',
+        exchangeRate: '1',
+        paymentTermId,
+        supplierReference: `SUP-INACTIVE-${Date.now()}`,
+        lines: [line('Inactive supplier check')],
+      },
+    );
+    await prisma.businessPartner.update({
+      where: { id: staleSupplier.id },
+      data: { isActive: false },
+    });
+    await expect(
+      supplierInvoices.postDraft(
+        companyId,
+        ownerId,
+        supplierDraft.id,
+        new Date('2026-10-21'),
+        `invoice-${supplierDraft.id}`,
+      ),
+    ).rejects.toBeInstanceOf(ConflictException);
+    const termDraft = await supplierInvoices.createDraft(companyId, ownerId, {
+      businessPartnerId: supplierId,
+      documentDate: new Date('2026-10-22'),
+      currencyCode: 'EGP',
+      exchangeRate: '1',
+      paymentTermId,
+      supplierReference: `TERM-INACTIVE-${Date.now()}`,
+      lines: [line('Inactive term check')],
+    });
+    await prisma.paymentTerm.update({
+      where: { id: paymentTermId },
+      data: { isActive: false },
+    });
+    await expect(
+      supplierInvoices.postDraft(
+        companyId,
+        ownerId,
+        termDraft.id,
+        new Date('2026-10-22'),
+        `invoice-${termDraft.id}`,
+      ),
+    ).rejects.toThrow('payment term is required');
+    await prisma.paymentTerm.update({
+      where: { id: paymentTermId },
+      data: { isActive: true },
+    });
+  });
+
   it('reverses the original AP basis with a partial supplier credit note and prevents over-credit', async () => {
     const draft = await supplierInvoices.createDraft(companyId, ownerId, {
       businessPartnerId: supplierId,

@@ -28,6 +28,7 @@ export class PurchaseLineDto {
   @IsOptional() @IsString() discountValue?: string;
   @IsOptional() @IsUUID() taxRateId?: string;
   @IsOptional() @IsUUID() taxTreatmentId?: string;
+  @IsOptional() @IsString() @MaxLength(1000) taxOverrideReason?: string;
   @IsOptional() @IsEnum(PurchaseAccountType) accountType?: PurchaseAccountType;
   @IsOptional() @IsUUID() expenseAccountId?: string;
   @IsOptional() @IsUUID() assetAccountId?: string;

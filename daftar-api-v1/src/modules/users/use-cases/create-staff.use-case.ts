@@ -11,6 +11,7 @@ function mapStaffPermissions(
   dto?: CreateStaffDto['permissions'],
 ): StaffPermissionsMap {
   return {
+    overridePurchaseTax: dto?.overridePurchaseTax ?? false,
     viewPurchaseOrders: dto?.viewPurchaseOrders ?? false,
     managePurchaseOrders: dto?.managePurchaseOrders ?? false,
     approvePurchaseOrders: dto?.approvePurchaseOrders ?? false,
