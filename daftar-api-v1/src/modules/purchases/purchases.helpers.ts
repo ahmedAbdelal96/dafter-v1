@@ -104,6 +104,20 @@ type TaxRateLifecycle = TaxTreatmentLifecycle & {
   treatmentId: string | null;
 };
 
+type TaxTreatmentRecord = TaxTreatmentLifecycle & {
+  companyId: string;
+  code: string;
+  category: TaxTreatmentCategory;
+  calculationMode: TaxCalculationMode;
+};
+
+type TaxRateRecord = TaxRateLifecycle & {
+  companyId: string;
+  code: string;
+  percentage: Prisma.Decimal;
+  treatment?: TaxTreatmentRecord | null;
+};
+
 export function lineCreateData(line: CalculatedPurchaseLine, index: number) {
   const { tax, ...data } = line;
   return {
@@ -265,7 +279,11 @@ async function loadPurchaseTaxPolicy(
         'Purchase tax rate and treatment do not match',
       );
     if (selection?.treatment)
-      assertTaxLifecycle(selection.treatment, selection.rate, asOf);
+      assertTaxLifecycle(
+        selection.treatment as TaxTreatmentRecord,
+        selection.rate as TaxRateRecord | null,
+        asOf,
+      );
   }
   return {
     moduleEnabled,
@@ -290,8 +308,8 @@ async function resolveTaxSelection(
       throw new ForbiddenException('Purchase tax override is forbidden');
     return undefined;
   }
-  let treatment: any;
-  let rate: any;
+  let treatment: TaxTreatmentRecord | null = null;
+  let rate: TaxRateRecord | null = null;
   let provenance: PurchaseTaxSelection['selectionProvenance'];
   let reason: string | null = null;
   if (explicit) {
@@ -310,7 +328,7 @@ async function resolveTaxSelection(
       ? await db.taxTreatment.findFirst({
           where: { id: line.taxTreatmentId, companyId },
         })
-      : rate?.treatment;
+      : (rate?.treatment ?? null);
     if (line.taxRateId && !rate)
       throw new BadRequestException('Purchase tax rate is invalid');
     if (!treatment)
@@ -319,10 +337,12 @@ async function resolveTaxSelection(
   } else {
     const selected = policy.moduleDefault ?? policy.companySelection;
     if (!selected) return undefined;
-    treatment = selected.treatment;
-    rate = selected.rate;
+    treatment = selected.treatment ?? null;
+    rate = selected.rate ?? null;
     provenance = policy.moduleDefault ? 'MODULE_DEFAULT' : 'COMPANY_DEFAULT';
   }
+  if (!treatment)
+    throw new BadRequestException('Purchase tax treatment is invalid');
   assertTaxLifecycle(treatment, rate, policy.asOf, explicit);
   if (treatment.category === TaxTreatmentCategory.STANDARD && !rate)
     throw new BadRequestException('Purchase tax rate is required');
@@ -349,10 +369,10 @@ async function resolveTaxSelection(
   );
   return {
     taxTreatmentId: treatment.id,
-    taxRateId: rate?.id,
+    taxRateId: rate?.id ?? null,
     treatmentCodeSnapshot: treatment.code,
     treatmentCategory: treatment.category,
-    rateCodeSnapshot: rate?.code,
+    rateCodeSnapshot: rate?.code ?? null,
     percentageSnapshot: rate?.percentage ?? ZERO,
     calculationMode: treatment.calculationMode,
     selectionProvenance: provenance,
