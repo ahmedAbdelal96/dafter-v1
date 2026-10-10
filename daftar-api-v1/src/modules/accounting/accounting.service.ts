@@ -844,7 +844,7 @@ export class AccountingService {
       include: {
         journal: true,
         accountingPeriod: true,
-        lines: { include: { account: true }, orderBy: { createdAt: 'asc' } },
+        lines: { include: { account: true }, orderBy: { sequence: 'asc' } },
       },
     });
     return rows.map((row) => this.serializeEntry(row));
@@ -1312,7 +1312,11 @@ export class AccountingService {
     });
 
     await tx.journalLine.createMany({
-      data: lineData.map((line) => ({ ...line, journalEntryId: entry.id })),
+      data: lineData.map((line, index) => ({
+        ...line,
+        journalEntryId: entry.id,
+        sequence: index + 1,
+      })),
     });
     const posted = await tx.journalEntry.update({
       where: { id: entry.id },
@@ -1382,7 +1386,7 @@ export class AccountingService {
     return this.prisma.journalEntry.findFirst({
       where: { id, companyId },
       include: {
-        lines: { include: { account: true }, orderBy: { createdAt: 'asc' } },
+        lines: { include: { account: true }, orderBy: { sequence: 'asc' } },
         journal: true,
         accountingPeriod: { include: { fiscalYear: true } },
       },

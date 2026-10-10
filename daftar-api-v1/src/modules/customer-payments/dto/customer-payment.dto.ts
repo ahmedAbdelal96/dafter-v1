@@ -101,6 +101,44 @@ export class ReconcileOnAccountDto {
   @Matches(DECIMAL)
   amount!: string;
 
+  @IsOptional()
+  @IsDateString()
+  postingDate?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(128)
+  idempotencyKey!: string;
+}
+
+export class CreateARReconciliationDto {
+  @IsUUID()
+  debitJournalLineId!: string;
+
+  @IsUUID()
+  creditJournalLineId!: string;
+
+  @Matches(DECIMAL)
+  amount!: string;
+
+  @IsDateString()
+  postingDate!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(128)
+  idempotencyKey!: string;
+}
+
+export class ReverseARReconciliationDto {
+  @IsDateString()
+  postingDate!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(500)
+  reason!: string;
+
   @IsString()
   @IsNotEmpty()
   @MaxLength(128)

@@ -210,6 +210,7 @@ enum JournalSourceType {
   EXPENSE
   CASH_TRANSFER
   REVERSAL
+  AR_RECONCILIATION
   MIGRATION
 }
 
@@ -225,6 +226,11 @@ enum CustomerPaymentMethod {
   CHEQUE
   CARD
   OTHER
+}
+
+enum ARReconciliationStatus {
+  ACTIVE
+  REVERSED
 }
 
 enum SalesInvoiceStatus {
@@ -335,7 +341,7 @@ model User {
   deviceTokens  DeviceToken[]  @relation("UserDeviceTokens")
   notifications Notification[] @relation("UserNotifications")
 
-  auditLogs            AuditLog[]    @relation("AuditActor")
+  auditLogs AuditLog[] @relation("AuditActor")
 
   // Phase 3: back-reference for expenses
   createdExpenses Expense[] @relation("ExpenseCreatedBy")
@@ -349,14 +355,15 @@ model User {
   postedOpeningBalanceBatches  OpeningBalanceBatch[] @relation("OpeningBalanceBatchPostedBy")
 
   // B03: authoritative Sales documents
-  createdSalesInvoices    SalesInvoice[]    @relation("SalesInvoiceCreatedBy")
-  postedSalesInvoices     SalesInvoice[]    @relation("SalesInvoicePostedBy")
-  createdSalesCreditNotes SalesCreditNote[] @relation("SalesCreditNoteCreatedBy")
-  postedSalesCreditNotes  SalesCreditNote[] @relation("SalesCreditNotePostedBy")
-  createdCustomerPayments CustomerPayment[]  @relation("CustomerPaymentCreatedBy")
-  postedCustomerPayments  CustomerPayment[]  @relation("CustomerPaymentPostedBy")
-  reversedCustomerPayments CustomerPayment[] @relation("CustomerPaymentReversedBy")
-  createdARReconciliations ARReconciliation[] @relation("ARReconciliationCreatedBy")
+  createdSalesInvoices      SalesInvoice[]     @relation("SalesInvoiceCreatedBy")
+  postedSalesInvoices       SalesInvoice[]     @relation("SalesInvoicePostedBy")
+  createdSalesCreditNotes   SalesCreditNote[]  @relation("SalesCreditNoteCreatedBy")
+  postedSalesCreditNotes    SalesCreditNote[]  @relation("SalesCreditNotePostedBy")
+  createdCustomerPayments   CustomerPayment[]  @relation("CustomerPaymentCreatedBy")
+  postedCustomerPayments    CustomerPayment[]  @relation("CustomerPaymentPostedBy")
+  reversedCustomerPayments  CustomerPayment[]  @relation("CustomerPaymentReversedBy")
+  createdARReconciliations  ARReconciliation[] @relation("ARReconciliationCreatedBy")
+  reversedARReconciliations ARReconciliation[] @relation("ARReconciliationReversedBy")
 
   // Optimistic locking
   version Int @default(0)
@@ -470,13 +477,13 @@ model Company {
   expenses Expense[]
 
   // B03: authoritative Sales documents
-  salesInvoices    SalesInvoice[]
-  salesCreditNotes SalesCreditNote[]
-  salesSequences   SalesDocumentSequence[]
-  customerPayments CustomerPayment[]
-  customerPaymentSequences CustomerPaymentSequence[]
+  salesInvoices              SalesInvoice[]
+  salesCreditNotes           SalesCreditNote[]
+  salesSequences             SalesDocumentSequence[]
+  customerPayments           CustomerPayment[]
+  customerPaymentSequences   CustomerPaymentSequence[]
   customerPaymentAllocations CustomerPaymentAllocation[]
-  arReconciliations ARReconciliation[]
+  arReconciliations          ARReconciliation[]
 
   // Tax setup foundation
   taxRegistrationProfile TaxRegistrationProfile?
@@ -953,10 +960,10 @@ model Employee {
   companyId String  @db.Uuid
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  name           String
-  phone          String?
-  jobTitle       String?
-  isActive       Boolean @default(true)
+  name     String
+  phone    String?
+  jobTitle String?
+  isActive Boolean @default(true)
 
   // Optimistic locking
   version Int @default(0)
@@ -1017,9 +1024,6 @@ model AuditLog {
 // ============================================================
 // END
 // ============================================================
-
-
-
 
 // ============================================================
 // PUSH NOTIFICATIONS
@@ -1139,7 +1143,7 @@ model Expense {
   // Key query patterns:
   // 1. List all expenses for a company sorted by date (default view)
   // 2. Filter by category (category breakdown)
-// 3. Filter by category and date range
+  // 3. Filter by category and date range
   // 4. Date-range reports
   @@index([companyId, isDeleted, expenseDate(sort: Desc)]) // default list
   @@index([companyId, isDeleted, category]) // category filter
@@ -1368,43 +1372,43 @@ model SalesInvoiceLine {
 }
 
 model SalesInvoiceLineTax {
-  id                    String                      @id @default(uuid()) @db.Uuid
-  companyId             String                      @db.Uuid
-  salesInvoiceLineId    String                      @db.Uuid
-  salesInvoiceLine      SalesInvoiceLine            @relation(fields: [salesInvoiceLineId, companyId], references: [id, companyId], onDelete: Cascade)
-  taxTreatmentId        String?                     @db.Uuid
-  taxRateId             String?                     @db.Uuid
-  taxLiabilityAccountId String?                     @db.Uuid
-  taxLiabilityAccount   AccountingAccount?          @relation("SalesInvoiceLineTaxLiabilityAccount", fields: [taxLiabilityAccountId, companyId], references: [id, companyId], onDelete: Restrict)
-  selectionProvenance   SalesTaxSelectionProvenance
-  overrideReasonSnapshot String?                   @db.VarChar(1000)
-  treatmentCodeSnapshot String                      @db.VarChar(40)
-  treatmentCategory     TaxTreatmentCategory
-  rateCodeSnapshot      String?
-  percentageSnapshot    Decimal                     @db.Decimal(9, 4)
-  calculationMode       TaxCalculationMode
-  taxableBase           Decimal                     @db.Decimal(19, 4)
-  taxAmount             Decimal                     @db.Decimal(19, 4)
-  createdAt             DateTime                    @default(now())
+  id                     String                      @id @default(uuid()) @db.Uuid
+  companyId              String                      @db.Uuid
+  salesInvoiceLineId     String                      @db.Uuid
+  salesInvoiceLine       SalesInvoiceLine            @relation(fields: [salesInvoiceLineId, companyId], references: [id, companyId], onDelete: Cascade)
+  taxTreatmentId         String?                     @db.Uuid
+  taxRateId              String?                     @db.Uuid
+  taxLiabilityAccountId  String?                     @db.Uuid
+  taxLiabilityAccount    AccountingAccount?          @relation("SalesInvoiceLineTaxLiabilityAccount", fields: [taxLiabilityAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  selectionProvenance    SalesTaxSelectionProvenance
+  overrideReasonSnapshot String?                     @db.VarChar(1000)
+  treatmentCodeSnapshot  String                      @db.VarChar(40)
+  treatmentCategory      TaxTreatmentCategory
+  rateCodeSnapshot       String?
+  percentageSnapshot     Decimal                     @db.Decimal(9, 4)
+  calculationMode        TaxCalculationMode
+  taxableBase            Decimal                     @db.Decimal(19, 4)
+  taxAmount              Decimal                     @db.Decimal(19, 4)
+  createdAt              DateTime                    @default(now())
 
   @@unique([companyId, salesInvoiceLineId])
   @@index([companyId, taxRateId])
 }
 
 model SalesInvoicePaymentSchedule {
-  id                      String       @id @default(uuid()) @db.Uuid
-  companyId               String       @db.Uuid
-  salesInvoiceId          String       @db.Uuid
-  salesInvoice            SalesInvoice @relation(fields: [salesInvoiceId, companyId], references: [id, companyId], onDelete: Cascade)
+  id                      String                      @id @default(uuid()) @db.Uuid
+  companyId               String                      @db.Uuid
+  salesInvoiceId          String                      @db.Uuid
+  salesInvoice            SalesInvoice                @relation(fields: [salesInvoiceId, companyId], references: [id, companyId], onDelete: Cascade)
   sequence                Int
-  dueDate                 DateTime     @db.Date
-  amount                  Decimal      @db.Decimal(19, 4)
-  journalLineId           String?      @db.Uuid
-  journalLine             JournalLine? @relation("SalesInvoicePaymentScheduleJournalLine", fields: [journalLineId, companyId], references: [id, companyId], onDelete: Restrict)
+  dueDate                 DateTime                    @db.Date
+  amount                  Decimal                     @db.Decimal(19, 4)
+  journalLineId           String?                     @db.Uuid
+  journalLine             JournalLine?                @relation("SalesInvoicePaymentScheduleJournalLine", fields: [journalLineId, companyId], references: [id, companyId], onDelete: Restrict)
   paymentTermCodeSnapshot String?
   paymentTermNameSnapshot String?
   allocations             CustomerPaymentAllocation[]
-  createdAt               DateTime     @default(now())
+  createdAt               DateTime                    @default(now())
 
   @@unique([id, companyId])
   @@unique([companyId, salesInvoiceId, sequence])
@@ -1530,6 +1534,8 @@ model CustomerPayment {
   method                  CustomerPaymentMethod
   destinationAccountId    String                @db.Uuid
   destinationAccount      AccountingAccount     @relation("CustomerPaymentDestinationAccount", fields: [destinationAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  receivableAccountId     String                @db.Uuid
+  receivableAccount       AccountingAccount     @relation("CustomerPaymentReceivableAccount", fields: [receivableAccountId, companyId], references: [id, companyId], onDelete: Restrict)
   transactionCurrencyCode String                @db.Char(3)
   transactionCurrency     Currency              @relation("CustomerPaymentTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
   exchangeRate            Decimal               @db.Decimal(19, 8)
@@ -1538,6 +1544,8 @@ model CustomerPayment {
   notes                   String?               @db.VarChar(2000)
   journalEntryId          String?               @db.Uuid
   journalEntry            JournalEntry?         @relation("CustomerPaymentJournalEntry", fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  arJournalLineId         String?               @db.Uuid
+  arJournalLine           JournalLine?          @relation("CustomerPaymentARSourceLine", fields: [arJournalLineId, companyId], references: [id, companyId], onDelete: Restrict)
   reversalJournalEntryId  String?               @db.Uuid
   reversalJournalEntry    JournalEntry?         @relation("CustomerPaymentReversalJournalEntry", fields: [reversalJournalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
   idempotencyKey          String?               @db.VarChar(128)
@@ -1546,62 +1554,91 @@ model CustomerPayment {
   createdBy               User                  @relation("CustomerPaymentCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
   postedById              String?               @db.Uuid
   postedBy                User?                 @relation("CustomerPaymentPostedBy", fields: [postedById], references: [id], onDelete: Restrict)
-  reversedById             String?               @db.Uuid
-  reversedBy               User?                 @relation("CustomerPaymentReversedBy", fields: [reversedById], references: [id], onDelete: Restrict)
+  reversedById            String?               @db.Uuid
+  reversedBy              User?                 @relation("CustomerPaymentReversedBy", fields: [reversedById], references: [id], onDelete: Restrict)
   postedAt                DateTime?
   reversedAt              DateTime?
   reversalReason          String?               @db.VarChar(500)
+  reversalIdempotencyKey  String?               @db.VarChar(128)
+  reversalRequestHash     String?               @db.Char(64)
 
-  allocations CustomerPaymentAllocation[]
+  allocations     CustomerPaymentAllocation[]
   reconciliations ARReconciliation[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt       DateTime                    @default(now())
+  updatedAt       DateTime                    @updatedAt
 
   @@unique([id, companyId])
   @@unique([companyId, paymentNumber])
   @@unique([companyId, idempotencyKey])
   @@unique([journalEntryId, companyId])
+  @@unique([arJournalLineId, companyId])
   @@unique([reversalJournalEntryId, companyId])
+  @@unique([companyId, reversalIdempotencyKey])
   @@index([companyId, status, paymentDate])
   @@index([companyId, businessPartnerId, paymentDate])
+  @@index([companyId, receivableAccountId])
 }
 
 model CustomerPaymentAllocation {
-  id                         String                        @id @default(uuid()) @db.Uuid
-  companyId                  String                        @db.Uuid
-  company                    Company                       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customerPaymentId          String                        @db.Uuid
-  customerPayment            CustomerPayment               @relation(fields: [customerPaymentId, companyId], references: [id, companyId], onDelete: Restrict)
-  journalLineId              String                        @db.Uuid
-  journalLine                JournalLine                   @relation(fields: [journalLineId, companyId], references: [id, companyId], onDelete: Restrict)
-  salesInvoicePaymentScheduleId String?                     @db.Uuid
+  id                            String                       @id @default(uuid()) @db.Uuid
+  companyId                     String                       @db.Uuid
+  company                       Company                      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customerPaymentId             String                       @db.Uuid
+  customerPayment               CustomerPayment              @relation(fields: [customerPaymentId, companyId], references: [id, companyId], onDelete: Restrict)
+  journalLineId                 String                       @db.Uuid
+  journalLine                   JournalLine                  @relation(fields: [journalLineId, companyId], references: [id, companyId], onDelete: Restrict)
+  salesInvoicePaymentScheduleId String?                      @db.Uuid
   salesInvoicePaymentSchedule   SalesInvoicePaymentSchedule? @relation(fields: [salesInvoicePaymentScheduleId, companyId], references: [id, companyId], onDelete: Restrict)
-  amount                     Decimal                       @db.Decimal(19, 4)
-  createdAt                  DateTime                      @default(now())
+  amount                        Decimal                      @db.Decimal(19, 4)
+  arReconciliationId            String?                      @db.Uuid
+  arReconciliation              ARReconciliation?            @relation(fields: [arReconciliationId, companyId], references: [id, companyId], onDelete: Restrict)
+  createdAt                     DateTime                     @default(now())
 
   @@unique([id, companyId])
+  @@unique([arReconciliationId, companyId])
   @@unique([companyId, customerPaymentId, journalLineId])
   @@index([companyId, journalLineId])
   @@index([companyId, customerPaymentId])
 }
 
 model ARReconciliation {
-  id                String          @id @default(uuid()) @db.Uuid
-  companyId         String          @db.Uuid
-  company           Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customerPaymentId String          @db.Uuid
-  customerPayment   CustomerPayment @relation(fields: [customerPaymentId, companyId], references: [id, companyId], onDelete: Restrict)
-  journalLineId     String          @db.Uuid
-  journalLine       JournalLine     @relation(fields: [journalLineId, companyId], references: [id, companyId], onDelete: Restrict)
-  amount            Decimal         @db.Decimal(19, 4)
-  idempotencyKey    String          @db.VarChar(128)
-  createdById       String          @db.Uuid
-  createdBy         User            @relation("ARReconciliationCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
-  createdAt         DateTime        @default(now())
+  id                       String                     @id @default(uuid()) @db.Uuid
+  companyId                String                     @db.Uuid
+  company                  Company                    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  debitJournalLineId       String                     @db.Uuid
+  debitJournalLine         JournalLine                @relation("ARReconciliationDebit", fields: [debitJournalLineId, companyId], references: [id, companyId], onDelete: Restrict)
+  creditJournalLineId      String                     @db.Uuid
+  creditJournalLine        JournalLine                @relation("ARReconciliationCredit", fields: [creditJournalLineId, companyId], references: [id, companyId], onDelete: Restrict)
+  customerPaymentId        String?                    @db.Uuid
+  customerPayment          CustomerPayment?           @relation(fields: [customerPaymentId, companyId], references: [id, companyId], onDelete: Restrict)
+  transactionAmount        Decimal                    @db.Decimal(19, 4)
+  debitBaseAmountApplied   Decimal                    @db.Decimal(19, 4)
+  creditBaseAmountApplied  Decimal                    @db.Decimal(19, 4)
+  realizedFxAmount         Decimal                    @db.Decimal(19, 4)
+  status                   ARReconciliationStatus     @default(ACTIVE)
+  adjustmentJournalEntryId String?                    @db.Uuid
+  adjustmentJournalEntry   JournalEntry?              @relation("ARReconciliationAdjustmentJournalEntry", fields: [adjustmentJournalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  reversalJournalEntryId   String?                    @db.Uuid
+  reversalJournalEntry     JournalEntry?              @relation("ARReconciliationReversalJournalEntry", fields: [reversalJournalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  idempotencyKey           String                     @db.VarChar(128)
+  requestHash              String                     @db.Char(64)
+  createdById              String                     @db.Uuid
+  createdBy                User                       @relation("ARReconciliationCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  reversedById             String?                    @db.Uuid
+  reversedBy               User?                      @relation("ARReconciliationReversedBy", fields: [reversedById], references: [id], onDelete: Restrict)
+  reversedAt               DateTime?
+  reversalReason           String?                    @db.VarChar(500)
+  reversalIdempotencyKey   String?                    @db.VarChar(128)
+  reversalRequestHash      String?                    @db.Char(64)
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  allocation               CustomerPaymentAllocation?
 
   @@unique([id, companyId])
   @@unique([companyId, idempotencyKey])
-  @@index([companyId, journalLineId])
+  @@unique([companyId, reversalIdempotencyKey])
+  @@index([companyId, debitJournalLineId, status])
+  @@index([companyId, creditJournalLineId, status])
 }
 
 // ============================================================
@@ -1659,6 +1696,7 @@ model AccountingAccount {
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   customerPaymentDestinations CustomerPayment[] @relation("CustomerPaymentDestinationAccount")
+  customerPaymentReceivables  CustomerPayment[] @relation("CustomerPaymentReceivableAccount")
 
   code                   String                @db.VarChar(40)
   name                   String                @db.VarChar(200)
@@ -1730,9 +1768,9 @@ model FiscalYear {
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 
-  periods                AccountingPeriod[]
-  sequences              AccountingEntrySequence[]
-  salesDocumentSequences SalesDocumentSequence[]
+  periods                  AccountingPeriod[]
+  sequences                AccountingEntrySequence[]
+  salesDocumentSequences   SalesDocumentSequence[]
   customerPaymentSequences CustomerPaymentSequence[]
 
   @@unique([id, companyId])
@@ -1807,11 +1845,13 @@ model JournalEntry {
   createdAt                   DateTime             @default(now())
   updatedAt                   DateTime             @updatedAt
 
-  lines           JournalLine[]
-  salesInvoice    SalesInvoice?    @relation("SalesInvoiceJournalEntry")
-  salesCreditNote SalesCreditNote? @relation("SalesCreditNoteJournalEntry")
-  customerPayment CustomerPayment? @relation("CustomerPaymentJournalEntry")
-  customerPaymentReversal CustomerPayment? @relation("CustomerPaymentReversalJournalEntry")
+  lines                       JournalLine[]
+  salesInvoice                SalesInvoice?      @relation("SalesInvoiceJournalEntry")
+  salesCreditNote             SalesCreditNote?   @relation("SalesCreditNoteJournalEntry")
+  customerPayment             CustomerPayment?   @relation("CustomerPaymentJournalEntry")
+  customerPaymentReversal     CustomerPayment?   @relation("CustomerPaymentReversalJournalEntry")
+  arReconciliationAdjustments ARReconciliation[] @relation("ARReconciliationAdjustmentJournalEntry")
+  arReconciliationReversals   ARReconciliation[] @relation("ARReconciliationReversalJournalEntry")
 
   @@unique([id, companyId])
   @@unique([companyId, entryNumber])
@@ -1888,36 +1928,40 @@ model OpeningBalanceLine {
 }
 
 model JournalLine {
-  id                      String            @id @default(uuid()) @db.Uuid
-  companyId               String            @db.Uuid
-  company                 Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  journalEntryId          String            @db.Uuid
-  journalEntry            JournalEntry      @relation(fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
-  accountId               String            @db.Uuid
-  account                 AccountingAccount @relation(fields: [accountId, companyId], references: [id, companyId], onDelete: Restrict)
-  debit                   Decimal           @db.Decimal(19, 4)
-  credit                  Decimal           @db.Decimal(19, 4)
-  transactionDebit        Decimal           @db.Decimal(19, 4)
-  transactionCredit       Decimal           @db.Decimal(19, 4)
-  description             String?           @db.VarChar(500)
-  businessPartnerId       String?           @db.Uuid
-  businessPartner         BusinessPartner?  @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
-  dueDate                 DateTime?         @db.Date
-  documentReference       String?           @db.VarChar(120)
-  reconciliationReference String?           @db.VarChar(160)
+  id                          String                       @id @default(uuid()) @db.Uuid
+  companyId                   String                       @db.Uuid
+  company                     Company                      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  journalEntryId              String                       @db.Uuid
+  sequence                    Int
+  journalEntry                JournalEntry                 @relation(fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  accountId                   String                       @db.Uuid
+  account                     AccountingAccount            @relation(fields: [accountId, companyId], references: [id, companyId], onDelete: Restrict)
+  debit                       Decimal                      @db.Decimal(19, 4)
+  credit                      Decimal                      @db.Decimal(19, 4)
+  transactionDebit            Decimal                      @db.Decimal(19, 4)
+  transactionCredit           Decimal                      @db.Decimal(19, 4)
+  description                 String?                      @db.VarChar(500)
+  businessPartnerId           String?                      @db.Uuid
+  businessPartner             BusinessPartner?             @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
+  dueDate                     DateTime?                    @db.Date
+  documentReference           String?                      @db.VarChar(120)
+  reconciliationReference     String?                      @db.VarChar(160)
   salesInvoicePaymentSchedule SalesInvoicePaymentSchedule? @relation("SalesInvoicePaymentScheduleJournalLine")
   customerPaymentAllocations  CustomerPaymentAllocation[]
-  arReconciliations            ARReconciliation[]
-  taxCode                 String?           @db.VarChar(40)
-  taxTreatmentCode        String?           @db.VarChar(40)
-  taxRate                 Decimal?          @db.Decimal(9, 4)
-  createdAt               DateTime          @default(now())
+  customerPaymentARSources    CustomerPayment[]            @relation("CustomerPaymentARSourceLine")
+  arReconciliationDebits      ARReconciliation[]           @relation("ARReconciliationDebit")
+  arReconciliationCredits     ARReconciliation[]           @relation("ARReconciliationCredit")
+  taxCode                     String?                      @db.VarChar(40)
+  taxTreatmentCode            String?                      @db.VarChar(40)
+  taxRate                     Decimal?                     @db.Decimal(9, 4)
+  createdAt                   DateTime                     @default(now())
 
+  @@unique([id, companyId])
+  @@unique([companyId, journalEntryId, sequence])
   @@index([companyId, accountId])
   @@index([companyId, journalEntryId])
   @@index([companyId, businessPartnerId])
   @@index([accountId, createdAt])
-  @@unique([id, companyId])
 }
 
 model AccountingConfiguration {

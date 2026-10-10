@@ -283,6 +283,7 @@ export class InitializeCompanyAccounting {
         [AccountingConfigJournalKey.SALES, 'SALES'],
         [AccountingConfigJournalKey.PURCHASE, 'PURCHASE'],
         [AccountingConfigJournalKey.CASH, 'CASH'],
+        [AccountingConfigJournalKey.EXCHANGE_DIFFERENCE, 'GENERAL'],
       ];
       for (const [settingKey, code] of journalMappings) {
         const journal = journalByCode.get(code);

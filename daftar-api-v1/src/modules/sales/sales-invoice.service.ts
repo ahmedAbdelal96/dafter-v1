@@ -400,18 +400,26 @@ export class SalesInvoiceService {
           accountId: accounts.receivable.id,
           businessPartnerId: invoice.businessPartnerId,
         },
-        orderBy: { createdAt: 'asc' },
-        select: { id: true },
+        orderBy: { sequence: 'asc' },
+        select: { id: true, sequence: true },
       });
       if (arJournalLines.length !== invoice.paymentSchedule.length) {
         throw new ConflictException(
           'Posted sales invoice maturities do not match AR journal lines',
         );
       }
-      for (const [index, schedule] of invoice.paymentSchedule.entries()) {
+      for (const schedule of invoice.paymentSchedule) {
+        const arJournalLine = arJournalLines.find(
+          (line) => line.sequence === schedule.sequence,
+        );
+        if (!arJournalLine) {
+          throw new ConflictException(
+            'Posted sales invoice maturity sequence does not match an AR journal line',
+          );
+        }
         await db.salesInvoicePaymentSchedule.update({
           where: { id: schedule.id },
-          data: { journalLineId: arJournalLines[index].id },
+          data: { journalLineId: arJournalLine.id },
         });
       }
 
@@ -1082,7 +1090,7 @@ export class SalesInvoiceService {
       JOIN "AccountingAccount" aa ON aa."id" = jl."accountId" AND aa."companyId" = jl."companyId"
       WHERE jl."companyId" = ${invoice.companyId}
         AND jl."businessPartnerId" = ${invoice.businessPartnerId}
-        AND je."status" = 'POSTED'
+        AND je."status" IN ('POSTED', 'REVERSED')
         AND aa."accountType" = 'ASSET_RECEIVABLE'
     `);
     const existingExposure = rows[0]?.exposure ?? new Prisma.Decimal(0);

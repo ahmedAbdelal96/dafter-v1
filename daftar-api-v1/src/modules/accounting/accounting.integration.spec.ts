@@ -511,6 +511,7 @@ describe('Accounting B01.1 PostgreSQL integration', () => {
         {
           companyId: fixture.companyId,
           journalEntryId: draft.id,
+          sequence: 1,
           accountId: fixture.cashAccountId,
           debit: new Prisma.Decimal(10),
           credit: new Prisma.Decimal(0),
@@ -520,6 +521,7 @@ describe('Accounting B01.1 PostgreSQL integration', () => {
         {
           companyId: fixture.companyId,
           journalEntryId: draft.id,
+          sequence: 2,
           accountId: fixture.incomeAccountId,
           debit: new Prisma.Decimal(0),
           credit: new Prisma.Decimal(9),

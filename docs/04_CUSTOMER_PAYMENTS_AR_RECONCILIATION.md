@@ -1,69 +1,73 @@
-# B04 — Customer Payments and AR Reconciliation
+# B04.1 — Customer Payments and Authoritative AR Reconciliation
 
 ## Authority and scope
 
-B04 records customer receipts against the B01 general ledger and the B02
-`BusinessPartner` domain. A payment is a company-scoped document with the
-lifecycle `DRAFT -> POSTED -> REVERSED`. `POSTED` payments and their
-allocations are immutable; corrections are made only by posting a reversal
-journal entry.
+B04.1 records customer receipts against the B01 general ledger and the B02
+`BusinessPartner` domain. A payment follows `DRAFT -> POSTED -> REVERSED`.
+Posted payments, allocations, and reconciliations are immutable financial
+records; correction is performed through a controlled reversal.
 
-The reconciliation key is an authoritative posted `JournalLine` plus its
-optional `SalesInvoicePaymentSchedule` maturity. An invoice id is descriptive
-provenance only and is never sufficient to identify an open item. B03 invoice
-posting stores the exact AR journal-line id on every maturity.
+An AR open item is a posted, non-reversal `JournalLine` on an active,
+direct-posting `ASSET_RECEIVABLE` control account with a business partner.
+`ARReconciliation` is the authoritative settlement record and always links
+one debit AR line to one credit AR line. Invoice ids and payment maturities
+are provenance only; `creditOffsets()` and invoice-id inference are not used.
 
-## Posting rules
+## Posting and reconciliation rules
 
-- Payment numbers use `CustomerPaymentSequence` and are independent of the GL
-  `AccountingEntrySequence`: `CP-YYYY-NNNNNN` per company and fiscal year.
-- Posting is one database transaction: payment lock, AR target locks, open-item
-  validation, journal posting, allocation persistence, and payment status update
-  either all commit or all roll back.
-- Cash methods require an active `ASSET_CASH` destination. Bank-like methods
-  require an active `ASSET_BANK` destination. No other account type is valid.
-- Amounts and exchange rates are PostgreSQL `Decimal` values. No JavaScript
-  floating-point arithmetic is used. Allocation across currencies is rejected
-  until an explicit FX settlement policy exists.
-- Allocations are bounded by the exact remaining debit amount of each posted AR
-  journal line. Multiple maturities can be allocated independently, partial
-  allocations are supported, and excess receipts remain unapplied/on-account.
-- Credit-note AR credits remain authoritative GL lines and therefore reduce
-  customer exposure through the GL query; they are not simulated by mutating
-  invoice totals.
-- Idempotent posting uses the payment id plus a request hash and the accounting
-  source idempotency key. Replays return the original result; a changed payload
-  is rejected.
+- Customer payments post one cash/bank debit and one customer-specific AR
+  credit. Each allocation is then recorded through the generic AR
+  reconciliation service.
+- Credit-note AR credits remain open credit items until an explicit
+  JournalLine-to-JournalLine reconciliation is requested.
+- Active reconciliations are bounded by both lines' exact remaining transaction
+  amounts. The final allocation carries the exact remaining base amount;
+  partial base allocations are rounded to four decimal places.
+- Reconciliation requires the same company, customer, transaction currency,
+  posted status, and AR control/reconciliation-eligible semantics on both
+  lines. Line locks are acquired in deterministic id order before allocation.
+- A different customer receivable account is allowed through the customer
+  profile override. Reconciliation posts a base-currency reclassification in
+  the configured `EXCHANGE_DIFFERENCE` journal; any realized difference uses
+  the configured `EXCHANGE_GAIN` or `EXCHANGE_LOSS` account.
+- Payment reversal reverses the payment journal and every active child
+  reconciliation in the same transaction. The invoice or credit open item is
+  therefore reopened without creating a fake compensating settlement.
+- JournalLines have a persisted per-entry `sequence`; all line selection and
+  serialization uses that deterministic order.
+- Posting, reconciliation, and reversal requests use company-scoped
+  idempotency keys and request hashes. Replaying the same payload returns the
+  original result; a changed payload is rejected.
+- Accounting readiness and an `OPEN` accounting period are required for every
+  financial transition. Cash methods require `ASSET_CASH`; bank-like methods
+  require `ASSET_BANK`.
 
 ## API surface
 
 - `POST /customer-payments` — create a draft with optional maturity allocations.
 - `PATCH /customer-payments/:id` — edit a draft only.
-- `POST /customer-payments/:id/post` — atomically post and reconcile.
-- `POST /customer-payments/:id/reverse` — reverse a posted payment.
-- `POST /customer-payments/:id/reconcile` — apply a previously unapplied
-  on-account amount to a later AR maturity without mutating the posted payment.
-- `GET /customer-payments` and `GET /customer-payments/:id` — scoped reads.
-- `GET /customer-payments/open-items?businessPartnerId=...` — exact remaining
-  AR maturities from posted GL lines.
+- `POST /customer-payments/:id/post` — post and reconcile atomically.
+- `POST /customer-payments/:id/reverse` — reverse a posted payment and its
+  active reconciliations.
+- `POST /customer-payments/:id/reconcile` — apply a posted payment's unapplied
+  credit to a later debit AR line.
+- `POST /customer-payments/ar-reconciliations` — create a generic AR
+  reconciliation from debit and credit JournalLine ids.
+- `POST /customer-payments/ar-reconciliations/:id/reverse` — reverse one
+  generic reconciliation.
+- `GET /customer-payments/open-items?businessPartnerId=...` — list exact
+  remaining debit and credit AR open items.
 
-## Required verification matrix
+## Verification
 
-The B04 integration suite covers:
-
-1. full, partial, and multiple-maturity allocations;
-2. unapplied receipts and overpayment preservation;
-3. credit-note AR credits and reduced GL-derived exposure;
-4. company scope, wrong customer, inactive customer, and closed period;
-5. inactive/wrong-type cash and bank destination accounts;
-6. concurrent posting against the same maturity with no over-allocation;
-7. idempotent replay and changed-payload rejection;
-8. atomic rollback when journal posting or the payment finalization fails;
-9. posted-payment and posted-allocation immutability;
-10. explicit multi-currency behavior and exchange-rate validation;
-11. exact remaining open amounts and later allocation of on-account money;
-12. absence of legacy customer/supplier/invoice financial paths.
+The B04.1 integration coverage verifies exact partial/full allocation,
+on-account application, wrong-customer protection, concurrent no-overallocation,
+destination-account policy, payment reversal reopening, reversal idempotency,
+and realized FX/base-carrying amounts. The schema integration coverage verifies
+the AR reconciliation table, status enum, deterministic JournalLine sequence,
+foreign keys, and immutability triggers. B03 sales integration coverage owns
+credit-note creation and GL-derived exposure behavior.
 
 Purchases/AP, supplier payments, inventory/COGS, frontend, mobile, reports,
 bank reconciliation, gateway/POS, deferred sales, and installment behavior are
-explicitly outside B04.
+outside B04.1.

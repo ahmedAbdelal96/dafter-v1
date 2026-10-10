@@ -53,14 +53,14 @@ describe('B04 customer payment and AR reconciliation schema', () => {
           'b04_customer_payment_allocation_immutable_insert',
           'b04_customer_payment_allocation_immutable_update',
           'b04_customer_payment_allocation_immutable_delete',
-          'b04_ar_reconciliation_immutable_update',
-          'b04_ar_reconciliation_immutable_delete'
+          'b041_ar_reconciliation_immutable_update',
+          'b041_ar_reconciliation_immutable_delete'
         )
       ORDER BY trigger_name
     `;
     expect(triggers.map((trigger) => trigger.trigger_name)).toEqual([
-      'b04_ar_reconciliation_immutable_delete',
-      'b04_ar_reconciliation_immutable_update',
+      'b041_ar_reconciliation_immutable_delete',
+      'b041_ar_reconciliation_immutable_update',
       'b04_customer_payment_allocation_immutable_delete',
       'b04_customer_payment_allocation_immutable_insert',
       'b04_customer_payment_allocation_immutable_update',

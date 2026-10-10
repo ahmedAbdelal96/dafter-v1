@@ -35,6 +35,10 @@ const REQUIRED_JOURNAL_MAPPINGS: Array<{
     type: AccountingJournalType.PURCHASE,
   },
   { key: AccountingConfigJournalKey.CASH, type: AccountingJournalType.CASH },
+  {
+    key: AccountingConfigJournalKey.EXCHANGE_DIFFERENCE,
+    type: AccountingJournalType.GENERAL,
+  },
 ];
 
 @Injectable()

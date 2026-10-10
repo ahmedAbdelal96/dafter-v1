@@ -10,7 +10,9 @@ import {
 
 import { SeedContext } from '../types';
 
-export const seedSalesAndAccounting = async (ctx: SeedContext): Promise<void> => {
+export const seedSalesAndAccounting = async (
+  ctx: SeedContext,
+): Promise<void> => {
   for (const tenant of ctx.tenantStates) {
     const companyId = tenant.company.id;
     const documentId = randomUUID();
@@ -102,6 +104,7 @@ export const seedSalesAndAccounting = async (ctx: SeedContext): Promise<void> =>
         {
           companyId,
           journalEntryId,
+          sequence: 1,
           accountId: receivable.id,
           debit: grandTotal,
           credit: 0,
@@ -114,6 +117,7 @@ export const seedSalesAndAccounting = async (ctx: SeedContext): Promise<void> =>
         {
           companyId,
           journalEntryId,
+          sequence: 2,
           accountId: revenue.id,
           debit: 0,
           credit: grandTotal,

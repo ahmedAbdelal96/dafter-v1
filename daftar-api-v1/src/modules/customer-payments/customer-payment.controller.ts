@@ -22,18 +22,24 @@ import {
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import type { AuthenticatedUser } from '../../common/types';
 import {
+  CreateARReconciliationDto,
   CreateCustomerPaymentDto,
   CustomerPaymentQueryDto,
   PostCustomerPaymentDto,
   ReconcileOnAccountDto,
+  ReverseARReconciliationDto,
   ReverseCustomerPaymentDto,
   UpdateCustomerPaymentDto,
 } from './dto';
+import { ARReconciliationService } from './ar-reconciliation.service';
 import { CustomerPaymentService } from './customer-payment.service';
 
 @Controller('customer-payments')
 export class CustomerPaymentController {
-  constructor(private readonly service: CustomerPaymentService) {}
+  constructor(
+    private readonly service: CustomerPaymentService,
+    private readonly ar: ARReconciliationService,
+  ) {}
 
   @Get()
   @UseGuards(PermissionsGuard)
@@ -64,6 +70,57 @@ export class CustomerPaymentController {
       .then(
         (rows) =>
           new ApiResponseDto(rows, 'AR open items retrieved successfully'),
+      );
+  }
+
+  @Post('ar-reconciliations')
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(PermissionsGuard)
+  @ProtectedWrite()
+  @RequirePermissions('postCustomerPayment')
+  reconcileAR(
+    @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CreateARReconciliationDto,
+  ) {
+    return this.ar
+      .reconcile({
+        companyId,
+        actorUserId: user.id,
+        debitJournalLineId: dto.debitJournalLineId,
+        creditJournalLineId: dto.creditJournalLineId,
+        transactionAmount: dto.amount,
+        idempotencyKey: dto.idempotencyKey,
+        postingDate: new Date(dto.postingDate),
+      })
+      .then(
+        (row) =>
+          new ApiResponseDto(row, 'AR reconciliation created successfully'),
+      );
+  }
+
+  @Post('ar-reconciliations/:id/reverse')
+  @UseGuards(PermissionsGuard)
+  @ProtectedWrite()
+  @RequirePermissions('postCustomerPayment')
+  reverseAR(
+    @CurrentTenant() companyId: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: ReverseARReconciliationDto,
+  ) {
+    return this.ar
+      .reverse({
+        companyId,
+        actorUserId: user.id,
+        reconciliationId: id,
+        postingDate: new Date(dto.postingDate),
+        reason: dto.reason,
+        idempotencyKey: dto.idempotencyKey,
+      })
+      .then(
+        (row) =>
+          new ApiResponseDto(row, 'AR reconciliation reversed successfully'),
       );
   }
 
@@ -198,6 +255,7 @@ export class CustomerPaymentController {
         dto.journalLineId,
         dto.amount,
         dto.idempotencyKey,
+        dto.postingDate ? new Date(dto.postingDate) : undefined,
       )
       .then(
         (row) =>

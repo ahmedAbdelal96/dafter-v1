@@ -568,6 +568,7 @@ describe('B02 GL BusinessPartner validation', () => {
           lines: {
             create: [
               {
+                sequence: 1,
                 accountId,
                 debit: '10',
                 credit: '0',
@@ -575,6 +576,7 @@ describe('B02 GL BusinessPartner validation', () => {
                 transactionCredit: '0',
               },
               {
+                sequence: 2,
                 accountId: cashAccountId,
                 debit: '0',
                 credit: '10',
@@ -658,6 +660,7 @@ describe('B02 GL BusinessPartner validation', () => {
         lines: {
           create: [
             {
+              sequence: 1,
               accountId: receivableAccountId,
               debit: '10',
               credit: '0',
@@ -665,6 +668,7 @@ describe('B02 GL BusinessPartner validation', () => {
               transactionCredit: '0',
             },
             {
+              sequence: 2,
               accountId: cashAccountId,
               debit: '0',
               credit: '10',

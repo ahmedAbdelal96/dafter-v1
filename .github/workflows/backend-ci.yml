@@ -67,6 +67,7 @@ jobs:
           "src/modules/payment-terms/**/*.ts"
           "src/modules/accounting-bootstrap/**/*.ts"
           "src/modules/opening-balances/**/*.ts"
+          "src/modules/customer-payments/**/*.ts"
           "src/common/types/auth.types.ts"
           "src/common/entitlements/feature-policy.manifest.ts"
           "src/app.module.ts"

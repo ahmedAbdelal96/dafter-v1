@@ -1,7 +1,12 @@
 import 'dotenv/config';
 
 import { ConflictException } from '@nestjs/common';
-import { AccountingAccountType } from '@prisma/client';
+import {
+  ARReconciliationStatus,
+  AccountingAccountType,
+  CustomerPaymentStatus,
+  JournalEntryStatus,
+} from '@prisma/client';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { PlatformIdempotencyService } from '../platform/idempotency/platform-idempotency.service';
 import { AccountingService } from '../accounting/accounting.service';
@@ -11,6 +16,7 @@ import { TemplateService } from '../accounting-bootstrap/template.service';
 import { SalesPricingService } from '../sales/sales-pricing.service';
 import { SalesTaxCalculatorService } from '../sales/sales-tax-calculator.service';
 import { SalesInvoiceService } from '../sales/sales-invoice.service';
+import { ARReconciliationService } from './ar-reconciliation.service';
 import { CustomerPaymentService } from './customer-payment.service';
 
 jest.setTimeout(60_000);
@@ -80,6 +86,7 @@ describe('B04 customer payments and AR reconciliation', () => {
       new PlatformIdempotencyService(prisma),
     );
     const readiness = new AccountingReadinessService(prisma);
+    const ar = new ARReconciliationService(prisma, accounting, readiness);
     sales = new SalesInvoiceService(
       prisma,
       new SalesPricingService(),
@@ -87,7 +94,7 @@ describe('B04 customer payments and AR reconciliation', () => {
       accounting,
       readiness,
     );
-    payments = new CustomerPaymentService(prisma, accounting, readiness);
+    payments = new CustomerPaymentService(prisma, accounting, readiness, ar);
     cashAccountId = (
       await prisma.accountingAccount.findFirstOrThrow({
         where: { companyId, accountType: AccountingAccountType.ASSET_CASH },
@@ -99,12 +106,16 @@ describe('B04 customer payments and AR reconciliation', () => {
     await prisma?.$disconnect();
   });
 
-  async function postInvoice(amount: string) {
+  async function postInvoice(
+    amount: string,
+    currencyCode = 'EGP',
+    exchangeRate = '1',
+  ) {
     const draft = await sales.createDraft(companyId, ownerId, {
       businessPartnerId: customerId,
       documentDate: new Date('2026-10-10'),
-      currencyCode: 'EGP',
-      exchangeRate: '1',
+      currencyCode,
+      exchangeRate,
       lines: [
         {
           description: `B04 service ${amount}`,
@@ -124,14 +135,16 @@ describe('B04 customer payments and AR reconciliation', () => {
     amount: string,
     journalLineId: string,
     allocation = amount,
+    currencyCode = 'EGP',
+    exchangeRate = '1',
   ) {
     return {
       businessPartnerId: customerId,
       paymentDate: new Date('2026-10-11'),
       method: 'CASH' as const,
       destinationAccountId: cashAccountId,
-      transactionCurrencyCode: 'EGP',
-      exchangeRate: '1',
+      transactionCurrencyCode: currencyCode,
+      exchangeRate,
       amount,
       allocations: [{ journalLineId, amount: allocation }],
     };
@@ -172,7 +185,11 @@ describe('B04 customer payments and AR reconciliation', () => {
       new Date('2026-10-12'),
       'b04-partial-2',
     );
-    expect(await payments.listOpenItems(companyId, customerId)).toHaveLength(0);
+    expect(
+      (await payments.listOpenItems(companyId, customerId)).find(
+        (row) => row.id === maturity.journalLineId,
+      ),
+    ).toBeUndefined();
   });
 
   it('keeps overpayment on-account and permits later reconciliation', async () => {
@@ -267,5 +284,144 @@ describe('B04 customer payments and AR reconciliation', () => {
         destinationAccountId: bank.id,
       }),
     ).rejects.toBeInstanceOf(ConflictException);
+  });
+
+  it('reopens the invoice and reverses active reconciliations when a payment is reversed', async () => {
+    const invoice = await postInvoice('70');
+    const maturity = await prisma.salesInvoicePaymentSchedule.findFirstOrThrow({
+      where: { salesInvoiceId: invoice.id },
+    });
+    const payment = await payments.createDraft(
+      companyId,
+      ownerId,
+      await paymentInput('70', maturity.journalLineId!),
+    );
+    await payments.postDraft(
+      companyId,
+      ownerId,
+      payment.id,
+      new Date('2026-10-15'),
+      'b041-reversal-post',
+    );
+    expect(
+      (await payments.listOpenItems(companyId, customerId)).find(
+        (row) => row.id === maturity.journalLineId,
+      ),
+    ).toBeUndefined();
+
+    const reversed = await payments.reverse(
+      companyId,
+      ownerId,
+      payment.id,
+      new Date('2026-10-16'),
+      'Customer requested reversal',
+      'b041-reversal-request',
+    );
+    expect(reversed.status).toBe(CustomerPaymentStatus.REVERSED);
+    const reconciliation = await prisma.aRReconciliation.findFirstOrThrow({
+      where: { customerPaymentId: payment.id },
+    });
+    expect(reconciliation.status).toBe(ARReconciliationStatus.REVERSED);
+    expect(
+      (await payments.listOpenItems(companyId, customerId)).find(
+        (row) => row.id === maturity.journalLineId,
+      )?.remainingAmount,
+    ).toBe('70');
+
+    const replay = await payments.reverse(
+      companyId,
+      ownerId,
+      payment.id,
+      new Date('2026-10-16'),
+      'Customer requested reversal',
+      'b041-reversal-request',
+    );
+    expect(replay.id).toBe(payment.id);
+    await expect(
+      payments.reverse(
+        companyId,
+        ownerId,
+        payment.id,
+        new Date('2026-10-16'),
+        'Changed reason',
+        'b041-reversal-request',
+      ),
+    ).rejects.toBeInstanceOf(ConflictException);
+
+    const original = await prisma.journalEntry.findUniqueOrThrow({
+      where: { id: reversed.journalEntryId! },
+    });
+    const reversal = await prisma.journalEntry.findUniqueOrThrow({
+      where: { id: reversed.reversalJournalEntryId! },
+    });
+    expect(original.status).toBe(JournalEntryStatus.REVERSED);
+    expect(reversal.status).toBe(JournalEntryStatus.POSTED);
+  });
+
+  it('carries base amounts and posts a realized FX loss for a changed settlement rate', async () => {
+    await prisma.currency.upsert({
+      where: { code: 'USD' },
+      update: { isActive: true, minorUnitPrecision: 2 },
+      create: { code: 'USD', name: 'US Dollar', minorUnitPrecision: 2 },
+    });
+    const usdCashJournal = await prisma.accountingJournal.create({
+      data: {
+        companyId,
+        code: `USD-CASH-${Date.now()}`,
+        name: 'USD Cash',
+        type: 'CASH',
+        currencyCode: 'USD',
+      },
+    });
+    const configuration =
+      await prisma.accountingConfiguration.findUniqueOrThrow({
+        where: { companyId },
+      });
+    const cashMapping =
+      await prisma.accountingConfigurationJournal.findFirstOrThrow({
+        where: {
+          companyId,
+          configurationId: configuration.id,
+          settingKey: 'CASH',
+        },
+      });
+    await prisma.accountingConfigurationJournal.update({
+      where: { id: cashMapping.id },
+      data: { journalId: usdCashJournal.id },
+    });
+    const invoice = await postInvoice('100', 'USD', '2');
+    const maturity = await prisma.salesInvoicePaymentSchedule.findFirstOrThrow({
+      where: { salesInvoiceId: invoice.id },
+    });
+    const payment = await payments.createDraft(
+      companyId,
+      ownerId,
+      await paymentInput('100', maturity.journalLineId!, '100', 'USD', '1.9'),
+    );
+    await payments.postDraft(
+      companyId,
+      ownerId,
+      payment.id,
+      new Date('2026-10-17'),
+      'b041-fx-post',
+    );
+    const reconciliation = await prisma.aRReconciliation.findFirstOrThrow({
+      where: { customerPaymentId: payment.id },
+    });
+    expect(reconciliation.debitBaseAmountApplied.toString()).toBe('200');
+    expect(reconciliation.creditBaseAmountApplied.toString()).toBe('190');
+    expect(reconciliation.realizedFxAmount.toString()).toBe('-10');
+    expect(reconciliation.adjustmentJournalEntryId).toBeTruthy();
+
+    const adjustment = await prisma.journalEntry.findUniqueOrThrow({
+      where: { id: reconciliation.adjustmentJournalEntryId! },
+      include: { lines: true },
+    });
+    expect(
+      adjustment.lines.reduce(
+        (sum, line) => sum + Number(line.debit) - Number(line.credit),
+        0,
+      ),
+    ).toBe(0);
   });
 });
