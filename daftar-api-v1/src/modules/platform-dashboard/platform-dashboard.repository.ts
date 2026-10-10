@@ -196,7 +196,11 @@ export class PlatformDashboardRepository {
             },
           },
           _count: {
-            select: { users: true, customers: true, ledgerEntries: true },
+            select: {
+              users: true,
+              businessPartners: true,
+              accountingJournalEntries: true,
+            },
           },
         },
       }),
@@ -232,8 +236,8 @@ export class PlatformDashboardRepository {
         ownerEmail: company.users[0]?.email ?? null,
         ownerName: company.users[0]?.fullName ?? null,
         usersCount: company._count.users,
-        customersCount: company._count.customers,
-        ledgerEntriesCount: company._count.ledgerEntries,
+        customersCount: company._count.businessPartners,
+        ledgerEntriesCount: company._count.accountingJournalEntries,
         subscriptionStatus: company.subscriptions[0]?.status ?? null,
         planName: company.subscriptions[0]?.plan.name ?? null,
       })),

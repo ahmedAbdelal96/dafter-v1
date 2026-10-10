@@ -7,7 +7,18 @@ import {
   QueryPlatformDashboardDto,
   QueryPlatformDashboardHealthDto,
 } from '../../dto/query-platform-dashboard.dto';
-import { endOfDay, startOfDay } from '../../../reports/use-cases/shared/date';
+
+function startOfDay(value: Date): Date {
+  const result = new Date(value);
+  result.setHours(0, 0, 0, 0);
+  return result;
+}
+
+function endOfDay(value: Date): Date {
+  const result = new Date(value);
+  result.setHours(23, 59, 59, 999);
+  return result;
+}
 
 export interface PlatformDashboardDateRange {
   dateFrom: Date;

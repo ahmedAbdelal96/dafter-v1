@@ -318,10 +318,9 @@ export class PlatformRepository {
         _count: {
           select: {
             users: true,
-            customers: true,
-            suppliers: true,
+            businessPartners: true,
             employees: true,
-            ledgerEntries: true,
+            accountingJournalEntries: true,
           },
         },
       },
@@ -498,11 +497,9 @@ export class PlatformRepository {
   async countHardDeleteBlockers(companyId: string) {
     const [
       liveSubscriptions,
-      invoices,
-      ledgerEntries,
+      salesInvoices,
+      journalEntries,
       expenses,
-      deferredSales,
-      installmentContracts,
       subscriptionPayments,
       auditLogs,
     ] = await this.prisma.$transaction(async (tx) => {
@@ -519,11 +516,9 @@ export class PlatformRepository {
             },
           },
         }),
-        tx.invoice.count({ where: { companyId } }),
-        tx.ledgerEntry.count({ where: { companyId } }),
+        tx.salesInvoice.count({ where: { companyId } }),
+        tx.journalEntry.count({ where: { companyId } }),
         tx.expense.count({ where: { companyId } }),
-        tx.deferredSale.count({ where: { companyId } }),
-        tx.installmentContract.count({ where: { companyId } }),
         tx.subscriptionPayment.count({ where: { companyId } }),
         tx.auditLog.count({ where: { companyId } }),
       ]);
@@ -533,11 +528,9 @@ export class PlatformRepository {
 
     const blockers = {
       liveSubscriptions,
-      invoices,
-      ledgerEntries,
+      salesInvoices,
+      journalEntries,
       expenses,
-      deferredSales,
-      installmentContracts,
       subscriptionPayments,
       auditLogs,
     };
@@ -600,10 +593,10 @@ export class PlatformRepository {
           currentSubscription,
         ] = await Promise.all([
           tx.user.count({ where: { companyId, isDeleted: false } }),
-          tx.customer.count({ where: { companyId, isDeleted: false } }),
-          tx.supplier.count({ where: { companyId, isDeleted: false } }),
+          tx.businessPartner.count({ where: { companyId, isActive: true } }),
+          tx.businessPartner.count({ where: { companyId, isActive: true } }),
           tx.employee.count({ where: { companyId, isDeleted: false } }),
-          tx.ledgerEntry.count({ where: { companyId, isDeleted: false } }),
+          tx.journalEntry.count({ where: { companyId } }),
           this.subscriptionGovernance.findSubscriptionForAccess(companyId, tx),
         ]);
 
