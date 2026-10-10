@@ -409,7 +409,7 @@ export class ProductsRepository {
     return {
       unitPrice: row.unitPrice,
       invoiceDate: row.salesInvoice.documentDate,
-      invoiceNumber: row.salesInvoice.invoiceNumber,
+      invoiceNumber: row.salesInvoice.invoiceNumber ?? '',
     };
   }
 

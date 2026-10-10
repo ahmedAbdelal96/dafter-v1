@@ -1,11 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
-import { Prisma, Expense, ExpenseCategory } from '@prisma/client';
+import { Prisma, ExpenseCategory } from '@prisma/client';
 import { QueryExpenseDto } from './dto';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-export interface ExpenseRecord extends Expense {
+export interface ExpenseRecord {
+  id: string;
+  companyId: string;
+  category: ExpenseCategory;
+  amount: Prisma.Decimal;
+  expenseDate: Date;
+  description: string | null;
+  referenceNumber: string | null;
+  paymentMethod: string | null;
+  notes: string | null;
+  createdById: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isDeleted: boolean;
+  deletedAt: Date | null;
   createdBy: { id: string; fullName: string | null };
 }
 
