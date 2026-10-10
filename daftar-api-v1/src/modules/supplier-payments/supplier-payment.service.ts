@@ -1018,7 +1018,10 @@ export class SupplierPaymentService {
   }
 
   private serialize<
-    T extends { allocations?: Array<{ amount: Prisma.Decimal }> },
+    T extends {
+      unappliedAmount: Prisma.Decimal;
+      allocations?: Array<{ amount: Prisma.Decimal }>;
+    },
   >(payment: T) {
     return {
       ...payment,
