@@ -121,11 +121,14 @@ export class SupplierInvoiceService {
         });
         if (!existing)
           throw new NotFoundException('Supplier invoice not found');
+        const date = dateOnly(postingDate);
         if (existing.status === SupplierInvoiceStatus.POSTED) {
-          if (existing.idempotencyKey === idempotencyKey) return existing;
+          if (
+            existing.requestHash === this.requestHash(id, idempotencyKey, date)
+          )
+            return existing;
           throw new ConflictException('Posted supplier invoices are immutable');
         }
-        const date = dateOnly(postingDate);
         const readiness = await this.readiness.evaluateInTransaction(
           db,
           companyId,
@@ -280,7 +283,7 @@ export class SupplierInvoiceService {
             journalEntryId: (entry as any).id,
             payableAccountId: payable.id,
             idempotencyKey,
-            requestHash: this.requestHash(id, idempotencyKey),
+            requestHash: this.requestHash(id, idempotencyKey, date),
             paymentSchedule: {
               create: schedule.map((item, index) => ({
                 sequence: item.sequence,
@@ -476,10 +479,10 @@ export class SupplierInvoiceService {
     });
   }
 
-  private requestHash(id: string, key: string) {
+  private requestHash(id: string, key: string, postingDate: Date) {
     return require('crypto')
       .createHash('sha256')
-      .update(`${id}:${key}`)
+      .update(`${id}:${key}:${postingDate.toISOString().slice(0, 10)}`)
       .digest('hex');
   }
 

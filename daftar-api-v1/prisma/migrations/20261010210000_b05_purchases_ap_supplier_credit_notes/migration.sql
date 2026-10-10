@@ -620,19 +620,52 @@ $$;
 
 CREATE OR REPLACE FUNCTION "b05_supplier_credit_note_overage_guard"()
 RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE current_line RECORD; already_credited NUMERIC;
+DECLARE current_line RECORD; source_line RECORD; already_credited RECORD;
 BEGIN
-  IF NEW."status" = 'POSTED' AND OLD."status" <> 'POSTED' THEN
+  IF NEW."status" = 'POSTED' AND (TG_OP = 'INSERT' OR OLD."status" <> 'POSTED') THEN
     FOR current_line IN SELECT "originalSupplierInvoiceLineId", "quantity" FROM "SupplierCreditNoteLine"
       WHERE "supplierCreditNoteId" = NEW."id" AND "companyId" = NEW."companyId" LOOP
-      SELECT COALESCE(SUM(cl."quantity"), 0) INTO already_credited
+      SELECT "quantity", "taxableBase", "taxAmount", "lineTotal"
+      INTO source_line
+      FROM "SupplierInvoiceLine"
+      WHERE "id" = current_line."originalSupplierInvoiceLineId"
+        AND "companyId" = NEW."companyId"
+      FOR UPDATE;
+      IF source_line IS NULL THEN
+        RAISE EXCEPTION 'supplier credit note source line is missing';
+      END IF;
+      SELECT
+        COALESCE(SUM(cl."quantity"), 0) AS quantity,
+        COALESCE(SUM(cl."taxableBase"), 0) AS taxable_base,
+        COALESCE(SUM(cl."taxAmount"), 0) AS tax_amount,
+        COALESCE(SUM(cl."lineTotal"), 0) AS line_total
+      INTO already_credited
       FROM "SupplierCreditNoteLine" cl JOIN "SupplierCreditNote" cn
         ON cn."id" = cl."supplierCreditNoteId" AND cn."companyId" = cl."companyId"
       WHERE cl."companyId" = NEW."companyId" AND cl."originalSupplierInvoiceLineId" = current_line."originalSupplierInvoiceLineId"
         AND cn."status" = 'POSTED' AND cn."id" <> NEW."id";
-      IF already_credited + current_line."quantity" > (SELECT "quantity" FROM "SupplierInvoiceLine"
-        WHERE "id" = current_line."originalSupplierInvoiceLineId" AND "companyId" = NEW."companyId")
-      THEN RAISE EXCEPTION 'posted supplier credit notes exceed original invoice quantity'; END IF;
+      IF already_credited.quantity + current_line."quantity" > source_line."quantity"
+        OR already_credited.taxable_base + (
+          SELECT "taxableBase" FROM "SupplierCreditNoteLine"
+          WHERE "supplierCreditNoteId" = NEW."id"
+            AND "companyId" = NEW."companyId"
+            AND "originalSupplierInvoiceLineId" = current_line."originalSupplierInvoiceLineId"
+        ) > source_line."taxableBase"
+        OR already_credited.tax_amount + (
+          SELECT "taxAmount" FROM "SupplierCreditNoteLine"
+          WHERE "supplierCreditNoteId" = NEW."id"
+            AND "companyId" = NEW."companyId"
+            AND "originalSupplierInvoiceLineId" = current_line."originalSupplierInvoiceLineId"
+        ) > source_line."taxAmount"
+        OR already_credited.line_total + (
+          SELECT "lineTotal" FROM "SupplierCreditNoteLine"
+          WHERE "supplierCreditNoteId" = NEW."id"
+            AND "companyId" = NEW."companyId"
+            AND "originalSupplierInvoiceLineId" = current_line."originalSupplierInvoiceLineId"
+        ) > source_line."lineTotal"
+      THEN
+        RAISE EXCEPTION 'posted supplier credit notes exceed original invoice value';
+      END IF;
     END LOOP;
   END IF;
   RETURN NEW;
@@ -654,4 +687,4 @@ BEFORE INSERT OR UPDATE OR DELETE ON "SupplierCreditNoteLine" FOR EACH ROW EXECU
 CREATE TRIGGER "b05_supplier_credit_note_line_tax_posted_immutability_trigger"
 BEFORE INSERT OR UPDATE OR DELETE ON "SupplierCreditNoteLineTax" FOR EACH ROW EXECUTE FUNCTION "b05_reject_posted_supplier_credit_note_child_mutation"();
 CREATE TRIGGER "b05_supplier_credit_note_overage_guard_trigger"
-BEFORE UPDATE OF "status" ON "SupplierCreditNote" FOR EACH ROW EXECUTE FUNCTION "b05_supplier_credit_note_overage_guard"();
+BEFORE INSERT OR UPDATE OF "status" ON "SupplierCreditNote" FOR EACH ROW EXECUTE FUNCTION "b05_supplier_credit_note_overage_guard"();

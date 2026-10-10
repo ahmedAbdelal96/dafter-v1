@@ -91,13 +91,17 @@ export class SupplierCreditNoteService {
         });
         if (!note)
           throw new NotFoundException('Supplier credit note not found');
+        const date = dateOnly(postingDate);
         if (note.status === SupplierCreditNoteStatus.POSTED) {
-          if (note.idempotencyKey === idempotencyKey) return note;
+          if (note.requestHash === this.requestHash(id, idempotencyKey, date))
+            return note;
           throw new ConflictException(
             'Posted supplier credit notes are immutable',
           );
         }
-        const date = dateOnly(postingDate);
+        await db.$queryRaw(
+          Prisma.sql`SELECT "id" FROM "SupplierInvoice" WHERE "id" = ${note.supplierInvoiceId} AND "companyId" = ${companyId} FOR UPDATE`,
+        );
         const readiness = await this.readiness.evaluateInTransaction(
           db,
           companyId,
@@ -208,7 +212,7 @@ export class SupplierCreditNoteService {
             journalEntryId: (entry as any).id,
             payableAccountId: payable.id,
             idempotencyKey,
-            requestHash: this.requestHash(id, idempotencyKey),
+            requestHash: this.requestHash(id, idempotencyKey, date),
           },
         });
         await this.audit(
@@ -412,10 +416,10 @@ export class SupplierCreditNoteService {
       },
     });
   }
-  private requestHash(id: string, key: string) {
+  private requestHash(id: string, key: string, postingDate: Date) {
     return require('crypto')
       .createHash('sha256')
-      .update(`${id}:${key}`)
+      .update(`${id}:${key}:${postingDate.toISOString().slice(0, 10)}`)
       .digest('hex');
   }
   private audit(
