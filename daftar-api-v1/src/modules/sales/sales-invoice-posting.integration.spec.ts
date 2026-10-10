@@ -729,7 +729,7 @@ describe('SalesInvoice posting', () => {
           },
         ],
       }),
-    ).rejects.toThrow(BadRequestException);
+    ).rejects.toThrow(ConflictException);
 
     await prisma.customerProfile.update({
       where: { businessPartnerId: partner.id },
