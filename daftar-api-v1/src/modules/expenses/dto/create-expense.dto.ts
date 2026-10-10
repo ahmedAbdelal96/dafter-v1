@@ -4,7 +4,6 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  IsUUID,
   MaxLength,
   Min,
 } from 'class-validator';
@@ -30,11 +29,6 @@ export class CreateExpenseDto {
   @MaxLength(500)
   @IsOptional()
   description?: string;
-
-  /** UUID of the supplier / vendor this expense was paid to (optional) */
-  @IsUUID()
-  @IsOptional()
-  supplierId?: string;
 
   /** Receipt or vendor invoice number */
   @IsString()

@@ -12,7 +12,7 @@ export class ListExpensesUseCase {
 
   /**
    * Returns a paginated, filtered list of expenses for the given company.
-   * Supports filtering by category, supplier, date range, and free-text search.
+   * Supports filtering by category, date range, and free-text search.
    */
   async execute(companyId: string, query: QueryExpenseDto) {
     return this.repo.findMany(companyId, query);

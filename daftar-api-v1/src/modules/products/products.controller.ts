@@ -131,9 +131,9 @@ export class ProductsController {
   async getLastPrice(
     @CurrentTenant() companyId: string,
     @Param('id', ParseUUIDPipe) id: string,
-    @Query('customerId', ParseUUIDPipe) customerId: string,
+    @Query('businessPartnerId', ParseUUIDPipe) businessPartnerId: string,
   ) {
-    const data = await this.productsService.getLastPrice(companyId, id, customerId);
+    const data = await this.productsService.getLastPrice(companyId, id, businessPartnerId);
     return new ApiResponseDto(data);
   }
 

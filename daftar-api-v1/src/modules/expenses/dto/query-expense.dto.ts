@@ -3,7 +3,6 @@ import {
   IsInt,
   IsOptional,
   IsString,
-  IsUUID,
   Max,
   Min,
 } from 'class-validator';
@@ -28,11 +27,6 @@ export class QueryExpenseDto {
   @IsEnum(ExpenseCategory)
   @IsOptional()
   category?: ExpenseCategory;
-
-  /** Filter by supplier UUID */
-  @IsUUID()
-  @IsOptional()
-  supplierId?: string;
 
   /** ISO date — start of date range (inclusive) */
   @IsString()

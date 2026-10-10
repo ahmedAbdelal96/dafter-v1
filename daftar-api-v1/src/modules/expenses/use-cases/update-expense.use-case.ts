@@ -3,14 +3,12 @@
 // ============================================================
 // Steps:
 //   1. Verify expense exists (404 if not)
-//   2. Validate new supplierId if provided
-//   3. Inside $transaction:
+//   2. Inside $transaction:
 //      a. updateMany (company-scoped)
 //      b. AuditLog { action: 'expense.update' }
 // ============================================================
 
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../../database/prisma/prisma.service';
 import { ExpensesRepository, UpdateExpenseData } from '../expenses.repository';
 import { UpdateExpenseDto } from '../dto';
 import { TranslationService } from '../../../common/services/translation.service';
@@ -22,7 +20,6 @@ export class UpdateExpenseUseCase {
 
   constructor(
     private readonly repo: ExpensesRepository,
-    private readonly prisma: PrismaService,
     private readonly t: TranslationService,
   ) {}
 
@@ -38,22 +35,7 @@ export class UpdateExpenseUseCase {
       throw new NotFoundException(this.t.translate('expenses.notFound'));
     }
 
-    // ── Step 2: Validate new supplierId ──────────────────────────────────
-    if (dto.supplierId !== undefined) {
-      if (dto.supplierId !== null) {
-        const supplier = await this.prisma.supplier.findFirst({
-          where: { id: dto.supplierId, companyId, isDeleted: false },
-          select: { id: true },
-        });
-        if (!supplier) {
-          throw new NotFoundException(
-            this.t.translate('expenses.supplierNotFound'),
-          );
-        }
-      }
-    }
-
-    // ── Step 3: Build update payload ──────────────────────────────────────
+    // ── Step 2: Build update payload ──────────────────────────────────────
     const updateData: UpdateExpenseData = {};
 
     if (dto.category !== undefined) updateData.category = dto.category;
@@ -65,7 +47,6 @@ export class UpdateExpenseUseCase {
       updateData.expenseDate = d;
     }
     if (dto.description !== undefined) updateData.description = dto.description;
-    if (dto.supplierId !== undefined) updateData.supplierId = dto.supplierId;
     if (dto.referenceNumber !== undefined)
       updateData.referenceNumber = dto.referenceNumber;
     if (dto.paymentMethod !== undefined)

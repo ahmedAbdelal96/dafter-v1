@@ -60,7 +60,7 @@ export class ProductsService {
     return this.recentUC.execute(companyId, limit);
   }
 
-  getLastPrice(companyId: string, productId: string, customerId: string) {
-    return this.lastPriceUC.execute(companyId, productId, customerId);
+  getLastPrice(companyId: string, productId: string, businessPartnerId: string) {
+    return this.lastPriceUC.execute(companyId, productId, businessPartnerId);
   }
 }

@@ -13,7 +13,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
-import { InvoiceStatus, PartyType, Prisma } from '@prisma/client';
+import { SalesInvoiceStatus, Prisma } from '@prisma/client';
 import { QueryProductDto } from './dto';
 
 // ── Return-shape interfaces ────────────────────────────────────────────────
@@ -349,22 +349,21 @@ export class ProductsRepository {
     limit: number,
   ): Promise<ProductSearchResult[]> {
     // Fetch more than needed to allow deduplication
-    const rows = await this.prisma.invoiceItem.findMany({
+    const rows = await this.prisma.salesInvoiceLine.findMany({
       where: {
         productId: { not: null },
         product: { isDeleted: false },
-        invoice: {
+        salesInvoice: {
           companyId,
-          isDeleted: false,
-          status: InvoiceStatus.APPROVED,
+          status: SalesInvoiceStatus.POSTED,
         },
       },
       select: {
         productId: true,
         product: { select: productSearchSelect },
-        invoice: { select: { issueDate: true } },
+        salesInvoice: { select: { documentDate: true } },
       },
-      orderBy: { invoice: { issueDate: 'desc' } },
+      orderBy: { salesInvoice: { documentDate: 'desc' } },
       take: limit * 5,
     });
 
@@ -383,37 +382,34 @@ export class ProductsRepository {
   // ── LAST PRICE ────────────────────────────────────────────────────────
 
   /**
-   * Last price this product was sold at to a specific customer
-   * (from APPROVED invoices). Returns null if no prior sale found.
+   * Last price this product was sold at to a specific BusinessPartner.
    */
   async getLastPrice(
     companyId: string,
     productId: string,
-    customerId: string,
+    businessPartnerId: string,
   ): Promise<LastPriceResult | null> {
-    const row = await this.prisma.invoiceItem.findFirst({
+    const row = await this.prisma.salesInvoiceLine.findFirst({
       where: {
         productId,
-        invoice: {
+        salesInvoice: {
           companyId,
-          isDeleted: false,
-          status: InvoiceStatus.APPROVED,
-          partyType: PartyType.CUSTOMER,
-          partyId: customerId,
+          status: SalesInvoiceStatus.POSTED,
+          businessPartnerId,
         },
       },
       select: {
         unitPrice: true,
-        invoice: { select: { issueDate: true, invoiceNumber: true } },
+        salesInvoice: { select: { documentDate: true, invoiceNumber: true } },
       },
-      orderBy: { invoice: { issueDate: 'desc' } },
+      orderBy: { salesInvoice: { documentDate: 'desc' } },
     });
 
     if (!row) return null;
     return {
       unitPrice: row.unitPrice,
-      invoiceDate: row.invoice.issueDate,
-      invoiceNumber: row.invoice.invoiceNumber,
+      invoiceDate: row.salesInvoice.documentDate,
+      invoiceNumber: row.salesInvoice.invoiceNumber,
     };
   }
 

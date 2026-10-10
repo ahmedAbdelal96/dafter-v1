@@ -1,12 +1,8 @@
 ﻿import {
+  BusinessPartner,
   Company,
-  Customer,
-  DeferredSale,
-  Employee,
-  InstallmentContract,
   Plan,
   Product,
-  Supplier,
   User,
 } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
@@ -40,12 +36,9 @@ export type TenantSeedState = {
   company: Company;
   owner: User;
   staffUsers: User[];
-  customers: Customer[];
-  suppliers: Supplier[];
-  employees: Employee[];
+  businessPartners: BusinessPartner[];
+  employees: never[];
   products: Product[];
-  deferredSales: DeferredSale[];
-  installmentContracts: InstallmentContract[];
 };
 
 export type SeedContext = {

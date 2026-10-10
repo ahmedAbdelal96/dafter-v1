@@ -2,14 +2,12 @@
 // Use Case: Create Expense (تسجيل مصروف)
 // ============================================================
 // Steps:
-//   1. Validate supplier exists (if supplierId provided)
-//   2. Inside $transaction:
+//   1. Inside $transaction:
 //      a. Create Expense record
 //      b. AuditLog { action: 'expense.create' }
 // ============================================================
 
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../../database/prisma/prisma.service';
 import { ExpensesRepository } from '../expenses.repository';
 import { CreateExpenseDto } from '../dto';
 import { TranslationService } from '../../../common/services/translation.service';
@@ -21,32 +19,16 @@ export class CreateExpenseUseCase {
 
   constructor(
     private readonly repo: ExpensesRepository,
-    private readonly prisma: PrismaService,
     private readonly t: TranslationService,
   ) {}
 
   /**
    * Records a new business expense.
    *
-   * If `supplierId` is provided we verify the supplier belongs to this company
-   * before persisting — prevents cross-tenant data leakage.
    * The write (Expense + AuditLog) runs inside a single $transaction.
    */
   async execute(companyId: string, userId: string, dto: CreateExpenseDto) {
-    // ── Step 1: Validate supplier (if given) ─────────────────────────────
-    if (dto.supplierId) {
-      const supplier = await this.prisma.supplier.findFirst({
-        where: { id: dto.supplierId, companyId, isDeleted: false },
-        select: { id: true },
-      });
-      if (!supplier) {
-        throw new NotFoundException(
-          this.t.translate('expenses.supplierNotFound'),
-        );
-      }
-    }
-
-    // ── Step 2: Parse date (strip time component) ─────────────────────────
+    // ── Step 1: Parse date (strip time component) ─────────────────────────
     const expenseDate = new Date(dto.expenseDate);
     expenseDate.setUTCHours(0, 0, 0, 0);
 
@@ -61,7 +43,6 @@ export class CreateExpenseUseCase {
           amount: new Prisma.Decimal(dto.amount),
           expenseDate,
           description: dto.description,
-          supplierId: dto.supplierId,
           referenceNumber: dto.referenceNumber,
           paymentMethod: dto.paymentMethod,
           notes: dto.notes,
@@ -80,7 +61,6 @@ export class CreateExpenseUseCase {
           category: dto.category,
           amount: dto.amount.toString(),
           expenseDate: expenseDate.toISOString().split('T')[0],
-          supplierId: dto.supplierId ?? null,
         },
       });
 

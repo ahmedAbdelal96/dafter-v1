@@ -1,5 +1,3 @@
-﻿import { PartyType } from '@prisma/client';
-
 import { daysAgo } from '../helpers';
 import { SeedContext } from '../types';
 
@@ -7,36 +5,35 @@ export const seedNotificationsAndAudit = async (
   ctx: SeedContext,
 ): Promise<void> => {
   for (const tenant of ctx.tenantStates) {
-    const recentCustomer = tenant.customers[0];
-    const recentSupplier = tenant.suppliers[0];
+    const partner = tenant.businessPartners[0];
 
     await ctx.prisma.notification.createMany({
       data: [
         {
           userId: tenant.owner.id,
           companyId: tenant.company.id,
-          type: 'customer.created',
-          title: 'New customer added',
-          body: `${recentCustomer.name} has been added to your customer list.`,
-          data: { screen: 'CustomerDetails', customerId: recentCustomer.id },
+          type: 'business-partner.created',
+          title: 'Business partner added',
+          body: `${partner.displayName} has been added to the workspace.`,
+          data: { screen: 'BusinessPartnerDetails', businessPartnerId: partner.id },
           createdAt: daysAgo(1),
         },
         {
           userId: tenant.owner.id,
           companyId: tenant.company.id,
-          type: 'invoice.overdue',
-          title: 'Overdue invoice reminder',
-          body: 'There are overdue invoices that require follow-up.',
-          data: { screen: 'Invoices', filter: 'overdue' },
+          type: 'sales-invoice.posted',
+          title: 'Sales invoice posted',
+          body: 'A seeded sales invoice was posted through the accounting engine.',
+          data: { screen: 'SalesInvoices', filter: 'posted' },
           createdAt: daysAgo(2),
         },
         {
           userId: tenant.staffUsers[0].id,
           companyId: tenant.company.id,
-          type: 'supplier.balance',
-          title: 'Supplier balance updated',
-          body: `${recentSupplier.name} balance has changed.`,
-          data: { screen: 'Suppliers', supplierId: recentSupplier.id },
+          type: 'journal-entry.posted',
+          title: 'Journal entry posted',
+          body: 'A journal entry was posted through JournalEntry and JournalLine.',
+          data: { screen: 'AccountingJournal' },
           readAt: daysAgo(1),
           createdAt: daysAgo(3),
         },
@@ -48,18 +45,18 @@ export const seedNotificationsAndAudit = async (
         {
           companyId: tenant.company.id,
           actorUserId: tenant.owner.id,
-          action: 'customer.create',
-          entityType: 'customer',
-          entityId: recentCustomer.id,
+          action: 'business-partner.create',
+          entityType: 'BusinessPartner',
+          entityId: partner.id,
           metadata: { source: 'seed' },
           createdAt: daysAgo(3),
         },
         {
           companyId: tenant.company.id,
           actorUserId: tenant.owner.id,
-          action: 'invoice.create',
-          entityType: 'invoice',
-          metadata: { source: 'seed', partyType: PartyType.CUSTOMER },
+          action: 'sales-invoice.post',
+          entityType: 'SalesInvoice',
+          metadata: { source: 'seed', accountingAuthority: 'JournalEntry/JournalLine' },
           createdAt: daysAgo(2),
         },
       ],

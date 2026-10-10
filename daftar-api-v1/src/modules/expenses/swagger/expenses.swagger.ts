@@ -27,8 +27,6 @@ export const ExpensesApiTags = () => ApiTags('💸 Expenses — المصروفا
 const expenseExample = {
   id: '550e8400-e29b-41d4-a716-446655440000',
   companyId: 'c1d2e3f4-...',
-  supplierId: null,
-  supplier: null,
   category: ExpenseCategory.RENT,
   amount: '3500.00',
   expenseDate: '2024-03-01T00:00:00.000Z',
@@ -65,7 +63,6 @@ export const CreateExpenseSwagger = () =>
 - OTHER — أخرى
 
 **ملاحظات:**
-- \`supplierId\` اختياري — يربط المصروف بمورّد
 - \`amount\` يُخزَّن بدقة Decimal(14,2) — لا حسابات JavaScript
 - العملية تسجّل AuditLog تلقائياً
       `,
@@ -100,7 +97,6 @@ export const ListExpensesSwagger = () =>
 
 **خيارات الفلترة:**
 - \`category\` — فلتر حسب الفئة
-- \`supplierId\` — فلتر حسب المورّد
 - \`dateFrom\` / \`dateTo\` — نطاق تاريخي (ISO date)
 - \`search\` — بحث نصي في الوصف ورقم المرجع
 
@@ -111,7 +107,6 @@ export const ListExpensesSwagger = () =>
     ApiQuery({ name: 'page', required: false, type: Number, example: 1 }),
     ApiQuery({ name: 'limit', required: false, type: Number, example: 20 }),
     ApiQuery({ name: 'category', required: false, enum: ExpenseCategory }),
-    ApiQuery({ name: 'supplierId', required: false, type: String, description: 'UUID مورد' }),
     ApiQuery({ name: 'dateFrom', required: false, type: String, example: '2024-01-01' }),
     ApiQuery({ name: 'dateTo', required: false, type: String, example: '2024-12-31' }),
     ApiQuery({ name: 'search', required: false, type: String }),
@@ -154,7 +149,6 @@ export const GetExpenseSummarySwagger = () =>
     }),
     ApiBearerAuth('access-token'),
     ApiQuery({ name: 'category', required: false, enum: ExpenseCategory }),
-    ApiQuery({ name: 'supplierId', required: false, type: String }),
     ApiQuery({ name: 'dateFrom', required: false, type: String, example: '2024-01-01' }),
     ApiQuery({ name: 'dateTo', required: false, type: String, example: '2024-12-31' }),
     ApiResponse({

@@ -115,12 +115,6 @@ describe('SalesInvoice posting', () => {
   });
 
   it('posts exactly once through the accounting engine and allocates a fiscal-year number', async () => {
-    const legacyLedgerBefore = await prisma.ledgerEntry.count({
-      where: { companyId },
-    });
-    const legacyBalancesBefore = await prisma.balance.count({
-      where: { companyId },
-    });
     const draft = await sales.createDraft(companyId, ownerId, {
       businessPartnerId: customerId,
       documentDate: new Date('2026-10-10'),
@@ -148,12 +142,6 @@ describe('SalesInvoice posting', () => {
     expect(entry.sourceId).toBe(draft.id);
     expect(entry.status).toBe('POSTED');
     expect(entry.lines).toHaveLength(2);
-    expect(await prisma.ledgerEntry.count({ where: { companyId } })).toBe(
-      legacyLedgerBefore,
-    );
-    expect(await prisma.balance.count({ where: { companyId } })).toBe(
-      legacyBalancesBefore,
-    );
     expect(
       entry.lines
         .reduce((sum, line) => sum.add(line.debit), new Prisma.Decimal(0))
@@ -971,12 +959,6 @@ describe('SalesInvoice posting', () => {
   });
 
   it('creates and posts a credit note against a posted invoice without mutating the invoice', async () => {
-    const legacyLedgerBefore = await prisma.ledgerEntry.count({
-      where: { companyId },
-    });
-    const legacyBalancesBefore = await prisma.balance.count({
-      where: { companyId },
-    });
     const invoice = await prisma.salesInvoice.findFirstOrThrow({
       where: { companyId, status: 'POSTED' },
       include: { lines: true },
@@ -994,12 +976,6 @@ describe('SalesInvoice posting', () => {
     expect(note.grandTotal.toFixed(2)).toBe('100.00');
     const posted = await creditNotes.postDraft(companyId, ownerId, note.id);
     expect(posted.status).toBe('POSTED');
-    expect(await prisma.ledgerEntry.count({ where: { companyId } })).toBe(
-      legacyLedgerBefore,
-    );
-    expect(await prisma.balance.count({ where: { companyId } })).toBe(
-      legacyBalancesBefore,
-    );
     expect(posted.creditNoteNumber).toMatch(/^CN-2026-\d{6}$/);
     const entry = await prisma.journalEntry.findFirstOrThrow({
       where: { id: posted.journalEntryId!, companyId },

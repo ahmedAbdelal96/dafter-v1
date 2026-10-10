@@ -42,18 +42,10 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PlatformModule } from './modules/platform/platform.module';
 import { CompaniesModule } from './modules/companies/companies.module';
 import { UsersModule } from './modules/users/users.module';
-import { CustomersModule } from './modules/customers/customers.module';
-import { SuppliersModule } from './modules/suppliers/suppliers.module';
-import { EmployeesModule } from './modules/employees/employees.module';
-import { LedgerModule } from './modules/ledger/ledger.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { EntitlementsModule } from './modules/entitlements/entitlements.module';
 
 // Phase 2 â€” Sales & Installments
-import { DeferredSalesModule } from './modules/deferred-sales/deferred-sales.module';
-import { InstallmentsModule } from './modules/installments/installments.module';
-import { ReportsModule } from './modules/reports/reports.module';
-import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { PlatformDashboardModule } from './modules/platform-dashboard/platform-dashboard.module';
 import { PlatformAuditModule } from './modules/platform-audit/platform-audit.module';
 
@@ -69,7 +61,6 @@ import { SalesModule } from './modules/sales/sales.module';
 // P2 â€” Pricing
 
 // P2 â€” Statements
-import { StatementsModule } from './modules/statements/statements.module';
 
 // P3 â€” Audit
 import { AuditModule } from './modules/audit/audit.module';
@@ -149,18 +140,10 @@ import { OpeningBalancesModule } from './modules/opening-balances/opening-balanc
     PlatformModule,
     CompaniesModule,
     UsersModule,
-    CustomersModule,
-    SuppliersModule,
-    EmployeesModule,
-    LedgerModule,
     NotificationsModule,
     EntitlementsModule, // GET /my/entitlements + GET /plans/feature-catalog
 
     // Phase 2 â€” Sales & Installments
-    DeferredSalesModule,
-    InstallmentsModule,
-    ReportsModule,
-    DashboardModule,
     PlatformDashboardModule,
     PlatformAuditModule,
 
@@ -176,7 +159,6 @@ import { OpeningBalancesModule } from './modules/opening-balances/opening-balanc
     // P2 â€” Pricing
 
     // P2 â€” Statements
-    StatementsModule,
 
     // P3 â€” Audit
     AuditModule,

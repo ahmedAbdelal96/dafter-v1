@@ -234,21 +234,15 @@ export class EntitlementService {
     if (!plan) return null;
 
     // Fetch all entity counts in parallel — one round-trip to the DB
-    const [usersCount, customersCount, suppliersCount, employeesCount, ledgerCount] =
+    const [usersCount, partnersCount, journalEntryCount] =
       await Promise.all([
         this.prisma.user.count({
           where: { companyId, isDeleted: false, status: { not: 'DISABLED' } },
         }),
-        this.prisma.customer.count({
-          where: { companyId, isDeleted: false },
+        this.prisma.businessPartner.count({
+          where: { companyId, isActive: true },
         }),
-        this.prisma.supplier.count({
-          where: { companyId, isDeleted: false },
-        }),
-        this.prisma.employee.count({
-          where: { companyId, isDeleted: false },
-        }),
-        this.prisma.ledgerEntry.count({
+        this.prisma.journalEntry.count({
           where: { companyId },
         }),
       ]);
@@ -260,10 +254,10 @@ export class EntitlementService {
       features:           plan.features,
       quotas: {
         users:         this.buildQuotaStatus(plan.maxUsers,         usersCount),
-        customers:     this.buildQuotaStatus(plan.maxCustomers,     customersCount),
-        suppliers:     this.buildQuotaStatus(plan.maxSuppliers,     suppliersCount),
-        employees:     this.buildQuotaStatus(plan.maxEmployees,     employeesCount),
-        ledgerEntries: this.buildQuotaStatus(plan.maxLedgerEntries, ledgerCount),
+        customers:     this.buildQuotaStatus(plan.maxCustomers,     partnersCount),
+        suppliers:     this.buildQuotaStatus(plan.maxSuppliers,     partnersCount),
+        employees:     this.buildQuotaStatus(plan.maxEmployees,     0),
+        ledgerEntries: this.buildQuotaStatus(plan.maxLedgerEntries, journalEntryCount),
       },
     };
   }
@@ -383,8 +377,8 @@ export class EntitlementService {
       case 'customers': {
         const limit = plan.maxCustomers;
         if (limit === null) return { limit: null, current: 0 };
-        const current = await db.customer.count({
-          where: { companyId, isDeleted: false },
+        const current = await db.businessPartner.count({
+          where: { companyId, isActive: true },
         });
         return { limit, current };
       }
@@ -392,8 +386,8 @@ export class EntitlementService {
       case 'suppliers': {
         const limit = plan.maxSuppliers;
         if (limit === null) return { limit: null, current: 0 };
-        const current = await db.supplier.count({
-          where: { companyId, isDeleted: false },
+        const current = await db.businessPartner.count({
+          where: { companyId, isActive: true },
         });
         return { limit, current };
       }
@@ -401,9 +395,7 @@ export class EntitlementService {
       case 'employees': {
         const limit = plan.maxEmployees;
         if (limit === null) return { limit: null, current: 0 };
-        const current = await db.employee.count({
-          where: { companyId, isDeleted: false },
-        });
+        const current = 0;
         return { limit, current };
       }
 
@@ -411,7 +403,7 @@ export class EntitlementService {
         const rawLimit = plan.maxLedgerEntries;
         if (rawLimit === null) return { limit: null, current: 0 };
         const limit = parseInt(rawLimit, 10);
-        const current = await db.ledgerEntry.count({
+        const current = await db.journalEntry.count({
           where: { companyId },
         });
         return { limit, current };

@@ -5,13 +5,12 @@ import { QueryExpenseDto } from './dto';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-export interface ExpenseWithSupplier extends Expense {
-  supplier: { id: string; name: string } | null;
+export interface ExpenseRecord extends Expense {
   createdBy: { id: string; fullName: string | null };
 }
 
 export interface PaginatedExpenses {
-  items: ExpenseWithSupplier[];
+  items: ExpenseRecord[];
   meta: {
     page: number;
     limit: number;
@@ -35,7 +34,6 @@ export interface CreateExpenseData {
   amount: Prisma.Decimal;
   expenseDate: Date;
   description?: string;
-  supplierId?: string;
   referenceNumber?: string;
   paymentMethod?: string;
   notes?: string;
@@ -46,7 +44,6 @@ export interface UpdateExpenseData {
   amount?: Prisma.Decimal;
   expenseDate?: Date;
   description?: string;
-  supplierId?: string | null;
   referenceNumber?: string;
   paymentMethod?: string;
   notes?: string;
@@ -57,8 +54,6 @@ export interface UpdateExpenseData {
 const expenseSelect = {
   id: true,
   companyId: true,
-  supplierId: true,
-  supplier: { select: { id: true, name: true } },
   category: true,
   amount: true,
   expenseDate: true,
@@ -102,7 +97,6 @@ export class ExpensesRepository {
     };
 
     if (query.category) where.category = query.category;
-    if (query.supplierId) where.supplierId = query.supplierId;
 
     if (query.dateFrom || query.dateTo) {
       where.expenseDate = {};
@@ -126,7 +120,7 @@ export class ExpensesRepository {
   async create(
     data: CreateExpenseData,
     tx?: Prisma.TransactionClient,
-  ): Promise<ExpenseWithSupplier> {
+  ): Promise<ExpenseRecord> {
     const db = tx ?? this.prisma;
     return db.expense.create({
       data: {
@@ -136,13 +130,12 @@ export class ExpensesRepository {
         amount: data.amount,
         expenseDate: data.expenseDate,
         description: data.description,
-        supplierId: data.supplierId,
         referenceNumber: data.referenceNumber,
         paymentMethod: data.paymentMethod,
         notes: data.notes,
       },
       select: expenseSelect,
-    }) as Promise<ExpenseWithSupplier>;
+    }) as Promise<ExpenseRecord>;
   }
 
   async findMany(
@@ -169,7 +162,7 @@ export class ExpensesRepository {
     const totalPages = Math.ceil(total / limit);
 
     return {
-      items: items as ExpenseWithSupplier[],
+      items: items as ExpenseRecord[],
       meta: {
         page,
         limit,
@@ -184,11 +177,11 @@ export class ExpensesRepository {
   async findOne(
     id: string,
     companyId: string,
-  ): Promise<ExpenseWithSupplier | null> {
+  ): Promise<ExpenseRecord | null> {
     return this.prisma.expense.findFirst({
       where: { id, companyId, isDeleted: false },
       select: expenseSelect,
-    }) as Promise<ExpenseWithSupplier | null>;
+    }) as Promise<ExpenseRecord | null>;
   }
 
   async update(
@@ -196,7 +189,7 @@ export class ExpensesRepository {
     companyId: string,
     data: UpdateExpenseData,
     tx?: Prisma.TransactionClient,
-  ): Promise<ExpenseWithSupplier> {
+  ): Promise<ExpenseRecord> {
     const db = tx ?? this.prisma;
     // updateMany scopes by companyId — prevents cross-tenant updates
     await db.expense.updateMany({
@@ -206,7 +199,7 @@ export class ExpensesRepository {
     return db.expense.findFirstOrThrow({
       where: { id, companyId },
       select: expenseSelect,
-    }) as Promise<ExpenseWithSupplier>;
+    }) as Promise<ExpenseRecord>;
   }
 
   async softDelete(

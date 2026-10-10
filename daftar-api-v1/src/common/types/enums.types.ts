@@ -5,8 +5,6 @@
 export {
   UserRole,
   UserStatus,
-  PartyType,
-  LedgerEntryType,
   SubscriptionStatus,
   PaymentStatus,
   BillingCycle,

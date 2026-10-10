@@ -14,7 +14,7 @@ import { ProductsRepository } from '../products.repository';
 export class GetLastPriceUseCase {
   constructor(private readonly repo: ProductsRepository) {}
 
-  async execute(companyId: string, productId: string, customerId: string) {
-    return this.repo.getLastPrice(companyId, productId, customerId);
+  async execute(companyId: string, productId: string, businessPartnerId: string) {
+    return this.repo.getLastPrice(companyId, productId, businessPartnerId);
   }
 }

@@ -129,12 +129,9 @@ export const seedPlatformAndTenants = async (
       company,
       owner,
       staffUsers,
-      customers: [],
-      suppliers: [],
+      businessPartners: [],
       employees: [],
       products: [],
-      deferredSales: [],
-      installmentContracts: [],
     };
 
     ctx.tenantStates.push(tenantState);

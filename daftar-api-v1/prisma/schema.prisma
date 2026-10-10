@@ -8,16 +8,14 @@
 // - Maintainability: clear enums, consistent naming, soft-delete fields
 // - Scalable RBAC: simple roles now, expandable to fine-grained permissions
 // - Financial architecture: business documents → posting engine → general ledger
-//   → reconciliation/subledger → reports. Legacy ledger_entries/balances remain
-//   only for unreplaced modules and are not the authoritative B01/B02/B03 truth.
+//   → reconciliation/subledger → reports.
 // - SaaS billing: plans + subscriptions + payments (managed by Super Admin)
 //
 // Notes (IMPORTANT):
 // - Prisma cannot enforce Row Level Security (RLS). Tenant isolation MUST be enforced
 //   in NestJS services/guards by always scoping queries to companyId.
 // - Authoritative B01+ financial writes MUST run through JournalEntry/JournalLine
-//   inside a transaction. Legacy LedgerEntry/Balance rows are not new accounting
-//   truth and are not written by authoritative B02/B03 flows.
+//   inside a transaction.
 //
 // ============================================================
 
@@ -47,12 +45,6 @@ enum UserStatus {
   DISABLED
 }
 
-enum PartyType {
-  CUSTOMER
-  SUPPLIER
-  EMPLOYEE
-}
-
 enum BusinessPartnerType {
   ORGANIZATION
   PERSON
@@ -63,20 +55,6 @@ enum BusinessPartnerAddressType {
   SHIPPING
   REGISTERED
   OTHER
-}
-
-enum LedgerEntryType {
-  // Generic
-  INVOICE
-  PAYMENT
-  RETURN
-  ADJUSTMENT
-
-  // Employee-focused (optional in MVP)
-  ADVANCE
-  SALARY_PAYMENT
-  DEDUCTION
-  SETTLEMENT
 }
 
 enum SubscriptionStatus {
@@ -168,49 +146,6 @@ enum ExpenseCategory {
   MARKETING // تسويق وإعلان
   TAXES // ضرائب ورسوم
   OTHER // أخرى
-}
-
-// ── Phase 2: Sale & Installment Enums ─────────────────────────────────────
-
-// Categorises a LedgerEntry so the frontend can distinguish
-// immediate cash sales from deferred (آجل) and installment (أقساط) sales.
-enum SaleType {
-  CASH
-  DEFERRED // بيع آجل — single future due date, supports partial payments
-  INSTALLMENT // بيع بالتقسيط — structured schedule of multiple payments
-}
-
-// Lifecycle of a single deferred (آجل) sale.
-// Transitions: PENDING → PARTIAL (first partial pay) → PAID (fully settled)
-//                      → OVERDUE (daily job flips after dueDate passes)
-enum DeferredSaleStatus {
-  PENDING // لم يُدفع بعد
-  PARTIAL // دُفع جزء منه
-  PAID // مسدد بالكامل
-  OVERDUE // متأخر — dueDate مرّ ولم يُسدَّد
-}
-
-// Lifecycle of an installment contract.
-enum InstallmentStatus {
-  ACTIVE // جاري — still has pending/partial schedules
-  COMPLETED // مكتمل — all schedules paid
-  CANCELLED // ملغي — cancelled before completion
-  DEFAULTED // متوقف عن السداد — admin/manual override
-}
-
-// Lifecycle of a single instalment row in the schedule.
-enum ScheduleStatus {
-  PENDING // لم يحل موعده أو حلّ ولم يُدفع
-  PARTIAL // دُفع جزء منه
-  PAID // مسدد
-  OVERDUE // متأخر — daily job flips after dueDate passes
-  WAIVED // أُعفي منه
-}
-
-// How the instalment schedule was built.
-enum ScheduleType {
-  FIXED // جميع الأقساط بنفس المبلغ — generated automatically
-  CUSTOM // التاجر يدخل كل قسط يدوياً — irregular amounts or intervals
 }
 
 // ============================================================
@@ -386,24 +321,13 @@ model User {
   deviceTokens  DeviceToken[]  @relation("UserDeviceTokens")
   notifications Notification[] @relation("UserNotifications")
 
-  // Audit relations (who created ledger entries, etc.)
-  createdLedgerEntries LedgerEntry[] @relation("LedgerCreatedBy")
   auditLogs            AuditLog[]    @relation("AuditActor")
-
-  // Phase 2: back-references for deferred sales & installments
-  createdDeferredSales        DeferredSale[]        @relation("DeferredSaleCreatedBy")
-  createdDeferredPayments     DeferredPayment[]     @relation("DeferredPaymentCreatedBy")
-  createdInstallmentContracts InstallmentContract[] @relation("InstallmentContractCreatedBy")
-  createdInstallmentPayments  InstallmentPayment[]  @relation("InstallmentPaymentCreatedBy")
 
   // Phase 3: back-reference for expenses
   createdExpenses Expense[] @relation("ExpenseCreatedBy")
 
   // Phase 4: back-reference for products catalog
   createdProducts Product[] @relation("ProductCreatedBy")
-
-  // Phase K: back-reference for invoices
-  createdInvoices Invoice[] @relation("InvoiceCreatedBy")
 
   // B01: authoritative accounting postings
   postedAccountingEntries      JournalEntry[]        @relation("AccountingEntryPostedBy")
@@ -415,9 +339,6 @@ model User {
   postedSalesInvoices     SalesInvoice[]    @relation("SalesInvoicePostedBy")
   createdSalesCreditNotes SalesCreditNote[] @relation("SalesCreditNoteCreatedBy")
   postedSalesCreditNotes  SalesCreditNote[] @relation("SalesCreditNotePostedBy")
-
-  // P2-BE-1: back-reference for customer product prices
-  updatedCustomerProductPrices CustomerProductPrice[] @relation("CustomerProductPriceUpdatedBy")
 
   // Optimistic locking
   version Int @default(0)
@@ -512,8 +433,6 @@ model Company {
   version Int @default(0)
 
   users               User[]
-  customers           Customer[]
-  suppliers           Supplier[]
   businessPartners    BusinessPartner[]
   customerProfiles    CustomerProfile[]
   supplierProfiles    SupplierProfile[]
@@ -521,8 +440,6 @@ model Company {
   partnerContacts     BusinessPartnerContact[]
   paymentTerms        PaymentTerm[]
   employees           Employee[]
-  ledgerEntries       LedgerEntry[]
-  balances            Balance[]
   auditLogs           AuditLog[]
   notifications       Notification[]
   cashReconciliations CashReconciliationDaily[]
@@ -530,26 +447,14 @@ model Company {
   subscriptions CompanySubscription[]
   payments      SubscriptionPayment[]
 
-  // Phase 2
-  deferredSales        DeferredSale[]
-  installmentContracts InstallmentContract[]
-
-  // Phase 3
-  expenses Expense[]
-
   // Phase 4
   products Product[]
-
-  // Phase K
-  invoices Invoice[]
+  expenses Expense[]
 
   // B03: authoritative Sales documents
   salesInvoices    SalesInvoice[]
   salesCreditNotes SalesCreditNote[]
   salesSequences   SalesDocumentSequence[]
-
-  // P2-BE-1
-  customerProductPrices CustomerProductPrice[]
 
   // Tax setup foundation
   taxRegistrationProfile TaxRegistrationProfile?
@@ -860,67 +765,6 @@ model StaffPermission {
 }
 
 // ============================================================
-// LEGACY PARTIES (CUSTOMERS / SUPPLIERS / EMPLOYEES)
-// ============================================================
-// These models remain only for unreplaced legacy modules. They are not the
-// authoritative B02 external-party identity and their openingBalance fields
-// are not read by BusinessPartner, the B01 GL, or any new B02 feature.
-// ============================================================
-
-model Customer {
-  id        String  @id @default(uuid()) @db.Uuid
-  companyId String  @db.Uuid
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  name           String
-  phone          String?
-  address        String?
-  openingBalance Decimal  @default(0.00) @db.Decimal(14, 2)
-  creditLimit    Decimal? @db.Decimal(14, 2)
-  isActive       Boolean  @default(true)
-
-  // Optimistic locking — prevents concurrent update conflicts
-  // Client must send the version it read; if changed by another user → 409 Conflict
-  version Int @default(0)
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  customerProductPrices CustomerProductPrice[] @relation("CustomerProductPrices")
-
-  @@index([companyId, isDeleted, isActive])
-  @@index([companyId, name])
-}
-
-model Supplier {
-  id        String  @id @default(uuid()) @db.Uuid
-  companyId String  @db.Uuid
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  name           String
-  phone          String?
-  address        String?
-  openingBalance Decimal @default(0.00) @db.Decimal(14, 2)
-  isActive       Boolean @default(true)
-
-  // Optimistic locking
-  version Int @default(0)
-
-  // Phase 3: expenses linked to this supplier (optional)
-  expenses Expense[]
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  @@index([companyId, isDeleted, isActive])
-  @@index([companyId, name])
-}
-
-// ============================================================
 // B02: AUTHORITATIVE BUSINESS PARTNER DOMAIN
 // ============================================================
 
@@ -1089,7 +933,6 @@ model Employee {
   name           String
   phone          String?
   jobTitle       String?
-  openingBalance Decimal @default(0.00) @db.Decimal(14, 2)
   isActive       Boolean @default(true)
 
   // Optimistic locking
@@ -1105,69 +948,6 @@ model Employee {
 }
 
 // ============================================================
-// LEGACY PARTY LEDGER ENGINE
-// ============================================================
-// Legacy party workflows retain this polymorphic relation temporarily. The
-// authoritative B01/B02 JournalLine uses BusinessPartner.businessPartnerId.
-// - partyType + partyId (UUID) identifies the party.
-// - No FK constraint possible here; enforce existence in service layer.
-// - Keep strong index for statements and lookups.
-// ============================================================
-
-model LedgerEntry {
-  id        String  @id @default(uuid()) @db.Uuid
-  companyId String  @db.Uuid
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  partyType PartyType
-  partyId   String    @db.Uuid
-
-  entryType    LedgerEntryType
-  signedAmount Decimal         @db.Decimal(14, 2)
-
-  entryDate DateTime  @db.Date
-  dueDate   DateTime? @db.Date
-  note      String?
-
-  // Phase 2: Sale type classification.
-  // null   → regular ledger entry (cash or non-sale)
-  // non-null → categorises the entry for frontend display and reporting.
-  saleType SaleType?
-
-  createdById String @db.Uuid
-  createdBy   User   @relation("LedgerCreatedBy", fields: [createdById], references: [id])
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  // Critical indexes for performance (statements, lists, due items):
-  @@index([companyId, partyType, partyId, entryDate(sort: Desc), createdAt(sort: Desc)])
-  @@index([companyId, dueDate])
-  @@index([companyId, createdAt(sort: Desc)])
-  @@index([createdById])
-}
-
-// Legacy current balance per party. B02 balances are derived from GL/open
-// items and never stored on BusinessPartner.
-model Balance {
-  companyId String    @db.Uuid
-  partyType PartyType
-  partyId   String    @db.Uuid
-
-  // CURRENT balance (initialized with openingBalance on party create)
-  balance Decimal @default(0.00) @db.Decimal(14, 2)
-
-  updatedAt DateTime @updatedAt
-
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@id([companyId, partyType, partyId])
-  @@index([companyId, partyType])
-}
-
-// ============================================================
 // AUDIT LOGGING
 // ============================================================
 
@@ -1180,7 +960,7 @@ model AuditLog {
   actorUser   User   @relation("AuditActor", fields: [actorUserId], references: [id])
 
   action     String // e.g. "invoice.approve", "invoice.update"
-  entityType String // e.g. "Invoice", "Customer"
+  entityType String // e.g. "SalesInvoice", "BusinessPartner"
   entityId   String? @db.Uuid
   metadata   Json    @default("{}")
   diff       Json? // before/after snapshot for tracked fields (price, discount, status…)
@@ -1215,213 +995,8 @@ model AuditLog {
 // END
 // ============================================================
 
-// ============================================================
-// PHASE 2: DEFERRED SALES (بيع الآجل)
-// ============================================================
-//
-// Design decisions:
-// - DeferredSale is the "header" that tracks aggregate state (paidAmount, status).
-// - DeferredPayment is a lightweight link between a PAYMENT LedgerEntry and its
-//   parent deferred sale — the actual financial record lives in LedgerEntry.
-// - partyType is stored (not just customerId) so deferred sales can be issued
-//   to Suppliers or Employees in the future without a schema migration.
-// - referenceNumber is human-readable: DEF-{YYYY}-{NNNN}.
-// - paidAmount is updated incrementally in the same transaction as the payment
-//   LedgerEntry to keep them consistent. Never compute from children in queries.
-// ============================================================
 
-model DeferredSale {
-  id        String  @id @default(uuid()) @db.Uuid
-  companyId String  @db.Uuid
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  // Polymorphic party — same pattern as LedgerEntry
-  partyType PartyType
-  partyId   String    @db.Uuid
-
-  // The INVOICE LedgerEntry that booked the full debt on party creation.
-  // Unique ensures 1:1 — one deferred sale = one opening invoice.
-  ledgerEntryId String @unique @db.Uuid
-
-  // Human-readable reference: DEF-2024-0001
-  referenceNumber String
-  description     String? @db.VarChar(500)
-
-  totalAmount Decimal @db.Decimal(14, 2)
-
-  // Incremented atomically on each payment. Stored for O(1) read.
-  // Rule: paidAmount <= totalAmount always.
-  paidAmount Decimal @default(0.00) @db.Decimal(14, 2)
-
-  dueDate DateTime           @db.Date
-  status  DeferredSaleStatus @default(PENDING)
-
-  createdById String @db.Uuid
-  createdBy   User   @relation("DeferredSaleCreatedBy", fields: [createdById], references: [id])
-
-  // Optimistic locking — concurrent payment recording prevention
-  version Int @default(0)
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  payments DeferredPayment[]
-
-  // Phase K: an invoice can be generated from this sale (at most one)
-  invoice Invoice?
-
-  @@index([companyId, partyType, partyId, status])
-  @@index([companyId, dueDate, status]) // daily overdue job + collection report
-  @@index([companyId, referenceNumber]) // lookup by ref number
-  @@index([companyId, createdAt(sort: Desc)]) // list with default sort
-}
-
-// Each row represents one payment instalment against a DeferredSale.
-// The financial record is the referenced LedgerEntry (PAYMENT, saleType=DEFERRED).
-model DeferredPayment {
-  id        String @id @default(uuid()) @db.Uuid
-  companyId String @db.Uuid
-
-  deferredSaleId String       @db.Uuid
-  deferredSale   DeferredSale @relation(fields: [deferredSaleId], references: [id], onDelete: Cascade)
-
-  // The PAYMENT LedgerEntry created alongside this record (atomic transaction).
-  // Unique — one payment record per ledger entry.
-  ledgerEntryId String @unique @db.Uuid
-
-  amount        Decimal  @db.Decimal(14, 2)
-  paymentDate   DateTime @db.Date
-  paymentMethod String?  @db.VarChar(100) // نقد / تحويل بنكي / شيك / إلخ
-  notes         String?  @db.VarChar(500)
-
-  createdById String @db.Uuid
-  createdBy   User   @relation("DeferredPaymentCreatedBy", fields: [createdById], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@index([companyId, deferredSaleId])
-  @@index([companyId, paymentDate])
-}
-
-// ============================================================
-// PHASE 2: INSTALLMENT CONTRACTS (بيع بالتقسيط)
-// ============================================================
-//
-// Design decisions:
-// - InstallmentContract is the header; InstallmentSchedule holds individual
-//   due rows; InstallmentPayment records each payment hit against a schedule row.
-// - paidAmount on Contract is kept in sync (incremented atomically) for O(1) reads.
-// - scheduleType=FIXED: server generates rows automatically (totalAmount/n per month).
-//   scheduleType=CUSTOM: client sends rows manually (irregular amounts/dates).
-// - downPayment is recorded as a separate PAYMENT LedgerEntry on contract creation.
-// - contractNumber format: CNT-{YYYY}-{NNNN}.
-// ============================================================
-
-model InstallmentContract {
-  id        String  @id @default(uuid()) @db.Uuid
-  companyId String  @db.Uuid
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  // Polymorphic party — extensible to Supplier/Employee
-  partyType PartyType
-  partyId   String    @db.Uuid
-
-  // The INVOICE LedgerEntry that booked the full debt (totalAmount - downPayment).
-  ledgerEntryId String @unique @db.Uuid
-
-  contractNumber String // CNT-2024-0001
-  description    String? @db.VarChar(500)
-
-  totalAmount Decimal @db.Decimal(14, 2) // إجمالي قيمة البيع
-  downPayment Decimal @default(0.00) @db.Decimal(14, 2) // المقدم (paid upfront)
-
-  // Incremented atomically on each payment. Includes downPayment.
-  paidAmount Decimal @default(0.00) @db.Decimal(14, 2)
-
-  numberOfInstallments Int
-  scheduleType         ScheduleType
-  startDate            DateTime     @db.Date // تاريخ أول قسط
-
-  status InstallmentStatus @default(ACTIVE)
-
-  createdById String @db.Uuid
-  createdBy   User   @relation("InstallmentContractCreatedBy", fields: [createdById], references: [id])
-
-  // Optimistic locking
-  version Int @default(0)
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  schedules InstallmentSchedule[]
-
-  @@index([companyId, partyType, partyId, status])
-  @@index([companyId, status])
-  @@index([companyId, contractNumber]) // lookup by number
-  @@index([companyId, createdAt(sort: Desc)])
-}
-
-// One row per instalment in the schedule.
-// Tracks how much was paid against each individual due date.
-model InstallmentSchedule {
-  id        String @id @default(uuid()) @db.Uuid
-  companyId String @db.Uuid
-
-  contractId String              @db.Uuid
-  contract   InstallmentContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-
-  installmentNumber Int // 1, 2, 3, … for ordering and display
-  dueDate           DateTime @db.Date
-  amount            Decimal  @db.Decimal(14, 2) // المبلغ المستحق لهذا القسط
-
-  // Incremented atomically on each payment. Stored for O(1) reads.
-  paidAmount Decimal @default(0.00) @db.Decimal(14, 2)
-
-  status ScheduleStatus @default(PENDING)
-  paidAt DateTime? // set when status reaches PAID
-  notes  String?        @db.VarChar(500)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  payments InstallmentPayment[]
-
-  @@index([companyId, contractId, installmentNumber])
-  @@index([companyId, dueDate, status]) // daily overdue job + upcoming schedule report
-}
-
-// Records a single payment hit against a schedule row.
-// The financial record lives in the referenced PAYMENT LedgerEntry.
-model InstallmentPayment {
-  id        String @id @default(uuid()) @db.Uuid
-  companyId String @db.Uuid
-
-  contractId String @db.Uuid
-  scheduleId String @db.Uuid
-
-  schedule InstallmentSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
-
-  // The PAYMENT LedgerEntry created in the same transaction.
-  ledgerEntryId String @unique @db.Uuid
-
-  amount        Decimal  @db.Decimal(14, 2)
-  paymentDate   DateTime @db.Date
-  paymentMethod String?  @db.VarChar(100)
-  notes         String?  @db.VarChar(500)
-
-  createdById String @db.Uuid
-  createdBy   User   @relation("InstallmentPaymentCreatedBy", fields: [createdById], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@index([companyId, contractId])
-  @@index([companyId, scheduleId])
-  @@index([companyId, paymentDate])
-}
 
 // ============================================================
 // PUSH NOTIFICATIONS
@@ -1500,10 +1075,11 @@ model Notification {
 // ============================================================
 //
 // Design decisions:
-// - Each expense belongs to a Company; supplierId is optional (links a vendor).
+// - Each expense belongs to a Company; commercial parties are authoritative
+//   BusinessPartner rows and are not embedded as legacy supplier records.
 // - category (ExpenseCategory enum) drives UI grouping and pie-chart analytics.
 // - referenceNumber is free-text (receipt / invoice number from vendor).
-// - No LedgerEntry link in MVP — expenses live in their own table for simplicity.
+// - Expenses remain operational records until the expense posting workflow is introduced.
 //   (A future migration can add a journal-entry bridge if double-entry is needed.)
 // - Soft-deleted with isDeleted + deletedAt for full auditability.
 // ============================================================
@@ -1512,10 +1088,6 @@ model Expense {
   id        String  @id @default(uuid()) @db.Uuid
   companyId String  @db.Uuid
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  // Optional: link to a supplier / vendor this expense was paid to
-  supplierId String?   @db.Uuid
-  supplier   Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
 
   category    ExpenseCategory
   amount      Decimal         @db.Decimal(14, 2)
@@ -1544,11 +1116,10 @@ model Expense {
   // Key query patterns:
   // 1. List all expenses for a company sorted by date (default view)
   // 2. Filter by category (category breakdown)
-  // 3. Filter by supplier (vendor spend)
+// 3. Filter by category and date range
   // 4. Date-range reports
   @@index([companyId, isDeleted, expenseDate(sort: Desc)]) // default list
   @@index([companyId, isDeleted, category]) // category filter
-  @@index([companyId, isDeleted, supplierId]) // supplier filter
   @@index([companyId, createdAt(sort: Desc)]) // audit sort
 }
 
@@ -1562,10 +1133,9 @@ model Expense {
 //   products with sku = null are allowed — enforcement happens at the DB level.
 // - `category` is a free-text string (not an enum) — merchants have wildly
 //   different product taxonomies; a rigid enum would hurt adoption.
-// - `isActive` provides soft-disable: hides from catalog pickers without
-//   breaking historical data in InvoiceItems (Phase K).
+// - `isActive` provides soft-disable: hides from catalog pickers.
 // - `unitPrice` stored at Decimal(14,2) — never do arithmetic in JS/TS.
-// - No InvoiceItem relation yet; Phase K will add it via migration.
+// - SalesInvoiceLine keeps its own immutable product snapshot.
 // - Soft-deleted with isDeleted + deletedAt for full auditability.
 // ============================================================
 
@@ -1599,12 +1169,7 @@ model Product {
   createdById String @db.Uuid
   createdBy   User   @relation("ProductCreatedBy", fields: [createdById], references: [id])
 
-  // Phase K: items in invoices that reference this product (snapshot FK — SetNull on delete)
-  invoiceItems InvoiceItem[]
-
   salesInvoiceLines SalesInvoiceLine[]
-
-  customerPrices CustomerProductPrice[]
 
   // SKU uniqueness: Postgres UNIQUE treats NULLs as distinct — multiple products
   // with sku = null are allowed; sku conflicts are caught at the app layer first
@@ -1619,38 +1184,6 @@ model Product {
   @@index([companyId, isDeleted, category]) // category filter
   @@index([companyId, isDeleted, name]) // name search support
   @@index([companyId, isDeleted, sku]) // SKU search support (B3)
-}
-
-// ============================================================
-// CustomerProductPrice — P2-BE-1
-// ============================================================
-// Stores a negotiated/custom price for a specific product when
-// sold to a specific customer.  Overrides unitPrice during
-// invoice creation if present.
-// ============================================================
-model CustomerProductPrice {
-  id        String  @id @default(uuid()) @db.Uuid
-  companyId String  @db.Uuid
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  customerId String   @db.Uuid
-  customer   Customer @relation("CustomerProductPrices", fields: [customerId], references: [id], onDelete: Cascade)
-
-  productId String  @db.Uuid
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  price Decimal @db.Decimal(14, 2)
-
-  updatedById String @db.Uuid
-  updatedBy   User   @relation("CustomerProductPriceUpdatedBy", fields: [updatedById], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([companyId, customerId, productId])
-  @@index([companyId, customerId]) // all prices for a customer
-  @@index([companyId, productId]) // all customers using a product
-  @@map("customer_product_prices")
 }
 
 model IdempotencyRecord {
@@ -1676,27 +1209,6 @@ model IdempotencyRecord {
   @@map("idempotency_records")
 }
 
-// ============================================================
-// PHASE K: INVOICES (الفواتير)
-// ============================================================
-
-enum InvoiceStatus {
-  DRAFT // حفظ مسودة — no financial effect
-  PENDING_APPROVAL // أُرسلت للاعتماد — no financial effect yet
-  APPROVED // معتمدة — ledger entry + balance created
-  REJECTED // مرفوضة — no financial effect
-  CANCELLED // ملغاة — ledger entry + balance reversed (if was APPROVED)
-}
-
-// Per-invoice payment tracking (B5).
-// Separate from the subscription PaymentStatus enum (line 81).
-// Only meaningful for APPROVED invoices — DRAFT/REJECTED/CANCELLED stay UNPAID by convention.
-enum InvoicePaymentStatus {
-  UNPAID // لم تُسدَّد — no payments received
-  PARTIAL // مسددة جزئيًا — paidAmount > 0 but < totalAmount
-  PAID // مسددة بالكامل — paidAmount >= totalAmount
-}
-
 enum IdempotencyStatus {
   IN_PROGRESS
   COMPLETED
@@ -1720,92 +1232,6 @@ enum IdempotencyStatus {
 // - taxAmount is stored separately so the net and gross totals are clear.
 // - Soft-delete only for full auditability.
 // ============================================================
-
-model Invoice {
-  id        String  @id @default(uuid()) @db.Uuid
-  companyId String  @db.Uuid
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  // Human-readable number: INV-2026-0001 (server-assigned, unique per company)
-  invoiceNumber String @db.VarChar(20)
-
-  // Optional: generated from a deferred sale — at most one invoice per sale
-  deferredSaleId String?       @unique @db.Uuid
-  deferredSale   DeferredSale? @relation(fields: [deferredSaleId], references: [id], onDelete: SetNull)
-
-  // Workflow status — financial effects (ledger + balance) only applied on APPROVED
-  status InvoiceStatus @default(DRAFT)
-
-  // LedgerEntry created when this invoice is APPROVED (manual invoices only).
-  // null for DRAFT/PENDING/REJECTED/CANCELLED and all DeferredSale-generated invoices.
-  ledgerEntryId String? @db.Uuid
-
-  // Snapshot of party data at invoice creation time
-  // (party details may change later — the invoice must remain accurate)
-  partyType    PartyType
-  partyId      String    @db.Uuid
-  partyName    String    @db.VarChar(200)
-  partyPhone   String?   @db.VarChar(20)
-  partyAddress String?   @db.VarChar(500)
-
-  items InvoiceItem[]
-
-  // Financial totals — server-computed from items + tax
-  // Rule: totalAmount = SUM(items[].total) + taxAmount
-  totalAmount Decimal @db.Decimal(14, 2)
-  taxAmount   Decimal @default(0.00) @db.Decimal(14, 2)
-
-  // Payment tracking (B5) — only meaningful for APPROVED invoices
-  paidAmount           Decimal              @default(0.00) @db.Decimal(14, 2)
-  invoicePaymentStatus InvoicePaymentStatus @default(UNPAID)
-
-  notes     String?   @db.VarChar(1000)
-  issueDate DateTime  @db.Date
-  dueDate   DateTime? @db.Date // B2.3 — payment due date for ageing/overdue queries
-
-  createdById String @db.Uuid
-  createdBy   User   @relation("InvoiceCreatedBy", fields: [createdById], references: [id])
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  // Key query patterns:
-  // 1. All invoices for a company sorted by issueDate desc (default view)
-  // 2. Invoices for a specific party (customer statement / supplier ledger)
-  // 3. Lookup by invoice number (search / sharing)
-  @@unique([companyId, invoiceNumber]) // DB-level dedup guard
-  @@index([companyId, isDeleted, issueDate(sort: Desc)]) // default list
-  @@index([companyId, isDeleted, status]) // status filter (workflow tabs)
-  @@index([companyId, isDeleted, partyType, partyId]) // party invoices
-  @@index([companyId, isDeleted, invoicePaymentStatus]) // unpaid invoice queries (B5)
-  @@index([companyId, isDeleted, partyType, partyId, issueDate(sort: Desc)]) // last invoices for party (B4)
-  @@index([companyId, isDeleted, partyId, status]) // B2.2 — snapshot: open invoices per party
-  @@index([companyId, isDeleted, dueDate]) // B2.3 — overdue/ageing queries
-  @@index([companyId, createdAt(sort: Desc)]) // audit sort
-}
-
-// One row per line-item in an invoice.
-// Values are frozen snapshots — independent from any catalog changes after creation.
-model InvoiceItem {
-  id        String  @id @default(uuid()) @db.Uuid
-  invoiceId String  @db.Uuid
-  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-
-  // Soft link to product catalog. SetNull on delete keeps invoice intact.
-  productId String?  @db.Uuid
-  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
-
-  // Snapshot values (frozen at creation — never updated after the fact)
-  description String  @db.VarChar(500)
-  quantity    Decimal @db.Decimal(10, 3) // supports fractional units (e.g. 1.5 kg)
-  unitPrice   Decimal @db.Decimal(14, 2)
-  total       Decimal @db.Decimal(14, 2) // quantity × unitPrice (server-verified on create)
-
-  @@index([invoiceId])
-  @@index([productId]) // B12.4 — frequent-products query
-}
 
 // ============================================================
 // B03: AUTHORITATIVE SALES DOCUMENTS
