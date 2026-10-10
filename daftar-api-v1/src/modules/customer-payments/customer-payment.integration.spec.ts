@@ -379,7 +379,7 @@ describe('B04 customer payments and AR reconciliation', () => {
       ownerId,
       paymentInput('70', maturity.journalLineId!),
     );
-    const postedPayment = await payments.postDraft(
+    await payments.postDraft(
       companyId,
       ownerId,
       payment.id,
