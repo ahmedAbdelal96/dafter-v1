@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { PaymentsPageClient } from "@/features/payments/components/PaymentsPageClient";
+import { PartyPaymentsPageClient } from "@/features/operations/components/PartyPaymentsPageClient";
 import { requirePermission } from "@/lib/auth/guards";
 
 type Props = {
@@ -20,9 +20,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PaymentsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await requirePermission(locale, "ledger:create", `/${locale}/payments`);
+  await requirePermission(locale, "viewCustomerPayments", `/${locale}/payments`);
 
-  return <PaymentsPageClient />;
+  return <PartyPaymentsPageClient mode="customer" />;
 }
 
 

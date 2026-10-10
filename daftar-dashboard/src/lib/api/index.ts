@@ -13,5 +13,9 @@ export { notificationsApi } from "./services/notifications";
 export { installmentsApi } from "./services/installments";
 export { reportsApi } from "./services/reports";
 export { entitlementsApi } from "./services/entitlements";
+export { businessPartnersApi } from "./services/business-partners";
+export { salesApi, salesCreditNotesApi, purchasesApi } from "./services/operational-documents";
+export { customerPaymentsApi, supplierPaymentsApi } from "./services/party-payments";
+export { accountingSetupApi } from "./services/accounting-setup";
 
 export * from "./hooks";

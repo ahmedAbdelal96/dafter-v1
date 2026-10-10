@@ -31,6 +31,8 @@ export function ProfileSettingsPageClient() {
   // Sync form with loaded user
   useEffect(() => {
     if (user) {
+      // The form intentionally mirrors server-loaded profile data when the query resolves.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFullName(user.fullName ?? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim());
       setPhone(user.phone ?? "");
     }

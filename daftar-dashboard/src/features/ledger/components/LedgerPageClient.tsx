@@ -68,6 +68,8 @@ export function LedgerPageClient() {
     const nextPartyType = normalizePartyType(searchParams.get("partyType"));
     const nextPartyId = searchParams.get("partyId") || undefined;
 
+    // URL search params are the source of truth for this synchronized filter state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPartyType((current) => (current === nextPartyType ? current : nextPartyType));
     setPartyId((current) => (current === nextPartyId ? current : nextPartyId));
   }, [searchParams]);

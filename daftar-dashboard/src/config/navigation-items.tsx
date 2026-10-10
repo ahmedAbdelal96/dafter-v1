@@ -30,8 +30,7 @@ const NAV_FEATURE_REQUIREMENTS: Partial<
 > = {
   main: {
     dashboard: "module.dashboard.read",
-    customers: "module.customers.read",
-    suppliers: "module.suppliers.read",
+    businessPartners: "module.customers.read",
     employees: "module.employees.read",
     products: "module.products.read",
   },
@@ -53,13 +52,19 @@ const NAV_PERMISSION_REQUIREMENTS: Partial<
 > = {
   main: {
     dashboard: "invoices:view",
-    customers: "customers:view",
-    suppliers: "suppliers:view",
+    businessPartners: "viewPartners",
     employees: "employees:view",
     products: "products:view",
   },
   accounting: {
     invoices: "invoices:view",
+    creditNotes: "viewSalesCreditNotes",
+    purchaseOrders: "viewPurchaseOrders",
+    supplierInvoices: "viewSupplierInvoices",
+    supplierCreditNotes: "viewSupplierCreditNotes",
+    supplierPayments: "viewSupplierPayments",
+    arOpenItems: "viewCustomerPayments",
+    apOpenItems: "viewSupplierPayments",
     deferredSales: "deferredSales:view",
     installments: "installments:view",
     expenses: "expenses:view",
@@ -73,15 +78,14 @@ const NAV_PERMISSION_REQUIREMENTS: Partial<
     notifications: "notifications:view",
     subscription: "users:view",
     profile: "users:view",
-    taxSetup: "tax_setup.view",
+    accountingSetup: "viewAccountingSetup",
   },
 };
 
 export const adminNavigation: NavigationConfig = {
   main: [
     { key: "dashboard", icon: <Icons.Dashboard />, path: "/dashboard" },
-    { key: "customers", icon: <Icons.Users />, path: "/customers" },
-    { key: "suppliers", icon: <Icons.Building />, path: "/suppliers" },
+    { key: "businessPartners", icon: <Icons.Users />, path: "/business-partners" },
     { key: "employees", icon: <Icons.Staff />, path: "/employees" },
     { key: "products", icon: <Icons.Services />, path: "/products" },
   ],
@@ -91,8 +95,20 @@ export const adminNavigation: NavigationConfig = {
       icon: <Icons.Money />,
       subItems: [
         { key: "invoices", path: "/invoices" },
-        { key: "deferredSales", path: "/deferred-sales" },
-        { key: "installments", path: "/installments" },
+        { key: "creditNotes", path: "/sales/credit-notes" },
+        { key: "payments", path: "/payments" },
+        { key: "arOpenItems", path: "/ar-open-items" },
+      ],
+    },
+    {
+      key: "purchases",
+      icon: <Icons.Building />,
+      subItems: [
+        { key: "purchaseOrders", path: "/purchases/orders" },
+        { key: "supplierInvoices", path: "/purchases/invoices" },
+        { key: "supplierCreditNotes", path: "/purchases/credit-notes" },
+        { key: "supplierPayments", path: "/supplier-payments" },
+        { key: "apOpenItems", path: "/ap-open-items" },
       ],
     },
     {
@@ -100,7 +116,6 @@ export const adminNavigation: NavigationConfig = {
       icon: <Icons.Reports />,
       subItems: [
         { key: "expenses", path: "/expenses" },
-        { key: "payments", path: "/payments" },
         { key: "ledger", path: "/ledger" },
         { key: "payroll", path: "/employees/payroll" },
         { key: "reports", path: "/reports" },
@@ -112,7 +127,7 @@ export const adminNavigation: NavigationConfig = {
     { key: "notifications", icon: <Icons.Bell />, path: "/notifications" },
     { key: "subscription", icon: <Icons.CreditCard />, path: "/settings/subscription" },
     { key: "profile", icon: <Icons.Settings />, path: "/settings/profile" },
-    { key: "taxSetup", icon: <Icons.Reports />, path: "/settings/tax-setup" },
+    { key: "accountingSetup", icon: <Icons.Reports />, path: "/settings/accounting" },
   ],
 };
 

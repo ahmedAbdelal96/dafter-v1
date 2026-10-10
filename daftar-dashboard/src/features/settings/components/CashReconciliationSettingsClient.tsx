@@ -72,6 +72,8 @@ export function CashReconciliationSettingsClient() {
 
   useEffect(() => {
     if (!dailyQuery.data) {
+      // The form is deliberately hydrated from the selected business date query.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         openingCash: "",
         cashSalesOutsideSystem: "",

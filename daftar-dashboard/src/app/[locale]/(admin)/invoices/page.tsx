@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { InvoicesPageClient } from "@/features/invoices/components/InvoicesPageClient";
+import { SalesInvoicesPageClient } from "@/features/operations/components/SalesInvoicesPageClient";
 import { requirePermission } from "@/lib/auth/guards";
 
 type Props = {
@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function InvoicesPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await requirePermission(locale, "invoices:view", `/${locale}/invoices`);
+  await requirePermission(locale, "viewSalesInvoices", `/${locale}/invoices`);
 
-  return <InvoicesPageClient />;
+  return <SalesInvoicesPageClient />;
 }
 

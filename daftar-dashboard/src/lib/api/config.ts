@@ -1,8 +1,8 @@
 ﻿/**
  * API configuration used by active dashboard services.
  *
- * Scope is intentionally limited to modules currently wired in the frontend
- * (auth, users, notifications, settings) to reduce legacy template surface area.
+ * Endpoint registry for typed dashboard services. Legacy endpoints remain
+ * available only where an existing feature still owns that workflow.
  */
 export const API_CONFIG = {
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:7000/api/v1",
@@ -73,6 +73,14 @@ export const API_ENDPOINTS = {
     delete: (id: string) => `/customers/${id}`,
   },
 
+  businessPartners: {
+    create: "/business-partners",
+    list: "/business-partners",
+    get: (id: string) => `/business-partners/${id}`,
+    update: (id: string) => `/business-partners/${id}`,
+    setActive: (id: string) => `/business-partners/${id}/active`,
+  },
+
   suppliers: {
     create: "/suppliers",
     list: "/suppliers",
@@ -109,6 +117,88 @@ export const API_ENDPOINTS = {
     cancel: (id: string) => `/invoices/${id}/cancel`,
     recordPayment: (id: string) => `/invoices/${id}/payments`,
     delete: (id: string) => `/invoices/${id}`,
+  },
+
+  sales: {
+    invoices: {
+      create: "/sales/invoices",
+      list: "/sales/invoices",
+      get: (id: string) => `/sales/invoices/${id}`,
+      update: (id: string) => `/sales/invoices/${id}`,
+      post: (id: string) => `/sales/invoices/${id}/post`,
+      delete: (id: string) => `/sales/invoices/${id}`,
+    },
+    creditNotes: {
+      create: "/sales/credit-notes",
+      list: "/sales/credit-notes",
+      get: (id: string) => `/sales/credit-notes/${id}`,
+      update: (id: string) => `/sales/credit-notes/${id}`,
+      post: (id: string) => `/sales/credit-notes/${id}/post`,
+    },
+  },
+
+  purchases: {
+    purchaseOrders: {
+      create: "/purchases/purchase-orders",
+      list: "/purchases/purchase-orders",
+      get: (id: string) => `/purchases/purchase-orders/${id}`,
+      approve: (id: string) => `/purchases/purchase-orders/${id}/approve`,
+      convert: (id: string) => `/purchases/purchase-orders/${id}/convert-to-invoice`,
+    },
+    supplierInvoices: {
+      create: "/purchases/supplier-invoices",
+      list: "/purchases/supplier-invoices",
+      get: (id: string) => `/purchases/supplier-invoices/${id}`,
+      post: (id: string) => `/purchases/supplier-invoices/${id}/post`,
+    },
+    supplierCreditNotes: {
+      create: "/purchases/supplier-credit-notes",
+      list: "/purchases/supplier-credit-notes",
+      get: (id: string) => `/purchases/supplier-credit-notes/${id}`,
+      post: (id: string) => `/purchases/supplier-credit-notes/${id}/post`,
+    },
+  },
+
+  customerPayments: {
+    create: "/customer-payments",
+    list: "/customer-payments",
+    get: (id: string) => `/customer-payments/${id}`,
+    update: (id: string) => `/customer-payments/${id}`,
+    post: (id: string) => `/customer-payments/${id}/post`,
+    reverse: (id: string) => `/customer-payments/${id}/reverse`,
+    openItems: "/customer-payments/open-items",
+    reconcile: (id: string) => `/customer-payments/${id}/reconcile`,
+    reconciliations: "/customer-payments/ar-reconciliations",
+  },
+
+  supplierPayments: {
+    create: "/supplier-payments",
+    list: "/supplier-payments",
+    get: (id: string) => `/supplier-payments/${id}`,
+    update: (id: string) => `/supplier-payments/${id}`,
+    post: (id: string) => `/supplier-payments/${id}/post`,
+    reverse: (id: string) => `/supplier-payments/${id}/reverse`,
+    openItems: "/supplier-payments/open-items",
+    reconcile: (id: string) => `/supplier-payments/${id}/reconcile`,
+    reconciliations: "/supplier-payments/ap-reconciliations",
+  },
+
+  accounting: {
+    accounts: "/accounting/accounts",
+    configuration: "/accounting/configuration",
+    journals: "/accounting/journals",
+    periods: "/accounting/periods",
+  },
+
+  accountingBootstrap: {
+    readiness: "/accounting-bootstrap/readiness",
+    initialize: "/accounting-bootstrap/initialize",
+  },
+
+  paymentTerms: {
+    list: "/payment-terms",
+    get: (id: string) => `/payment-terms/${id}`,
+    calculate: (id: string) => `/payment-terms/${id}/calculate`,
   },
 
   payments: {

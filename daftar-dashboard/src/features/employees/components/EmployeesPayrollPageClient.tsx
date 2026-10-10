@@ -307,6 +307,8 @@ export function EmployeesPayrollPageClient() {
     }
   };
 
+  // Intl.DateTimeFormat is stable for the selected locale; keep this memo explicit for render cost.
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const dateFormatter = useMemo(
     () =>
       new Intl.DateTimeFormat(locale === "ar" ? "ar-EG" : "en-US", {

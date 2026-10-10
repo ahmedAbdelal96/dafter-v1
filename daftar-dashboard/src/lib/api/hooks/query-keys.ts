@@ -48,6 +48,41 @@ export const customersKeys = {
   snapshot: (id: string) => [...customersKeys.snapshots(), id] as const,
 };
 
+export const businessPartnersKeys = {
+  all: ["business-partners"] as const,
+  list: (filters?: unknown) => [...businessPartnersKeys.all, "list", filters] as const,
+  detail: (id: string) => [...businessPartnersKeys.all, "detail", id] as const,
+};
+
+export const salesOperationsKeys = {
+  all: ["sales-operations"] as const,
+  invoices: (filters?: unknown) => [...salesOperationsKeys.all, "invoices", filters] as const,
+  invoice: (id: string) => [...salesOperationsKeys.all, "invoice", id] as const,
+  creditNotes: (filters?: unknown) => [...salesOperationsKeys.all, "credit-notes", filters] as const,
+};
+
+export const purchaseOperationsKeys = {
+  all: ["purchase-operations"] as const,
+  orders: (filters?: unknown) => [...purchaseOperationsKeys.all, "orders", filters] as const,
+  invoices: (filters?: unknown) => [...purchaseOperationsKeys.all, "invoices", filters] as const,
+  creditNotes: (filters?: unknown) => [...purchaseOperationsKeys.all, "credit-notes", filters] as const,
+  creditNote: (id: string) => [...purchaseOperationsKeys.all, "credit-note", id] as const,
+};
+
+export const partyPaymentsKeys = {
+  all: ["party-payments"] as const,
+  customer: (filters?: unknown) => [...partyPaymentsKeys.all, "customer", filters] as const,
+  supplier: (filters?: unknown) => [...partyPaymentsKeys.all, "supplier", filters] as const,
+  customerOpenItems: (partnerId?: string) => [...partyPaymentsKeys.all, "customer-open-items", partnerId] as const,
+  supplierOpenItems: (partnerId?: string) => [...partyPaymentsKeys.all, "supplier-open-items", partnerId] as const,
+};
+
+export const accountingSetupKeys = {
+  all: ["accounting-setup"] as const,
+  accounts: () => [...accountingSetupKeys.all, "accounts"] as const,
+  readiness: (postingDate?: string) => [...accountingSetupKeys.all, "readiness", postingDate] as const,
+};
+
 export const suppliersKeys = {
   all: ["suppliers"] as const,
   lists: () => [...suppliersKeys.all, "list"] as const,
@@ -238,12 +273,17 @@ export const queryKeys = {
   cashReconciliation: cashReconciliationKeys,
   pricing: pricingKeys,
   customers: customersKeys,
+  businessPartners: businessPartnersKeys,
   suppliers: suppliersKeys,
   employees: employeesKeys,
   products: productsKeys,
   expenses: expensesKeys,
   ledger: ledgerKeys,
   invoices: invoicesKeys,
+  salesOperations: salesOperationsKeys,
+  purchaseOperations: purchaseOperationsKeys,
+  partyPayments: partyPaymentsKeys,
+  accountingSetup: accountingSetupKeys,
   deferredSales: deferredSalesKeys,
   installments: installmentsKeys,
   users: usersKeys,

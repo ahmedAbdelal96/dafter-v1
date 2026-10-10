@@ -2,8 +2,7 @@
   "main": {
     "menu": "القائمة",
     "dashboard": "لوحة التحكم",
-    "customers": "العملاء",
-    "suppliers": "الموردون",
+    "businessPartners": "دليل الأطراف",
     "employees": "الموظفون",
     "products": "المنتجات",
     "tenants": "الشركات",
@@ -16,6 +15,14 @@
     "title": "المحاسبة",
     "sales": "المبيعات",
     "invoices": "الفواتير",
+    "creditNotes": "إشعارات دائنة للمبيعات",
+    "purchases": "المشتريات",
+    "purchaseOrders": "أوامر الشراء",
+    "supplierInvoices": "فواتير الموردين",
+    "supplierCreditNotes": "إشعارات دائنة للموردين",
+    "supplierPayments": "دفعات الموردين",
+    "arOpenItems": "بنود العملاء المفتوحة",
+    "apOpenItems": "بنود الموردين المفتوحة",
     "deferredSales": "البيع الآجل",
     "installments": "التقسيط",
     "finance": "المالية",
@@ -33,7 +40,8 @@
     "profile": "ملفي الشخصي",
     "settings": "الإعدادات",
     "platformSettings": "إعدادات المنصة",
-    "taxSetup": "????? ???????"
+    "taxSetup": "إعداد الضرائب",
+    "accountingSetup": "جاهزية المحاسبة"
   },
   "accessNote": {
     "role": {

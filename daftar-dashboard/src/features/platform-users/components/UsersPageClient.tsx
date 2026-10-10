@@ -102,6 +102,8 @@ export function UsersPageClient() {
   useEffect(() => {
     if (selectedCompanyId) return;
     if (companyOptions.length === 0) return;
+    // Select the first available company only after the lookup query resolves.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedCompanyId(companyOptions[0].value);
   }, [companyOptions, selectedCompanyId]);
 

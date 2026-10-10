@@ -47,6 +47,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     entitlements,
     profile,
     platformAnalytics,
+    operations,
   ] = await Promise.all([
     loadNamespace("common"),
     loadNamespace("dashboard"),
@@ -74,6 +75,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     loadNamespace("entitlements"),
     loadNamespace("profile"),
     loadNamespace("platform-analytics"),
+    loadNamespace("operations"),
   ]);
 
   return {
@@ -105,6 +107,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       entitlements,
       profile,
       platformAnalytics,
+      operations,
     },
     onError(error) {
       if (error.code === IntlErrorCode.MISSING_MESSAGE) {

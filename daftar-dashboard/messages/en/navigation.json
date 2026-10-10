@@ -2,8 +2,7 @@
   "main": {
     "menu": "Menu",
     "dashboard": "Dashboard",
-    "customers": "Customers",
-    "suppliers": "Suppliers",
+    "businessPartners": "Business partners",
     "employees": "Employees",
     "products": "Products",
     "tenants": "Organizations",
@@ -16,6 +15,14 @@
     "title": "Accounting",
     "sales": "Sales",
     "invoices": "Invoices",
+    "creditNotes": "Sales credit notes",
+    "purchases": "Purchases",
+    "purchaseOrders": "Purchase orders",
+    "supplierInvoices": "Supplier invoices",
+    "supplierCreditNotes": "Supplier credit notes",
+    "supplierPayments": "Supplier payments",
+    "arOpenItems": "AR open items",
+    "apOpenItems": "AP open items",
     "deferredSales": "Deferred Sales",
     "installments": "Installments",
     "finance": "Finance",
@@ -33,7 +40,8 @@
     "profile": "My Profile",
     "settings": "Settings",
     "platformSettings": "Platform Settings",
-    "taxSetup": "Tax Setup"
+    "taxSetup": "Tax Setup",
+    "accountingSetup": "Accounting readiness"
   },
   "accessNote": {
     "role": {

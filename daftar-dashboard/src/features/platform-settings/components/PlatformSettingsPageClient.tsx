@@ -79,6 +79,8 @@ export function PlatformSettingsPageClient() {
     const settings = settingsQuery.data;
     if (!settings) return;
 
+    // These controls are drafts initialized from the authoritative settings query.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTrialDurationDays(settings.trialDefaults.durationDays);
     setAutoActivateOnSignup(settings.trialDefaults.autoActivateOnSignup);
     setRequireCompanyPhone(settings.trialDefaults.requireCompanyPhone);
@@ -110,6 +112,8 @@ export function PlatformSettingsPageClient() {
       };
     }
 
+    // Feature flag edits are local drafts initialized from the authoritative query.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFeatureDrafts(nextDrafts);
   }, [featureFlagsQuery.data]);
 

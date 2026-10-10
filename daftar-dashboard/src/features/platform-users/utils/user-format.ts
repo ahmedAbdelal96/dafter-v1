@@ -1,7 +1,7 @@
 import type { CompanyUser, StaffPermissionsMap } from "@/lib/api/types/platform";
 import { DEFAULT_STAFF_PERMISSIONS } from "./user-schemas";
 
-export function extractUserPermissions(user: CompanyUser): Required<StaffPermissionsMap> {
+export function extractUserPermissions(user: CompanyUser): StaffPermissionsMap {
   const raw = user.permissions?.permissions;
   return {
     manageUsers: Boolean(raw?.manageUsers),
@@ -13,7 +13,7 @@ export function extractUserPermissions(user: CompanyUser): Required<StaffPermiss
   };
 }
 
-export function getDefaultPermissionsForRole(user: CompanyUser): Required<StaffPermissionsMap> {
+export function getDefaultPermissionsForRole(user: CompanyUser): StaffPermissionsMap {
   if (user.role !== "STAFF") return DEFAULT_STAFF_PERMISSIONS;
   return extractUserPermissions(user);
 }

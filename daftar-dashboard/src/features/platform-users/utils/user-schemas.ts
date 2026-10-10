@@ -12,7 +12,7 @@ export const DEFAULT_USERS_META: UsersListMeta = {
   hasPrev: false,
 };
 
-export const DEFAULT_STAFF_PERMISSIONS: Required<StaffPermissionsMap> = {
+export const DEFAULT_STAFF_PERMISSIONS: StaffPermissionsMap = {
   manageUsers: false,
   viewParties: false,
   manageParties: false,

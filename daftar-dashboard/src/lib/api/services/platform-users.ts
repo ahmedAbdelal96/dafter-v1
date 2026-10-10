@@ -11,7 +11,6 @@ import type {
   ResetUserCredentialsResponse,
   StaffPermissionsMap,
   UpdateCompanyUserRequest,
-  UpdateStaffPermissionsRequest,
   UsersFilters,
   UsersListMeta,
   UsersListResponse,
@@ -34,9 +33,9 @@ export interface PlatformUpdateUserRequest extends UpdateCompanyUserRequest {
   companyId: string;
 }
 
-export interface PlatformUpdateUserPermissionsRequest
-  extends UpdateStaffPermissionsRequest {
+export interface PlatformUpdateUserPermissionsRequest {
   companyId: string;
+  [permission: string]: string | boolean | undefined;
 }
 
 export interface PlatformResetUserCredentialsRequest {

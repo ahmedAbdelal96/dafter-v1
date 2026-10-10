@@ -140,6 +140,8 @@ export function AuthProvider({
 
   useEffect(() => {
     if (initialUser) {
+      // Server-provided identity means the initial loading state is already resolved.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsLoading(false);
       return;
     }

@@ -42,12 +42,13 @@ export default function SignInForm() {
     },
   });
 
+  const devAccountsEnabled = process.env.NODE_ENV === "development";
   const demoAccounts = [
     {
       label: "Super Admin",
       shortLabel: "Super Admin",
       email: "superadmin@daftar.com",
-      password: "superadmin123",
+      password: process.env.NEXT_PUBLIC_DEV_SUPERADMIN_PASSWORD ?? "",
       cardClass: "bg-slate-50 dark:bg-slate-900/30",
       titleClass: "text-slate-700 dark:text-slate-200",
     },
@@ -55,7 +56,7 @@ export default function SignInForm() {
       label: "Owner - Company 1",
       shortLabel: "Owner 1",
       email: "owner@daftar.com",
-      password: "owner123",
+      password: process.env.NEXT_PUBLIC_DEV_OWNER_PASSWORD ?? "",
       cardClass: "bg-blue-light-50 dark:bg-blue-light-900/20",
       titleClass: "text-blue-light-700 dark:text-blue-light-300",
     },
@@ -63,7 +64,7 @@ export default function SignInForm() {
       label: "Owner - Company 2",
       shortLabel: "Owner 2",
       email: "owner2@daftar.com",
-      password: "owner123",
+      password: process.env.NEXT_PUBLIC_DEV_OWNER2_PASSWORD ?? "",
       cardClass: "bg-blue-light-25 dark:bg-primary/12",
       titleClass: "text-primary dark:text-primary",
     },
@@ -71,11 +72,14 @@ export default function SignInForm() {
       label: "Staff - Company 1",
       shortLabel: "Staff 1",
       email: "staff1@daftar.com",
-      password: "owner123",
+      password: process.env.NEXT_PUBLIC_DEV_STAFF_PASSWORD ?? "",
       cardClass: "bg-success-50 dark:bg-success-900/20",
       titleClass: "text-success-700 dark:text-success-300",
     },
   ] as const;
+  const availableDemoAccounts = devAccountsEnabled
+    ? demoAccounts.filter((account) => account.password.length > 0)
+    : [];
 
   const onSubmit = async (data: LoginFormData) => {
     setError(null);
@@ -190,7 +194,7 @@ export default function SignInForm() {
                 </div>
               )}
 
-              {process.env.NODE_ENV === "development" && (
+              {availableDemoAccounts.length > 0 && (
                 <div className="rounded-xl border border-border-light bg-surface-tertiary/70 p-3 dark:border-border-strong dark:bg-surface-tertiary/40">
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-text-muted dark:text-slate-400">
@@ -201,7 +205,7 @@ export default function SignInForm() {
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    {demoAccounts.map((account) => (
+                    {availableDemoAccounts.map((account) => (
                       <button
                         key={account.email}
                         type="button"

@@ -6,7 +6,7 @@ const root = process.cwd();
 const messagesRoot = path.join(root, "messages");
 const baseLocale = "en";
 const targetLocales = ["ar"];
-const namespaces = ["common", "dashboard", "navigation", "auth", "settings", "customers"];
+const namespaces = ["common", "dashboard", "navigation", "auth", "settings", "customers", "operations"];
 
 const mojibakeRegex = /(Ã.|Ø.|Ù.|â.|ï¿½|�)/;
 const brokenQuestionRegex = /\?{2,}/;

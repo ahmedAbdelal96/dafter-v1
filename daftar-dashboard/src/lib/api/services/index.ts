@@ -20,3 +20,7 @@ export { platformUsersApi } from "./platform-users";
 export { entitlementsApi } from "./entitlements";
 export { cashReconciliationApi } from "./cash-reconciliation";
 export { taxSetupApi } from "./tax-setup";
+export { businessPartnersApi } from "./business-partners";
+export { salesApi, salesCreditNotesApi, purchasesApi } from "./operational-documents";
+export { customerPaymentsApi, supplierPaymentsApi } from "./party-payments";
+export { accountingSetupApi } from "./accounting-setup";

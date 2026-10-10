@@ -37,6 +37,8 @@ export function CompanySettingsClient() {
   // Sync form when company data loads
   useEffect(() => {
     if (company) {
+      // The editable form is initialized from the authoritative company query.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         name: company.name ?? "",
         phone: company.phone ?? "",
@@ -48,6 +50,8 @@ export function CompanySettingsClient() {
 
   useEffect(() => {
     if (cashModeData?.cashReconciliationMode) {
+      // The select mirrors the authoritative company setting after it loads.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCashMode(cashModeData.cashReconciliationMode);
     }
   }, [cashModeData]);
