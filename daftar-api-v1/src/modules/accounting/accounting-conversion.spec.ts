@@ -31,17 +31,17 @@ describe('base-currency conversion and residual allocation', () => {
 
     expect(result.transactionDebitTotal.toString()).toBe('100');
     expect(result.transactionCreditTotal.toString()).toBe('100');
-    expect(result.lines.map((line) => line.transactionDebit.toString())).toEqual([
-      '34',
-      '33',
-      '33',
-      '0',
-    ]);
+    expect(
+      result.lines.map((line) => line.transactionDebit.toString()),
+    ).toEqual(['34', '33', '33', '0']);
     expect(result.debitTotal.toFixed(4)).toBe(result.creditTotal.toFixed(4));
     expect(
       result.lines
         .filter((line) => line.accountId === 'ar')
-        .reduce((total, line) => total.add(line.debit).sub(line.credit), new Prisma.Decimal(0))
+        .reduce(
+          (total, line) => total.add(line.debit).sub(line.credit),
+          new Prisma.Decimal(0),
+        )
         .toFixed(4),
     ).toBe(result.debitTotal.toFixed(4));
   });
@@ -49,15 +49,31 @@ describe('base-currency conversion and residual allocation', () => {
   it('keeps an exact limit equal to the final authoritative exposure and rejects 0.0001 overage at the caller boundary', () => {
     const exact = convertAndAllocateBaseCurrency(
       [
-        { accountId: 'ar', transactionDebit: new Prisma.Decimal('100'), transactionCredit: new Prisma.Decimal('0') },
-        { accountId: 'revenue', transactionDebit: new Prisma.Decimal('0'), transactionCredit: new Prisma.Decimal('100') },
+        {
+          accountId: 'ar',
+          transactionDebit: new Prisma.Decimal('100'),
+          transactionCredit: new Prisma.Decimal('0'),
+        },
+        {
+          accountId: 'revenue',
+          transactionDebit: new Prisma.Decimal('0'),
+          transactionCredit: new Prisma.Decimal('100'),
+        },
       ],
       new Prisma.Decimal('30'),
     );
     const over = convertAndAllocateBaseCurrency(
       [
-        { accountId: 'ar', transactionDebit: new Prisma.Decimal('100'), transactionCredit: new Prisma.Decimal('0') },
-        { accountId: 'revenue', transactionDebit: new Prisma.Decimal('0'), transactionCredit: new Prisma.Decimal('100') },
+        {
+          accountId: 'ar',
+          transactionDebit: new Prisma.Decimal('100'),
+          transactionCredit: new Prisma.Decimal('0'),
+        },
+        {
+          accountId: 'revenue',
+          transactionDebit: new Prisma.Decimal('0'),
+          transactionCredit: new Prisma.Decimal('100'),
+        },
       ],
       new Prisma.Decimal('30.000001'),
     );

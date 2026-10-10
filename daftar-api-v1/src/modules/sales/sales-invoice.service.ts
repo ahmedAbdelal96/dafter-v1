@@ -1049,7 +1049,7 @@ export class SalesInvoiceService {
   ) {
     const limit = invoice.businessPartner.customerProfile?.creditLimit;
     if (limit === null || limit === undefined) return;
-    const creditLimit: Prisma.Decimal.Value = String(limit);
+    const creditLimit: string = String(limit);
     const rows = await db.$queryRaw<{ exposure: Prisma.Decimal }[]>(Prisma.sql`
       SELECT COALESCE(SUM(jl."debit" - jl."credit"), 0) AS exposure
       FROM "JournalLine" jl
@@ -1080,7 +1080,7 @@ export class SalesInvoiceService {
           transactionCredit: line.taxAmount,
         })),
     ];
-    let converted;
+    let converted: ReturnType<typeof convertAndAllocateBaseCurrency>;
     try {
       converted = convertAndAllocateBaseCurrency(
         projection,
