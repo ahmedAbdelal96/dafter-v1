@@ -390,6 +390,31 @@ export class SalesInvoiceService {
         },
       );
 
+      // Keep each contractual maturity tied to the exact authoritative AR
+      // JournalLine. Customer-payment reconciliation must never infer an open
+      // item from invoice id alone (an invoice may have multiple maturities).
+      const arJournalLines = await db.journalLine.findMany({
+        where: {
+          companyId,
+          journalEntryId: journalEntry.id,
+          accountId: accounts.receivable.id,
+          businessPartnerId: invoice.businessPartnerId,
+        },
+        orderBy: { createdAt: 'asc' },
+        select: { id: true },
+      });
+      if (arJournalLines.length !== invoice.paymentSchedule.length) {
+        throw new ConflictException(
+          'Posted sales invoice maturities do not match AR journal lines',
+        );
+      }
+      for (const [index, schedule] of invoice.paymentSchedule.entries()) {
+        await db.salesInvoicePaymentSchedule.update({
+          where: { id: schedule.id },
+          data: { journalLineId: arJournalLines[index].id },
+        });
+      }
+
       for (const line of invoice.lines) {
         await db.salesInvoiceLine.update({
           where: { id: line.id },

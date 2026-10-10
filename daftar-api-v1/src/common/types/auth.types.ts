@@ -33,6 +33,10 @@ export interface StaffPermissionsMap {
   createSalesCreditNote?: boolean;
   editSalesCreditNote?: boolean;
   postSalesCreditNote?: boolean;
+  viewCustomerPayments?: boolean;
+  createCustomerPayment?: boolean;
+  editCustomerPayment?: boolean;
+  postCustomerPayment?: boolean;
   overrideSalesTax?: boolean;
   overrideCustomerCreditLimit?: boolean;
   viewAccountingSetup?: boolean;
