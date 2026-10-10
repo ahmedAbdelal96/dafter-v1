@@ -93,6 +93,17 @@ type PurchaseTaxSelection = {
   taxInputAccountId?: string;
 };
 
+type TaxTreatmentLifecycle = {
+  id: string;
+  status: TaxLifecycleStatus;
+  effectiveFrom: Date | null;
+  effectiveTo: Date | null;
+};
+
+type TaxRateLifecycle = TaxTreatmentLifecycle & {
+  treatmentId: string | null;
+};
+
 export function lineCreateData(line: CalculatedPurchaseLine, index: number) {
   const { tax, ...data } = line;
   return {
@@ -168,8 +179,8 @@ function inEffectiveWindow(
 }
 
 function assertTaxLifecycle(
-  treatment: any,
-  rate: any,
+  treatment: TaxTreatmentLifecycle | null | undefined,
+  rate: TaxRateLifecycle | null | undefined,
   asOf: Date,
   explicit = false,
 ) {
@@ -491,6 +502,7 @@ export async function calculateLines(
 ) {
   if (!inputs.length)
     throw new BadRequestException('At least one purchase line is required');
+  void minorUnitPrecision;
   const lines: CalculatedPurchaseLine[] = [];
   for (const input of inputs) {
     const quantity = decimal(input.quantity, 'Quantity');

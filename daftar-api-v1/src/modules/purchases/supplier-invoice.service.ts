@@ -9,6 +9,7 @@ import {
   Prisma,
   SupplierInvoiceStatus,
 } from '@prisma/client';
+import { createHash } from 'crypto';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { AccountingService } from '../accounting/accounting.service';
 import { AccountingReadinessService } from '../accounting-bootstrap/accounting-readiness.service';
@@ -272,7 +273,7 @@ export class SupplierInvoiceService {
         const payableJournalLines = await db.journalLine.findMany({
           where: {
             companyId,
-            journalEntryId: (entry as any).id,
+            journalEntryId: entry.id,
             accountId: payable.id,
             businessPartnerId: existing.businessPartnerId,
           },
@@ -303,7 +304,7 @@ export class SupplierInvoiceService {
             postingDate: date,
             postedById: actorUserId,
             postedAt: new Date(),
-            journalEntryId: (entry as any).id,
+            journalEntryId: entry.id,
             payableAccountId: payable.id,
             idempotencyKey,
             requestHash: this.requestHash(id, idempotencyKey, date),
@@ -331,7 +332,7 @@ export class SupplierInvoiceService {
           actorUserId,
           'supplier-invoice.posted',
           id,
-          { journalEntryId: (entry as any).id, idempotencyKey },
+          { journalEntryId: entry.id, idempotencyKey },
         );
         return updated;
       });
@@ -522,8 +523,7 @@ export class SupplierInvoiceService {
   }
 
   private requestHash(id: string, key: string, postingDate: Date) {
-    return require('crypto')
-      .createHash('sha256')
+    return createHash('sha256')
       .update(`${id}:${key}:${postingDate.toISOString().slice(0, 10)}`)
       .digest('hex');
   }

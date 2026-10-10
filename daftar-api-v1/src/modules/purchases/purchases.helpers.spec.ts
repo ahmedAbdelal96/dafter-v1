@@ -75,7 +75,7 @@ describe('purchase helpers', () => {
   });
 
   it('calculates purchase net, discount and gross totals with Decimal arithmetic', async () => {
-    const result = await calculateLines(db, 'company-1', [
+    const result = await calculateLines(db as never, 'company-1', [
       {
         description: 'Paper',
         quantity: '2',
@@ -99,7 +99,7 @@ describe('purchase helpers', () => {
       defaultRate: activeRate(),
       defaultTreatment: activeTreatment(),
     });
-    const result = await calculateLines(db, 'company-1', [
+    const result = await calculateLines(db as never, 'company-1', [
       {
         description: 'Service',
         quantity: '1',
@@ -131,7 +131,7 @@ describe('purchase helpers', () => {
     };
     await expect(
       calculateLines(
-        db,
+        db as never,
         'company-1',
         [
           {
@@ -169,7 +169,7 @@ describe('purchase helpers', () => {
       activeTreatment(TaxCalculationMode.TAX_EXCLUSIVE),
     );
     const result = await calculateLines(
-      db,
+      db as never,
       'company-1',
       [
         {
