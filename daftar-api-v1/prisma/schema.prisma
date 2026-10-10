@@ -206,6 +206,7 @@ enum JournalSourceType {
   SALES_CREDIT_NOTE
   CUSTOMER_PAYMENT
   PURCHASE_INVOICE
+  SUPPLIER_CREDIT_NOTE
   SUPPLIER_PAYMENT
   EXPENSE
   CASH_TRANSFER
@@ -252,6 +253,27 @@ enum SalesDiscountType {
   NONE
   PERCENT
   FIXED
+}
+
+enum PurchaseOrderStatus {
+  DRAFT
+  APPROVED
+  CANCELLED
+}
+
+enum SupplierInvoiceStatus {
+  DRAFT
+  POSTED
+}
+
+enum SupplierCreditNoteStatus {
+  DRAFT
+  POSTED
+}
+
+enum PurchaseAccountType {
+  EXPENSE
+  ASSET
 }
 
 enum AccountingConfigAccountKey {
@@ -364,6 +386,14 @@ model User {
   reversedCustomerPayments  CustomerPayment[]  @relation("CustomerPaymentReversedBy")
   createdARReconciliations  ARReconciliation[] @relation("ARReconciliationCreatedBy")
   reversedARReconciliations ARReconciliation[] @relation("ARReconciliationReversedBy")
+
+  // B05: authoritative purchases/AP documents
+  createdPurchaseOrders      PurchaseOrder[]      @relation("PurchaseOrderCreatedBy")
+  approvedPurchaseOrders     PurchaseOrder[]      @relation("PurchaseOrderApprovedBy")
+  createdSupplierInvoices    SupplierInvoice[]    @relation("SupplierInvoiceCreatedBy")
+  postedSupplierInvoices     SupplierInvoice[]    @relation("SupplierInvoicePostedBy")
+  createdSupplierCreditNotes SupplierCreditNote[] @relation("SupplierCreditNoteCreatedBy")
+  postedSupplierCreditNotes  SupplierCreditNote[] @relation("SupplierCreditNotePostedBy")
 
   // Optimistic locking
   version Int @default(0)
@@ -484,6 +514,13 @@ model Company {
   customerPaymentSequences   CustomerPaymentSequence[]
   customerPaymentAllocations CustomerPaymentAllocation[]
   arReconciliations          ARReconciliation[]
+
+  // B05
+  purchaseOrders            PurchaseOrder[]
+  supplierInvoices          SupplierInvoice[]
+  supplierCreditNotes       SupplierCreditNote[]
+  purchaseOrderSequence     PurchaseOrderSequence?
+  supplierDocumentSequences SupplierDocumentSequence[]
 
   // Tax setup foundation
   taxRegistrationProfile TaxRegistrationProfile?
@@ -816,15 +853,18 @@ model BusinessPartner {
   createdAt                    DateTime            @default(now())
   updatedAt                    DateTime            @updatedAt
 
-  customerProfile  CustomerProfile?
-  supplierProfile  SupplierProfile?
-  addresses        BusinessPartnerAddress[]
-  contacts         BusinessPartnerContact[]
-  journalLines     JournalLine[]
-  openingLines     OpeningBalanceLine[]
-  salesInvoices    SalesInvoice[]
-  salesCreditNotes SalesCreditNote[]
-  customerPayments CustomerPayment[]
+  customerProfile     CustomerProfile?
+  supplierProfile     SupplierProfile?
+  addresses           BusinessPartnerAddress[]
+  contacts            BusinessPartnerContact[]
+  journalLines        JournalLine[]
+  openingLines        OpeningBalanceLine[]
+  salesInvoices       SalesInvoice[]
+  purchaseOrders      PurchaseOrder[]
+  supplierInvoices    SupplierInvoice[]
+  salesCreditNotes    SalesCreditNote[]
+  supplierCreditNotes SupplierCreditNote[]
+  customerPayments    CustomerPayment[]
 
   @@unique([id, companyId])
   @@unique([companyId, partnerCode])
@@ -932,6 +972,8 @@ model PaymentTerm {
   customerProfiles CustomerProfile[]
   supplierProfiles SupplierProfile[]
   salesInvoices    SalesInvoice[]
+  purchaseOrders   PurchaseOrder[]
+  supplierInvoices SupplierInvoice[]
 
   @@unique([id, companyId])
   @@unique([companyId, code])
@@ -1196,7 +1238,9 @@ model Product {
   createdById String @db.Uuid
   createdBy   User   @relation("ProductCreatedBy", fields: [createdById], references: [id])
 
-  salesInvoiceLines SalesInvoiceLine[]
+  salesInvoiceLines    SalesInvoiceLine[]
+  purchaseOrderLines   PurchaseOrderLine[]
+  supplierInvoiceLines SupplierInvoiceLine[]
 
   // SKU uniqueness: Postgres UNIQUE treats NULLs as distinct — multiple products
   // with sku = null are allowed; sku conflicts are caught at the app layer first
@@ -1507,6 +1551,356 @@ model SalesCreditNoteLineTax {
 }
 
 // ============================================================
+// B05: AUTHORITATIVE PURCHASES, AP AND SUPPLIER CREDIT NOTES
+// ============================================================
+
+enum SupplierDocumentSequenceType {
+  SUPPLIER_INVOICE
+  SUPPLIER_CREDIT_NOTE
+}
+
+model PurchaseOrderSequence {
+  companyId String   @id @db.Uuid
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  nextValue Int      @default(1)
+  updatedAt DateTime @updatedAt
+}
+
+model SupplierDocumentSequence {
+  companyId    String                       @db.Uuid
+  company      Company                      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  fiscalYearId String                       @db.Uuid
+  fiscalYear   FiscalYear                   @relation(fields: [fiscalYearId, companyId], references: [id, companyId], onDelete: Restrict)
+  documentType SupplierDocumentSequenceType
+  nextValue    Int                          @default(1)
+  updatedAt    DateTime                     @updatedAt
+
+  @@id([companyId, fiscalYearId, documentType])
+  @@index([companyId, documentType])
+}
+
+model PurchaseOrder {
+  id                            String              @id @default(uuid()) @db.Uuid
+  companyId                     String              @db.Uuid
+  company                       Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  businessPartnerId             String              @db.Uuid
+  businessPartner               BusinessPartner     @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
+  status                        PurchaseOrderStatus @default(DRAFT)
+  orderNumber                   String?             @db.VarChar(40)
+  documentDate                  DateTime            @db.Date
+  requestedDeliveryDate         DateTime?           @db.Date
+  transactionCurrencyCode       String              @db.Char(3)
+  transactionCurrency           Currency            @relation("PurchaseOrderTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
+  exchangeRate                  Decimal             @db.Decimal(19, 8)
+  paymentTermId                 String?             @db.Uuid
+  paymentTerm                   PaymentTerm?        @relation(fields: [paymentTermId, companyId], references: [id, companyId], onDelete: Restrict)
+  supplierReference             String?             @db.VarChar(120)
+  notes                         String?             @db.VarChar(2000)
+  subtotal                      Decimal             @db.Decimal(19, 4)
+  discountTotal                 Decimal             @db.Decimal(19, 4)
+  taxableBaseTotal              Decimal             @db.Decimal(19, 4)
+  taxTotal                      Decimal             @db.Decimal(19, 4)
+  grandTotal                    Decimal             @db.Decimal(19, 4)
+  partnerCodeSnapshot           String              @db.VarChar(40)
+  partnerNameSnapshot           String              @db.VarChar(200)
+  partnerLegalNameSnapshot      String?
+  taxRegistrationNumberSnapshot String?
+  billingAddressSnapshot        Json?
+  createdById                   String              @db.Uuid
+  createdBy                     User                @relation("PurchaseOrderCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  approvedById                  String?             @db.Uuid
+  approvedBy                    User?               @relation("PurchaseOrderApprovedBy", fields: [approvedById], references: [id], onDelete: Restrict)
+  approvedAt                    DateTime?
+  lines                         PurchaseOrderLine[]
+  supplierInvoices              SupplierInvoice[]
+  createdAt                     DateTime            @default(now())
+  updatedAt                     DateTime            @updatedAt
+
+  @@unique([id, companyId])
+  @@unique([companyId, orderNumber])
+  @@index([companyId, status, documentDate])
+  @@index([companyId, businessPartnerId, documentDate])
+}
+
+model PurchaseOrderLine {
+  id                  String                 @id @default(uuid()) @db.Uuid
+  companyId           String                 @db.Uuid
+  purchaseOrderId     String                 @db.Uuid
+  purchaseOrder       PurchaseOrder          @relation(fields: [purchaseOrderId, companyId], references: [id, companyId], onDelete: Cascade)
+  sequence            Int
+  productId           String?                @db.Uuid
+  product             Product?               @relation(fields: [productId, companyId], references: [id, companyId], onDelete: Restrict)
+  descriptionSnapshot String                 @db.VarChar(500)
+  quantity            Decimal                @db.Decimal(19, 6)
+  unitPrice           Decimal                @db.Decimal(19, 6)
+  discountType        SalesDiscountType      @default(NONE)
+  discountValue       Decimal                @db.Decimal(19, 6)
+  grossBeforeDiscount Decimal                @db.Decimal(19, 4)
+  discountAmount      Decimal                @db.Decimal(19, 4)
+  taxableBase         Decimal                @db.Decimal(19, 4)
+  taxAmount           Decimal                @db.Decimal(19, 4)
+  lineTotal           Decimal                @db.Decimal(19, 4)
+  accountType         PurchaseAccountType    @default(EXPENSE)
+  expenseAccountId    String?                @db.Uuid
+  expenseAccount      AccountingAccount?     @relation("PurchaseOrderExpenseAccount", fields: [expenseAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  assetAccountId      String?                @db.Uuid
+  assetAccount        AccountingAccount?     @relation("PurchaseOrderAssetAccount", fields: [assetAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  taxes               PurchaseOrderLineTax[]
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+
+  @@unique([id, companyId])
+  @@unique([companyId, purchaseOrderId, sequence])
+  @@index([companyId, productId])
+}
+
+model PurchaseOrderLineTax {
+  id                    String               @id @default(uuid()) @db.Uuid
+  companyId             String               @db.Uuid
+  purchaseOrderLineId   String               @db.Uuid
+  purchaseOrderLine     PurchaseOrderLine    @relation(fields: [purchaseOrderLineId, companyId], references: [id, companyId], onDelete: Cascade)
+  taxTreatmentId        String?              @db.Uuid
+  taxRateId             String?              @db.Uuid
+  treatmentCodeSnapshot String               @db.VarChar(40)
+  treatmentCategory     TaxTreatmentCategory
+  rateCodeSnapshot      String?
+  percentageSnapshot    Decimal              @db.Decimal(9, 4)
+  calculationMode       TaxCalculationMode
+  taxableBase           Decimal              @db.Decimal(19, 4)
+  taxAmount             Decimal              @db.Decimal(19, 4)
+  createdAt             DateTime             @default(now())
+
+  @@unique([companyId, purchaseOrderLineId])
+}
+
+model SupplierInvoice {
+  id                            String                           @id @default(uuid()) @db.Uuid
+  companyId                     String                           @db.Uuid
+  company                       Company                          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  businessPartnerId             String                           @db.Uuid
+  businessPartner               BusinessPartner                  @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
+  purchaseOrderId               String?                          @db.Uuid
+  purchaseOrder                 PurchaseOrder?                   @relation(fields: [purchaseOrderId, companyId], references: [id, companyId], onDelete: Restrict)
+  status                        SupplierInvoiceStatus            @default(DRAFT)
+  invoiceNumber                 String?                          @db.VarChar(40)
+  supplierDocumentReference     String?                          @db.VarChar(120)
+  documentDate                  DateTime                         @db.Date
+  postingDate                   DateTime?                        @db.Date
+  dueDate                       DateTime?                        @db.Date
+  transactionCurrencyCode       String                           @db.Char(3)
+  transactionCurrency           Currency                         @relation("SupplierInvoiceTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
+  exchangeRate                  Decimal                          @db.Decimal(19, 8)
+  paymentTermId                 String?                          @db.Uuid
+  paymentTerm                   PaymentTerm?                     @relation(fields: [paymentTermId, companyId], references: [id, companyId], onDelete: Restrict)
+  notes                         String?                          @db.VarChar(2000)
+  subtotal                      Decimal                          @db.Decimal(19, 4)
+  discountTotal                 Decimal                          @db.Decimal(19, 4)
+  taxableBaseTotal              Decimal                          @db.Decimal(19, 4)
+  taxTotal                      Decimal                          @db.Decimal(19, 4)
+  grandTotal                    Decimal                          @db.Decimal(19, 4)
+  partnerCodeSnapshot           String                           @db.VarChar(40)
+  partnerNameSnapshot           String                           @db.VarChar(200)
+  partnerLegalNameSnapshot      String?
+  taxRegistrationNumberSnapshot String?
+  billingAddressSnapshot        Json?
+  payableAccountId              String?                          @db.Uuid
+  payableAccount                AccountingAccount?               @relation("SupplierInvoicePayableAccount", fields: [payableAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  journalEntryId                String?                          @db.Uuid
+  journalEntry                  JournalEntry?                    @relation("SupplierInvoiceJournalEntry", fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  idempotencyKey                String?                          @db.VarChar(128)
+  requestHash                   String?                          @db.Char(64)
+  createdById                   String                           @db.Uuid
+  createdBy                     User                             @relation("SupplierInvoiceCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  postedById                    String?                          @db.Uuid
+  postedBy                      User?                            @relation("SupplierInvoicePostedBy", fields: [postedById], references: [id], onDelete: Restrict)
+  postedAt                      DateTime?
+  lines                         SupplierInvoiceLine[]
+  paymentSchedule               SupplierInvoicePaymentSchedule[]
+  creditNotes                   SupplierCreditNote[]
+  createdAt                     DateTime                         @default(now())
+  updatedAt                     DateTime                         @updatedAt
+
+  @@unique([id, companyId])
+  @@unique([companyId, invoiceNumber])
+  @@unique([journalEntryId, companyId])
+  @@unique([companyId, idempotencyKey])
+  @@unique([companyId, businessPartnerId, supplierDocumentReference])
+  @@index([companyId, status, documentDate])
+  @@index([companyId, businessPartnerId, documentDate])
+  @@index([companyId, supplierDocumentReference])
+  @@index([companyId, purchaseOrderId])
+}
+
+model SupplierInvoiceLine {
+  id                  String                   @id @default(uuid()) @db.Uuid
+  companyId           String                   @db.Uuid
+  supplierInvoiceId   String                   @db.Uuid
+  supplierInvoice     SupplierInvoice          @relation(fields: [supplierInvoiceId, companyId], references: [id, companyId], onDelete: Cascade)
+  sequence            Int
+  productId           String?                  @db.Uuid
+  product             Product?                 @relation(fields: [productId, companyId], references: [id, companyId], onDelete: Restrict)
+  descriptionSnapshot String                   @db.VarChar(500)
+  quantity            Decimal                  @db.Decimal(19, 6)
+  unitPrice           Decimal                  @db.Decimal(19, 6)
+  discountType        SalesDiscountType        @default(NONE)
+  discountValue       Decimal                  @db.Decimal(19, 6)
+  grossBeforeDiscount Decimal                  @db.Decimal(19, 4)
+  discountAmount      Decimal                  @db.Decimal(19, 4)
+  taxableBase         Decimal                  @db.Decimal(19, 4)
+  taxAmount           Decimal                  @db.Decimal(19, 4)
+  lineTotal           Decimal                  @db.Decimal(19, 4)
+  accountType         PurchaseAccountType      @default(EXPENSE)
+  expenseAccountId    String?                  @db.Uuid
+  expenseAccount      AccountingAccount?       @relation("SupplierInvoiceLineExpenseAccount", fields: [expenseAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  assetAccountId      String?                  @db.Uuid
+  assetAccount        AccountingAccount?       @relation("SupplierInvoiceLineAssetAccount", fields: [assetAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  taxes               SupplierInvoiceLineTax[]
+  creditNoteLines     SupplierCreditNoteLine[]
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+
+  @@unique([id, companyId])
+  @@unique([companyId, supplierInvoiceId, sequence])
+  @@index([companyId, productId])
+}
+
+model SupplierInvoiceLineTax {
+  id                    String               @id @default(uuid()) @db.Uuid
+  companyId             String               @db.Uuid
+  supplierInvoiceLineId String               @db.Uuid
+  supplierInvoiceLine   SupplierInvoiceLine  @relation(fields: [supplierInvoiceLineId, companyId], references: [id, companyId], onDelete: Cascade)
+  taxTreatmentId        String?              @db.Uuid
+  taxRateId             String?              @db.Uuid
+  taxInputAccountId     String?              @db.Uuid
+  taxInputAccount       AccountingAccount?   @relation("SupplierInvoiceLineTaxInputAccount", fields: [taxInputAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  treatmentCodeSnapshot String               @db.VarChar(40)
+  treatmentCategory     TaxTreatmentCategory
+  rateCodeSnapshot      String?
+  percentageSnapshot    Decimal              @db.Decimal(9, 4)
+  calculationMode       TaxCalculationMode
+  taxableBase           Decimal              @db.Decimal(19, 4)
+  taxAmount             Decimal              @db.Decimal(19, 4)
+  createdAt             DateTime             @default(now())
+
+  @@unique([companyId, supplierInvoiceLineId])
+}
+
+model SupplierInvoicePaymentSchedule {
+  id                      String          @id @default(uuid()) @db.Uuid
+  companyId               String          @db.Uuid
+  supplierInvoiceId       String          @db.Uuid
+  supplierInvoice         SupplierInvoice @relation(fields: [supplierInvoiceId, companyId], references: [id, companyId], onDelete: Cascade)
+  sequence                Int
+  dueDate                 DateTime        @db.Date
+  amount                  Decimal         @db.Decimal(19, 4)
+  journalLineId           String?         @db.Uuid
+  journalLine             JournalLine?    @relation("SupplierInvoicePaymentScheduleJournalLine", fields: [journalLineId, companyId], references: [id, companyId], onDelete: Restrict)
+  paymentTermCodeSnapshot String?
+  paymentTermNameSnapshot String?
+  createdAt               DateTime        @default(now())
+
+  @@unique([id, companyId])
+  @@unique([companyId, supplierInvoiceId, sequence])
+  @@unique([journalLineId, companyId])
+  @@index([companyId, dueDate])
+}
+
+model SupplierCreditNote {
+  id                            String                   @id @default(uuid()) @db.Uuid
+  companyId                     String                   @db.Uuid
+  company                       Company                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  supplierInvoiceId             String                   @db.Uuid
+  supplierInvoice               SupplierInvoice          @relation(fields: [supplierInvoiceId, companyId], references: [id, companyId], onDelete: Restrict)
+  businessPartnerId             String                   @db.Uuid
+  businessPartner               BusinessPartner          @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
+  status                        SupplierCreditNoteStatus @default(DRAFT)
+  creditNoteNumber              String?                  @db.VarChar(40)
+  documentDate                  DateTime                 @db.Date
+  postingDate                   DateTime?                @db.Date
+  transactionCurrencyCode       String                   @db.Char(3)
+  transactionCurrency           Currency                 @relation("SupplierCreditNoteTransactionCurrency", fields: [transactionCurrencyCode], references: [code], onDelete: Restrict)
+  exchangeRate                  Decimal                  @db.Decimal(19, 8)
+  reason                        String                   @db.VarChar(1000)
+  subtotal                      Decimal                  @db.Decimal(19, 4)
+  taxTotal                      Decimal                  @db.Decimal(19, 4)
+  grandTotal                    Decimal                  @db.Decimal(19, 4)
+  partnerCodeSnapshot           String                   @db.VarChar(40)
+  partnerNameSnapshot           String                   @db.VarChar(200)
+  taxRegistrationNumberSnapshot String?
+  billingAddressSnapshot        Json?
+  payableAccountId              String                   @db.Uuid
+  payableAccount                AccountingAccount        @relation("SupplierCreditNotePayableAccount", fields: [payableAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  journalEntryId                String?                  @db.Uuid
+  journalEntry                  JournalEntry?            @relation("SupplierCreditNoteJournalEntry", fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  idempotencyKey                String?                  @db.VarChar(128)
+  requestHash                   String?                  @db.Char(64)
+  createdById                   String                   @db.Uuid
+  createdBy                     User                     @relation("SupplierCreditNoteCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  postedById                    String?                  @db.Uuid
+  postedBy                      User?                    @relation("SupplierCreditNotePostedBy", fields: [postedById], references: [id], onDelete: Restrict)
+  postedAt                      DateTime?
+  lines                         SupplierCreditNoteLine[]
+  createdAt                     DateTime                 @default(now())
+  updatedAt                     DateTime                 @updatedAt
+
+  @@unique([id, companyId])
+  @@unique([companyId, creditNoteNumber])
+  @@unique([journalEntryId, companyId])
+  @@unique([companyId, idempotencyKey])
+  @@index([companyId, status, documentDate])
+  @@index([companyId, supplierInvoiceId])
+  @@index([companyId, businessPartnerId, documentDate])
+}
+
+model SupplierCreditNoteLine {
+  id                            String                      @id @default(uuid()) @db.Uuid
+  companyId                     String                      @db.Uuid
+  supplierCreditNoteId          String                      @db.Uuid
+  supplierCreditNote            SupplierCreditNote          @relation(fields: [supplierCreditNoteId, companyId], references: [id, companyId], onDelete: Cascade)
+  originalSupplierInvoiceLineId String                      @db.Uuid
+  originalSupplierInvoiceLine   SupplierInvoiceLine         @relation(fields: [originalSupplierInvoiceLineId, companyId], references: [id, companyId], onDelete: Restrict)
+  sequence                      Int
+  descriptionSnapshot           String                      @db.VarChar(500)
+  quantity                      Decimal                     @db.Decimal(19, 6)
+  unitPrice                     Decimal                     @db.Decimal(19, 6)
+  taxableBase                   Decimal                     @db.Decimal(19, 4)
+  taxAmount                     Decimal                     @db.Decimal(19, 4)
+  lineTotal                     Decimal                     @db.Decimal(19, 4)
+  accountType                   PurchaseAccountType         @default(EXPENSE)
+  expenseAccountId              String?                     @db.Uuid
+  expenseAccount                AccountingAccount?          @relation("SupplierCreditNoteLineExpenseAccount", fields: [expenseAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  assetAccountId                String?                     @db.Uuid
+  assetAccount                  AccountingAccount?          @relation("SupplierCreditNoteLineAssetAccount", fields: [assetAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  taxes                         SupplierCreditNoteLineTax[]
+  createdAt                     DateTime                    @default(now())
+
+  @@unique([id, companyId])
+  @@unique([companyId, supplierCreditNoteId, sequence])
+  @@index([companyId, originalSupplierInvoiceLineId])
+}
+
+model SupplierCreditNoteLineTax {
+  id                       String                 @id @default(uuid()) @db.Uuid
+  companyId                String                 @db.Uuid
+  supplierCreditNoteLineId String                 @db.Uuid
+  supplierCreditNoteLine   SupplierCreditNoteLine @relation(fields: [supplierCreditNoteLineId, companyId], references: [id, companyId], onDelete: Cascade)
+  taxTreatmentId           String?                @db.Uuid
+  taxRateId                String?                @db.Uuid
+  taxInputAccountId        String?                @db.Uuid
+  taxInputAccount          AccountingAccount?     @relation("SupplierCreditNoteLineTaxInputAccount", fields: [taxInputAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  treatmentCodeSnapshot    String                 @db.VarChar(40)
+  treatmentCategory        TaxTreatmentCategory
+  rateCodeSnapshot         String?
+  percentageSnapshot       Decimal                @db.Decimal(9, 4)
+  calculationMode          TaxCalculationMode
+  taxableBase              Decimal                @db.Decimal(19, 4)
+  taxAmount                Decimal                @db.Decimal(19, 4)
+  createdAt                DateTime               @default(now())
+
+  @@unique([companyId, supplierCreditNoteLineId])
+}
+
+// ============================================================
 // B04: AUTHORITATIVE CUSTOMER PAYMENTS + AR RECONCILIATION
 // ============================================================
 
@@ -1728,6 +2122,17 @@ model AccountingAccount {
   salesCreditNoteReceivables        SalesCreditNote[]                @relation("SalesCreditNoteReceivableAccount")
   salesCreditNoteLineRevenues       SalesCreditNoteLine[]            @relation("SalesCreditNoteLineRevenueAccount")
   salesCreditNoteLineTaxLiabilities SalesCreditNoteLine[]            @relation("SalesCreditNoteLineTaxLiabilityAccount")
+  purchaseOrderExpenseLines         PurchaseOrderLine[]              @relation("PurchaseOrderExpenseAccount")
+  purchaseOrderAssetLines           PurchaseOrderLine[]              @relation("PurchaseOrderAssetAccount")
+
+  supplierInvoicePayables         SupplierInvoice[]           @relation("SupplierInvoicePayableAccount")
+  supplierInvoiceExpenseLines     SupplierInvoiceLine[]       @relation("SupplierInvoiceLineExpenseAccount")
+  supplierInvoiceAssetLines       SupplierInvoiceLine[]       @relation("SupplierInvoiceLineAssetAccount")
+  supplierInvoiceTaxInputLines    SupplierInvoiceLineTax[]    @relation("SupplierInvoiceLineTaxInputAccount")
+  supplierCreditNotePayables      SupplierCreditNote[]        @relation("SupplierCreditNotePayableAccount")
+  supplierCreditNoteExpenseLines  SupplierCreditNoteLine[]    @relation("SupplierCreditNoteLineExpenseAccount")
+  supplierCreditNoteAssetLines    SupplierCreditNoteLine[]    @relation("SupplierCreditNoteLineAssetAccount")
+  supplierCreditNoteTaxInputLines SupplierCreditNoteLineTax[] @relation("SupplierCreditNoteLineTaxInputAccount")
 
   @@unique([id, companyId])
   @@unique([companyId, code])
@@ -1768,10 +2173,11 @@ model FiscalYear {
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 
-  periods                  AccountingPeriod[]
-  sequences                AccountingEntrySequence[]
-  salesDocumentSequences   SalesDocumentSequence[]
-  customerPaymentSequences CustomerPaymentSequence[]
+  periods                   AccountingPeriod[]
+  sequences                 AccountingEntrySequence[]
+  salesDocumentSequences    SalesDocumentSequence[]
+  customerPaymentSequences  CustomerPaymentSequence[]
+  supplierDocumentSequences SupplierDocumentSequence[]
 
   @@unique([id, companyId])
   @@unique([companyId, name])
@@ -1846,12 +2252,14 @@ model JournalEntry {
   updatedAt                   DateTime             @updatedAt
 
   lines                       JournalLine[]
-  salesInvoice                SalesInvoice?      @relation("SalesInvoiceJournalEntry")
-  salesCreditNote             SalesCreditNote?   @relation("SalesCreditNoteJournalEntry")
-  customerPayment             CustomerPayment?   @relation("CustomerPaymentJournalEntry")
-  customerPaymentReversal     CustomerPayment?   @relation("CustomerPaymentReversalJournalEntry")
-  arReconciliationAdjustments ARReconciliation[] @relation("ARReconciliationAdjustmentJournalEntry")
-  arReconciliationReversals   ARReconciliation[] @relation("ARReconciliationReversalJournalEntry")
+  salesInvoice                SalesInvoice?       @relation("SalesInvoiceJournalEntry")
+  salesCreditNote             SalesCreditNote?    @relation("SalesCreditNoteJournalEntry")
+  customerPayment             CustomerPayment?    @relation("CustomerPaymentJournalEntry")
+  customerPaymentReversal     CustomerPayment?    @relation("CustomerPaymentReversalJournalEntry")
+  arReconciliationAdjustments ARReconciliation[]  @relation("ARReconciliationAdjustmentJournalEntry")
+  arReconciliationReversals   ARReconciliation[]  @relation("ARReconciliationReversalJournalEntry")
+  supplierInvoice             SupplierInvoice?    @relation("SupplierInvoiceJournalEntry")
+  supplierCreditNote          SupplierCreditNote? @relation("SupplierCreditNoteJournalEntry")
 
   @@unique([id, companyId])
   @@unique([companyId, entryNumber])
@@ -1928,33 +2336,34 @@ model OpeningBalanceLine {
 }
 
 model JournalLine {
-  id                          String                       @id @default(uuid()) @db.Uuid
-  companyId                   String                       @db.Uuid
-  company                     Company                      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  journalEntryId              String                       @db.Uuid
-  sequence                    Int
-  journalEntry                JournalEntry                 @relation(fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
-  accountId                   String                       @db.Uuid
-  account                     AccountingAccount            @relation(fields: [accountId, companyId], references: [id, companyId], onDelete: Restrict)
-  debit                       Decimal                      @db.Decimal(19, 4)
-  credit                      Decimal                      @db.Decimal(19, 4)
-  transactionDebit            Decimal                      @db.Decimal(19, 4)
-  transactionCredit           Decimal                      @db.Decimal(19, 4)
-  description                 String?                      @db.VarChar(500)
-  businessPartnerId           String?                      @db.Uuid
-  businessPartner             BusinessPartner?             @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
-  dueDate                     DateTime?                    @db.Date
-  documentReference           String?                      @db.VarChar(120)
-  reconciliationReference     String?                      @db.VarChar(160)
-  salesInvoicePaymentSchedule SalesInvoicePaymentSchedule? @relation("SalesInvoicePaymentScheduleJournalLine")
-  customerPaymentAllocations  CustomerPaymentAllocation[]
-  customerPaymentARSources    CustomerPayment[]            @relation("CustomerPaymentARSourceLine")
-  arReconciliationDebits      ARReconciliation[]           @relation("ARReconciliationDebit")
-  arReconciliationCredits     ARReconciliation[]           @relation("ARReconciliationCredit")
-  taxCode                     String?                      @db.VarChar(40)
-  taxTreatmentCode            String?                      @db.VarChar(40)
-  taxRate                     Decimal?                     @db.Decimal(9, 4)
-  createdAt                   DateTime                     @default(now())
+  id                             String                          @id @default(uuid()) @db.Uuid
+  companyId                      String                          @db.Uuid
+  company                        Company                         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  journalEntryId                 String                          @db.Uuid
+  sequence                       Int
+  journalEntry                   JournalEntry                    @relation(fields: [journalEntryId, companyId], references: [id, companyId], onDelete: Restrict)
+  accountId                      String                          @db.Uuid
+  account                        AccountingAccount               @relation(fields: [accountId, companyId], references: [id, companyId], onDelete: Restrict)
+  debit                          Decimal                         @db.Decimal(19, 4)
+  credit                         Decimal                         @db.Decimal(19, 4)
+  transactionDebit               Decimal                         @db.Decimal(19, 4)
+  transactionCredit              Decimal                         @db.Decimal(19, 4)
+  description                    String?                         @db.VarChar(500)
+  businessPartnerId              String?                         @db.Uuid
+  businessPartner                BusinessPartner?                @relation(fields: [businessPartnerId, companyId], references: [id, companyId], onDelete: Restrict)
+  dueDate                        DateTime?                       @db.Date
+  documentReference              String?                         @db.VarChar(120)
+  reconciliationReference        String?                         @db.VarChar(160)
+  salesInvoicePaymentSchedule    SalesInvoicePaymentSchedule?    @relation("SalesInvoicePaymentScheduleJournalLine")
+  customerPaymentAllocations     CustomerPaymentAllocation[]
+  customerPaymentARSources       CustomerPayment[]               @relation("CustomerPaymentARSourceLine")
+  arReconciliationDebits         ARReconciliation[]              @relation("ARReconciliationDebit")
+  arReconciliationCredits        ARReconciliation[]              @relation("ARReconciliationCredit")
+  supplierInvoicePaymentSchedule SupplierInvoicePaymentSchedule? @relation("SupplierInvoicePaymentScheduleJournalLine")
+  taxCode                        String?                         @db.VarChar(40)
+  taxTreatmentCode               String?                         @db.VarChar(40)
+  taxRate                        Decimal?                        @db.Decimal(9, 4)
+  createdAt                      DateTime                        @default(now())
 
   @@unique([id, companyId])
   @@unique([companyId, journalEntryId, sequence])
@@ -2019,6 +2428,9 @@ model Currency {
   salesInvoices           SalesInvoice[]            @relation("SalesInvoiceTransactionCurrency")
   salesCreditNotes        SalesCreditNote[]         @relation("SalesCreditNoteTransactionCurrency")
   customerPayments        CustomerPayment[]         @relation("CustomerPaymentTransactionCurrency")
+  purchaseOrders          PurchaseOrder[]           @relation("PurchaseOrderTransactionCurrency")
+  supplierInvoices        SupplierInvoice[]         @relation("SupplierInvoiceTransactionCurrency")
+  supplierCreditNotes     SupplierCreditNote[]      @relation("SupplierCreditNoteTransactionCurrency")
   baseConfigurations      AccountingConfiguration[] @relation("AccountingBaseCurrency")
   reportingConfigurations AccountingConfiguration[] @relation("AccountingReportingCurrency")
   templateDefaults        AccountingTemplate[]      @relation("AccountingTemplateDefaultCurrency")

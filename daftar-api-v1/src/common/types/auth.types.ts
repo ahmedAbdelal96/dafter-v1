@@ -54,6 +54,15 @@ export interface StaffPermissionsMap {
   viewCustomerBalances?: boolean;
   viewInstallments?: boolean;
   manageInstallments?: boolean;
+  viewPurchaseOrders?: boolean;
+  managePurchaseOrders?: boolean;
+  approvePurchaseOrders?: boolean;
+  viewSupplierInvoices?: boolean;
+  manageSupplierInvoices?: boolean;
+  postSupplierInvoices?: boolean;
+  viewSupplierCreditNotes?: boolean;
+  manageSupplierCreditNotes?: boolean;
+  postSupplierCreditNotes?: boolean;
   'tax_setup.view'?: boolean;
   'tax_setup.manage_registration_profile'?: boolean;
   'tax_setup.create_rate'?: boolean;

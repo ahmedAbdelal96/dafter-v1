@@ -31,6 +31,9 @@ export const CONTROLLER_FEATURE_POLICY: Record<
   'products/products.controller.ts': 'feature-gated',
   'sales/sales-invoice.controller.ts': 'role-guarded',
   'sales/sales-credit-note.controller.ts': 'role-guarded',
+  'purchases/purchase-order.controller.ts': 'role-guarded',
+  'purchases/supplier-invoice.controller.ts': 'role-guarded',
+  'purchases/supplier-credit-note.controller.ts': 'role-guarded',
   'tax-setup/controllers/tax-setup.controller.ts': 'role-guarded',
   'users/users.controller.ts': 'role-guarded',
 };

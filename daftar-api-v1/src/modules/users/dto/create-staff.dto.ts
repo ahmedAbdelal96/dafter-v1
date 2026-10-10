@@ -13,6 +13,75 @@ import {
 } from 'class-validator';
 
 export class StaffPermissionsDto {
+  @ApiPropertyOptional({ example: true, description: 'View purchase orders.' })
+  @IsOptional()
+  @IsBoolean()
+  viewPurchaseOrders?: boolean;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Create and edit purchase orders.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  managePurchaseOrders?: boolean;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Approve purchase orders.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  approvePurchaseOrders?: boolean;
+
+  @ApiPropertyOptional({
+    example: true,
+    description: 'View supplier invoices.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  viewSupplierInvoices?: boolean;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Create and edit supplier invoices.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  manageSupplierInvoices?: boolean;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Post supplier invoices.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  postSupplierInvoices?: boolean;
+
+  @ApiPropertyOptional({
+    example: true,
+    description: 'View supplier credit notes.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  viewSupplierCreditNotes?: boolean;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Create and edit supplier credit notes.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  manageSupplierCreditNotes?: boolean;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Post supplier credit notes.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  postSupplierCreditNotes?: boolean;
+
   @ApiPropertyOptional({
     example: true,
     description: 'View customer payment documents and AR open items.',
