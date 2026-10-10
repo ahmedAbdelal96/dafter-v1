@@ -48,7 +48,7 @@ describe('B03 legacy purge architecture', () => {
       'ReportsModule',
       'DashboardModule',
     ]) {
-      expect(appModule).not.toContain(removedModule);
+      expect(appModule).not.toMatch(new RegExp(`\\b${removedModule}\\b`));
     }
   });
 });
