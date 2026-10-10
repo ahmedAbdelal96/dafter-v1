@@ -481,7 +481,7 @@ describe('SalesInvoice posting', () => {
         partnerCode: `FX-LIMIT-${stamp}`,
         displayName: 'Multi-currency Credit Customer',
         partnerType: BusinessPartnerType.ORGANIZATION,
-        customerProfile: { create: { creditLimit: '5500' } },
+        customerProfile: { create: { creditLimit: '5100' } },
       },
     });
     const receivableMapping =
@@ -578,6 +578,28 @@ describe('SalesInvoice posting', () => {
     await expect(
       postInvoice('USD', '30', '2026-10-05', `fx-limit-prospective-${stamp}`),
     ).resolves.toMatchObject({ status: 'POSTED' });
+    const authoritativeExposure = await prisma.journalLine.aggregate({
+      _sum: { debit: true, credit: true },
+      where: {
+        companyId,
+        businessPartnerId: partner.id,
+        journalEntry: { status: 'POSTED' },
+        account: { accountType: AccountingAccountType.ASSET_RECEIVABLE },
+      },
+    });
+    expect(
+      new Prisma.Decimal(authoritativeExposure._sum.debit ?? 0)
+        .sub(authoritativeExposure._sum.credit ?? 0)
+        .toFixed(4),
+    ).toBe('5100.0000');
+    await expect(
+      postInvoice(
+        'USD',
+        '30.000001',
+        '2026-10-06',
+        `fx-limit-over-by-point-one-mil-${stamp}`,
+      ),
+    ).rejects.toThrow('sales.customer_credit_limit_exceeded');
   });
 
   it('rejects Sales posting when the real AccountingSetup is not READY', async () => {
@@ -863,6 +885,31 @@ describe('SalesInvoice posting', () => {
           taxTreatmentId: vat15Treatment.id,
           taxRateId: vat15.id,
           taxOverrideReason: 'Approved temporary override',
+        }),
+      );
+      const overrideLine = await prisma.salesInvoiceLine.findFirstOrThrow({
+        where: { salesInvoiceId: overrideDraft.id, sequence: 1 },
+        include: { taxes: true },
+      });
+      expect(overrideLine.taxes[0].overrideReasonSnapshot).toBe(
+        'Approved temporary override',
+      );
+      const overrideAudit = await prisma.auditLog.findFirstOrThrow({
+        where: {
+          companyId,
+          action: 'sales.tax.override_selected',
+          entityType: 'SalesInvoiceLine',
+          entityId: overrideLine.id,
+        },
+      });
+      expect(overrideAudit.metadata).toEqual(
+        expect.objectContaining({
+          salesInvoiceId: overrideDraft.id,
+          salesInvoiceLineId: overrideLine.id,
+          normalSelection: expect.any(String),
+          overrideSelection: vat15Treatment.code,
+          reason: 'Approved temporary override',
+          actorUserId: ownerId,
         }),
       );
       await prisma.taxModuleApplicabilityRule.update({

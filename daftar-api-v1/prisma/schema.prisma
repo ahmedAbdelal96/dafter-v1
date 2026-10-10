@@ -1928,6 +1928,7 @@ model SalesInvoiceLineTax {
   taxLiabilityAccountId String?                     @db.Uuid
   taxLiabilityAccount   AccountingAccount?          @relation("SalesInvoiceLineTaxLiabilityAccount", fields: [taxLiabilityAccountId, companyId], references: [id, companyId], onDelete: Restrict)
   selectionProvenance   SalesTaxSelectionProvenance
+  overrideReasonSnapshot String?                   @db.VarChar(1000)
   treatmentCodeSnapshot String                      @db.VarChar(40)
   treatmentCategory     TaxTreatmentCategory
   rateCodeSnapshot      String?

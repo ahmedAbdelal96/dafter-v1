@@ -15,6 +15,7 @@ import {
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { PlatformIdempotencyService } from '../platform/idempotency/platform-idempotency.service';
 import { AccountingMoney } from './accounting.money';
+import { convertAndAllocateBaseCurrency } from './accounting-conversion';
 import {
   assertAccountMappingCompatibility,
   assertJournalMappingCompatibility,
@@ -1104,12 +1105,8 @@ export class AccountingService {
       );
     }
 
-    let debitTotal = AccountingMoney.zero();
-    let creditTotal = AccountingMoney.zero();
     let transactionDebitTotal = AccountingMoney.zero();
     let transactionCreditTotal = AccountingMoney.zero();
-    let baseConversionResidualAccountId: string | null = null;
-    let baseConversionResidualSide: 'debit' | 'credit' | null = null;
     const lineData: Array<{
       companyId: string;
       accountId: string;
@@ -1129,18 +1126,22 @@ export class AccountingService {
     const transactionMinorUnitPrecision = Number(
       currencyContext.transaction.minorUnitPrecision,
     );
+    const parsedLines: Array<{
+      input: (typeof command.lines)[number];
+      transactionDebit: Prisma.Decimal;
+      transactionCredit: Prisma.Decimal;
+    }> = [];
     for (const line of command.lines) {
       const account = accountById.get(line.accountId)!;
       if (!account.isActive)
         throw new ConflictException(`Account ${account.code} is inactive`);
       if (
-        account.isControlAccount &&
         command.sourceType === JournalSourceType.MANUAL_JOURNAL &&
-        (account.templateKey === 'AR_CONTROL' ||
-          account.templateKey === 'AP_CONTROL')
+        (account.accountType === 'ASSET_RECEIVABLE' ||
+          account.accountType === 'LIABILITY_PAYABLE')
       )
         throw new ConflictException(
-          `Control account ${account.code} requires a source-document posting`,
+          `Account ${account.code} requires a source-document posting`,
         );
       if (!account.allowDirectPosting)
         throw new ConflictException(
@@ -1183,30 +1184,12 @@ export class AccountingService {
           'A transaction line must contain a debit or credit amount',
         );
       }
-      const debit = transactionDebit.multiply(exchangeRate).round(4);
-      const credit = transactionCredit.multiply(exchangeRate).round(4);
-      debitTotal = debitTotal.add(debit);
-      creditTotal = creditTotal.add(credit);
       transactionDebitTotal = transactionDebitTotal.add(transactionDebit);
       transactionCreditTotal = transactionCreditTotal.add(transactionCredit);
-      lineData.push({
-        companyId: command.companyId,
-        accountId: line.accountId,
-        debit: debit.toDecimal(),
-        credit: credit.toDecimal(),
+      parsedLines.push({
+        input: line,
         transactionDebit: transactionDebit.toDecimal(),
         transactionCredit: transactionCredit.toDecimal(),
-        description: line.description ?? null,
-        businessPartnerId: line.businessPartnerId ?? null,
-        dueDate: line.dueDate
-          ? this.parseDate(line.dueDate, 'line.dueDate')
-          : dueDate,
-        documentReference:
-          line.documentReference ?? command.documentReference ?? null,
-        reconciliationReference: line.reconciliationReference ?? null,
-        taxCode: line.taxCode ?? null,
-        taxTreatmentCode: line.taxTreatmentCode ?? null,
-        taxRate: line.taxRate ? this.parseTaxRate(line.taxRate) : null,
       });
     }
 
@@ -1216,71 +1199,57 @@ export class AccountingService {
       );
     }
 
-    const baseConversionResidual = debitTotal
-      .toDecimal()
-      .sub(creditTotal.toDecimal());
-    if (!baseConversionResidual.isZero()) {
-      // Every line was converted independently at four base-currency places.
-      // The only permissible imbalance is the bounded sum of those genuine
-      // half-unit-in-the-last-place conversion residuals. Allocate that
-      // residual to the largest converted line on the overrepresented side;
-      // transaction-currency amounts remain untouched and the audit log makes
-      // the deterministic adjustment explainable.
-      const maximumResidual = new Prisma.Decimal(lineData.length).mul(
-        '0.00005',
+    let conversion: ReturnType<typeof convertAndAllocateBaseCurrency>;
+    try {
+      conversion = convertAndAllocateBaseCurrency(
+        parsedLines.map((line) => ({
+          accountId: line.input.accountId,
+          transactionDebit: line.transactionDebit,
+          transactionCredit: line.transactionCredit,
+        })),
+        exchangeRate.toDecimal(),
       );
-      if (baseConversionResidual.abs().gt(maximumResidual)) {
-        throw new BadRequestException(
-          'Journal base-currency imbalance exceeds conversion-rounding tolerance',
-        );
-      }
-
-      const overrepresentedSide = baseConversionResidual.gt(0)
-        ? 'debit'
-        : 'credit';
-      const amountToRemove = baseConversionResidual.abs();
-      const candidates = lineData
-        .map((line, index) => ({ line, index }))
-        .filter(({ line }) =>
-          overrepresentedSide === 'debit'
-            ? new Prisma.Decimal(String(line.debit)).gte(amountToRemove)
-            : new Prisma.Decimal(String(line.credit)).gte(amountToRemove),
-        )
-        .sort((left, right) => {
-          const leftAmount =
-            overrepresentedSide === 'debit'
-              ? new Prisma.Decimal(String(left.line.debit))
-              : new Prisma.Decimal(String(left.line.credit));
-          const rightAmount =
-            overrepresentedSide === 'debit'
-              ? new Prisma.Decimal(String(right.line.debit))
-              : new Prisma.Decimal(String(right.line.credit));
-          return rightAmount.comparedTo(leftAmount) || left.index - right.index;
-        });
-      const candidate = candidates[0];
-      if (!candidate) {
-        throw new BadRequestException(
-          'Journal conversion residual cannot be allocated safely',
-        );
-      }
-      if (overrepresentedSide === 'debit') {
-        candidate.line.debit = new Prisma.Decimal(
-          String(candidate.line.debit),
-        ).sub(amountToRemove);
-        debitTotal = debitTotal.sub(
-          AccountingMoney.fromString(amountToRemove.toFixed(4)),
-        );
-      } else {
-        candidate.line.credit = new Prisma.Decimal(
-          String(candidate.line.credit),
-        ).sub(amountToRemove);
-        creditTotal = creditTotal.sub(
-          AccountingMoney.fromString(amountToRemove.toFixed(4)),
-        );
-      }
-      baseConversionResidualAccountId = candidate.line.accountId;
-      baseConversionResidualSide = overrepresentedSide;
+    } catch (error) {
+      throw new BadRequestException((error as Error).message);
     }
+    const debitTotal = AccountingMoney.fromString(
+      conversion.debitTotal.toFixed(4),
+    );
+    const creditTotal = AccountingMoney.fromString(
+      conversion.creditTotal.toFixed(4),
+    );
+    transactionDebitTotal = AccountingMoney.fromString(
+      conversion.transactionDebitTotal.toFixed(transactionMinorUnitPrecision),
+    );
+    transactionCreditTotal = AccountingMoney.fromString(
+      conversion.transactionCreditTotal.toFixed(transactionMinorUnitPrecision),
+    );
+    const baseConversionResidualAccountId = conversion.residualAccountId;
+    const baseConversionResidualSide = conversion.residualSide;
+    const baseConversionResidual = conversion.residual;
+    lineData.push(
+      ...parsedLines.map((parsed, index) => ({
+        companyId: command.companyId,
+        accountId: parsed.input.accountId,
+        debit: conversion.lines[index].debit,
+        credit: conversion.lines[index].credit,
+        transactionDebit: parsed.transactionDebit,
+        transactionCredit: parsed.transactionCredit,
+        description: parsed.input.description ?? null,
+        businessPartnerId: parsed.input.businessPartnerId ?? null,
+        dueDate: parsed.input.dueDate
+          ? this.parseDate(parsed.input.dueDate, 'line.dueDate')
+          : dueDate,
+        documentReference:
+          parsed.input.documentReference ?? command.documentReference ?? null,
+        reconciliationReference: parsed.input.reconciliationReference ?? null,
+        taxCode: parsed.input.taxCode ?? null,
+        taxTreatmentCode: parsed.input.taxTreatmentCode ?? null,
+        taxRate: parsed.input.taxRate
+          ? this.parseTaxRate(parsed.input.taxRate)
+          : null,
+      })),
+    );
 
     if (!debitTotal.eq(creditTotal)) {
       throw new BadRequestException(

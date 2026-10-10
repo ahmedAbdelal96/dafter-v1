@@ -263,39 +263,77 @@ describe('B02 GL BusinessPartner validation', () => {
       ],
     });
 
+  const postTrusted = (
+    businessPartnerId: string | undefined,
+    accountId: string,
+    debit: string,
+    credit: string,
+    key: string,
+  ) =>
+    accounting.postInternal(companyA.id, ownerA.id, {
+      journalId,
+      accountingPeriodId: periodId,
+      postingDate: '2026-07-01',
+      transactionCurrencyCode: 'EGP',
+      exchangeRate: '1',
+      description: 'B02 trusted counterparty test',
+      sourceType: 'OPENING_BALANCE',
+      sourceId: companyA.id,
+      idempotencyKey: key,
+      lines: [
+        {
+          accountId,
+          businessPartnerId,
+          transactionDebit: debit,
+          transactionCredit: credit,
+        },
+        {
+          accountId: cashAccountId,
+          transactionDebit: credit,
+          transactionCredit: debit,
+        },
+      ],
+    });
+
   it('accepts customer-only AR, supplier-only AP, and BOTH for both account types', async () => {
     await expect(
-      post(customerId, receivableAccountId, '100', '0', 'gl-customer-ar'),
+      postTrusted(
+        customerId,
+        receivableAccountId,
+        '100',
+        '0',
+        'gl-customer-ar',
+      ),
     ).resolves.toBeDefined();
     await expect(
-      post(supplierId, payableAccountId, '0', '100', 'gl-supplier-ap'),
+      postTrusted(supplierId, payableAccountId, '0', '100', 'gl-supplier-ap'),
     ).resolves.toBeDefined();
     await expect(
-      post(bothId, receivableAccountId, '25', '0', 'gl-both-ar'),
+      postTrusted(bothId, receivableAccountId, '25', '0', 'gl-both-ar'),
     ).resolves.toBeDefined();
     await expect(
-      post(bothId, payableAccountId, '0', '25', 'gl-both-ap'),
+      postTrusted(bothId, payableAccountId, '0', '25', 'gl-both-ap'),
     ).resolves.toBeDefined();
   });
 
   it('rejects wrong roles, inactive partners, and cross-company partners', async () => {
     await expect(
-      post(undefined, receivableAccountId, '10', '0', 'gl-missing-ar'),
+      postTrusted(undefined, receivableAccountId, '10', '0', 'gl-missing-ar'),
     ).rejects.toBeInstanceOf(BadRequestException);
     await expect(
-      post(undefined, payableAccountId, '0', '10', 'gl-missing-ap'),
+      postTrusted(undefined, payableAccountId, '0', '10', 'gl-missing-ap'),
     ).rejects.toBeInstanceOf(BadRequestException);
     await expect(
-      post(supplierId, receivableAccountId, '10', '0', 'gl-wrong-ar'),
+      postTrusted(supplierId, receivableAccountId, '10', '0', 'gl-wrong-ar'),
     ).rejects.toBeInstanceOf(BadRequestException);
     await expect(
-      post(customerId, payableAccountId, '0', '10', 'gl-wrong-ap'),
+      postTrusted(customerId, payableAccountId, '0', '10', 'gl-wrong-ap'),
     ).rejects.toBeInstanceOf(BadRequestException);
     await expect(
-      post(inactiveId, receivableAccountId, '10', '0', 'gl-inactive'),
+      postTrusted(inactiveId, receivableAccountId, '10', '0', 'gl-inactive'),
     ).rejects.toBeInstanceOf(BadRequestException);
     await expect(
-      post(
+      postTrusted(
         otherCompanyPartnerId,
         receivableAccountId,
         '10',
@@ -432,6 +470,12 @@ describe('B02 GL BusinessPartner validation', () => {
 
   it('rejects generic manual journals on real AR and AP control accounts', async () => {
     await expect(
+      post(customerId, receivableAccountId, '10', '0', 'manual-custom-ar'),
+    ).rejects.toBeInstanceOf(ConflictException);
+    await expect(
+      post(supplierId, payableAccountId, '0', '10', 'manual-custom-ap'),
+    ).rejects.toBeInstanceOf(ConflictException);
+    await expect(
       post(customerId, templateArAccountId, '10', '0', 'manual-real-ar'),
     ).rejects.toBeInstanceOf(ConflictException);
     await expect(
@@ -565,7 +609,13 @@ describe('B02 GL BusinessPartner validation', () => {
       roles: ['CUSTOMER'],
     });
     const results = await Promise.allSettled([
-      post(partner.id, receivableAccountId, '11', '0', `gl-race-post-${stamp}`),
+      postTrusted(
+        partner.id,
+        receivableAccountId,
+        '11',
+        '0',
+        `gl-race-post-${stamp}`,
+      ),
       partners.removeCustomerProfile(companyA.id, ownerA.id, partner.id),
     ]);
     const posted = await prisma.journalEntry.findFirst({
@@ -630,7 +680,7 @@ describe('B02 GL BusinessPartner validation', () => {
         where: { id: entry.id },
         data: { status: 'POSTED' },
       }),
-    ).rejects.toThrow('BusinessPartner');
+    ).rejects.toThrow('Manual journals cannot post');
     await prisma.journalLine.deleteMany({
       where: { journalEntryId: entry.id },
     });

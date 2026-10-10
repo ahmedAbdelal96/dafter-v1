@@ -44,6 +44,7 @@ import {
 } from './sales-tax-calculator.service';
 import { AccountingReadinessService } from '../accounting-bootstrap/accounting-readiness.service';
 import { assertAccountMappingCompatibility } from '../accounting/accounting-policies';
+import { convertAndAllocateBaseCurrency } from '../accounting/accounting-conversion';
 
 type Db = Prisma.TransactionClient | PrismaService;
 
@@ -73,6 +74,19 @@ export class SalesInvoiceService {
       const created = await db.salesInvoice.create({
         data: this.buildCreateData(companyId, actorUserId, input, calculation),
       });
+      const createdLines = await db.salesInvoiceLine.findMany({
+        where: { salesInvoiceId: created.id, companyId },
+        include: { taxes: true },
+        orderBy: { sequence: 'asc' },
+      });
+      await this.auditTaxOverrides(
+        db,
+        companyId,
+        actorUserId,
+        created.id,
+        createdLines,
+        calculation.lineResults,
+      );
 
       await db.auditLog.create({
         data: {
@@ -125,6 +139,19 @@ export class SalesInvoiceService {
         where: { id },
         data: this.buildUpdateData(input, calculation),
       });
+      const updatedLines = await db.salesInvoiceLine.findMany({
+        where: { salesInvoiceId: id, companyId },
+        include: { taxes: true },
+        orderBy: { sequence: 'asc' },
+      });
+      await this.auditTaxOverrides(
+        db,
+        companyId,
+        actorUserId,
+        id,
+        updatedLines,
+        calculation.lineResults,
+      );
       await db.auditLog.create({
         data: {
           companyId,
@@ -240,7 +267,6 @@ export class SalesInvoiceService {
         actorUserId,
       );
       this.assertPaymentSchedule(invoice);
-      await this.assertCreditLimit(db, invoice);
       const period = await db.accountingPeriod.findFirst({
         where: {
           companyId,
@@ -293,6 +319,11 @@ export class SalesInvoiceService {
         invoice,
         mappedAccounts,
       );
+      await this.assertCreditLimit(db, invoice, {
+        receivableAccountId: accounts.receivable.id,
+        revenueAccountId: accounts.revenue.id,
+        taxAccountId: accounts.tax?.id ?? null,
+      });
       const allocatedNumber = await this.allocateDocumentNumber(
         db,
         companyId,
@@ -495,6 +526,7 @@ export class SalesInvoiceService {
       taxableBase: Prisma.Decimal;
       taxAmount: Prisma.Decimal;
       lineTotal: Prisma.Decimal;
+      normalSelection: string;
       tax: any;
     }>;
     for (const line of input.lines) {
@@ -541,24 +573,6 @@ export class SalesInvoiceService {
       if (explicit && !line.taxOverrideReason?.trim()) {
         throw new BadRequestException('sales.tax_override_reason_required');
       }
-      if (explicit) {
-        await db.auditLog.create({
-          data: {
-            companyId,
-            actorUserId,
-            action: 'sales.tax.override_selected',
-            entityType: 'SalesInvoiceLine',
-            metadata: {
-              lineDescription: line.description,
-              normalSelection:
-                defaultSelection?.treatmentCode ??
-                TaxTreatmentCategory.OUT_OF_SCOPE,
-              overrideSelection: explicit.treatmentCode,
-              reason: line.taxOverrideReason!.trim(),
-            },
-          },
-        });
-      }
       const tax = this.tax.calculateTax({
         ...selection,
         enteredAmount: priced.taxableBase,
@@ -573,6 +587,8 @@ export class SalesInvoiceService {
         taxableBase: tax.taxableBase,
         taxAmount: tax.taxAmount,
         lineTotal: tax.grossAmount,
+        normalSelection:
+          defaultSelection?.treatmentCode ?? TaxTreatmentCategory.OUT_OF_SCOPE,
         tax,
       });
     }
@@ -746,11 +762,72 @@ export class SalesInvoiceService {
           selectionProvenance:
             line.tax.selectionProvenance ??
             SalesTaxSelectionProvenance.COMPANY_DEFAULT,
+          overrideReasonSnapshot:
+            line.tax.selectionProvenance ===
+            SalesTaxSelectionProvenance.EXPLICIT_OVERRIDE
+              ? line.input.taxOverrideReason!.trim()
+              : null,
           taxableBase: line.taxableBase,
           taxAmount: line.taxAmount,
         },
       },
     };
+  }
+
+  private async auditTaxOverrides(
+    db: Db,
+    companyId: string,
+    actorUserId: string,
+    salesInvoiceId: string,
+    lines: Array<{
+      id: string;
+      taxes: Array<{
+        selectionProvenance: SalesTaxSelectionProvenance;
+        treatmentCodeSnapshot: string;
+        overrideReasonSnapshot: string | null;
+      }>;
+    }>,
+    lineResults: Array<{
+      normalSelection: string;
+      tax: {
+        selectionProvenance?: SalesTaxSelectionProvenance;
+        treatmentCode: string;
+      };
+    }>,
+  ) {
+    for (const [index, line] of lines.entries()) {
+      const tax = line.taxes[0];
+      const result = lineResults[index];
+      if (
+        !tax ||
+        !result ||
+        tax.selectionProvenance !==
+          SalesTaxSelectionProvenance.EXPLICIT_OVERRIDE
+      ) {
+        continue;
+      }
+      const reason = tax.overrideReasonSnapshot?.trim();
+      if (!reason) {
+        throw new ConflictException('sales.tax_override_reason_required');
+      }
+      await db.auditLog.create({
+        data: {
+          companyId,
+          actorUserId,
+          action: 'sales.tax.override_selected',
+          entityType: 'SalesInvoiceLine',
+          entityId: line.id,
+          metadata: {
+            salesInvoiceId,
+            salesInvoiceLineId: line.id,
+            normalSelection: result.normalSelection,
+            overrideSelection: tax.treatmentCodeSnapshot,
+            reason,
+            actorUserId,
+          },
+        },
+      });
+    }
   }
 
   private requireDraft(
@@ -954,16 +1031,25 @@ export class SalesInvoiceService {
     invoice: {
       companyId: string;
       businessPartnerId: string;
-      grandTotal: Prisma.Decimal;
       exchangeRate: Prisma.Decimal;
       paymentSchedule: Array<{ amount: Prisma.Decimal }>;
+      lines: Array<{
+        taxableBase: Prisma.Decimal;
+        taxAmount: Prisma.Decimal;
+      }>;
       businessPartner: {
         customerProfile: { creditLimit: Prisma.Decimal | null } | null;
       };
     },
+    accounts: {
+      receivableAccountId: string;
+      revenueAccountId: string;
+      taxAccountId: string | null;
+    },
   ) {
     const limit = invoice.businessPartner.customerProfile?.creditLimit;
     if (limit === null || limit === undefined) return;
+    const creditLimit: Prisma.Decimal.Value = String(limit);
     const rows = await db.$queryRaw<{ exposure: Prisma.Decimal }[]>(Prisma.sql`
       SELECT COALESCE(SUM(jl."debit" - jl."credit"), 0) AS exposure
       FROM "JournalLine" jl
@@ -975,16 +1061,41 @@ export class SalesInvoiceService {
         AND aa."accountType" = 'ASSET_RECEIVABLE'
     `);
     const existingExposure = rows[0]?.exposure ?? new Prisma.Decimal(0);
-    const prospective = invoice.paymentSchedule.reduce(
-      (total, schedule) =>
-        total.add(
-          schedule.amount
-            .mul(invoice.exchangeRate)
-            .toDecimalPlaces(4, Prisma.Decimal.ROUND_HALF_UP),
-        ),
-      new Prisma.Decimal(0),
-    );
-    if (existingExposure.add(prospective).gt(limit)) {
+    const projection = [
+      ...invoice.paymentSchedule.map((schedule) => ({
+        accountId: accounts.receivableAccountId,
+        transactionDebit: schedule.amount,
+        transactionCredit: new Prisma.Decimal(0),
+      })),
+      ...invoice.lines.map((line) => ({
+        accountId: accounts.revenueAccountId,
+        transactionDebit: new Prisma.Decimal(0),
+        transactionCredit: line.taxableBase,
+      })),
+      ...invoice.lines
+        .filter((line) => line.taxAmount.gt(0))
+        .map((line) => ({
+          accountId: accounts.taxAccountId!,
+          transactionDebit: new Prisma.Decimal(0),
+          transactionCredit: line.taxAmount,
+        })),
+    ];
+    let converted;
+    try {
+      converted = convertAndAllocateBaseCurrency(
+        projection,
+        invoice.exchangeRate,
+      );
+    } catch (error) {
+      throw new ConflictException((error as Error).message);
+    }
+    const prospective = converted.lines
+      .filter((line) => line.accountId === accounts.receivableAccountId)
+      .reduce(
+        (total, line) => total.add(line.debit).sub(line.credit),
+        new Prisma.Decimal(0),
+      );
+    if (existingExposure.add(prospective).gt(creditLimit)) {
       throw new ConflictException('sales.customer_credit_limit_exceeded');
     }
   }
@@ -1117,6 +1228,17 @@ export class SalesInvoiceService {
           (rate.effectiveFrom && postingDate < rate.effectiveFrom) ||
           (rate.effectiveTo && postingDate > rate.effectiveTo))
       ) {
+        throw new ConflictException('sales.draft_requires_recalculation');
+      }
+
+      if (
+        tax.selectionProvenance ===
+        SalesTaxSelectionProvenance.EXPLICIT_OVERRIDE
+      ) {
+        if (!tax.overrideReasonSnapshot?.trim()) {
+          throw new ConflictException('sales.tax_override_reason_required');
+        }
+      } else if (tax.overrideReasonSnapshot?.trim()) {
         throw new ConflictException('sales.draft_requires_recalculation');
       }
 
