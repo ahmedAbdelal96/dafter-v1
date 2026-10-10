@@ -148,6 +148,13 @@ enum TaxModuleKey {
   JOURNALS
 }
 
+enum SalesTaxSelectionProvenance {
+  MODULE_DEFAULT
+  COMPANY_DEFAULT
+  EXPLICIT_OVERRIDE
+  MODULE_DISABLED_OUT_OF_SCOPE
+}
+
 // ── Phase 3: Expenses Enum ─────────────────────────────────────────────────
 
 // Classifies what the money was spent on — drives category filtering & pie charts.
@@ -1912,22 +1919,23 @@ model SalesInvoiceLine {
 }
 
 model SalesInvoiceLineTax {
-  id                    String               @id @default(uuid()) @db.Uuid
-  companyId             String               @db.Uuid
-  salesInvoiceLineId    String               @db.Uuid
-  salesInvoiceLine      SalesInvoiceLine     @relation(fields: [salesInvoiceLineId, companyId], references: [id, companyId], onDelete: Cascade)
-  taxTreatmentId        String?              @db.Uuid
-  taxRateId             String?              @db.Uuid
-  taxLiabilityAccountId String?              @db.Uuid
-  taxLiabilityAccount   AccountingAccount?   @relation("SalesInvoiceLineTaxLiabilityAccount", fields: [taxLiabilityAccountId, companyId], references: [id, companyId], onDelete: Restrict)
-  treatmentCodeSnapshot String               @db.VarChar(40)
+  id                    String                      @id @default(uuid()) @db.Uuid
+  companyId             String                      @db.Uuid
+  salesInvoiceLineId    String                      @db.Uuid
+  salesInvoiceLine      SalesInvoiceLine            @relation(fields: [salesInvoiceLineId, companyId], references: [id, companyId], onDelete: Cascade)
+  taxTreatmentId        String?                     @db.Uuid
+  taxRateId             String?                     @db.Uuid
+  taxLiabilityAccountId String?                     @db.Uuid
+  taxLiabilityAccount   AccountingAccount?          @relation("SalesInvoiceLineTaxLiabilityAccount", fields: [taxLiabilityAccountId, companyId], references: [id, companyId], onDelete: Restrict)
+  selectionProvenance   SalesTaxSelectionProvenance
+  treatmentCodeSnapshot String                      @db.VarChar(40)
   treatmentCategory     TaxTreatmentCategory
   rateCodeSnapshot      String?
-  percentageSnapshot    Decimal              @db.Decimal(9, 4)
+  percentageSnapshot    Decimal                     @db.Decimal(9, 4)
   calculationMode       TaxCalculationMode
-  taxableBase           Decimal              @db.Decimal(19, 4)
-  taxAmount             Decimal              @db.Decimal(19, 4)
-  createdAt             DateTime             @default(now())
+  taxableBase           Decimal                     @db.Decimal(19, 4)
+  taxAmount             Decimal                     @db.Decimal(19, 4)
+  createdAt             DateTime                    @default(now())
 
   @@unique([companyId, salesInvoiceLineId])
   @@index([companyId, taxRateId])

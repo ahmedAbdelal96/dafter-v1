@@ -96,6 +96,8 @@ export async function validateAccountingCounterparty(
     companyId: string;
     accountType: AccountingAccountType;
     businessPartnerId?: string | null;
+    isControlAccount?: boolean;
+    reconciliationEligible?: boolean;
   },
 ) {
   const requiresCustomer =
@@ -110,6 +112,14 @@ export async function validateAccountingCounterparty(
       requiresCustomer
         ? 'Receivable journal lines require a business partner with an active customer role'
         : 'Payable journal lines require a business partner with an active supplier role',
+    );
+  }
+  if (
+    (requiresCustomer || requiresSupplier) &&
+    (!input.isControlAccount || !input.reconciliationEligible)
+  ) {
+    throw new BadRequestException(
+      'Receivable and payable journal lines require a control account eligible for reconciliation',
     );
   }
 

@@ -64,6 +64,8 @@ describe('B02 BusinessPartner schema foundation', () => {
           code: `B02-AR-${stamp}`,
           name: 'B02 receivable account',
           accountType: AccountingAccountType.ASSET_RECEIVABLE,
+          isControlAccount: true,
+          reconciliationEligible: true,
         },
       }),
       prisma.accountingAccount.create({
@@ -72,6 +74,8 @@ describe('B02 BusinessPartner schema foundation', () => {
           code: `B02-AP-${stamp}`,
           name: 'B02 payable account',
           accountType: AccountingAccountType.LIABILITY_PAYABLE,
+          isControlAccount: true,
+          reconciliationEligible: true,
         },
       }),
     ]);

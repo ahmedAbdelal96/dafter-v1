@@ -880,6 +880,17 @@ export class BusinessPartnersService {
       throw new BadRequestException(
         `Accounting account must be ${expectedType} for this profile override`,
       );
+    const requiresControl =
+      expectedType === AccountingAccountType.ASSET_RECEIVABLE ||
+      expectedType === AccountingAccountType.LIABILITY_PAYABLE;
+    if (
+      requiresControl &&
+      (!account.isControlAccount || !account.reconciliationEligible)
+    ) {
+      throw new BadRequestException(
+        'Receivable and payable profile overrides must be control accounts eligible for reconciliation',
+      );
+    }
     return account;
   }
 

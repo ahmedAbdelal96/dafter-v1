@@ -2,6 +2,9 @@ import 'dotenv/config';
 
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { AccountingService } from '../accounting/accounting.service';
+import { AccountingReadinessService } from '../accounting-bootstrap/accounting-readiness.service';
+import { PlatformIdempotencyService } from '../platform/idempotency/platform-idempotency.service';
 import { SalesPricingService } from './sales-pricing.service';
 import { SalesTaxCalculatorService } from './sales-tax-calculator.service';
 import { SalesInvoiceService } from './sales-invoice.service';
@@ -105,6 +108,8 @@ describe('SalesInvoice drafts', () => {
       prisma,
       new SalesPricingService(),
       new SalesTaxCalculatorService(),
+      new AccountingService(prisma, new PlatformIdempotencyService(prisma)),
+      new AccountingReadinessService(prisma),
     );
   });
 

@@ -58,9 +58,9 @@ export class SalesCreditNoteService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly tax: SalesTaxCalculatorService,
-    @Optional() private readonly accounting?: AccountingService,
+    private readonly accounting: AccountingService,
+    private readonly readiness: AccountingReadinessService,
     @Optional() private readonly repository?: SalesCreditNoteRepository,
-    @Optional() private readonly readiness?: AccountingReadinessService,
   ) {}
 
   async createDraft(
@@ -229,8 +229,6 @@ export class SalesCreditNoteService {
     id: string,
     input?: PostSalesCreditNoteInput,
   ) {
-    if (!this.accounting)
-      throw new ConflictException('Accounting service is not available');
     const accounting = this.accounting;
     return this.prisma.$transaction(async (db) => {
       await db.$queryRaw(Prisma.sql`
@@ -291,17 +289,15 @@ export class SalesCreditNoteService {
         });
       }
       const postingDateValue = input?.postingDate ?? note.documentDate;
-      if (this.readiness) {
-        const readiness = await this.readiness.evaluateInTransaction(
-          db,
-          companyId,
-          postingDateValue,
+      const readiness = await this.readiness.evaluateInTransaction(
+        db,
+        companyId,
+        postingDateValue,
+      );
+      if (!readiness.ready)
+        throw new ConflictException(
+          `Accounting is not ready: ${readiness.reasons.join(', ')}`,
         );
-        if (!readiness.ready)
-          throw new ConflictException(
-            `Accounting is not ready: ${readiness.reasons.join(', ')}`,
-          );
-      }
       const currency = await db.currency.findFirst({
         where: { code: note.transactionCurrencyCode, isActive: true },
       });

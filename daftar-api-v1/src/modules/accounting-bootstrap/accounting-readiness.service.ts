@@ -146,6 +146,13 @@ export class AccountingReadinessService {
       } catch {
         reasons.push(`ACCOUNT_MAPPING_INCOMPATIBLE:${key}`);
       }
+      if (
+        (key === AccountingConfigAccountKey.RECEIVABLE ||
+          key === AccountingConfigAccountKey.PAYABLE) &&
+        (!account.isControlAccount || !account.reconciliationEligible)
+      ) {
+        reasons.push(`ACCOUNT_MAPPING_NOT_CONTROL_ELIGIBLE:${key}`);
+      }
     }
 
     const configuredJournals = new Map(

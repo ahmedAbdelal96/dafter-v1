@@ -10,6 +10,15 @@ import {
   TaxTreatmentCategory,
 } from '@prisma/client';
 
+export const SalesTaxSelectionProvenance = {
+  MODULE_DEFAULT: 'MODULE_DEFAULT',
+  COMPANY_DEFAULT: 'COMPANY_DEFAULT',
+  EXPLICIT_OVERRIDE: 'EXPLICIT_OVERRIDE',
+  MODULE_DISABLED_OUT_OF_SCOPE: 'MODULE_DISABLED_OUT_OF_SCOPE',
+} as const;
+export type SalesTaxSelectionProvenance =
+  (typeof SalesTaxSelectionProvenance)[keyof typeof SalesTaxSelectionProvenance];
+
 export interface SalesTaxRateSnapshot {
   id: string;
   code: string;
@@ -28,6 +37,7 @@ export interface SalesTaxSelection {
   treatmentStatus?: TaxLifecycleStatus;
   treatmentEffectiveFrom?: Date | null;
   treatmentEffectiveTo?: Date | null;
+  selectionProvenance?: SalesTaxSelectionProvenance;
 }
 
 export interface SalesTaxInput extends SalesTaxSelection {
@@ -37,6 +47,7 @@ export interface SalesTaxInput extends SalesTaxSelection {
 }
 
 export interface SalesTaxResult {
+  selectionProvenance: SalesTaxSelectionProvenance;
   treatmentId: string | null;
   treatmentCode: string;
   treatmentCategory: TaxTreatmentCategory;
@@ -68,6 +79,8 @@ export class SalesTaxCalculatorService {
         treatmentCode: TaxTreatmentCategory.OUT_OF_SCOPE,
         treatmentCategory: TaxTreatmentCategory.OUT_OF_SCOPE,
         calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
+        selectionProvenance:
+          SalesTaxSelectionProvenance.MODULE_DISABLED_OUT_OF_SCOPE,
       };
     }
 
@@ -75,19 +88,32 @@ export class SalesTaxCalculatorService {
       if (!input.allowManualOverride || !input.overrideAuthorized) {
         throw new ForbiddenException('sales.tax_override_forbidden');
       }
-      return input.explicit;
+      return {
+        ...input.explicit,
+        selectionProvenance: SalesTaxSelectionProvenance.EXPLICIT_OVERRIDE,
+      };
     }
 
-    return (
-      input.moduleDefault ??
-      input.companyDefault ?? {
-        rate: null,
-        treatmentId: null,
-        treatmentCode: TaxTreatmentCategory.OUT_OF_SCOPE,
-        treatmentCategory: TaxTreatmentCategory.OUT_OF_SCOPE,
-        calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
-      }
-    );
+    if (input.moduleDefault) {
+      return {
+        ...input.moduleDefault,
+        selectionProvenance: SalesTaxSelectionProvenance.MODULE_DEFAULT,
+      };
+    }
+    if (input.companyDefault) {
+      return {
+        ...input.companyDefault,
+        selectionProvenance: SalesTaxSelectionProvenance.COMPANY_DEFAULT,
+      };
+    }
+    return {
+      rate: null,
+      treatmentId: null,
+      treatmentCode: TaxTreatmentCategory.OUT_OF_SCOPE,
+      treatmentCategory: TaxTreatmentCategory.OUT_OF_SCOPE,
+      calculationMode: TaxCalculationMode.TAX_EXCLUSIVE,
+      selectionProvenance: SalesTaxSelectionProvenance.COMPANY_DEFAULT,
+    };
   }
 
   calculateTax(input: SalesTaxInput): SalesTaxResult {
@@ -139,6 +165,9 @@ export class SalesTaxCalculatorService {
         : this.money(taxableBase.add(taxAmount), input.currencyPrecision);
 
     return {
+      selectionProvenance:
+        input.selectionProvenance ??
+        SalesTaxSelectionProvenance.COMPANY_DEFAULT,
       treatmentId: input.treatmentId ?? null,
       treatmentCode: input.treatmentCode,
       treatmentCategory: input.treatmentCategory,

@@ -115,6 +115,8 @@ describe('Accounting B01.1 PostgreSQL integration', () => {
       code: '1100',
       name: 'Receivables',
       accountType: AccountingAccountType.ASSET_RECEIVABLE,
+      isControlAccount: true,
+      reconciliationEligible: true,
     })) as { id: string };
     const journal = (await service.createJournal(company.id, actor.id, {
       code: 'GEN',

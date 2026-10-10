@@ -334,6 +334,8 @@ export class OpeningBalancesService {
           companyId: input.companyId,
           accountType: account.accountType,
           businessPartnerId: line.businessPartnerId,
+          isControlAccount: account.isControlAccount,
+          reconciliationEligible: account.reconciliationEligible,
         });
       }
       const batch = await db.openingBalanceBatch.create({
@@ -400,7 +402,11 @@ export class OpeningBalancesService {
     db: Prisma.TransactionClient,
     companyId: string,
     lines: Array<{
-      account: { accountType: AccountingAccountType };
+      account: {
+        accountType: AccountingAccountType;
+        isControlAccount: boolean;
+        reconciliationEligible: boolean;
+      };
       businessPartnerId: string | null;
     }>,
   ) {
@@ -409,6 +415,8 @@ export class OpeningBalancesService {
         companyId,
         accountType: line.account.accountType,
         businessPartnerId: line.businessPartnerId,
+        isControlAccount: line.account.isControlAccount,
+        reconciliationEligible: line.account.reconciliationEligible,
       });
     }
   }

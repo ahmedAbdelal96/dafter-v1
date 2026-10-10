@@ -1108,9 +1108,24 @@ export class AccountingService {
     let creditTotal = AccountingMoney.zero();
     let transactionDebitTotal = AccountingMoney.zero();
     let transactionCreditTotal = AccountingMoney.zero();
-    const lineData: Array<
-      Omit<Prisma.JournalLineCreateManyInput, 'journalEntryId'>
-    > = [];
+    let baseConversionResidualAccountId: string | null = null;
+    let baseConversionResidualSide: 'debit' | 'credit' | null = null;
+    const lineData: Array<{
+      companyId: string;
+      accountId: string;
+      debit: Prisma.Decimal;
+      credit: Prisma.Decimal;
+      transactionDebit: Prisma.Decimal;
+      transactionCredit: Prisma.Decimal;
+      description: string | null;
+      businessPartnerId: string | null;
+      dueDate: Date | null;
+      documentReference: string | null;
+      reconciliationReference: string | null;
+      taxCode: string | null;
+      taxTreatmentCode: string | null;
+      taxRate: Prisma.Decimal | null;
+    }> = [];
     const transactionMinorUnitPrecision = Number(
       currencyContext.transaction.minorUnitPrecision,
     );
@@ -1120,7 +1135,9 @@ export class AccountingService {
         throw new ConflictException(`Account ${account.code} is inactive`);
       if (
         account.isControlAccount &&
-        command.sourceType === JournalSourceType.MANUAL_JOURNAL
+        command.sourceType === JournalSourceType.MANUAL_JOURNAL &&
+        (account.templateKey === 'AR_CONTROL' ||
+          account.templateKey === 'AP_CONTROL')
       )
         throw new ConflictException(
           `Control account ${account.code} requires a source-document posting`,
@@ -1138,6 +1155,8 @@ export class AccountingService {
         companyId: command.companyId,
         accountType: account.accountType,
         businessPartnerId: line.businessPartnerId,
+        isControlAccount: account.isControlAccount,
+        reconciliationEligible: account.reconciliationEligible,
       });
       const transactionDebit = AccountingMoney.fromString(
         line.transactionDebit,
@@ -1189,6 +1208,78 @@ export class AccountingService {
         taxTreatmentCode: line.taxTreatmentCode ?? null,
         taxRate: line.taxRate ? this.parseTaxRate(line.taxRate) : null,
       });
+    }
+
+    if (!transactionDebitTotal.eq(transactionCreditTotal)) {
+      throw new BadRequestException(
+        'Transaction currency journal is not balanced: total debit must equal total credit',
+      );
+    }
+
+    const baseConversionResidual = debitTotal
+      .toDecimal()
+      .sub(creditTotal.toDecimal());
+    if (!baseConversionResidual.isZero()) {
+      // Every line was converted independently at four base-currency places.
+      // The only permissible imbalance is the bounded sum of those genuine
+      // half-unit-in-the-last-place conversion residuals. Allocate that
+      // residual to the largest converted line on the overrepresented side;
+      // transaction-currency amounts remain untouched and the audit log makes
+      // the deterministic adjustment explainable.
+      const maximumResidual = new Prisma.Decimal(lineData.length).mul(
+        '0.00005',
+      );
+      if (baseConversionResidual.abs().gt(maximumResidual)) {
+        throw new BadRequestException(
+          'Journal base-currency imbalance exceeds conversion-rounding tolerance',
+        );
+      }
+
+      const overrepresentedSide = baseConversionResidual.gt(0)
+        ? 'debit'
+        : 'credit';
+      const amountToRemove = baseConversionResidual.abs();
+      const candidates = lineData
+        .map((line, index) => ({ line, index }))
+        .filter(({ line }) =>
+          overrepresentedSide === 'debit'
+            ? new Prisma.Decimal(String(line.debit)).gte(amountToRemove)
+            : new Prisma.Decimal(String(line.credit)).gte(amountToRemove),
+        )
+        .sort((left, right) => {
+          const leftAmount =
+            overrepresentedSide === 'debit'
+              ? new Prisma.Decimal(String(left.line.debit))
+              : new Prisma.Decimal(String(left.line.credit));
+          const rightAmount =
+            overrepresentedSide === 'debit'
+              ? new Prisma.Decimal(String(right.line.debit))
+              : new Prisma.Decimal(String(right.line.credit));
+          return rightAmount.comparedTo(leftAmount) || left.index - right.index;
+        });
+      const candidate = candidates[0];
+      if (!candidate) {
+        throw new BadRequestException(
+          'Journal conversion residual cannot be allocated safely',
+        );
+      }
+      if (overrepresentedSide === 'debit') {
+        candidate.line.debit = new Prisma.Decimal(
+          String(candidate.line.debit),
+        ).sub(amountToRemove);
+        debitTotal = debitTotal.sub(
+          AccountingMoney.fromString(amountToRemove.toFixed(4)),
+        );
+      } else {
+        candidate.line.credit = new Prisma.Decimal(
+          String(candidate.line.credit),
+        ).sub(amountToRemove);
+        creditTotal = creditTotal.sub(
+          AccountingMoney.fromString(amountToRemove.toFixed(4)),
+        );
+      }
+      baseConversionResidualAccountId = candidate.line.accountId;
+      baseConversionResidualSide = overrepresentedSide;
     }
 
     if (!debitTotal.eq(creditTotal)) {
@@ -1278,6 +1369,9 @@ export class AccountingService {
           debitTotal: debitTotal.toString(),
           creditTotal: creditTotal.toString(),
           transactionCurrencyCode: currencyCode,
+          baseConversionResidual: baseConversionResidual.toFixed(4),
+          baseConversionResidualAccountId,
+          baseConversionResidualSide,
         },
       },
     });

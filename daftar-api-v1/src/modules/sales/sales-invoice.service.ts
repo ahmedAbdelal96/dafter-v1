@@ -38,7 +38,10 @@ import {
   SALES_INVOICE_INCLUDE,
 } from './sales-invoice.repository';
 import { SalesPricingService } from './sales-pricing.service';
-import { SalesTaxCalculatorService } from './sales-tax-calculator.service';
+import {
+  SalesTaxCalculatorService,
+  SalesTaxSelectionProvenance,
+} from './sales-tax-calculator.service';
 import { AccountingReadinessService } from '../accounting-bootstrap/accounting-readiness.service';
 import { assertAccountMappingCompatibility } from '../accounting/accounting-policies';
 
@@ -50,9 +53,9 @@ export class SalesInvoiceService {
     private readonly prisma: PrismaService,
     private readonly pricing: SalesPricingService,
     private readonly tax: SalesTaxCalculatorService,
-    @Optional() private readonly accounting?: AccountingService,
+    private readonly accounting: AccountingService,
+    private readonly readiness: AccountingReadinessService,
     @Optional() private readonly repository?: SalesInvoiceRepository,
-    @Optional() private readonly readiness?: AccountingReadinessService,
   ) {}
 
   async createDraft(
@@ -167,9 +170,6 @@ export class SalesInvoiceService {
     id: string,
     input?: PostSalesInvoiceInput,
   ) {
-    if (!this.accounting) {
-      throw new ConflictException('Accounting service is not available');
-    }
     const accounting = this.accounting;
 
     return this.prisma.$transaction(async (db) => {
@@ -218,24 +218,27 @@ export class SalesInvoiceService {
       const postingDateValue = input?.postingDate ?? invoice.documentDate;
       this.assertDate(postingDateValue, 'sales.posting_date_invalid');
       const postingDate = this.dateOnly(postingDateValue);
-      if (this.readiness) {
-        const readiness = await this.readiness.evaluateInTransaction(
-          db,
-          companyId,
-          postingDateValue,
+      const readiness = await this.readiness.evaluateInTransaction(
+        db,
+        companyId,
+        postingDateValue,
+      );
+      if (!readiness.ready) {
+        throw new ConflictException(
+          `Accounting is not ready: ${readiness.reasons.join(', ')}`,
         );
-        if (!readiness.ready) {
-          throw new ConflictException(
-            `Accounting is not ready: ${readiness.reasons.join(', ')}`,
-          );
-        }
       }
       await db.$queryRaw(Prisma.sql`
         SELECT "id" FROM "BusinessPartner"
         WHERE "id" = ${invoice.businessPartnerId} AND "companyId" = ${companyId}
         FOR UPDATE
       `);
-      await this.assertDraftStillCurrent(db, invoice, postingDateValue);
+      await this.assertDraftStillCurrent(
+        db,
+        invoice,
+        postingDateValue,
+        actorUserId,
+      );
       this.assertPaymentSchedule(invoice);
       await this.assertCreditLimit(db, invoice);
       const period = await db.accountingPeriod.findFirst({
@@ -476,86 +479,13 @@ export class SalesInvoiceService {
       throw new BadRequestException('sales.partner_inactive');
     }
 
-    const [moduleRule, defaultPolicy, actor] = await Promise.all([
-      db.taxModuleApplicabilityRule.findUnique({
-        where: {
-          companyId_moduleKey: { companyId, moduleKey: TaxModuleKey.SALES },
-        },
-        include: { defaultRate: true, defaultTreatment: true },
-      }),
-      db.taxDefaultPolicy.findUnique({
-        where: { companyId },
-        include: { defaultRate: true, defaultTreatment: true },
-      }),
-      db.user.findFirst({
-        where: { id: actorUserId },
-        include: { permissions: true },
-      }),
-    ]);
-    const overrideAuthorized =
-      actor?.role === 'OWNER' ||
-      actor?.role === 'SUPER_ADMIN' ||
-      (
-        actor?.permissions?.permissions as Record<string, unknown> | undefined
-      )?.['overrideSalesTax'] === true;
-    const defaultSelection = moduleRule?.defaultTreatment
-      ? {
-          treatmentId: moduleRule.defaultTreatment.id,
-          treatmentCode: moduleRule.defaultTreatment.code,
-          treatmentCategory: moduleRule.defaultTreatment.category,
-          calculationMode: moduleRule.defaultTreatment.calculationMode,
-          treatmentStatus: moduleRule.defaultTreatment.status,
-          treatmentEffectiveFrom: moduleRule.defaultTreatment.effectiveFrom,
-          treatmentEffectiveTo: moduleRule.defaultTreatment.effectiveTo,
-          rate: moduleRule.defaultRate
-            ? {
-                id: moduleRule.defaultRate.id,
-                code: moduleRule.defaultRate.code,
-                percentage: moduleRule.defaultRate.percentage,
-                status: moduleRule.defaultRate.status,
-                effectiveFrom: moduleRule.defaultRate.effectiveFrom,
-                effectiveTo: moduleRule.defaultRate.effectiveTo,
-              }
-            : null,
-        }
-      : defaultPolicy?.defaultTreatment
-        ? {
-            treatmentId: defaultPolicy.defaultTreatment.id,
-            treatmentCode: defaultPolicy.defaultTreatment.code,
-            treatmentCategory: defaultPolicy.defaultTreatment.category,
-            calculationMode: defaultPolicy.defaultCalculationMode,
-            treatmentStatus: defaultPolicy.defaultTreatment.status,
-            treatmentEffectiveFrom:
-              defaultPolicy.defaultTreatment.effectiveFrom,
-            treatmentEffectiveTo: defaultPolicy.defaultTreatment.effectiveTo,
-            rate: defaultPolicy.defaultRate
-              ? {
-                  id: defaultPolicy.defaultRate.id,
-                  code: defaultPolicy.defaultRate.code,
-                  percentage: defaultPolicy.defaultRate.percentage,
-                  status: defaultPolicy.defaultRate.status,
-                  effectiveFrom: defaultPolicy.defaultRate.effectiveFrom,
-                  effectiveTo: defaultPolicy.defaultRate.effectiveTo,
-                }
-              : null,
-          }
-        : null;
-
-    const configuredTaxPairs = [
-      [moduleRule?.defaultTreatment, moduleRule?.defaultRate],
-      [defaultPolicy?.defaultTreatment, defaultPolicy?.defaultRate],
-    ] as const;
-    for (const [treatment, rate] of configuredTaxPairs) {
-      if (treatment && treatment.companyId !== companyId) {
-        throw new BadRequestException('sales.tax_treatment_company_mismatch');
-      }
-      if (rate && rate.companyId !== companyId) {
-        throw new BadRequestException('sales.tax_rate_company_mismatch');
-      }
-      if (treatment && rate && rate.treatmentId !== treatment.id) {
-        throw new BadRequestException('sales.tax_rate_treatment_mismatch');
-      }
-    }
+    const taxPolicy = await this.loadCurrentTaxPolicy(
+      db,
+      companyId,
+      actorUserId,
+    );
+    const defaultSelection =
+      taxPolicy.moduleDefault ?? taxPolicy.companyDefault;
 
     const lineResults = [] as Array<{
       input: SalesInvoiceLineInput;
@@ -601,19 +531,17 @@ export class SalesInvoiceService {
             )
           : null;
       const selection = this.tax.resolveTaxSelection({
-        moduleEnabled: moduleRule?.isEnabled ?? true,
-        moduleDefault: defaultSelection,
-        companyDefault: moduleRule?.defaultTreatment ? null : defaultSelection,
+        moduleEnabled: taxPolicy.moduleEnabled,
+        moduleDefault: taxPolicy.moduleDefault,
+        companyDefault: taxPolicy.companyDefault,
         explicit,
-        allowManualOverride:
-          (moduleRule?.allowOverride ?? true) &&
-          (defaultPolicy?.allowManualOverride ?? true),
-        overrideAuthorized,
+        allowManualOverride: taxPolicy.allowManualOverride,
+        overrideAuthorized: taxPolicy.overrideAuthorized,
       });
       if (explicit && !line.taxOverrideReason?.trim()) {
         throw new BadRequestException('sales.tax_override_reason_required');
       }
-      if (explicit && actor) {
+      if (explicit) {
         await db.auditLog.create({
           data: {
             companyId,
@@ -815,6 +743,9 @@ export class SalesInvoiceService {
           rateCodeSnapshot: line.tax.rateCode,
           percentageSnapshot: line.tax.percentage,
           calculationMode: line.tax.calculationMode,
+          selectionProvenance:
+            line.tax.selectionProvenance ??
+            SalesTaxSelectionProvenance.COMPANY_DEFAULT,
           taxableBase: line.taxableBase,
           taxAmount: line.taxAmount,
         },
@@ -915,6 +846,109 @@ export class SalesInvoiceService {
     };
   }
 
+  private async loadCurrentTaxPolicy(
+    db: Db,
+    companyId: string,
+    actorUserId: string,
+  ) {
+    const [moduleRule, defaultPolicy, actor] = await Promise.all([
+      db.taxModuleApplicabilityRule.findUnique({
+        where: {
+          companyId_moduleKey: { companyId, moduleKey: TaxModuleKey.SALES },
+        },
+        include: { defaultRate: true, defaultTreatment: true },
+      }),
+      db.taxDefaultPolicy.findUnique({
+        where: { companyId },
+        include: { defaultRate: true, defaultTreatment: true },
+      }),
+      db.user.findFirst({
+        where: { id: actorUserId, companyId },
+        include: { permissions: true },
+      }),
+    ]);
+    const moduleDefault = moduleRule?.defaultTreatment
+      ? this.taxSelectionFromPolicy(
+          moduleRule.defaultTreatment,
+          moduleRule.defaultRate,
+          moduleRule.defaultTreatment.calculationMode,
+        )
+      : null;
+    const companyDefault = defaultPolicy?.defaultTreatment
+      ? this.taxSelectionFromPolicy(
+          defaultPolicy.defaultTreatment,
+          defaultPolicy.defaultRate,
+          defaultPolicy.defaultCalculationMode,
+        )
+      : null;
+    for (const [treatment, rate] of [
+      [moduleRule?.defaultTreatment, moduleRule?.defaultRate],
+      [defaultPolicy?.defaultTreatment, defaultPolicy?.defaultRate],
+    ] as const) {
+      if (treatment && treatment.companyId !== companyId)
+        throw new BadRequestException('sales.tax_treatment_company_mismatch');
+      if (rate && rate.companyId !== companyId)
+        throw new BadRequestException('sales.tax_rate_company_mismatch');
+      if (treatment && rate && rate.treatmentId !== treatment.id)
+        throw new BadRequestException('sales.tax_rate_treatment_mismatch');
+    }
+    return {
+      moduleEnabled: moduleRule?.isEnabled ?? true,
+      moduleDefault,
+      companyDefault,
+      allowManualOverride:
+        (moduleRule?.allowOverride ?? true) &&
+        (defaultPolicy?.allowManualOverride ?? true),
+      overrideAuthorized:
+        actor?.role === 'OWNER' ||
+        actor?.role === 'SUPER_ADMIN' ||
+        (
+          actor?.permissions?.permissions as Record<string, unknown> | undefined
+        )?.['overrideSalesTax'] === true,
+    };
+  }
+
+  private taxSelectionFromPolicy(
+    treatment: {
+      id: string;
+      code: string;
+      category: TaxTreatmentCategory;
+      calculationMode: TaxCalculationMode;
+      status: TaxLifecycleStatus;
+      effectiveFrom: Date | null;
+      effectiveTo: Date | null;
+    },
+    rate: {
+      id: string;
+      code: string;
+      percentage: Prisma.Decimal;
+      status: TaxLifecycleStatus;
+      effectiveFrom: Date | null;
+      effectiveTo: Date | null;
+    } | null,
+    calculationMode: TaxCalculationMode,
+  ) {
+    return {
+      treatmentId: treatment.id,
+      treatmentCode: treatment.code,
+      treatmentCategory: treatment.category,
+      calculationMode,
+      treatmentStatus: treatment.status,
+      treatmentEffectiveFrom: treatment.effectiveFrom,
+      treatmentEffectiveTo: treatment.effectiveTo,
+      rate: rate
+        ? {
+            id: rate.id,
+            code: rate.code,
+            percentage: rate.percentage,
+            status: rate.status,
+            effectiveFrom: rate.effectiveFrom,
+            effectiveTo: rate.effectiveTo,
+          }
+        : null,
+    };
+  }
+
   private async assertCreditLimit(
     db: Prisma.TransactionClient,
     invoice: {
@@ -996,7 +1030,7 @@ export class SalesInvoiceService {
         mappedAccounts.get(AccountingConfigAccountKey.RECEIVABLE),
       AccountingConfigAccountKey.RECEIVABLE,
       AccountingAccountType.ASSET_RECEIVABLE,
-      false,
+      true,
     );
     const revenue = await load(
       mappedAccounts.get(AccountingConfigAccountKey.INCOME),
@@ -1021,6 +1055,7 @@ export class SalesInvoiceService {
     db: Prisma.TransactionClient,
     invoice: any,
     postingDate: Date,
+    actorUserId: string,
   ) {
     const partner = await db.businessPartner.findFirst({
       where: { id: invoice.businessPartnerId, companyId: invoice.companyId },
@@ -1043,6 +1078,11 @@ export class SalesInvoiceService {
     ) {
       throw new ConflictException('sales.draft_requires_recalculation');
     }
+    const taxPolicy = await this.loadCurrentTaxPolicy(
+      db,
+      String(invoice.companyId),
+      actorUserId,
+    );
     for (const line of invoice.lines) {
       const tax = line.taxes[0];
       if (!tax) continue;
@@ -1079,10 +1119,80 @@ export class SalesInvoiceService {
       ) {
         throw new ConflictException('sales.draft_requires_recalculation');
       }
+
+      let currentSelection;
+      if (
+        tax.selectionProvenance ===
+        SalesTaxSelectionProvenance.EXPLICIT_OVERRIDE
+      ) {
+        if (!taxPolicy.moduleEnabled || !taxPolicy.allowManualOverride) {
+          throw new ConflictException('sales.draft_requires_recalculation');
+        }
+        if (!taxPolicy.overrideAuthorized) {
+          throw new ConflictException('sales.tax_override_forbidden');
+        }
+        const explicit = await this.loadExplicitTaxSelection(
+          db,
+          String(invoice.companyId),
+          tax.taxTreatmentId ? String(tax.taxTreatmentId) : undefined,
+          tax.taxRateId ? String(tax.taxRateId) : undefined,
+        );
+        currentSelection = this.tax.resolveTaxSelection({
+          moduleEnabled: true,
+          moduleDefault: null,
+          companyDefault: null,
+          explicit,
+          allowManualOverride: true,
+          overrideAuthorized: true,
+        });
+      } else if (
+        tax.selectionProvenance ===
+        SalesTaxSelectionProvenance.MODULE_DISABLED_OUT_OF_SCOPE
+      ) {
+        if (taxPolicy.moduleEnabled) {
+          throw new ConflictException('sales.draft_requires_recalculation');
+        }
+        currentSelection = this.tax.resolveTaxSelection({
+          moduleEnabled: false,
+          moduleDefault: null,
+          companyDefault: null,
+          explicit: null,
+          allowManualOverride: false,
+          overrideAuthorized: false,
+        });
+      } else {
+        currentSelection = this.tax.resolveTaxSelection({
+          moduleEnabled: taxPolicy.moduleEnabled,
+          moduleDefault: taxPolicy.moduleDefault,
+          companyDefault: taxPolicy.companyDefault,
+          explicit: null,
+          allowManualOverride: taxPolicy.allowManualOverride,
+          overrideAuthorized: taxPolicy.overrideAuthorized,
+        });
+      }
+      if (
+        currentSelection.selectionProvenance !== tax.selectionProvenance ||
+        currentSelection.treatmentId !== tax.taxTreatmentId ||
+        currentSelection.treatmentCode !== tax.treatmentCodeSnapshot ||
+        currentSelection.treatmentCategory !== tax.treatmentCategory ||
+        currentSelection.calculationMode !== tax.calculationMode ||
+        (currentSelection.rate?.id ?? null) !== (tax.taxRateId ?? null) ||
+        (currentSelection.rate?.code ?? null) !==
+          (tax.rateCodeSnapshot ?? null) ||
+        !new Prisma.Decimal(String(currentSelection.rate?.percentage ?? 0)).eq(
+          String(tax.percentageSnapshot),
+        )
+      ) {
+        throw new ConflictException('sales.draft_requires_recalculation');
+      }
     }
     if (invoice.paymentTermId) {
       const term = await db.paymentTerm.findFirst({
-        where: { id: invoice.paymentTermId, companyId: invoice.companyId },
+        where: {
+          id: invoice.paymentTermId,
+          companyId: invoice.companyId,
+          isActive: true,
+        },
         include: { lines: { orderBy: { sequence: 'asc' } } },
       });
       const first = invoice.paymentSchedule[0];
