@@ -2,7 +2,7 @@ name: Backend CI
 
 on:
   push:
-    branches: [main, master, "codex/**"]
+    branches: [main, master, "codex/**", "hotfix/**"]
     paths:
       - "daftar-api-v1/**"
       - "docs/**"

@@ -2,7 +2,7 @@ name: Web Dashboard CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, "hotfix/**"]
     paths:
       - "daftar-dashboard/**"
       - ".github/workflows/web-ci.yml"
