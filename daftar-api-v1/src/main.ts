@@ -14,6 +14,7 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const logger = app.get(AppLoggerService);
+  const isProduction = configService.get<string>('NODE_ENV', 'development') === 'production';
 
   app.use(
     helmet({
@@ -23,6 +24,13 @@ async function bootstrap() {
       crossOriginResourcePolicy: { policy: 'cross-origin' },
       // Keep opener policy relaxed for dev convenience.
       crossOriginOpenerPolicy: false,
+      // Local development is served over HTTP. Do not publish browser policies
+      // that upgrade local API calls to HTTPS, while retaining Helmet defaults
+      // in production where TLS is expected.
+      hsts: isProduction ? undefined : false,
+      contentSecurityPolicy: isProduction
+        ? undefined
+        : { directives: { upgradeInsecureRequests: null } },
     }),
   );
 
