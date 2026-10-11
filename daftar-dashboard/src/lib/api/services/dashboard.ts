@@ -45,16 +45,12 @@ export interface DashboardOverviewResponse {
   };
   operations: {
     invoicesCount: number;
-    deferredSalesCount: number;
-    installmentContractsCount: number;
     overdueCount: number;
     activeCustomers: number;
     activeProducts: number;
     activeEmployees: number;
   };
   alerts: {
-    overdueDeferredSales: number;
-    overdueInstallments: number;
     customersNearCreditLimit: number;
     criticalNegativeBalances: number;
   };
@@ -73,11 +69,6 @@ export interface DashboardChartsResponse {
     receivables: number;
     payables: number;
   };
-  salesDistribution: {
-    cash: number;
-    deferred: number;
-    installment: number;
-  };
 }
 
 export interface DashboardHighlightsResponse {
@@ -93,17 +84,10 @@ export interface DashboardHighlightsResponse {
     quantitySold: string;
     salesAmount: string;
   }>;
-  topEmployees: Array<{
-    id: string;
-    name: string;
-    invoicesCount: number;
-    salesAmount: string;
-    collectionsAmount: string;
-  }>;
 }
 
 export interface DashboardAlertItem {
-  type: "OVERDUE_DEFERRED" | "OVERDUE_INSTALLMENT" | "CREDIT_LIMIT_RISK" | "CRITICAL_PAYABLE";
+  type: "OVERDUE_RECEIVABLE";
   severity: "low" | "medium" | "high";
   title: string;
   description: string;

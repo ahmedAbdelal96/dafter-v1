@@ -38,4 +38,5 @@ export const CONTROLLER_FEATURE_POLICY: Record<
   'tax-setup/controllers/tax-setup.controller.ts': 'role-guarded',
   'users/users.controller.ts': 'role-guarded',
   'financial-reports/financial-reports.controller.ts': 'role-guarded',
+  'dashboard/dashboard.controller.ts': 'role-guarded',
 };

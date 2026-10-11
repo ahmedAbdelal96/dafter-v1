@@ -77,6 +77,7 @@ import { CustomerPaymentModule } from './modules/customer-payments/customer-paym
 import { SupplierPaymentModule } from './modules/supplier-payments/supplier-payment.module';
 import { PurchasesModule } from './modules/purchases/purchases.module';
 import { FinancialReportsModule } from './modules/financial-reports/financial-reports.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -179,6 +180,7 @@ import { FinancialReportsModule } from './modules/financial-reports/financial-re
     SupplierPaymentModule,
     PurchasesModule,
     FinancialReportsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [

@@ -33,7 +33,7 @@ export function DashboardHighlightsSection({ highlights, locale, currencyCode, i
   const t = useTranslations("dashboard.highlights");
 
   return (
-    <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
       <ComponentCard title={t("topCustomersTitle")} desc={t("topCustomersDescription")}>
         {isLoading || !highlights ? (
           <HighlightsSkeleton />
@@ -70,23 +70,6 @@ export function DashboardHighlightsSection({ highlights, locale, currencyCode, i
         )}
       </ComponentCard>
 
-      <ComponentCard title={t("topEmployeesTitle")} desc={t("topEmployeesDescription")}>
-        {isLoading || !highlights ? (
-          <HighlightsSkeleton />
-        ) : (
-          <div className="space-y-3">
-            {highlights.topEmployees.map((item) => (
-              <RowLink
-                key={item.id}
-                href={`/users`}
-                title={item.name}
-                subtitle={t("employeeMeta", { invoices: item.invoicesCount, collections: formatMoney(item.collectionsAmount, locale, currencyCode) })}
-                value={formatMoney(item.salesAmount, locale, currencyCode)}
-              />
-            ))}
-          </div>
-        )}
-      </ComponentCard>
     </div>
   );
 }

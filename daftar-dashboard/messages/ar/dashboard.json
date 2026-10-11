@@ -55,6 +55,8 @@
     "receivables": "الذمم المدينة: {amount}",
     "deferredInstallments": "آجل {deferred} • تقسيط {installments}",
     "overdueBreakdown": "آجل متأخر {deferred} • أقساط متأخرة {installments}",
+    "cashNetFlowDescription": "حركة النقد والبنوك المرحلة",
+    "overdueReceivables": "عملاء لديهم أرصدة مستحقة متأخرة",
     "criticalNegativeBalances": "أرصدة حرجة: {count}"
   },
   "charts": {

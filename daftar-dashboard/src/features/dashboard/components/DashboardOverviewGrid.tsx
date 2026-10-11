@@ -110,10 +110,7 @@ export function DashboardOverviewGrid({ overview, locale, isLoading }: Dashboard
       title: t("cashNetFlow"),
       value: formatMoney(overview?.kpis.cashNetFlow, locale, currencyCode),
       isMonetary: true,
-      subtitle: t("deferredInstallments", {
-        deferred: overview?.operations.deferredSalesCount ?? 0,
-        installments: overview?.operations.installmentContractsCount ?? 0,
-      }),
+      subtitle: t("cashNetFlowDescription"),
       icon: WalletIcon,
       iconColor: "text-primary",
       iconBgColor: "bg-primary/10",
@@ -121,10 +118,7 @@ export function DashboardOverviewGrid({ overview, locale, isLoading }: Dashboard
     {
       title: t("overdueCount"),
       value: formatCompactNumber(overview?.operations.overdueCount ?? 0, locale),
-      subtitle: t("overdueBreakdown", {
-        deferred: overview?.alerts.overdueDeferredSales ?? 0,
-        installments: overview?.alerts.overdueInstallments ?? 0,
-      }),
+      subtitle: t("overdueReceivables"),
       icon: WarningIcon,
       iconColor: "text-error-700",
       iconBgColor: "bg-error-500/12",

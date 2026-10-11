@@ -55,6 +55,8 @@
     "receivables": "Receivables: {amount}",
     "deferredInstallments": "Deferred {deferred} • Installments {installments}",
     "overdueBreakdown": "Deferred overdue {deferred} • Installments overdue {installments}",
+    "cashNetFlowDescription": "Posted cash and bank movement",
+    "overdueReceivables": "Customers with overdue receivables",
     "criticalNegativeBalances": "Critical balances: {count}"
   },
   "charts": {

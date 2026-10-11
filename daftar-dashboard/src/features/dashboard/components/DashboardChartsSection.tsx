@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl";
 import ComponentCard from "@/components/common/ComponentCard";
 import { DashboardAreaChart } from "@/components/charts/dashboard/DashboardAreaChart";
 import { DashboardBarChart } from "@/components/charts/dashboard/DashboardBarChart";
-import { DashboardDonutChart } from "@/components/charts/dashboard/DashboardDonutChart";
 import type { DashboardChartsResponse } from "@/lib/api/services/dashboard";
 import { formatMoney } from "../utils/dashboard-format";
 
@@ -57,27 +56,7 @@ export function DashboardChartsSection({ charts, locale, currencyCode, isLoading
         {isLoading || !charts ? (
           <DashboardChartSkeleton />
         ) : (
-          <DashboardDonutChart
-            labels={[t("receivablesLabel"), t("payablesLabel")]}
-            series={[charts.receivablesVsPayables.receivables, charts.receivablesVsPayables.payables]}
-            valueFormatter={moneyFormatter}
-          />
-        )}
-      </ComponentCard>
-
-      <ComponentCard title={t("salesDistributionTitle")} desc={t("salesDistributionDescription")}>
-        {isLoading || !charts ? (
-          <DashboardChartSkeleton />
-        ) : (
-          <DashboardDonutChart
-            labels={[t("cashLabel"), t("deferredLabel"), t("installmentLabel")]}
-            series={[
-              charts.salesDistribution.cash,
-              charts.salesDistribution.deferred,
-              charts.salesDistribution.installment,
-            ]}
-            valueFormatter={moneyFormatter}
-          />
+          <div className="grid grid-cols-2 gap-4 pt-8 text-center"><div><p className="text-xs text-text-secondary">{t("receivablesLabel")}</p><p className="mt-2 text-xl font-semibold">{moneyFormatter(charts.receivablesVsPayables.receivables)}</p></div><div><p className="text-xs text-text-secondary">{t("payablesLabel")}</p><p className="mt-2 text-xl font-semibold">{moneyFormatter(charts.receivablesVsPayables.payables)}</p></div></div>
         )}
       </ComponentCard>
     </div>

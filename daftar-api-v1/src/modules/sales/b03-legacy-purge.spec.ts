@@ -17,7 +17,6 @@ describe('B03 legacy purge architecture', () => {
       'installments',
       'statements',
       'reports',
-      'dashboard',
       'pricing',
     ]) {
       expect(existsSync(join(sourceRoot, 'modules', moduleName))).toBe(false);
@@ -46,7 +45,6 @@ describe('B03 legacy purge architecture', () => {
       'DeferredSalesModule',
       'InstallmentsModule',
       'ReportsModule',
-      'DashboardModule',
     ]) {
       expect(appModule).not.toMatch(new RegExp(`\\b${removedModule}\\b`));
     }
