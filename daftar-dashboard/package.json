@@ -15,7 +15,7 @@
     "ar:fix-encoding": "node ../scripts/fix-ar-encoding.js",
     "ar:fix-encoding:dry": "node ../scripts/fix-ar-encoding.js --dry-run --verbose",
     "ci:local": "npm run contracts:check && npm run roles:check && npm run i18n:check && npm run test:frontend && npm run lint && npm run build",
-    "build": "npm run i18n:check && next build",
+    "build": "npm run i18n:check && next build --webpack",
     "start": "next start",
     "lint": "npm run contracts:check && npm run roles:check && npm run i18n:check && eslint ."
   },
