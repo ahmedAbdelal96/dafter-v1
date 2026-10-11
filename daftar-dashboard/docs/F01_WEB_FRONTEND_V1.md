@@ -102,7 +102,11 @@ stored in tracked frontend source.
   initialization. Direct HTTP route checks are not substituted for browser
   interaction claims.
 
+The GitHub Web Dashboard CI uses Node.js 22 because the focused runtime
+contract test uses Node's built-in TypeScript stripping support.
+
 The build and local development verification required a machine-local SWC
 cache directory. On this Windows environment, the dev server was run with the
 Webpack mode when Turbopack's Google-font resolver failed; this changed no
 tracked configuration or dependency.
+
