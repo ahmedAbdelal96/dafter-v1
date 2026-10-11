@@ -13,7 +13,7 @@ describe('B06 supplier payment and AP reconciliation schema', () => {
   });
 
   afterAll(async () => {
-    await prisma?.$disconnect();
+    await prisma?.onModuleDestroy();
   });
 
   it('creates the authoritative supplier payment and AP tables', async () => {

@@ -57,73 +57,43 @@ function extractItems(payload) {
 
 async function main() {
   const { token, companyId } = await login();
-  const list = await request("/invoices?page=1&limit=50", { token, companyId });
+  const list = await request("/sales/invoices?page=1&limit=50", { token, companyId });
   if (!list.response.ok) {
-    fail(`invoices list failed (${list.response.status})`);
+    fail(`sales invoices list failed (${list.response.status})`);
   }
 
   const invoices = extractItems(list.payload);
   if (invoices.length === 0) {
-    fail("no invoices available for smoke check");
+    fail("no sales invoices available for smoke check");
   }
 
   const draft = invoices.find((inv) => inv.status === "DRAFT");
-  if (!draft?.id) {
-    fail("no draft invoice available for lifecycle happy path");
+  if (draft?.id) {
+    const postRes = await request(`/sales/invoices/${draft.id}/post`, {
+      method: "POST",
+      token,
+      companyId,
+      body: {
+        postingDate: new Date().toISOString().slice(0, 10),
+        idempotencyKey: `web-smoke-${draft.id}`,
+      },
+    });
+    if (!postRes.response.ok) {
+      fail(`sales invoice post failed (${postRes.response.status})`);
+    }
+  } else if (!invoices.some((invoice) => invoice.status === "POSTED")) {
+    fail("sales invoice list has neither a draft nor a posted invoice");
   }
 
-  const submitRes = await request(`/invoices/${draft.id}/submit`, {
-    method: "PATCH",
-    token,
-    companyId,
-  });
-  if (![200, 403].includes(submitRes.response.status)) {
-    fail(`submit returned unexpected status (${submitRes.response.status})`);
-  }
-
-  const approveRes = await request(`/invoices/${draft.id}/approve`, {
-    method: "PATCH",
-    token,
-    companyId,
-  });
-  if (!approveRes.response.ok) {
-    fail(`approve failed (${approveRes.response.status})`);
-  }
-
-  const paymentRes = await request(`/invoices/${draft.id}/payments`, {
-    method: "POST",
-    token,
-    companyId,
-    body: { amount: 1, method: "CASH", note: "smoke payment" },
-  });
-  if (![200, 201, 400, 403, 409].includes(paymentRes.response.status)) {
-    fail(`record payment returned unexpected status (${paymentRes.response.status})`);
-  }
-
-  const cancelRes = await request(`/invoices/${draft.id}/cancel`, {
-    method: "PATCH",
-    token,
-    companyId,
-  });
-  if (!cancelRes.response.ok) {
-    fail(`cancel failed (${cancelRes.response.status})`);
-  }
-
-  const rejectAfterCancelRes = await request(`/invoices/${draft.id}/reject`, {
-    method: "PATCH",
-    token,
-    companyId,
-  });
-
-  if (rejectAfterCancelRes.response.ok) {
-    fail("invalid transition check failed: reject after cancel unexpectedly succeeded");
-  }
-
-  const expectedInvalidTransitionStatuses = new Set([400, 403, 409]);
-  if (!expectedInvalidTransitionStatuses.has(rejectAfterCancelRes.response.status)) {
-    fail(
-      `invalid transition returned unexpected status (${rejectAfterCancelRes.response.status})`
+  const postedInvoice = invoices.find((invoice) => invoice.status === "POSTED");
+  if (postedInvoice?.businessPartnerId) {
+    const openItems = await request(
+      `/customer-payments/open-items?businessPartnerId=${postedInvoice.businessPartnerId}`,
+      { token, companyId },
     );
+    if (!openItems.response.ok) {
+      fail(`AR open-items request failed (${openItems.response.status})`);
+    }
   }
 
   console.log("Invoice lifecycle smoke check passed.");

@@ -18,7 +18,7 @@ describe('B03 Sales document schema', () => {
   });
 
   afterAll(async () => {
-    await prisma?.$disconnect();
+    await prisma?.onModuleDestroy();
   });
 
   it('creates all authoritative Sales document tables', async () => {

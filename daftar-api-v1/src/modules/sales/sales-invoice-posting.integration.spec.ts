@@ -111,7 +111,7 @@ describe('SalesInvoice posting', () => {
   });
 
   afterAll(async () => {
-    await prisma?.$disconnect();
+    await prisma?.onModuleDestroy();
   });
 
   it('posts exactly once through the accounting engine and allocates a fiscal-year number', async () => {

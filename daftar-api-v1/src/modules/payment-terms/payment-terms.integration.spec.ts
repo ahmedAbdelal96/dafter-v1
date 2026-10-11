@@ -69,7 +69,7 @@ describe('B02 payment terms', () => {
       await prisma.company.delete({ where: { id: companyA.id } });
     if (companyB?.id)
       await prisma.company.delete({ where: { id: companyB.id } });
-    await prisma?.$disconnect();
+    await prisma?.onModuleDestroy();
   });
 
   it('creates a tenant-scoped term, calculates Decimal schedules, and audits it', async () => {

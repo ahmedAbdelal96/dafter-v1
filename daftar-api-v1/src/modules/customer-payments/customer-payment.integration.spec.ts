@@ -114,7 +114,7 @@ describe('B04 customer payments and AR reconciliation', () => {
   });
 
   afterAll(async () => {
-    await prisma?.$disconnect();
+    await prisma?.onModuleDestroy();
   });
 
   async function postInvoice(

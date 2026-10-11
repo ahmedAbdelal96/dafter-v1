@@ -16,7 +16,7 @@ describe('B05 purchases/AP schema', () => {
     await prisma.$connect();
   });
 
-  afterAll(async () => prisma?.$disconnect());
+  afterAll(async () => prisma?.onModuleDestroy());
 
   it('creates the authoritative purchase, AP maturity, and supplier credit-note tables', async () => {
     const rows = await prisma.$queryRaw<Array<{ table_name: string }>>`

@@ -103,7 +103,7 @@ describe('B02 BusinessPartner schema foundation', () => {
       await prisma.company.delete({ where: { id: companyA.id } });
     if (companyB?.id)
       await prisma.company.delete({ where: { id: companyB.id } });
-    await prisma?.$disconnect();
+    await prisma?.onModuleDestroy();
   });
 
   it('creates the authoritative partner tables without monetary balance fields', async () => {

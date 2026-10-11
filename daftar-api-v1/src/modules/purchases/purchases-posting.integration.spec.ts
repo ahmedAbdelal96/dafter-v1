@@ -112,7 +112,7 @@ describe('B05 purchase/AP posting', () => {
     creditNotes = new SupplierCreditNoteService(prisma, accounting, readiness);
   });
 
-  afterAll(async () => prisma?.$disconnect());
+  afterAll(async () => prisma?.onModuleDestroy());
 
   const line = (description = 'Professional service') => ({
     description,

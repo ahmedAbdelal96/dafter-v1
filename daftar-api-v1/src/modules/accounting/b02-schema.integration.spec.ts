@@ -16,7 +16,7 @@ describe('B02 JournalLine schema foundation', () => {
   });
 
   afterAll(async () => {
-    await prisma?.$disconnect();
+    await prisma?.onModuleDestroy();
   });
 
   it('uses a relational business partner counterparty instead of party polymorphism', async () => {

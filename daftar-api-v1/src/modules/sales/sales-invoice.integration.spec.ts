@@ -114,7 +114,7 @@ describe('SalesInvoice drafts', () => {
   });
 
   afterAll(async () => {
-    await prisma?.$disconnect();
+    await prisma?.onModuleDestroy();
   });
 
   const line = {

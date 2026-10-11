@@ -136,7 +136,7 @@ describe('B06 supplier payments and AP reconciliation', () => {
     ).id;
   });
 
-  afterAll(async () => prisma?.$disconnect());
+  afterAll(async () => prisma?.onModuleDestroy());
 
   const invoiceLine = (description: string) => ({
     description,

@@ -77,7 +77,7 @@ describe('B02 company accounting bootstrap', () => {
       });
       await prisma.company.delete({ where: { id: company.id } });
     }
-    await prisma?.$disconnect();
+    await prisma?.onModuleDestroy();
   });
 
   it('bootstraps EG_STANDARD_V1 with July-June periods and READY status', async () => {

@@ -13,7 +13,7 @@ describe('B04 customer payment and AR reconciliation schema', () => {
   });
 
   afterAll(async () => {
-    await prisma?.$disconnect();
+    await prisma?.onModuleDestroy();
   });
 
   it('creates the authoritative payment, allocation, later-reconciliation, and numbering tables', async () => {

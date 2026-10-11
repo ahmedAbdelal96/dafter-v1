@@ -120,7 +120,7 @@ describe('B02 controlled opening balances', () => {
 
   afterAll(async () => {
     // Posted journal lines are intentionally immutable; the disposable test database is dropped by the test harness.
-    await prisma?.$disconnect();
+    await prisma?.onModuleDestroy();
   });
 
   const customerLines = () => [
