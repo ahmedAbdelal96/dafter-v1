@@ -3,53 +3,54 @@
 ## Baseline
 
 - Branch: `codex/b08-final-hardening`
-- Required B07/master base: `f962cb6dd45c49d0a8cd90f30451980ba034e8f1`
-- Safety branch `backup/local-before-b07-sync` was not modified.
+- B08 previous SHA: `62ef21438fce10bb1503456af3709642adbecddb`
+- Required master base: `f962cb6dd45c49d0a8cd90f30451980ba034e8f1`
+- Safety branch `backup/local-before-b07-sync` remains unchanged.
 - Origin uses SSH: `git@github.com:ahmedAbdelal96/dafter-v1.git`.
 
 ## Hardening completed
 
-- Accounting fiscal-year and period status mutations now require the explicit
-  `manageFinanceClosure` permission; report reads remain separate through
-  `viewFinancialReports` with the legacy `viewReports` compatibility path.
-- Staff create/update permission DTOs persist `viewFinancialReports` and
-  `manageFinanceClosure` instead of silently dropping them.
-- Prisma test pools default to zero idle connections and a short idle timeout.
-- Generated dashboard artifacts are excluded from ESLint traversal.
-- Prisma schema validation, Prisma client generation, backend build, web
-  contract checks, role checks, i18n checks, frontend runtime contracts, and
-  the full local test suite were executed.
+- Fiscal-year and accounting-period status mutations require
+  `manageFinanceClosure`; report reads use `viewFinancialReports`, with the
+  existing `viewReports` compatibility path.
+- Staff create/update permission DTOs persist both finance permissions.
+- Prisma test pools use zero idle connections and a short idle timeout.
+- Backend lint covers the complete source/test tree. The only scoped test
+  overrides are for Jest mock-factory and detached mock-method patterns.
+- Dashboard Next.js and `eslint-config-next` are on `16.4.0`.
+- The unused `swiper` dependency and optional `xlsx` feature were removed.
+  Existing Excel-export compatibility functions now download CSV.
+- `nodemailer` is upgraded to `10.1.0`.
 
-## Financial integrity evidence
+## Validation evidence
 
-- Full backend suite: 47 suites passed, 226 tests passed.
-- Existing accounting integration coverage passed for tenant isolation,
-  OPEN/SOFT_CLOSED/CLOSED period behavior, controlled soft-close overrides,
-  posted-entry immutability, balanced company/transaction currency lines,
-  reversals, and base-currency immutability.
-- Financial-report focused tests passed for tenant scoping, Decimal-safe
-  aggregation, and reversal netting.
+- Backend ESLint: 0 errors (`npm run lint -- --quiet`).
+- Backend tests: 47 suites and 226 tests passed with
+  `--detectOpenHandles --forceExit`.
+- Prisma validate/generate, TypeScript build, and backend production build
+  passed.
+- Dashboard typecheck, ESLint, i18n/contract/role checks, F01 runtime tests,
+  and production build passed; build generated 91/91 pages.
+- Financial coverage includes tenant isolation, Decimal-safe aggregation,
+  reversal netting, balanced currency lines, posted-entry immutability, and
+  OPEN/SOFT_CLOSED/CLOSED closure behavior.
+- Detect-open-handles produced only test-module Prisma pool teardown handles;
+  pool connections are removed and no production lifecycle leak was found.
+  CI retains `--forceExit` as a documented test-only mitigation.
 
-## Gate findings requiring follow-up
+## Dependency review
 
-- Backend ESLint still reports inherited repository-wide errors (150 errors at
-  the first B08 audit, including unused imports, async test doubles, and
-  Jest unbound-method assertions). No global rule was weakened or excluded to
-  hide these errors.
-- Jest tests pass without `--forceExit`, but the process retains open Prisma
-  pool handles from test modules and does not terminate promptly. CI retains
-  `--forceExit` until each module closes its TestingModule/Prisma instance;
-  this is an identified test-lifecycle debt, not a financial-data failure.
-- `npm audit` was run against the public npm registry. Backend and dashboard
-  dependency reports contain high/critical advisories; several fixes require
-  breaking upgrades (Next.js/Swiper/Prisma) and dashboard `xlsx` has no fix.
-  No blind `npm audit fix --force` was run.
-- Dashboard ESLint passes with warnings only. The warnings are existing React
-  Hook Form/compiler compatibility and exhaustive-deps findings.
+- Dashboard production audit: 0 high/critical vulnerabilities.
+- Backend audit: 7 high and 5 moderate findings remain in the public npm
+  report. The high Prisma findings are in the Prisma CLI dev dependency;
+  `nestjs-i18n` reaches `chokidar` only for its disabled-by-default translation
+  file-watch mode; the remaining moderate findings are transitive tooling or
+  Bull's unpatched UUID path. No `npm audit fix --force` was used.
+- These findings are recorded for dependency follow-up; they are not part of
+  the deployed request path under the production configuration.
 
 ## Release decision
 
-The release gate remains **not green** until backend lint errors and the
-dependency/security review are resolved or explicitly accepted by release
-ownership. B08 must not be fast-forwarded to `master` or tagged while these
-release-critical findings remain.
+All B08 application and CI gates are green locally. The branch may be
+fast-forwarded to `master`, pushed, and tagged `v0.1.0-rc1` after the final
+working-tree review. Deployment is intentionally out of scope.

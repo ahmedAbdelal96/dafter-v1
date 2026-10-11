@@ -26,7 +26,6 @@ import {
   TaxRegistrationProfileView,
   TaxTreatmentView,
 } from '../types/tax-setup.types';
-import { TaxDbClient } from './tax-setup-policy.service';
 
 function requireCompanyId(companyId?: string | null): string {
   if (!companyId) {

@@ -34,7 +34,8 @@ export class EnableUserUseCase {
 
     // Already active — idempotent, return current state
     if (user.status === UserStatus.ACTIVE) {
-      const { passwordHash: _removed, ...safeUser } = user;
+    const { passwordHash, ...safeUser } = user;
+    void passwordHash;
       return safeUser;
     }
 

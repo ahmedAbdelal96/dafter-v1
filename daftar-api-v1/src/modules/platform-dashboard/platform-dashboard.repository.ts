@@ -46,11 +46,6 @@ type PlanDistributionRow = {
   revenue: Prisma.Decimal | number | string | null;
 };
 
-type StatusDistributionRow = {
-  status: SubscriptionStatus;
-  count: bigint | number;
-};
-
 @Injectable()
 export class PlatformDashboardRepository {
   constructor(private readonly prisma: PrismaService) {}

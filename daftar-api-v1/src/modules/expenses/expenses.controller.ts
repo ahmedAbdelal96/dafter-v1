@@ -35,7 +35,6 @@ import { PermissionsGuard } from '../../common/guards/permissions.guard';
 
 import { FeatureKey } from '../../common/entitlements/feature-catalog';
 import {
-  ExpensesApiTags,
   CreateExpenseSwagger,
   ListExpensesSwagger,
   GetExpenseSummarySwagger,

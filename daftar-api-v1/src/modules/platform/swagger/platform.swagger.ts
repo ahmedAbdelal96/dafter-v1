@@ -294,10 +294,10 @@ export const UpdatePlanSwagger = () =>
     ApiOperation({
       summary: 'ØªØ­Ø¯ÙŠØ« Ø®Ø·Ø© Ø§Ø´ØªØ±Ø§Ùƒ',
       description: `
-ÙŠÙØ¹Ø¯Ù‘Ù„ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø®Ø·Ø© Ø§Ø´ØªØ±Ø§Ùƒ Ù…ÙˆØ¬ÙˆØ¯Ø©.
+Subscription plan settings for the selected plan.
 
-**âš ï¸ ØªØ­Ø°ÙŠØ±:** ØªØºÙŠÙŠØ± Ø§Ù„Ø­Ø¯ÙˆØ¯ ÙŠØ¤Ø«Ø± Ø¹Ù„Ù‰ Ø§Ù„Ø´Ø±ÙƒØ§Øª Ø§Ù„Ù…Ø´ØªØ±ÙƒØ© Ø­Ø§Ù„ÙŠØ§Ù‹.
-Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø­Ù‚ÙˆÙ„ Ø§Ø®ØªÙŠØ§Ø±ÙŠØ© â€” Ø£Ø±Ø³Ù„ ÙÙ‚Ø· Ù…Ø§ ØªØ±ÙŠØ¯ ØªØºÙŠÙŠØ±Ù‡.
+Warning: changing plan limits affects subscribed companies.
+All fields are optional; send only the values that should change.
       `,
     }),
     ApiBody({ type: UpdatePlanDto }),

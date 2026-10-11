@@ -1,5 +1,3 @@
-import { SetMetadata } from '@nestjs/common';
-
 export const CACHE_KEY_METADATA = 'cache_key';
 export const CACHE_TTL_METADATA = 'cache_ttl';
 export const CACHE_NAMESPACE_METADATA = 'cache_namespace';

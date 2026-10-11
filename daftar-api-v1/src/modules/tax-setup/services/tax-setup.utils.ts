@@ -10,7 +10,9 @@ export function toNullableString(value: unknown): string | null {
     return null;
   }
 
-  return String(value);
+  return typeof value === 'object'
+    ? JSON.stringify(value)
+    : String(value as string | number | boolean | bigint);
 }
 
 export function decimalToString(value: Prisma.Decimal | string | number): string {

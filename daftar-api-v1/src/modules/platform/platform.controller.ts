@@ -480,7 +480,7 @@ export class PlatformController {
   @Get('capabilities')
   @NoSubscriptionCheck(UserRole.SUPER_ADMIN)
   @HttpCode(HttpStatus.OK)
-  async getCapabilities() {
+  getCapabilities() {
     const data = this.platformService.getCapabilities();
     return new ApiResponseDto(data, this.t.translate('common.success'));
   }

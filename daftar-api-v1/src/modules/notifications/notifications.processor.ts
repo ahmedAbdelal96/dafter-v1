@@ -58,7 +58,7 @@ export class NotificationsProcessor {
     // Skip if already sent (idempotency — handles Bull retry edge cases)
     if (notification.sentAt) {
       this.logger.debug(
-        `Notification ${notificationId} already sent at ${notification.sentAt} — skipping`,
+        `Notification ${notificationId} already sent at ${notification.sentAt?.toISOString()} — skipping`,
       );
       return;
     }

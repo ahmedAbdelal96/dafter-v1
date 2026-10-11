@@ -11,7 +11,6 @@ import {
   UserRole,
   UserStatus,
   SubscriptionStatus,
-  Prisma,
 } from '@prisma/client';
 
 @Injectable()
@@ -56,10 +55,12 @@ export class AuthRepository {
   /**
    * Update user's failed login attempts counter
    */
-  async updateLoginAttempts(
+  updateLoginAttempts(
     userId: string,
     data: { failedAttempts: number; lockedUntil: Date | null },
   ) {
+    void userId;
+    void data;
     // We store these in metadata since User model doesn't have these fields.
     // For now, we use a simple approach: store in a JSON or add fields.
     // Since schema doesn't have failedAttempts, we'll handle it in-memory via Redis cache.

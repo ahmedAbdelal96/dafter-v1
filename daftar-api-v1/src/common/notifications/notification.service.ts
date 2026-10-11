@@ -289,7 +289,7 @@ export class NotificationService {
             (await this.cacheService.get<number>(unreadKey, 'notifications')) ||
             0;
         }
-      } catch (e) {
+      } catch {
         unreadCount = notifications.filter((n) => !n.read).length;
       }
 

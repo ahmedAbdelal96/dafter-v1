@@ -32,7 +32,8 @@ export class DisableUserUseCase {
 
     // Already disabled — idempotent, just return current state
     if (user.status === UserStatus.DISABLED) {
-      const { passwordHash: _removed, ...safeUser } = user;
+    const { passwordHash, ...safeUser } = user;
+    void passwordHash;
       return safeUser;
     }
 

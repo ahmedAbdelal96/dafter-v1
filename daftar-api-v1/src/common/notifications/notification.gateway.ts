@@ -9,8 +9,7 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { Logger } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CacheService } from '../cache/cache.service';
 
@@ -44,7 +43,8 @@ export class NotificationGateway
     private cacheService: CacheService,
   ) {}
 
-  afterInit(server: Server): void {
+  afterInit(_server: Server): void {
+    void _server;
     this.logger.log('✅ WebSocket Gateway Initialized');
   }
 
@@ -86,7 +86,7 @@ export class NotificationGateway
     }
   }
 
-  async handleDisconnect(socket: Socket): Promise<void> {
+  handleDisconnect(socket: Socket): void {
     try {
       const userId = socket.handshake.query.userId as string;
 

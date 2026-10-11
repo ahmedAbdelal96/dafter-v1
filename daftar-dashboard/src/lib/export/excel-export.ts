@@ -96,47 +96,30 @@ export async function exportRowsToExcel(
   rows: Record<string, unknown>[],
   options: ExportWorkbookOptions
 ): Promise<void> {
-  const XLSX = await import("xlsx");
-  const workbook = XLSX.utils.book_new();
-  const worksheet = XLSX.utils.json_to_sheet(rows);
-
-  if (options.columnWidths?.length) {
-    worksheet["!cols"] = options.columnWidths.map((width) => ({ wch: width }));
-  }
-
-  XLSX.utils.book_append_sheet(workbook, worksheet, options.sheetName);
-
-  // Keep workbook direction aligned with selected locale for better Arabic readability.
-  if (!workbook.Workbook) workbook.Workbook = {};
-  if (!workbook.Workbook.Views) workbook.Workbook.Views = [];
-  workbook.Workbook.Views[0] = { RTL: options.locale === "ar" };
-
-  const datePart = new Date().toISOString().split("T")[0];
-  const safePrefix = sanitizeFileName(options.filePrefix);
-  XLSX.writeFile(workbook, `${safePrefix}_${datePart}.xlsx`);
+  downloadCsv(rows, options.filePrefix);
 }
 
 export async function exportWorkbookToExcel(
   options: ExportMultiSheetWorkbookOptions,
 ): Promise<void> {
-  const XLSX = await import("xlsx");
-  const workbook = XLSX.utils.book_new();
+  downloadCsv(options.sheets.flatMap((sheet) => sheet.rows), options.filePrefix);
+}
 
-  for (const sheet of options.sheets) {
-    const worksheet = XLSX.utils.json_to_sheet(sheet.rows);
-    if (sheet.columnWidths?.length) {
-      worksheet["!cols"] = sheet.columnWidths.map((width) => ({ wch: width }));
-    }
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheet.sheetName);
-  }
+function downloadCsv(rows: Record<string, unknown>[], filePrefix: string): void {
+  const columns = [...new Set(rows.flatMap((row) => Object.keys(row)))];
+  const lines = [columns.map(csvCell).join(","), ...rows.map((row) => columns.map((column) => csvCell(row[column])).join(","))];
+  const blob = new Blob([`\uFEFF${lines.join("\r\n")}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `${sanitizeFileName(filePrefix)}_${new Date().toISOString().split("T")[0]}.csv`;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
 
-  if (!workbook.Workbook) workbook.Workbook = {};
-  if (!workbook.Workbook.Views) workbook.Workbook.Views = [];
-  workbook.Workbook.Views[0] = { RTL: options.locale === "ar" };
-
-  const datePart = new Date().toISOString().split("T")[0];
-  const safePrefix = sanitizeFileName(options.filePrefix);
-  XLSX.writeFile(workbook, `${safePrefix}_${datePart}.xlsx`);
+function csvCell(value: unknown): string {
+  const text = value === null || value === undefined ? "" : typeof value === "object" ? JSON.stringify(value) : String(value);
+  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
 function sanitizeFileName(input: string): string {

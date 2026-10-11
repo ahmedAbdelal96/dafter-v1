@@ -112,7 +112,7 @@ export class EntitlementsController {
       'Use this to populate feature selectors when creating or editing plans.',
   })
   @ApiResponse({ status: 200, description: 'Feature catalog returned' })
-  async getFeatureCatalog() {
+  getFeatureCatalog() {
     return new ApiResponseDto(
       {
         version:  FEATURE_CATALOG_VERSION,

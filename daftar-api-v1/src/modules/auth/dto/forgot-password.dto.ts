@@ -13,7 +13,7 @@ export class ForgotPasswordDto {
   @IsNotEmpty({ message: 'البريد الإلكتروني أو رقم الهاتف مطلوب' })
   // Allow email OR international phone starting with +
   @Matches(
-    /^([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})|(\+[1-9]\d{7,14})$/,
+    /^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})|(\+[1-9]\d{7,14})$/,
     {
       message: 'يجب إدخال بريد إلكتروني صالح أو رقم هاتف دولي يبدأ بـ +',
     },

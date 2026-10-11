@@ -4,7 +4,6 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
-  Inject,
   Optional,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
@@ -112,7 +111,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const user = (request as any).user;
 
-    if (status >= 500) {
+    const numericStatus = Number(status);
+    if (numericStatus >= 500) {
       this.logger.error(
         logMessage,
         exception instanceof Error ? exception.stack : undefined,
@@ -140,7 +140,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           },
         });
       }
-    } else if (status >= 400) {
+    } else if (numericStatus >= 400) {
       this.logger.warn(logMessage);
     }
 

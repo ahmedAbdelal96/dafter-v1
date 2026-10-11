@@ -21,7 +21,8 @@ export class GetUserUseCase {
     }
 
     // Strip passwordHash before returning
-    const { passwordHash: _removed, ...safeUser } = user;
+    const { passwordHash, ...safeUser } = user;
+    void passwordHash;
     return safeUser;
   }
 }

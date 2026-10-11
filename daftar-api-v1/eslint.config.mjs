@@ -42,4 +42,15 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ['**/*.spec.ts'],
+    rules: {
+      // Jest mock factories and assertion references intentionally use async
+      // signatures and detached mock methods; these are test harness patterns,
+      // not production promise or receiver-safety violations.
+      '@typescript-eslint/require-await': 'off',
+      '@typescript-eslint/unbound-method': 'off',
+      '@typescript-eslint/no-misused-promises': 'off',
+    },
+  },
 );

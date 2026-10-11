@@ -73,7 +73,7 @@ export class PushService {
     // ── Step 1: Validate tokens ─────────────────────────────────────────
     const validTokens = tokens.filter((token) => {
       if (!Expo.isExpoPushToken(token)) {
-        this.logger.warn(`Skipping invalid Expo push token: ${token}`);
+        this.logger.warn(`Skipping invalid Expo push token: ${String(token)}`);
         return false;
       }
       return true;

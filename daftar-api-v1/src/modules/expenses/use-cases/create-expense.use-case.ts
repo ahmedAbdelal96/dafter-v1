@@ -7,7 +7,7 @@
 //      b. AuditLog { action: 'expense.create' }
 // ============================================================
 
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ExpensesRepository } from '../expenses.repository';
 import { CreateExpenseDto } from '../dto';
 import { TranslationService } from '../../../common/services/translation.service';

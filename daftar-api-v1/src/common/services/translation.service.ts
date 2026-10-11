@@ -50,7 +50,7 @@ export class TranslationService {
         lang: this.lang,
         args,
       });
-    } catch (error) {
+    } catch {
       // If the key doesn't exist in the JSON files, return the key itself
       // so callers still get a human-readable string rather than undefined.
       return key;

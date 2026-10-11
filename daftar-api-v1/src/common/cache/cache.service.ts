@@ -34,7 +34,7 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
 
   constructor(private configService: ConfigService) {}
 
-  async onModuleInit(): Promise<void> {
+  onModuleInit(): void {
     try {
       const redisUrl =
         this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379';

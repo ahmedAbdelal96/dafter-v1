@@ -3,6 +3,11 @@ import { Injectable, LoggerService as NestLoggerService } from '@nestjs/common';
 import * as winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 
+function formatContext(value: unknown): string {
+  if (value !== null && typeof value === 'object') return JSON.stringify(value);
+  return typeof value === 'string' ? value : String(value as string | number | boolean | bigint);
+}
+
 /**
  * AppLoggerService
  * - Centralized logging using Winston
@@ -35,7 +40,7 @@ export class AppLoggerService implements NestLoggerService {
       winston.format.splat(),
       winston.format.printf(
         ({ timestamp, level, message, context, ...meta }) => {
-          const ctx = context ? `[${String(context)}]` : '';
+          const ctx = context ? `[${formatContext(context)}]` : '';
           const metaStr = Object.keys(meta).length
             ? ` | ${JSON.stringify(meta)}`
             : '';
@@ -71,7 +76,7 @@ export class AppLoggerService implements NestLoggerService {
               break;
           }
 
-          const ctx = context ? `[${String(context)}]` : '';
+          const ctx = context ? `[${formatContext(context)}]` : '';
           const metaStr = Object.keys(meta).length
             ? ` | ${JSON.stringify(meta)}`
             : '';

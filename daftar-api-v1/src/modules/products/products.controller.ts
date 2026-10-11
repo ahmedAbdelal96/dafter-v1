@@ -32,7 +32,6 @@ import {
 import { RequireFeature } from '../../common/decorators/require-feature.decorator';
 import { FeatureKey } from '../../common/entitlements/feature-catalog';
 import {
-  ProductsApiTags,
   CreateProductSwagger,
   ListProductsSwagger,
   GetProductSwagger,

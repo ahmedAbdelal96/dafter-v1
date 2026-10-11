@@ -131,7 +131,7 @@ export class EntitlementService {
     // Fail-closed on unknown keys — prevents typos from bypassing gates
     if (!isValidFeatureKey(featureKey)) {
       this.logger.error(
-        `Unknown feature key requested: "${featureKey}" for company ${companyId}`,
+        `Unknown feature key requested: "${String(featureKey)}" for company ${companyId}`,
       );
       return false;
     }

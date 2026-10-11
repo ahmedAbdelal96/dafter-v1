@@ -31,7 +31,6 @@ import { ProtectedRead } from '../../../common/decorators/subscription.decorator
 import type { AuthenticatedUser } from '../../../common/types';
 import {
   CreateTaxRateDto,
-  CreateTaxRegistrationProfileDto,
   CreateTaxTreatmentDto,
   TaxRateSearchQueryDto,
   TaxSetupQueryDto,

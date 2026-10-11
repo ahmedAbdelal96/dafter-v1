@@ -13,7 +13,6 @@
 import {
   Injectable,
   Logger,
-  BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -244,10 +243,11 @@ export class FileUploadService {
    * Process images (resize, compress)
    * Note: لتفعيل معالجة الصور المتقدمة، قم بتثبيت sharp: npm install sharp
    */
-  private async processImage(
+  private processImage(
     file: MulterFile,
-    options: UploadOptions,
+    _options: UploadOptions,
   ): Promise<MulterFile> {
+    void _options;
     try {
       // الحالي: نستخدم الملف الأصلي كما هو
       // للمستقبل: يمكن دمج sharp أو ImageMagick للمعالجة المتقدمة
@@ -283,10 +283,12 @@ export class FileUploadService {
         break;
       case 'original':
       default:
-        const sanitized = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
-        storedName = options.preserveOriginalName
-          ? sanitized
-          : `${Date.now()}-${sanitized}`;
+        {
+          const sanitized = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+          storedName = options.preserveOriginalName
+            ? sanitized
+            : `${Date.now()}-${sanitized}`;
+        }
     }
 
     // 2. إنشاء المسار الكامل

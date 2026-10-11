@@ -6,6 +6,7 @@ export default defineConfig([
   ...nextConfig,
   globalIgnores([
     '.next/**',
+    '.next-stale-b08/**',
     'out/**',
     'build/**',
     'artifacts/**',

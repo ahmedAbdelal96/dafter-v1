@@ -85,7 +85,8 @@ export class CreateStaffUseCase {
       );
     });
 
-    const { passwordHash: _removed, ...safeUser } = user;
+    const { passwordHash: storedPasswordHash, ...safeUser } = user;
+    void storedPasswordHash;
     return safeUser;
   }
 }

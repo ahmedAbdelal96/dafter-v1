@@ -59,21 +59,7 @@ jobs:
         run: npx prisma generate
 
       - name: Lint
-        run: >-
-          npx eslint
-          "src/modules/accounting/**/*.ts"
-          "src/modules/business-partners/**/*.ts"
-          "src/modules/sales/**/*.ts"
-          "src/modules/payment-terms/**/*.ts"
-          "src/modules/accounting-bootstrap/**/*.ts"
-          "src/modules/opening-balances/**/*.ts"
-          "src/modules/customer-payments/**/*.ts"
-          "src/modules/supplier-payments/**/*.ts"
-          "src/modules/purchases/**/*.ts"
-          "src/common/types/auth.types.ts"
-          "src/common/entitlements/feature-policy.manifest.ts"
-          "src/app.module.ts"
-          --max-warnings=0
+        run: npm run lint
 
       - name: Type-check
         run: npx tsc --noEmit -p tsconfig.build.json
@@ -132,9 +118,11 @@ jobs:
             echo 'Unexpected Prisma migration/schema additions or changes:'
             exit 1
           fi
-          expected_partial_indexes=$(grep -Ec \
-            '  \[-\] Removed unique index on columns \(companyId, businessPartnerId, addressType\)|  \[-\] Removed unique index on columns \(companyId, businessPartnerId\)' \
-            /tmp/prisma-migration-diff.txt || true)
+          expected_partial_indexes=$(awk '
+            /  \[-\] Removed unique index on columns \(companyId, businessPartnerId, addressType\)/ { count++ }
+            /  \[-\] Removed unique index on columns \(companyId, businessPartnerId\)$/ { count++ }
+            END { print count + 0 }
+          ' /tmp/prisma-migration-diff.txt)
           if [ "$expected_partial_indexes" -ne 2 ]; then
             echo 'Expected exactly two partial-index representation differences.'
             exit 1

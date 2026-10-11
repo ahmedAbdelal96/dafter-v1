@@ -1,11 +1,9 @@
 /**
- * Excel Export Utilities
+ * CSV Export Utilities
  * 
- * Utilities for exporting table data to Excel format.
+ * Utilities for exporting table data to CSV format.
  * Supports customizable columns, formatting, and RTL content.
  * 
- * Uses SheetJS (xlsx) library for Excel generation.
- * Install: npm install xlsx
  * 
  * @author Senior Development Team
  */
@@ -13,12 +11,12 @@
 import type { ColumnDef } from './types';
 
 /**
- * Export data to Excel file
+ * Export data to CSV file
  * 
  * @param data - Array of data objects to export
  * @param columns - Column definitions for headers and formatting
  * @param filename - Output filename (without extension)
- * @param sheetName - Excel sheet name (default: 'Data')
+ * @param sheetName - Retained for API compatibility.
  */
 export async function exportToExcel<T = any>(
   data: T[],
@@ -27,9 +25,6 @@ export async function exportToExcel<T = any>(
   sheetName: string = 'Data'
 ): Promise<void> {
   try {
-    // Dynamically import xlsx to reduce bundle size
-    const XLSX = await import('xlsx');
-    
     // Transform data based on column definitions
     const transformedData = data.map((row) => {
       const transformedRow: Record<string, any> = {};
@@ -48,38 +43,23 @@ export async function exportToExcel<T = any>(
           value = (row as any)[column.id];
         }
         
-        // Format value for Excel
-        transformedRow[header] = formatValueForExcel(value);
+        transformedRow[header] = formatValueForCsv(value);
       });
       
       return transformedRow;
     });
     
-    // Create worksheet from data
-    const worksheet = XLSX.utils.json_to_sheet(transformedData);
-    
-    // Set column widths based on content
-    const columnWidths = columns.map((column) => {
-      const header = typeof column.header === 'string' ? column.header : column.id;
-      return { wch: Math.max(header.length, 15) };
-    });
-    worksheet['!cols'] = columnWidths;
-    
-    // Create workbook
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-    
-    // Set workbook properties for RTL support
-    if (!workbook.Workbook) workbook.Workbook = {};
-    if (!workbook.Workbook.Views) workbook.Workbook.Views = [];
-    workbook.Workbook.Views[0] = { RTL: isRTL() };
-    
-    // Generate filename with timestamp
+    const headers = columns.map((column) => typeof column.header === 'string' ? column.header : column.id);
+    const lines = [headers.map(csvCell).join(','), ...transformedData.map((row) => headers.map((header) => csvCell(row[header])).join(','))];
     const timestamp = new Date().toISOString().slice(0, 10);
-    const fullFilename = `${filename}_${timestamp}.xlsx`;
-    
-    // Write file
-    XLSX.writeFile(workbook, fullFilename);
+    const fullFilename = `${filename}_${timestamp}.csv`;
+    const blob = new Blob([`\uFEFF${lines.join('\r\n')}`], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = fullFilename;
+    anchor.click();
+    URL.revokeObjectURL(url);
     
     console.log(`✅ Exported ${data.length} rows to ${fullFilename}`);
   } catch (error) {
@@ -92,7 +72,7 @@ export async function exportToExcel<T = any>(
  * Format value for Excel cell
  * Handles different data types appropriately
  */
-function formatValueForExcel(value: any): any {
+function formatValueForCsv(value: any): any {
   // Handle null/undefined
   if (value === null || value === undefined) {
     return '';
@@ -125,6 +105,11 @@ function formatValueForExcel(value: any): any {
   
   // Return as-is for primitives
   return value;
+}
+
+function csvCell(value: unknown): string {
+  const text = value === null || value === undefined ? '' : String(value);
+  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
 /**
