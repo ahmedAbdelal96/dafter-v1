@@ -10,7 +10,7 @@ describe('TaxSetupPolicyService', () => {
       taxAccountBinding: { upsert: jest.fn(), findUnique: jest.fn() },
       taxModuleApplicabilityRule: { upsert: jest.fn(), findMany: jest.fn() },
     } as any;
-    return new TaxSetupPolicyService(prisma as any);
+    return new TaxSetupPolicyService(prisma);
   }
 
   it('builds a normalized rate code and rejects duplicates', async () => {

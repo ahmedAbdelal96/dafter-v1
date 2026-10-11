@@ -57,7 +57,7 @@ describe('EnableUserUseCase', () => {
     }).compile();
 
     useCase = module.get<EnableUserUseCase>(EnableUserUseCase);
-    repo = module.get(UsersRepository) as jest.Mocked<UsersRepository>;
+    repo = module.get(UsersRepository);
   });
 
   afterEach(() => jest.clearAllMocks());

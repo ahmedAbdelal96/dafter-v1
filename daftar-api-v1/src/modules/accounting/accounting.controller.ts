@@ -138,7 +138,8 @@ export class AccountingController {
   }
 
   @Patch('fiscal-years/:id/status')
-  @OwnerOnly()
+  @UseGuards(PermissionsGuard)
+  @RequirePermissions('manageFinanceClosure')
   async changeFiscalYearStatus(
     @CurrentTenant() companyId: string,
     @CurrentUser() user: AuthenticatedUser,
@@ -182,7 +183,8 @@ export class AccountingController {
   }
 
   @Patch('periods/:id/status')
-  @OwnerOnly()
+  @UseGuards(PermissionsGuard)
+  @RequirePermissions('manageFinanceClosure')
   async changePeriodStatus(
     @CurrentTenant() companyId: string,
     @CurrentUser() user: AuthenticatedUser,

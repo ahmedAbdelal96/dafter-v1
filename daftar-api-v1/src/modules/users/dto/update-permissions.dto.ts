@@ -175,6 +175,16 @@ export class UpdatePermissionsDto {
   @IsBoolean()
   viewReports?: boolean;
 
+  @ApiPropertyOptional({ example: true, description: 'View authoritative financial reports.' })
+  @IsOptional()
+  @IsBoolean()
+  viewFinancialReports?: boolean;
+
+  @ApiPropertyOptional({ example: false, description: 'Close or reopen accounting periods.' })
+  @IsOptional()
+  @IsBoolean()
+  manageFinanceClosure?: boolean;
+
   @ApiPropertyOptional({
     example: true,
     description: 'View tax setup screens.',

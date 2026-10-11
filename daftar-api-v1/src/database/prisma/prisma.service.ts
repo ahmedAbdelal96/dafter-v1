@@ -28,12 +28,13 @@ export class PrismaService
 
     // Create PostgreSQL connection pool with optimized settings
     // Configured for production-ready multi-tenant SaaS with 1000+ centers
+    const isTest = process.env.NODE_ENV === 'test';
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       // Connection pool settings
-      max: parseInt(process.env.DB_POOL_MAX || '20', 10), // Max connections
-      min: parseInt(process.env.DB_POOL_MIN || '5', 10), // Min connections
-      idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || '30000', 10), // 30s
+      max: parseInt(process.env.DB_POOL_MAX || (isTest ? '5' : '20'), 10), // Max connections
+      min: parseInt(process.env.DB_POOL_MIN || (isTest ? '0' : '5'), 10), // Min connections
+      idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || (isTest ? '1000' : '30000'), 10), // 30s
       connectionTimeoutMillis: parseInt(
         process.env.DB_CONNECTION_TIMEOUT || '10000',
         10,

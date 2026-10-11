@@ -33,6 +33,8 @@ function mapPermissions(dto: UpdatePermissionsDto): StaffPermissionsMap {
     viewLedger: dto.viewLedger ?? false,
     manageLedger: dto.manageLedger ?? false,
     viewReports: dto.viewReports ?? false,
+    viewFinancialReports: dto.viewFinancialReports ?? false,
+    manageFinanceClosure: dto.manageFinanceClosure ?? false,
     'tax_setup.view': dto.taxSetupView ?? false,
     'tax_setup.manage_registration_profile':
       dto.taxSetupManageRegistrationProfile ?? false,

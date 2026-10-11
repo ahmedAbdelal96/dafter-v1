@@ -109,7 +109,7 @@ export function isValidFeatureKey(key: string): key is FeatureKey {
  * Logs a warning for any unknown keys (helps catch DB drift).
  */
 export function filterValidFeatureKeys(keys: string[]): FeatureKey[] {
-  return keys.filter((k) => isValidFeatureKey(k)) as FeatureKey[];
+  return keys.filter((k) => isValidFeatureKey(k));
 }
 
 // ── Default Plan Feature Matrices ────────────────────────────────────────────

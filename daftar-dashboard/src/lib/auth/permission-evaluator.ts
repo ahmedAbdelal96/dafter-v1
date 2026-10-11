@@ -71,6 +71,8 @@ const LEGACY_PERMISSION_TO_BACKEND_FLAG: Record<string, keyof StaffPermissionsMa
 
   "reports:view": "viewReports",
   "reports:export": "viewReports",
+  "financialReports:view": "viewFinancialReports",
+  "financeClosure:manage": "manageFinanceClosure",
 
   "users:view": "manageUsers",
   "users:create": "manageUsers",

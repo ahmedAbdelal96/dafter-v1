@@ -41,9 +41,9 @@ describe('CreateStaffUseCase', () => {
     }).compile();
 
     useCase = module.get(CreateStaffUseCase);
-    repo = module.get(UsersRepository) as jest.Mocked<UsersRepository>;
-    entitlement = module.get(EntitlementService) as unknown as { assertQuota: jest.Mock };
-    prisma = module.get(PrismaService) as unknown as { $transaction: jest.Mock };
+    repo = module.get(UsersRepository);
+    entitlement = module.get(EntitlementService);
+    prisma = module.get(PrismaService);
   });
 
   it('creates staff when under quota and passes tx', async () => {
