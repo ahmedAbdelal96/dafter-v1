@@ -52,6 +52,8 @@ export interface StaffPermissionsMap {
   viewLedger?: boolean;
   manageLedger?: boolean;
   viewReports?: boolean;
+  viewFinancialReports?: boolean;
+  manageFinanceClosure?: boolean;
   createInvoice?: boolean;
   editDraft?: boolean;
   approveInvoice?: boolean;

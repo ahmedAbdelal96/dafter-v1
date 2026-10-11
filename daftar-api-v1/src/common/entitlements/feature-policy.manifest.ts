@@ -37,4 +37,5 @@ export const CONTROLLER_FEATURE_POLICY: Record<
   'purchases/supplier-credit-note.controller.ts': 'role-guarded',
   'tax-setup/controllers/tax-setup.controller.ts': 'role-guarded',
   'users/users.controller.ts': 'role-guarded',
+  'financial-reports/financial-reports.controller.ts': 'role-guarded',
 };

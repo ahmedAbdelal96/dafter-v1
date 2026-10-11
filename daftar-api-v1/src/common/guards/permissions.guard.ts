@@ -38,8 +38,9 @@ export class PermissionsGuard implements CanActivate {
       throw new ForbiddenException('Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ Ø£ÙŠ ØµÙ„Ø§Ø­ÙŠØ§Øª');
     }
 
-    const hasAllPermissions = requiredPermissions.every(
-      (perm) => user.permissions?.[perm] === true,
+    const hasAllPermissions = requiredPermissions.every((perm) =>
+      user.permissions?.[perm] === true ||
+      (perm === 'viewFinancialReports' && user.permissions?.viewReports === true),
     );
 
     if (!hasAllPermissions) {

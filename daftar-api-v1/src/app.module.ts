@@ -76,6 +76,7 @@ import { OpeningBalancesModule } from './modules/opening-balances/opening-balanc
 import { CustomerPaymentModule } from './modules/customer-payments/customer-payment.module';
 import { SupplierPaymentModule } from './modules/supplier-payments/supplier-payment.module';
 import { PurchasesModule } from './modules/purchases/purchases.module';
+import { FinancialReportsModule } from './modules/financial-reports/financial-reports.module';
 
 @Module({
   imports: [
@@ -177,6 +178,7 @@ import { PurchasesModule } from './modules/purchases/purchases.module';
     CustomerPaymentModule,
     SupplierPaymentModule,
     PurchasesModule,
+    FinancialReportsModule,
   ],
   controllers: [AppController],
   providers: [

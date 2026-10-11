@@ -256,6 +256,18 @@ export const API_ENDPOINTS = {
     simpleLedger: "/reports/simple-ledger",
   },
 
+  financialReports: {
+    generalLedger: "/financial-reports/general-ledger",
+    trialBalance: "/financial-reports/trial-balance",
+    profitLoss: "/financial-reports/profit-loss",
+    balanceSheet: "/financial-reports/balance-sheet",
+    arAging: "/financial-reports/ar-aging",
+    apAging: "/financial-reports/ap-aging",
+    customerStatement: "/financial-reports/customer-statement",
+    supplierStatement: "/financial-reports/supplier-statement",
+    periodClose: "/financial-reports/period-close-readiness",
+  },
+
   taxSetup: {
     registrationProfile: "/tax-registration-profile",
     taxRates: "/tax-rates",
